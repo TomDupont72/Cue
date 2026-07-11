@@ -1,17 +1,18 @@
-import Fastify from "fastify"
-import { env } from "@/config/env.js"
-import { tmdbGet } from "@/external/tmdb/tmdb.client.js"
-import { logger } from "@/logger/logger.js"
+import Fastify from "fastify";
+import { env } from "@/config/env.js";
+import { logger } from "@/logger/logger.js";
+import { searchSeries } from "./external/tmdb/series.tmdb.js";
 
 const app = Fastify({
-  loggerInstance: logger,
-})
+  loggerInstance: logger
+});
 
 app.get("/health", async () => {
-  return { status: "ok" }
-})
+  console.log(await searchSeries("one", 2));
+  return { status: "ok" };
+});
 
 await app.listen({
   port: Number(env.PORT),
-  host: env.HOST,
-})
+  host: env.HOST
+});

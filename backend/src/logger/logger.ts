@@ -11,8 +11,8 @@ export const logger = pino({
           options: {
             colorize: true,
             translateTime: "SYS:standard",
-            ignore: "pid,hostname",
-          },
+            ignore: "pid,hostname"
+          }
         }
       : undefined,
 
@@ -26,8 +26,8 @@ export const logger = pino({
       "authorization",
       "headers.authorization",
       "cookie",
-      "headers.cookie",
+      "headers.cookie"
     ],
-    censor: "[REDACTED]",
-  },
+    censor: "[REDACTED]"
+  }
 });
