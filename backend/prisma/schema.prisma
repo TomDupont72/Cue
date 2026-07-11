@@ -13,15 +13,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String  @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+  series   UserSeries[]
+  episodes UserEpisode[]
 
   @@unique([email])
   @@map("user")
@@ -97,6 +101,7 @@ model Series {
   genres   SeriesGenre[]
   peoples  SeriesPeople[]
   networks SeriesNetwork[]
+  users    UserSeries[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -138,6 +143,7 @@ model Episode {
 
   characters EpisodeCharacter[]
   peoples    EpisodePeople[]
+  users      UserEpisode[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -259,4 +265,40 @@ model EpisodeCharacter {
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@id([episodeId, characterId])
+}
+
+model UserSeries {
+  userId   String
+  seriesId Int
+
+  status        UserSeriesStatus @default(PLANNED)
+  isFavorite    Boolean          @default(false)
+  addedAt       DateTime         @default(now())
+  lastWatchedAt DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@id([userId, seriesId])
+}
+
+enum UserSeriesStatus {
+  PLANNED
+  WATCHING
+  COMPLETED
+  DROPPED
+  PAUSED
+}
+
+model UserEpisode {
+  userId    String
+  episodeId Int
+
+  watched   Boolean   @default(false)
+  watchedAt DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, episodeId])
 }
