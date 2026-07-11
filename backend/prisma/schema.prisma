@@ -74,3 +74,189 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+model Series {
+  id               Int       @id @default(autoincrement())
+  adult            Boolean
+  backdropPath     String?
+  firstAirDate     DateTime?
+  tmdbId           Int       @unique
+  inProduction     Boolean
+  name             String
+  nextEpisodeToAir DateTime?
+  numberOfEpisodes Int
+  numberOfSeasons  Int
+  originalLanguage String
+  originalName     String
+  overview         String?
+  popularity       Float
+  posterPath       String?
+
+  seasons  Season[]
+  episodes Episode[]
+  genres   SeriesGenre[]
+  peoples  SeriesPeople[]
+  networks SeriesNetwork[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Season {
+  id           Int       @id @default(autoincrement())
+  seriesId     Int
+  airDate      DateTime?
+  name         String
+  overview     String?
+  tmdbId       Int       @unique
+  posterPath   String?
+  seasonNumber Int
+  voteAverage  Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  episodes Episode[]
+
+  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@unique([seriesId, seasonNumber])
+}
+
+model Episode {
+  id            Int       @id @default(autoincrement())
+  seriesId      Int
+  seasonId      Int
+  airDate       DateTime?
+  episodeNumber Int
+  name          String
+  overview      String?
+  tmdbId        Int       @unique
+  stillPath     String?
+  seasonNumber  Int
+  voteAverage   Float
+
+  characters EpisodeCharacter[]
+  peoples    EpisodePeople[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  season Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@unique([seriesId, seasonNumber, episodeNumber])
+}
+
+model Genre {
+  id     Int    @id @default(autoincrement())
+  tmdbId Int    @unique
+  name   String
+
+  series SeriesGenre[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SeriesGenre {
+  seriesId Int
+  genreId  Int
+
+  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  genre  Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([seriesId, genreId])
+}
+
+model People {
+  id                 Int       @id @default(autoincrement())
+  adult              Boolean
+  biography          String?
+  birthday           DateTime
+  deathday           DateTime?
+  gender             Int
+  homepage           String?
+  tmdbId             Int       @unique
+  knownForDepartment String
+  name               String
+  placeOfBirth       String
+  popularity         Float
+  profilePath        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  characters Character[]
+  series     SeriesPeople[]
+  episodes   EpisodePeople[]
+}
+
+model SeriesPeople {
+  seriesId Int
+  peopleId Int
+
+  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  people People @relation(fields: [peopleId], references: [id], onDelete: Cascade)
+
+  @@id([seriesId, peopleId])
+}
+
+model Network {
+  id           Int     @id @default(autoincrement())
+  headquarters String
+  homepage     String?
+  tmdbId       Int     @unique
+  logoPath     String?
+  name         String
+
+  series SeriesNetwork[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SeriesNetwork {
+  seriesId  Int
+  networkId Int
+
+  series  Series  @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  network Network @relation(fields: [networkId], references: [id], onDelete: Cascade)
+
+  @@id([seriesId, networkId])
+}
+
+model Character {
+  id       Int    @id @default(autoincrement())
+  peopleId Int
+  name     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  episodes EpisodeCharacter[]
+
+  people People @relation(fields: [peopleId], references: [id], onDelete: Cascade)
+
+  @@unique([peopleId, name])
+}
+
+model EpisodePeople {
+  episodeId Int
+  peopleId  Int
+
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  people  People  @relation(fields: [peopleId], references: [id], onDelete: Cascade)
+
+  @@id([episodeId, peopleId])
+}
+
+model EpisodeCharacter {
+  episodeId   Int
+  characterId Int
+
+  episode   Episode   @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([episodeId, characterId])
+}
