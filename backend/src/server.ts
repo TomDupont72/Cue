@@ -1,14 +1,14 @@
 import Fastify from "fastify";
 import { env } from "@/config/env.js";
 import { logger } from "@/logger/logger.js";
-import { tvDetails } from "./external/tmdb/tv-details.tmdb.js";
+import { seasonDetails } from "./external/tmdb/season-details.tmdb.js";
 
 const app = Fastify({
   loggerInstance: logger
 });
 
 app.get("/health", async () => {
-  console.log(await tvDetails(42009));
+  console.log(await seasonDetails(42009, 2));
   return { status: "ok" };
 });
 

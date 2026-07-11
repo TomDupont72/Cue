@@ -1,10 +1,12 @@
 import { z } from "zod";
-import { tmdbTvDetailsSchema, tmdbTvSearchResponseSchema } from "@/external/tmdb/modules.tmdb.js";
+import {
+  tmdbSeasonDetailsSchema,
+  tmdbTvDetailsSchema,
+  tmdbTvSearchSchema
+} from "./modules.tmdb.js";
 
-export type TmdbTvSearchResponse = z.infer<
-  typeof tmdbTvSearchResponseSchema
->;
+export type TmdbTvSearchResponse = z.infer<typeof tmdbTvSearchSchema>;
 
-export type TmdbTvDetailsResponse = z.infer<
-    typeof tmdbTvDetailsSchema
->;
+export type TmdbTvDetailsResponse = z.infer<typeof tmdbTvDetailsSchema>;
+
+export type TmdbSeasonDetailsResponse = z.infer<typeof tmdbSeasonDetailsSchema>;

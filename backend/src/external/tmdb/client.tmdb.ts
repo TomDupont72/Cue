@@ -6,7 +6,11 @@ const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
 type QueryParams = Record<string, string | number | boolean | undefined>;
 
-export async function tmdbGet<T>(path: string, schema: z.ZodSchema<T>, params: QueryParams = {}): Promise<T> {
+export async function tmdbGet<T>(
+  path: string,
+  schema: z.ZodSchema<T>,
+  params: QueryParams = {}
+): Promise<T> {
   const url = new URL(`${TMDB_BASE_URL}${path}`);
 
   for (const [key, value] of Object.entries(params)) {
