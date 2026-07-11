@@ -4,7 +4,7 @@ import {
   tmdbSeasonDetailsSchema,
   tmdbTvDetailsSchema,
   tmdbTvSearchSchema
-} from "./modules.tmdb.js";
+} from "./tmdb.schemas.js";
 
 export type TmdbTvSearchResponse = z.infer<typeof tmdbTvSearchSchema>;
 
