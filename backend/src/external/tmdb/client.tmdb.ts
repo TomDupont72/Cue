@@ -1,11 +1,12 @@
 import { env } from "@/config/env.js";
 import { logger } from "@/logger/logger.js";
+import z from "zod";
 
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
 type QueryParams = Record<string, string | number | boolean | undefined>;
 
-export async function tmdbGet<T>(path: string, params: QueryParams = {}): Promise<T> {
+export async function tmdbGet<T>(path: string, schema: z.ZodSchema<T>, params: QueryParams = {}): Promise<T> {
   const url = new URL(`${TMDB_BASE_URL}${path}`);
 
   for (const [key, value] of Object.entries(params)) {
@@ -37,5 +38,7 @@ export async function tmdbGet<T>(path: string, params: QueryParams = {}): Promis
     throw new Error(`TMDB_REQUEST_FAILED_${response.status}`);
   }
 
-  return response.json() as Promise<T>;
+  const data = await response.json();
+
+  return schema.parse(data);
 }
