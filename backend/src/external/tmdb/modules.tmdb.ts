@@ -20,7 +20,7 @@ export const tmdbTvSearchSchema = z.object({
 });
 
 const tmdbTvDetailsCreatedByItemSchema = z.object({
-  id: z.number(),
+  id: z.number()
 });
 
 const tmdbTvDetailsGenresItemSchema = z.object({
@@ -67,23 +67,23 @@ export const tmdbSeasonDetailsSchema = z.object({
 });
 
 const tmdbEpisodeDetailsCrewSchema = z.object({
-    id: z.number(),
-})
+  id: z.number()
+});
 
 const tmdbEpisodeDetailsGuestStarSchema = z.object({
-    character: z.string(),
-    id: z.number()
-})
+  character: z.string(),
+  id: z.number()
+});
 
 export const tmdbEpisodeDetailsSchema = z.object({
-    air_date: z.string().optional().default(""),
-    crew: z.array(tmdbEpisodeDetailsCrewSchema),
-    episode_number: z.number(),
-    guest_stars: z.array(tmdbEpisodeDetailsGuestStarSchema),
-    name: z.string(),
-    overview: z.string().default(""),
-    id: z.number(),
-    still_path: z.string().nullable(),
-    season_number: z.number(),
-    vote_average: z.number(),
-})
+  air_date: z.string().optional().default(""),
+  crew: z.array(tmdbEpisodeDetailsCrewSchema),
+  episode_number: z.number(),
+  guest_stars: z.array(tmdbEpisodeDetailsGuestStarSchema),
+  name: z.string(),
+  overview: z.string().default(""),
+  id: z.number(),
+  still_path: z.string().nullable(),
+  season_number: z.number(),
+  vote_average: z.number()
+});

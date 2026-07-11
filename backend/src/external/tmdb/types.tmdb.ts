@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-    tmdbEpisodeDetailsSchema,
+  tmdbEpisodeDetailsSchema,
   tmdbSeasonDetailsSchema,
   tmdbTvDetailsSchema,
   tmdbTvSearchSchema
