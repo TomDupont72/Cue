@@ -1,6 +1,6 @@
-import { tmdbGet } from "./client.tmdb.js";
-import { tmdbSeasonDetailsSchema } from "./modules.tmdb.js";
-import { TmdbSeasonDetailsResponse } from "./types.tmdb.js";
+import { tmdbGet } from "./tmdb.client.js";
+import { tmdbSeasonDetailsSchema } from "./tmdb.schemas.js";
+import { TmdbSeasonDetailsResponse } from "./tmdb.types.js";
 
 export async function seasonDetails(
   seriesId: number,
