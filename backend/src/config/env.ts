@@ -1,4 +1,4 @@
-import "dotenv/config"
+import "dotenv/config";
 import { z } from "zod";
 
 const envSchema = z.object({
@@ -11,7 +11,7 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.string().min(1),
   CLIENT_ORIGIN: z.string().min(1),
   TMDB_API_TOKEN: z.string().min(32),
-  TMDB_API_KEY: z.string().min(16),
+  TMDB_API_KEY: z.string().min(16)
 });
 
 export const env = envSchema.parse(process.env);
