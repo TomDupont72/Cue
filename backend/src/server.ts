@@ -1,8 +1,10 @@
 import Fastify from "fastify"
 import { env } from "@/config/env.js"
+import { tmdbGet } from "@/external/tmdb/tmdb.client.js"
+import { logger } from "@/logger/logger.js"
 
 const app = Fastify({
-  logger: true,
+  loggerInstance: logger,
 })
 
 app.get("/health", async () => {
