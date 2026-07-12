@@ -138,6 +138,7 @@ model Episode {
   overview      String?
   tmdbId        Int       @unique
   stillPath     String?
+  runtime       Int
   seasonNumber  Int
   voteAverage   Float
 
