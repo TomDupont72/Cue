@@ -5,13 +5,14 @@ import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { authRoutes } from "./modules/auth/auth.routes.js";
 import {
-    jsonSchemaTransform,
+  jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
-  type ZodTypeProvider,
+  type ZodTypeProvider
 } from "fastify-type-provider-zod";
 import { authGuard } from "./shared/middlewares/require-auth.js";
 import { metadataRoutes } from "./modules/metadata/metadata.routes.js";
+import { seriesRoutes } from "./modules/series/series.routes.js";
 
 const app = Fastify({
   loggerInstance: logger
@@ -28,7 +29,7 @@ if (env.NODE_ENV != "prod") {
         version: "1.0.0"
       }
     },
-    transform: jsonSchemaTransform,
+    transform: jsonSchemaTransform
   });
 
   await app.register(swaggerUI, {
@@ -44,7 +45,9 @@ await app.register(authRoutes, { prefix: "/api/auth" });
 
 await app.register(authGuard);
 
-await app.register(metadataRoutes, { prefix: "/api/metadata" })
+await app.register(metadataRoutes, { prefix: "/api/metadata" });
+
+await app.register(seriesRoutes, { prefix: "/api/series" });
 
 await app.listen({
   port: Number(env.PORT),

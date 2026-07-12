@@ -7,7 +7,7 @@ export async function episodeDetails(
   SeasonNumber: number,
   EpisodeNumber: number
 ): Promise<TmdbEpisodeDetailsResponse> {
-  return await tmdbGet<TmdbEpisodeDetailsResponse>(
+  return tmdbGet(
     `/tv/${seriesId}/season/${SeasonNumber}/episode/${EpisodeNumber}`,
     tmdbEpisodeDetailsSchema
   );

@@ -5,34 +5,28 @@ import { auth } from "@/shared/lib/auth.js";
 import { unauthorized } from "@/shared/errors/errors.helpers.js";
 
 async function authGuardPlugin(app: FastifyInstance) {
-  app.decorate(
-    "requireAuth",
-    async (request: FastifyRequest, _reply: FastifyReply) => {
-      const session = await auth.api.getSession({
-        headers: fromNodeHeaders(request.headers),
-      });
+  app.decorate("requireAuth", async (request: FastifyRequest, _reply: FastifyReply) => {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(request.headers)
+    });
 
-      if (!session?.session?.userId) {
-        throw unauthorized("You must be logged in");
-      }
+    if (!session?.session?.userId) {
+      throw unauthorized("You must be logged in");
+    }
 
-      request.user = {
-        id: session.session.userId,
-      };
-    },
-  );
+    request.user = {
+      id: session.session.userId
+    };
+  });
 }
 
 export const authGuard = fp(authGuardPlugin, {
-  name: "auth-guard",
+  name: "auth-guard"
 });
 
 declare module "fastify" {
   interface FastifyInstance {
-    requireAuth: (
-      request: FastifyRequest,
-      reply: FastifyReply,
-    ) => Promise<void>;
+    requireAuth: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
 
   interface FastifyRequest {

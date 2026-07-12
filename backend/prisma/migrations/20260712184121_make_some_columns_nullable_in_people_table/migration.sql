@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "People" ALTER COLUMN "adult" DROP NOT NULL,
+ALTER COLUMN "knownForDepartment" DROP NOT NULL,
+ALTER COLUMN "popularity" DROP NOT NULL;

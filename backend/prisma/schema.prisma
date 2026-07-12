@@ -86,8 +86,8 @@ model Series {
   firstAirDate     DateTime?
   tmdbId           Int       @unique
   inProduction     Boolean
+  lastAirDate      DateTime?
   name             String
-  nextEpisodeToAir DateTime?
   numberOfEpisodes Int
   numberOfSeasons  Int
   originalLanguage String
@@ -177,18 +177,13 @@ model SeriesGenre {
 }
 
 model People {
-  id                 Int       @id @default(autoincrement())
-  adult              Boolean
-  biography          String?
-  birthday           DateTime
-  deathday           DateTime?
+  id                 Int      @id @default(autoincrement())
+  adult              Boolean?
   gender             Int
-  homepage           String?
-  tmdbId             Int       @unique
-  knownForDepartment String
+  tmdbId             Int      @unique
+  knownForDepartment String?
   name               String
-  placeOfBirth       String
-  popularity         Float
+  popularity         Float?
   profilePath        String?
 
   createdAt DateTime @default(now())
@@ -210,12 +205,10 @@ model SeriesPeople {
 }
 
 model Network {
-  id           Int     @id @default(autoincrement())
-  headquarters String
-  homepage     String?
-  tmdbId       Int     @unique
-  logoPath     String?
-  name         String
+  id       Int     @id @default(autoincrement())
+  tmdbId   Int     @unique
+  logoPath String?
+  name     String
 
   series SeriesNetwork[]
 
