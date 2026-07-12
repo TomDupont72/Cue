@@ -9,17 +9,9 @@ export function forbidden(message = "Forbidden") {
 }
 
 export function notFound(resource = "Resource") {
-  return new AppError(
-    `${resource.toUpperCase()}_NOT_FOUND`,
-    404,
-    `${resource} not found`,
-  );
+  return new AppError(`${resource.toUpperCase()}_NOT_FOUND`, 404, `${resource} not found`);
 }
 
-export function badRequest(
-  code = "BAD_REQUEST",
-  message = "Bad request",
-  details?: unknown,
-) {
+export function badRequest(code = "BAD_REQUEST", message = "Bad request", details?: unknown) {
   return new AppError(code, 400, message, details);
 }

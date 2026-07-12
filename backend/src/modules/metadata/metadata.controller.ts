@@ -1,14 +1,14 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { SeriesSearch } from "./metadata.schemas.js";
+import type { MetadataSeriesSearch } from "./metadata.schemas.js";
 import { metadataService } from "./metadata.service.js";
 
-export const seriesSearchController = {
+export const metadataSeriesSearchController = {
   async search(
-    request: FastifyRequest<{ Querystring: SeriesSearch }>,
-    reply: FastifyReply,
+    request: FastifyRequest<{ Querystring: MetadataSeriesSearch }>,
+    reply: FastifyReply
   ) {
-    const results = await metadataService.searchSeries(request.query);
+    const results = await metadataService.metadataSearchSeries(request.query);
 
     return reply.send(results);
-  },
+  }
 };
