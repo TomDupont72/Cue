@@ -84,6 +84,7 @@ export const tmdbEpisodeDetailsSchema = z.object({
   overview: z.string().default(""),
   id: z.number(),
   still_path: z.string().nullable(),
+  runtime: z.number(),
   season_number: z.number(),
   vote_average: z.number()
 });
