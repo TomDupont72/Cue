@@ -1,8 +1,6 @@
-import { camelCaseKeys, excludeMissingFields } from "@/shared/utils/object.js";
+import { camelCaseKeys } from "@/shared/utils/object.js";
 import { z } from "zod";
-
-const tmdbTvSearchResultsItemSchema = z
-  .object({
+const tmdbTvSearchResultsItemSchema = z.object({
     id: z.number(),
     name: z.string(),
     original_name: z.string(),
@@ -12,60 +10,40 @@ const tmdbTvSearchResultsItemSchema = z
     first_air_date: z.string().nullable(),
     original_language: z.string(),
     vote_average: z.number()
-  })
-  .transform((series) =>
-    camelCaseKeys(series, {
-      id: "tmdbId"
-    } as const)
-  );
-
+}).transform((series) => camelCaseKeys(series, {
+    id: "tmdbId",
+}));
 export const tmdbTvSearchSchema = z.object({
-  page: z.number(),
-  results: z.array(tmdbTvSearchResultsItemSchema),
-  total_pages: z.number(),
-  total_results: z.number()
+    page: z.number(),
+    results: z.array(tmdbTvSearchResultsItemSchema),
+    total_pages: z.number(),
+    total_results: z.number()
 });
-
-const tmdbPeopleItemSchema = z
-  .object({
-    adult: z.boolean().nullish(),
+const tmdbPeopleItemSchema = z.object({
+    adult: z.boolean(),
     gender: z.number(),
     id: z.number(),
-    known_for_department: z.string().nullish(),
+    known_for_department: z.string(),
     name: z.string(),
-    popularity: z.number().nullish(),
+    popularity: z.number(),
     profile_path: z.string().nullable()
-  })
-  .transform((people) => camelCaseKeys(people, { id: "tmdbId" } as const));
-
-const tmdbTvDetailsGenresItemSchema = z
-  .object({
+}).transform((people) => camelCaseKeys(people, { id: "tmdbId" }));
+const tmdbTvDetailsGenresItemSchema = z.object({
     id: z.number(),
-    name: z.string()
-  })
-  .transform((genre) => camelCaseKeys(genre, { id: "tmdbId" } as const));
-
-const tmdbTvDetailsNetworksItemSchema = z
-  .object({
+    name: z.string(),
+}).transform((genre) => camelCaseKeys(genre, { id: "tmdbId" }));
+const tmdbTvDetailsNetworksItemSchema = z.object({
     id: z.number(),
     logo_path: z.string().nullable(),
     name: z.string()
-  })
-  .transform((network) =>
-    camelCaseKeys(network, {
-      id: "tmdbId"
-    } as const)
-  );
-
-const tmdbTvDetailsSeasonsItemSchema = z
-  .object({
+}).transform((network) => camelCaseKeys(network, {
+    id: "tmdbId",
+}));
+const tmdbTvDetailsSeasonsItemSchema = z.object({
     id: z.number(),
     season_number: z.number()
-  })
-  .transform((season) => camelCaseKeys(season, { id: "tmdbId" } as const));
-
-export const tmdbTvDetailsSchema = z
-  .object({
+}).transform((season) => camelCaseKeys(season, { id: "tmdbId" }));
+export const tmdbTvDetailsSchema = z.object({
     adult: z.boolean(),
     backdrop_path: z.string().nullable(),
     created_by: z.array(tmdbPeopleItemSchema),
@@ -84,11 +62,8 @@ export const tmdbTvDetailsSchema = z
     overview: z.string().default(""),
     popularity: z.number(),
     poster_path: z.string().nullable()
-  })
-  .transform((series) => camelCaseKeys(series, { id: "tmdbId" } as const));
-
-const tmdbEpisodeDetailsGuestStarSchema = z
-  .object({
+}).transform((series) => camelCaseKeys(series, { id: "tmdbId" }));
+const tmdbEpisodeDetailsGuestStarSchema = z.object({
     adult: z.boolean(),
     character: z.string(),
     gender: z.number(),
@@ -96,16 +71,13 @@ const tmdbEpisodeDetailsGuestStarSchema = z
     known_for_department: z.string(),
     name: z.string(),
     popularity: z.number(),
-    profile_path: z.string().nullable()
-  })
-  .transform((people) => camelCaseKeys(people, { id: "tmdbId" } as const));
-
-export const tmdbEpisodeDetailsSchema = z
-  .object({
+    profile_path: z.string().nullable(),
+}).transform((people) => camelCaseKeys(people, { id: "tmdbId" }));
+export const tmdbEpisodeDetailsSchema = z.object({
     air_date: z.string().nullable(),
-    crew: excludeMissingFields(tmdbPeopleItemSchema, ["tmdbId"]),
+    crew: z.array(tmdbPeopleItemSchema),
     episode_number: z.number(),
-    guest_stars: excludeMissingFields(tmdbEpisodeDetailsGuestStarSchema, ["tmdbId"]),
+    guest_stars: z.array(tmdbEpisodeDetailsGuestStarSchema),
     name: z.string(),
     overview: z.string().default(""),
     id: z.number(),
@@ -113,11 +85,8 @@ export const tmdbEpisodeDetailsSchema = z
     runtime: z.number().nullable(),
     season_number: z.number(),
     vote_average: z.number()
-  })
-  .transform((episode) => camelCaseKeys(episode, { id: "tmdbId" } as const));
-
-export const tmdbSeasonDetailsSchema = z
-  .object({
+}).transform((episode) => camelCaseKeys(episode, { id: "tmdbId" }));
+export const tmdbSeasonDetailsSchema = z.object({
     air_date: z.string().nullable(),
     episodes: z.array(tmdbEpisodeDetailsSchema),
     name: z.string(),
@@ -126,5 +95,4 @@ export const tmdbSeasonDetailsSchema = z
     poster_path: z.string().nullable(),
     season_number: z.number(),
     vote_average: z.number()
-  })
-  .transform((season) => camelCaseKeys(season, { id: "tmdbId" } as const));
+}).transform((season) => camelCaseKeys(season, { id: "tmdbId" }));

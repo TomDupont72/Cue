@@ -1,0 +1,7 @@
+import { tvSearch } from "@/external/tmdb/tmdb.tv-search.js";
+export const metadataService = {
+    async metadataSearchSeries(input) {
+        const results = await tvSearch(input.query, input.page);
+        return results;
+    }
+};

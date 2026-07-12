@@ -177,13 +177,13 @@ model SeriesGenre {
 }
 
 model People {
-  id                 Int     @id @default(autoincrement())
-  adult              Boolean
+  id                 Int      @id @default(autoincrement())
+  adult              Boolean?
   gender             Int
-  tmdbId             Int     @unique
-  knownForDepartment String
+  tmdbId             Int      @unique
+  knownForDepartment String?
   name               String
-  popularity         Float
+  popularity         Float?
   profilePath        String?
 
   createdAt DateTime @default(now())

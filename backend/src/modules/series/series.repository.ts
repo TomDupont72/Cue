@@ -21,31 +21,30 @@ export const seriesRepository = {
     });
   },
 
-  async addGenres(
-    seriesId: number,
-    genreIds: number[],
-    db: PrismaTx = prisma
-  ) {
+  async addGenres(seriesId: number, genreIds: number[], db: PrismaTx = prisma) {
     await db.seriesGenre.createMany({
       data: genreIds.map((genreId) => ({
         seriesId,
-        genreId,
+        genreId
       })),
-      skipDuplicates: true,
+      skipDuplicates: true
     });
   },
 
-  async addNetworks(
-    seriesId: number,
-    networkIds: number[],
-    db: PrismaTx = prisma
-  ) {
+  async addNetworks(seriesId: number, networkIds: number[], db: PrismaTx = prisma) {
     await db.seriesNetwork.createMany({
       data: networkIds.map((networkId) => ({
         seriesId,
-        networkId,
+        networkId
       })),
-      skipDuplicates: true,
+      skipDuplicates: true
+    });
+  },
+
+  async addPeople(seriesId: number, peopleIds: number[], db: PrismaTx = prisma) {
+    await db.seriesPeople.createMany({
+      data: peopleIds.map((peopleId) => ({ seriesId, peopleId })),
+      skipDuplicates: true
     });
   }
 };
