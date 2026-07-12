@@ -1,7 +1,7 @@
 import { PrismaClient } from "@/generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import { env } from "@/config/env.js";
+import { env } from "@/shared/config/env.js";
 
 const databaseUrl = env.DATABASE_URL;
 

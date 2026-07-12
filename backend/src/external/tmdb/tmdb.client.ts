@@ -1,5 +1,5 @@
-import { env } from "@/config/env.js";
-import { logger } from "@/logger/logger.js";
+import { env } from "@/shared/config/env.js";
+import { logger } from "@/shared/logger/logger.js";
 import z from "zod";
 
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";

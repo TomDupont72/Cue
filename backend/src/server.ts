@@ -1,13 +1,24 @@
 import Fastify from "fastify";
-import { env } from "@/config/env.js";
-import { logger } from "@/logger/logger.js";
+import { env } from "./shared/config/env.js";
+import { logger } from "./shared/logger/logger.js";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { authRoutes } from "./modules/auth/auth.routes.js";
+import {
+    jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+  type ZodTypeProvider,
+} from "fastify-type-provider-zod";
+import { authGuard } from "./shared/middlewares/require-auth.js";
+import { metadataRoutes } from "./modules/metadata/metadata.routes.js";
 
 const app = Fastify({
   loggerInstance: logger
-});
+}).withTypeProvider<ZodTypeProvider>();
+
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
 
 if (env.NODE_ENV != "prod") {
   await app.register(swagger, {
@@ -16,7 +27,8 @@ if (env.NODE_ENV != "prod") {
         title: "Cue API",
         version: "1.0.0"
       }
-    }
+    },
+    transform: jsonSchemaTransform,
   });
 
   await app.register(swaggerUI, {
@@ -29,6 +41,10 @@ app.get("/health", async () => {
 });
 
 await app.register(authRoutes, { prefix: "/api/auth" });
+
+await app.register(authGuard);
+
+await app.register(metadataRoutes, { prefix: "/api/metadata" })
 
 await app.listen({
   port: Number(env.PORT),

@@ -1,9 +1,9 @@
 import type { FastifyInstance } from "fastify";
-import { auth } from "@/lib/auth.js";
+import { auth } from "@/shared/lib/auth.js";
 
-export async function authRoutes(fastify: FastifyInstance) {
+export async function authRoutes(app: FastifyInstance) {
   // Register authentication endpoint
-  fastify.route({
+  app.route({
     method: ["GET", "POST"],
     url: "/*",
     async handler(request, reply) {
