@@ -1,10 +1,13 @@
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
+import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 export const seasonRepository = {
-    upsert(seriesId, data, db = prisma) {
-        return db.season.upsert({
-            where: { tmdbId: data.tmdbId },
-            create: { ...data, seriesId },
-            update: data,
+    async createMany(seriesId, data, db = prisma) {
+        return createManyAndFetch({
+            data: data.map((season) => ({ ...season, seriesId })),
+            scalarFields: Prisma.SeasonScalarFieldEnum,
+            uniqueBy: "tmdbId",
+            delegate: db.season
         });
-    },
+    }
 };

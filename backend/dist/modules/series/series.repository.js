@@ -16,24 +16,24 @@ export const seriesRepository = {
         await db.seriesGenre.createMany({
             data: genreIds.map((genreId) => ({
                 seriesId,
-                genreId,
+                genreId
             })),
-            skipDuplicates: true,
+            skipDuplicates: true
         });
     },
     async addNetworks(seriesId, networkIds, db = prisma) {
         await db.seriesNetwork.createMany({
             data: networkIds.map((networkId) => ({
                 seriesId,
-                networkId,
+                networkId
             })),
-            skipDuplicates: true,
+            skipDuplicates: true
         });
     },
     async addPeople(seriesId, peopleIds, db = prisma) {
         await db.seriesPeople.createMany({
             data: peopleIds.map((peopleId) => ({ seriesId, peopleId })),
-            skipDuplicates: true,
+            skipDuplicates: true
         });
     }
 };

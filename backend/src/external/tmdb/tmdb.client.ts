@@ -44,12 +44,49 @@ async function rawTmdbGet<TSchema extends z.ZodTypeAny>(
 
     if (response.status === 429 || response.status >= 500) {
       const retryAfter = response.headers.get("retry-after");
-
       const waitMs = retryAfter ? Number(retryAfter) * 1000 : attempt * 1000;
+
+      if (attempt === 3) {
+        logger.error(
+          {
+            status: response.status,
+            statusText: response.statusText,
+            path,
+            params,
+            attempt
+          },
+          "TMDB request failed after retries"
+        );
+
+        throw new Error(`TMDB request failed after retries: ${response.status}`);
+      }
+
+      logger.warn(
+        {
+          status: response.status,
+          statusText: response.statusText,
+          path,
+          params,
+          attempt,
+          waitMs
+        },
+        "TMDB request failed, retrying"
+      );
 
       await sleep(waitMs);
       continue;
     }
+
+    logger.error(
+      {
+        status: response.status,
+        statusText: response.statusText,
+        path,
+        params,
+        attempt
+      },
+      "TMDB request failed"
+    );
 
     throw new Error(`TMDB request failed: ${response.status}`);
   }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  tmdbEpisodeDetailsGuestStarSchema,
   tmdbEpisodeDetailsSchema,
   tmdbSeasonDetailsSchema,
   tmdbTvDetailsSchema,
@@ -13,3 +14,5 @@ export type TmdbTvDetailsResponse = z.infer<typeof tmdbTvDetailsSchema>;
 export type TmdbSeasonDetailsResponse = z.infer<typeof tmdbSeasonDetailsSchema>;
 
 export type TmdbEpisodeDetailsResponse = z.infer<typeof tmdbEpisodeDetailsSchema>;
+
+export type TmdbEpisodeDetailsGuestStar = z.infer<typeof tmdbEpisodeDetailsGuestStarSchema>;

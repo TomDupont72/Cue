@@ -1,4 +1,16 @@
-import type { FastifyInstance } from "fastify";
+import type {
+  FastifyBaseLogger,
+  FastifyInstance,
+  RawReplyDefaultExpression,
+  RawRequestDefaultExpression,
+  RawServerDefault
+} from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
-export type AppFastifyInstance = FastifyInstance<any, any, any, any, ZodTypeProvider>;
+export type AppFastifyInstance = FastifyInstance<
+  RawServerDefault,
+  RawRequestDefaultExpression<RawServerDefault>,
+  RawReplyDefaultExpression<RawServerDefault>,
+  FastifyBaseLogger,
+  ZodTypeProvider
+>;

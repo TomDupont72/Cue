@@ -3,6 +3,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
+    "test": "tsc --noEmit -p tsconfig.test.json && node --import tsx --test src/modules/*/__tests__/*.test.ts src/shared/utils/*/__tests__/*.test.ts",
     "start": "node dist/server.js",
     "lint": "eslint .",
     "format": "prettier --write ."

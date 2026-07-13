@@ -1,5 +1,10 @@
-import { camelCaseKeys, excludeMissingFields } from "@/shared/utils/object.js";
+import { camelCaseKeys, excludeMissingFields } from "@/shared/utils/object/object.js";
 import { z } from "zod";
+
+const nullableDateSchema = z
+  .string()
+  .nullable()
+  .transform((value) => (value ? new Date(value) : null));
 
 const tmdbTvSearchResultsItemSchema = z
   .object({
@@ -69,11 +74,11 @@ export const tmdbTvDetailsSchema = z
     adult: z.boolean(),
     backdrop_path: z.string().nullable(),
     created_by: z.array(tmdbPeopleItemSchema),
-    first_air_date: z.string().nullable(),
+    first_air_date: nullableDateSchema,
     genres: z.array(tmdbTvDetailsGenresItemSchema),
     id: z.number(),
     in_production: z.boolean(),
-    last_air_date: z.string().nullable(),
+    last_air_date: nullableDateSchema,
     name: z.string(),
     seasons: z.array(tmdbTvDetailsSeasonsItemSchema),
     networks: z.array(tmdbTvDetailsNetworksItemSchema),
@@ -87,7 +92,7 @@ export const tmdbTvDetailsSchema = z
   })
   .transform((series) => camelCaseKeys(series, { id: "tmdbId" } as const));
 
-const tmdbEpisodeDetailsGuestStarSchema = z
+export const tmdbEpisodeDetailsGuestStarSchema = z
   .object({
     adult: z.boolean(),
     character: z.string(),
@@ -102,15 +107,18 @@ const tmdbEpisodeDetailsGuestStarSchema = z
 
 export const tmdbEpisodeDetailsSchema = z
   .object({
-    air_date: z.string().nullable(),
-    crew: excludeMissingFields(tmdbPeopleItemSchema, ["tmdbId"]),
+    air_date: nullableDateSchema,
+    crew: excludeMissingFields(tmdbPeopleItemSchema, ["id"]),
     episode_number: z.number(),
-    guest_stars: excludeMissingFields(tmdbEpisodeDetailsGuestStarSchema, ["tmdbId"]),
+    guest_stars: excludeMissingFields(tmdbEpisodeDetailsGuestStarSchema, ["id"]),
     name: z.string(),
     overview: z.string().default(""),
     id: z.number(),
     still_path: z.string().nullable(),
-    runtime: z.number().nullable(),
+    runtime: z
+      .number()
+      .nullable()
+      .transform((value) => value ?? 0),
     season_number: z.number(),
     vote_average: z.number()
   })
@@ -118,7 +126,7 @@ export const tmdbEpisodeDetailsSchema = z
 
 export const tmdbSeasonDetailsSchema = z
   .object({
-    air_date: z.string().nullable(),
+    air_date: nullableDateSchema,
     episodes: z.array(tmdbEpisodeDetailsSchema),
     name: z.string(),
     overview: z.string().default(""),

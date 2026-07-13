@@ -1,6 +1,7 @@
-import type { Prisma } from "@/generated/prisma/client.js";
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
+import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
 export const seasonRepository = {
   async createMany(
@@ -8,15 +9,11 @@ export const seasonRepository = {
     data: Omit<Prisma.SeasonUncheckedCreateInput, "seriesId">[],
     db: PrismaTx = prisma
   ) {
-    await db.season.createMany({
+    return createManyAndFetch({
       data: data.map((season) => ({ ...season, seriesId })),
-      skipDuplicates: true
-    });
-
-    return db.season.findMany({
-      where: {
-        tmdbId: { in: data.map((season) => season.tmdbId) }
-      }
+      scalarFields: Prisma.SeasonScalarFieldEnum,
+      uniqueBy: "tmdbId",
+      delegate: db.season
     });
   }
 };

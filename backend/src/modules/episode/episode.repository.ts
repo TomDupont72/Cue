@@ -1,18 +1,15 @@
-import type { Prisma } from "@/generated/prisma/client.js";
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
+import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
 export const episodeRepository = {
   async createMany(episodes: Prisma.EpisodeUncheckedCreateInput[], db: PrismaTx = prisma) {
-    await db.episode.createMany({
+    return createManyAndFetch({
       data: episodes,
-      skipDuplicates: true
-    });
-
-    return db.episode.findMany({
-      where: {
-        tmdbId: { in: episodes.map((episode) => episode.tmdbId) }
-      }
+      scalarFields: Prisma.EpisodeScalarFieldEnum,
+      uniqueBy: "tmdbId",
+      delegate: db.episode
     });
   },
 
