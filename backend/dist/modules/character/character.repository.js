@@ -1,14 +1,13 @@
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
+import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 export const characterRepository = {
     async createMany(data, db = prisma) {
-        const uniqueCharacters = [
-            ...new Map(data.map((character) => [`${character.peopleId}:${character.name}`, character])).values(),
-        ];
-        await db.character.createMany({ data: uniqueCharacters, skipDuplicates: true });
-        return db.character.findMany({
-            where: {
-                OR: uniqueCharacters.map(({ peopleId, name }) => ({ peopleId, name })),
-            },
+        return createManyAndFetch({
+            data,
+            scalarFields: Prisma.CharacterScalarFieldEnum,
+            uniqueBy: ["peopleId", "name"],
+            delegate: db.character
         });
-    },
+    }
 };

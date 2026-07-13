@@ -1,7 +1,6 @@
 import { seasonDetails } from "@/external/tmdb/tmdb.season-details.js";
 import { tvDetails } from "@/external/tmdb/tmdb.tv-details.js";
 import { prisma } from "@/shared/db/prisma.js";
-import { dropKeys } from "@/shared/utils/object.js";
 import { characterRepository } from "../character/character.repository.js";
 import { episodeRepository } from "../episode/episode.repository.js";
 import { genreRepository } from "../genre/genre.repository.js";
@@ -9,40 +8,7 @@ import { networkRepository } from "../network/network.repository.js";
 import { peopleRepository } from "../people/people.repository.js";
 import { seasonRepository } from "../season/season.repository.js";
 import { seriesRepository } from "./series.repository.js";
-function toDate(value) {
-    return value ? new Date(value) : null;
-}
-function mapPeople(people) {
-    return {
-        adult: people.adult,
-        gender: people.gender,
-        tmdbId: people.tmdbId,
-        knownForDepartment: people.knownForDepartment,
-        name: people.name,
-        popularity: people.popularity,
-        profilePath: people.profilePath,
-    };
-}
-function mapSeries(series) {
-    return {
-        ...dropKeys(series, ["createdBy", "genres", "networks", "seasons"]),
-        firstAirDate: toDate(series.firstAirDate),
-        lastAirDate: toDate(series.lastAirDate),
-    };
-}
-function mapSeason(season) {
-    return {
-        ...dropKeys(season, ["episodes"]),
-        airDate: toDate(season.airDate),
-    };
-}
-function mapEpisode(episode) {
-    return {
-        ...dropKeys(episode, ["crew", "guestStars"]),
-        airDate: toDate(episode.airDate),
-        runtime: episode.runtime ?? 0,
-    };
-}
+import { dropKeys, getMany, joinBy } from "@/shared/utils/object/object.js";
 export const seriesService = {
     async seriesImport(input) {
         const existingSeries = await seriesRepository.findOne(input);
@@ -50,52 +16,81 @@ export const seriesService = {
             return existingSeries;
         const tmdbSeries = await tvDetails(input.tmdbId);
         const tmdbSeasons = await Promise.all(tmdbSeries.seasons.map((season) => seasonDetails(input.tmdbId, season.seasonNumber)));
+        const tmdbEpisodes = getMany({
+            data: tmdbSeasons,
+            fields: ["episodes"]
+        });
         return prisma.$transaction(async (tx) => {
-            const series = await seriesRepository.upsert({ tmdbId: tmdbSeries.tmdbId }, mapSeries(tmdbSeries), tx);
+            const series = await seriesRepository.upsert({ tmdbId: tmdbSeries.tmdbId }, dropKeys(tmdbSeries, ["createdBy", "genres", "networks", "seasons"]), tx);
             const genres = await genreRepository.createMany(tmdbSeries.genres, tx);
             await seriesRepository.addGenres(series.id, genres.map((genre) => genre.id), tx);
             const networks = await networkRepository.createMany(tmdbSeries.networks, tx);
             await seriesRepository.addNetworks(series.id, networks.map((network) => network.id), tx);
-            const allEpisodes = tmdbSeasons.flatMap((season) => season.episodes);
-            const allPeople = await peopleRepository.createMany([
-                ...tmdbSeries.createdBy.map(mapPeople),
-                ...allEpisodes.flatMap((episode) => [
-                    ...episode.crew.map(mapPeople),
-                    ...episode.guestStars.map(mapPeople),
-                ]),
-            ], tx);
-            const peopleByTmdbId = new Map(allPeople.map((people) => [people.tmdbId, people]));
-            await seriesRepository.addPeople(series.id, tmdbSeries.createdBy.flatMap((people) => {
-                const storedPeople = peopleByTmdbId.get(people.tmdbId);
-                return storedPeople ? [storedPeople.id] : [];
+            const people = await peopleRepository.createMany(getMany({ data: tmdbSeries, fields: ["createdBy"] }, { data: tmdbEpisodes, fields: ["crew", "guestStars"] }), tx);
+            const creatorIds = joinBy({ data: tmdbSeries.createdBy, key: "tmdbId" }, { data: people, key: "tmdbId", value: "id" });
+            await seriesRepository.addPeople(series.id, creatorIds, tx);
+            const characters = await characterRepository.createMany(joinBy({
+                data: getMany({
+                    data: tmdbEpisodes,
+                    fields: ["guestStars"]
+                }),
+                key: "tmdbId",
+                value: "character",
+                as: "name"
+            }, {
+                data: people,
+                key: "tmdbId",
+                value: "id",
+                as: "peopleId"
             }), tx);
-            const characters = await characterRepository.createMany(allEpisodes.flatMap((episode) => episode.guestStars.flatMap((guestStar) => {
-                const people = peopleByTmdbId.get(guestStar.tmdbId);
-                return people ? [{ peopleId: people.id, name: guestStar.character }] : [];
-            })), tx);
-            const characterByPeopleAndName = new Map(characters.map((character) => [`${character.peopleId}:${character.name}`, character]));
-            for (const tmdbSeason of tmdbSeasons) {
-                const season = await seasonRepository.upsert(series.id, mapSeason(tmdbSeason), tx);
-                const episodes = await episodeRepository.upsertMany(series.id, season.id, tmdbSeason.episodes.map(mapEpisode), tx);
-                const episodeByTmdbId = new Map(episodes.map((episode) => [episode.tmdbId, episode]));
-                for (const tmdbEpisode of tmdbSeason.episodes) {
-                    const episode = episodeByTmdbId.get(tmdbEpisode.tmdbId);
-                    if (!episode)
-                        continue;
-                    await episodeRepository.addPeople(episode.id, tmdbEpisode.crew.flatMap((people) => {
-                        const storedPeople = peopleByTmdbId.get(people.tmdbId);
-                        return storedPeople ? [storedPeople.id] : [];
-                    }), tx);
-                    await episodeRepository.addCharacters(episode.id, tmdbEpisode.guestStars.flatMap((guestStar) => {
-                        const people = peopleByTmdbId.get(guestStar.tmdbId);
-                        if (!people)
-                            return [];
-                        const character = characterByPeopleAndName.get(`${people.id}:${guestStar.character}`);
-                        return character ? [character.id] : [];
-                    }), tx);
-                }
-            }
+            const seasons = await seasonRepository.createMany(series.id, tmdbSeasons.map((season) => dropKeys(season, ["episodes"])), tx);
+            const episodes = await episodeRepository.createMany(joinBy({ data: tmdbEpisodes, key: "seasonNumber" }, {
+                data: seasons,
+                key: "seasonNumber",
+                select: (season, episode) => ({
+                    ...dropKeys(episode, ["crew", "guestStars"]),
+                    seriesId: series.id,
+                    seasonId: season.id
+                })
+            }), tx);
+            const episodeCrew = joinBy({ data: tmdbEpisodes, key: "tmdbId" }, {
+                data: episodes,
+                key: "tmdbId",
+                select: (episode, tmdbEpisode) => tmdbEpisode.crew.map((person) => ({ episodeId: episode.id, person }))
+            });
+            await episodeRepository.addPeople(joinBy({ data: episodeCrew, key: ({ person }) => person.tmdbId }, {
+                data: people,
+                key: "tmdbId",
+                select: (person, { episodeId }) => ({ episodeId, peopleId: person.id })
+            }), tx);
+            const episodeGuestStars = joinBy({
+                data: tmdbEpisodes,
+                key: "tmdbId",
+                value: "guestStars",
+                as: "guestStar"
+            }, {
+                data: episodes,
+                key: "tmdbId",
+                value: "id",
+                as: "episodeId"
+            });
+            const episodeGuestStarsWithPeople = joinBy({ data: episodeGuestStars, key: ({ guestStar }) => guestStar.tmdbId }, {
+                data: people,
+                key: "tmdbId",
+                select: (person, episodeGuestStar) => ({ ...episodeGuestStar, peopleId: person.id })
+            });
+            await episodeRepository.addCharacters(joinBy({
+                data: episodeGuestStarsWithPeople,
+                key: ({ peopleId, guestStar }) => `${peopleId}:${guestStar.character}`
+            }, {
+                data: characters,
+                key: (character) => `${character.peopleId}:${character.name}`,
+                select: (character, { episodeId }) => ({
+                    episodeId,
+                    characterId: character.id
+                })
+            }), tx);
             return series;
         });
-    },
+    }
 };

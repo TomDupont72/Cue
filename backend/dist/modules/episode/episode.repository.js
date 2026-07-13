@@ -1,22 +1,25 @@
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
+import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 export const episodeRepository = {
-    upsertMany(seriesId, seasonId, episodes, db = prisma) {
-        return Promise.all(episodes.map((episode) => db.episode.upsert({
-            where: { tmdbId: episode.tmdbId },
-            create: { ...episode, seriesId, seasonId },
-            update: { ...episode, seriesId, seasonId },
-        })));
+    async createMany(episodes, db = prisma) {
+        return createManyAndFetch({
+            data: episodes,
+            scalarFields: Prisma.EpisodeScalarFieldEnum,
+            uniqueBy: "tmdbId",
+            delegate: db.episode
+        });
     },
-    addPeople(episodeId, peopleIds, db = prisma) {
+    addPeople(data, db = prisma) {
         return db.episodePeople.createMany({
-            data: peopleIds.map((peopleId) => ({ episodeId, peopleId })),
-            skipDuplicates: true,
+            data,
+            skipDuplicates: true
         });
     },
-    addCharacters(episodeId, characterIds, db = prisma) {
+    addCharacters(data, db = prisma) {
         return db.episodeCharacter.createMany({
-            data: characterIds.map((characterId) => ({ episodeId, characterId })),
-            skipDuplicates: true,
+            data,
+            skipDuplicates: true
         });
-    },
+    }
 };

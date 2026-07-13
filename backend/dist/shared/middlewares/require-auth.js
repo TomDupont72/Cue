@@ -3,7 +3,7 @@ import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "@/shared/lib/auth.js";
 import { unauthorized } from "@/shared/errors/errors.helpers.js";
 async function authGuardPlugin(app) {
-    app.decorate("requireAuth", async (request, _reply) => {
+    app.decorate("requireAuth", async (request) => {
         const session = await auth.api.getSession({
             headers: fromNodeHeaders(request.headers)
         });

@@ -5,7 +5,7 @@ import { auth } from "@/shared/lib/auth.js";
 import { unauthorized } from "@/shared/errors/errors.helpers.js";
 
 async function authGuardPlugin(app: FastifyInstance) {
-  app.decorate("requireAuth", async (request: FastifyRequest, _reply: FastifyReply) => {
+  app.decorate("requireAuth", async (request: FastifyRequest) => {
     const session = await auth.api.getSession({
       headers: fromNodeHeaders(request.headers)
     });
