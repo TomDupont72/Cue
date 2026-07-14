@@ -1,12 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import {
-  camelCaseKeys,
-  dropKeys,
-  excludeMissingFields,
-  getMany,
-  joinBy
-} from "../object.js";
+import { camelCaseKeys, dropKeys, excludeMissingFields, getMany, joinBy } from "../object.js";
 import { z } from "zod";
 
 describe("object utilities", () => {
@@ -18,10 +12,7 @@ describe("object utilities", () => {
   });
 
   it("extracts and flattens several fields with getMany", () => {
-    const seasons = [
-      { episodes: [{ id: 1 }, { id: 2 }] },
-      { episodes: [{ id: 3 }] }
-    ];
+    const seasons = [{ episodes: [{ id: 1 }, { id: 2 }] }, { episodes: [{ id: 3 }] }];
     const series = { createdBy: [{ id: 4 }], owner: { id: 5 } };
 
     assert.deepEqual(
@@ -41,10 +32,7 @@ describe("object utilities", () => {
     ];
 
     assert.deepEqual(
-      joinBy(
-        { data: tmdbPeople, key: "tmdbId" },
-        { data: people, key: "tmdbId", value: "id" }
-      ),
+      joinBy({ data: tmdbPeople, key: "tmdbId" }, { data: people, key: "tmdbId", value: "id" }),
       [1]
     );
   });
@@ -111,13 +99,14 @@ describe("object utilities", () => {
   });
 
   it("filters array entries missing required fields before parsing", () => {
-    const schema = excludeMissingFields(
-      z.object({ id: z.number(), name: z.string() }),
-      ["id"]
-    );
+    const schema = excludeMissingFields(z.object({ id: z.number(), name: z.string() }), ["id"]);
 
-    assert.deepEqual(schema.parse([{ id: 1, name: "Stan" }, { id: null, name: "Unknown" }]), [
-      { id: 1, name: "Stan" }
-    ]);
+    assert.deepEqual(
+      schema.parse([
+        { id: 1, name: "Stan" },
+        { id: null, name: "Unknown" }
+      ]),
+      [{ id: 1, name: "Stan" }]
+    );
   });
 });

@@ -231,12 +231,7 @@ export function createEmptyPrismaMockData(): PrismaMockData {
   };
 }
 
-function replaceMethod(
-  t: TestContext,
-  target: object,
-  method: string,
-  replacement: unknown
-) {
+function replaceMethod(t: TestContext, target: object, method: string, replacement: unknown) {
   const record = target as Record<string, unknown>;
   const original = record[method];
 
@@ -409,12 +404,10 @@ export function mockPrisma(t: TestContext, data: PrismaMockData = onePiecePrisma
     "episodeId",
     "peopleId"
   ]);
-  const episodeCharacter = mockJoinDelegate(
-    t,
-    prisma.episodeCharacter,
-    data.episodeCharacters,
-    ["episodeId", "characterId"]
-  );
+  const episodeCharacter = mockJoinDelegate(t, prisma.episodeCharacter, data.episodeCharacters, [
+    "episodeId",
+    "characterId"
+  ]);
   const transaction = t.mock.fn(
     async <TResult>(callback: (tx: typeof prisma) => Promise<TResult>) => callback(prisma)
   );

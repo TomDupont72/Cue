@@ -107,8 +107,7 @@ describe("POST /api/series/import", () => {
     );
     assert.ok(
       data.episodeCharacters.every(
-        (relation) =>
-          episodeIds.has(relation.episodeId) && characterIds.has(relation.characterId)
+        (relation) => episodeIds.has(relation.episodeId) && characterIds.has(relation.characterId)
       )
     );
     assert.equal("createdBy" in data.series[0], false);

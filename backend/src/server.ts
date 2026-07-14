@@ -13,6 +13,7 @@ import {
 import { authGuard } from "./shared/middlewares/require-auth.js";
 import { metadataRoutes } from "./modules/metadata/metadata.routes.js";
 import { seriesRoutes } from "./modules/series/series.routes.js";
+import { userRoutes } from "./modules/user/user.routes.js";
 
 const app = Fastify({
   loggerInstance: logger
@@ -46,8 +47,8 @@ await app.register(authRoutes, { prefix: "/api/auth" });
 await app.register(authGuard);
 
 await app.register(metadataRoutes, { prefix: "/api/metadata" });
-
 await app.register(seriesRoutes, { prefix: "/api/series" });
+await app.register(userRoutes, { prefix: "/api/user" });
 
 await app.listen({
   port: Number(env.PORT),
