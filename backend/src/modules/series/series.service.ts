@@ -17,14 +17,14 @@ import type {
 } from "@/external/tmdb/tmdb.types.js";
 
 export const seriesService = {
-  async seriesImport(input: SeriesImport) {
-    const existingSeries = await seriesRepository.findOne(input);
+  async seriesImport(body: SeriesImport) {
+    const existingSeries = await seriesRepository.findOne(body);
 
     if (existingSeries) return existingSeries;
 
-    const tmdbSeries = await tvDetails(input.tmdbId);
+    const tmdbSeries = await tvDetails(body.tmdbId);
     const tmdbSeasons = await Promise.all(
-      tmdbSeries.seasons.map((season) => seasonDetails(input.tmdbId, season.seasonNumber))
+      tmdbSeries.seasons.map((season) => seasonDetails(body.tmdbId, season.seasonNumber))
     );
     const tmdbEpisodes = getMany<TmdbEpisodeDetailsResponse>({
       data: tmdbSeasons,
