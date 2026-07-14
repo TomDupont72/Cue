@@ -288,7 +288,6 @@ model UserEpisode {
   userId    String
   episodeId Int
 
-  watched   Boolean   @default(false)
   watchedAt DateTime?
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
