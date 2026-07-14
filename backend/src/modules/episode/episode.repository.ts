@@ -4,6 +4,12 @@ import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
 export const episodeRepository = {
+  findOne(where: Prisma.EpisodeWhereUniqueInput, db: PrismaTx = prisma) {
+    return db.episode.findUnique({
+      where
+    });
+  },
+
   async createMany(episodes: Prisma.EpisodeUncheckedCreateInput[], db: PrismaTx = prisma) {
     return createManyAndFetch({
       data: episodes,

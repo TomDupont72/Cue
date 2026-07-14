@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { UserSeriesPostBody, UserSeriesPostParams } from "./user.schemas.js";
+import { UserEpisodePostParams, UserSeriesPostBody, UserSeriesPostParams } from "./user.schemas.js";
 import { userService } from "./user.service.js";
 
 export const userSeriesController = {
@@ -8,6 +8,14 @@ export const userSeriesController = {
     reply: FastifyReply
   ) {
     const result = await userService.userSeriesPost(request.user.id, request.params, request.body);
+
+    return reply.send(result);
+  }
+};
+
+export const userEpisodeController = {
+  async post(request: FastifyRequest<{ Params: UserEpisodePostParams }>, reply: FastifyReply) {
+    const result = await userService.userEpisodePost(request.user.id, request.params);
 
     return reply.send(result);
   }

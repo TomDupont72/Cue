@@ -54,3 +54,9 @@ export type JoinResult<
   ? Flatten<[TTargetValueKey] extends [never] ? TResult : TTarget[TTargetValueKey]>
   : ProjectedValue<TSource, TSourceValueKey, TSourceAlias> &
       ProjectedValue<TTarget, TTargetValueKey, TTargetAlias>;
+
+export type RenameKeys<T extends object, TRename extends Partial<Record<keyof T, PropertyKey>>> = {
+  [
+    K in keyof T as K extends keyof TRename ? (TRename[K] extends PropertyKey ? TRename[K] : K) : K
+  ]: T[K];
+};

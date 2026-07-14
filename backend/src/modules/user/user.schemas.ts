@@ -19,3 +19,10 @@ export const userSeriesPostParamsSchema = z.object({
 
 export type UserSeriesPostBody = z.infer<typeof userSeriesPostBodySchema>;
 export type UserSeriesPostParams = z.infer<typeof userSeriesPostParamsSchema>;
+
+export const userEpisodePostParamsSchema = z.object({
+  seriesId: z.coerce.number().int().min(1),
+  episodeId: z.coerce.number().int().min(1)
+});
+
+export type UserEpisodePostParams = z.infer<typeof userEpisodePostParamsSchema>;

@@ -1,6 +1,10 @@
 import { AppFastifyInstance } from "@/shared/types/fastify.js";
-import { userSeriesPostBodySchema, userSeriesPostParamsSchema } from "./user.schemas.js";
-import { userSeriesController } from "./user.controller.js";
+import {
+  userEpisodePostParamsSchema,
+  userSeriesPostBodySchema,
+  userSeriesPostParamsSchema
+} from "./user.schemas.js";
+import { userEpisodeController, userSeriesController } from "./user.controller.js";
 
 export async function userRoutes(app: AppFastifyInstance) {
   app.post("/series/:seriesId", {
@@ -10,5 +14,13 @@ export async function userRoutes(app: AppFastifyInstance) {
       body: userSeriesPostBodySchema
     },
     handler: userSeriesController.post
+  });
+
+  app.post("/series/:seriesId/episode/:episodeId", {
+    preHandler: [app.requireAuth],
+    schema: {
+      params: userEpisodePostParamsSchema
+    },
+    handler: userEpisodeController.post
   });
 }

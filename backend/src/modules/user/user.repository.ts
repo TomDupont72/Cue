@@ -19,5 +19,17 @@ export const userRepository = {
       create: data,
       update: data
     });
+  },
+
+  upsertEpisode(
+    where: Prisma.UserEpisodeWhereUniqueInput,
+    data: Prisma.UserEpisodeUncheckedCreateInput,
+    db: PrismaTx = prisma
+  ) {
+    return db.userEpisode.upsert({
+      where,
+      create: data,
+      update: data
+    });
   }
 };
