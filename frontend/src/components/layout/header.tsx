@@ -16,7 +16,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle
 } from "../ui/navigation-menu";
-import cueLogo from "@/assets/cue-logo.png"
+import cueLogo from "@/assets/cue-logo.png";
 
 export default function Header() {
   return (
@@ -24,7 +24,7 @@ export default function Header() {
       <Container className="flex h-16 items-center justify-between">
         <div className="flex  items-center justify-between">
           <Link to="/" className="text-xl font-semibold">
-            <img src={cueLogo} className="h-8"/>
+            <img src={cueLogo} className="h-8" />
           </Link>
           <NavigationMenu>
             <NavigationMenuList>
