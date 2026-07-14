@@ -5,6 +5,7 @@ import {
   JoinResult,
   JoinSource,
   JoinTarget,
+  RenameKeys,
   RenameMap,
   RenameOrCamelCase
 } from "./object.types.js";
@@ -20,6 +21,19 @@ export function dropKeys<T extends object, K extends keyof T>(
   }
 
   return result;
+}
+
+export function renameKeys<T extends object, TRename extends Partial<Record<keyof T, PropertyKey>>>(
+  object: T,
+  rename: TRename
+): RenameKeys<T, TRename> {
+  return Object.fromEntries(
+    Reflect.ownKeys(object).map((key) => {
+      const newKey = key in rename ? rename[key as keyof TRename] : key;
+
+      return [newKey ?? key, object[key as keyof T]];
+    })
+  ) as RenameKeys<T, TRename>;
 }
 
 export function joinBy<
