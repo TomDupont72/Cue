@@ -1,13 +1,39 @@
 import { apiClient } from "@/api/client";
-import type { SeriesSearchResponse } from "../types/series.types";
-import { seriesSearchParamsSchema } from "../schemas/series.schemas";
+import type {
+  SeriesGetResponse,
+  SeriesImportPostResponse,
+  SeriesSearchGetResponse
+} from "../types/series.types";
+import type { SeriesImportPostBody } from "../schemas/series.schemas";
+import {
+  seriesGetParamsSchema,
+  seriesImportPostBodySchema,
+  seriesSearchGetParamsSchema
+} from "../schemas/series.schemas";
 
-export function seriesSearch(query: string, page: number): Promise<SeriesSearchResponse> {
-  return apiClient<SeriesSearchResponse>("/metadata/series/search", {
+export function seriesSearchGet(query: string, page: number): Promise<SeriesSearchGetResponse> {
+  return apiClient<SeriesSearchGetResponse>("/metadata/series/search", {
     query: {
       query,
       page
     },
-    querySchema: seriesSearchParamsSchema
+    querySchema: seriesSearchGetParamsSchema
+  });
+}
+
+export function seriesGet(id: number): Promise<SeriesGetResponse> {
+  return apiClient<SeriesGetResponse>(`/series/:id`, {
+    params: {
+      id
+    },
+    paramsSchema: seriesGetParamsSchema
+  });
+}
+
+export function seriesImportPost(tmdbId: number): Promise<SeriesImportPostResponse> {
+  return apiClient<SeriesImportPostResponse, SeriesImportPostBody>("/series/import", {
+    method: "POST",
+    body: { tmdbId },
+    bodySchema: seriesImportPostBodySchema
   });
 }

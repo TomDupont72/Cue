@@ -22,8 +22,8 @@ export default function Header() {
   return (
     <header className="border-b border-border bg-background">
       <Container className="flex h-16 items-center justify-between">
-        <div className="flex  items-center justify-between">
-          <Link to="/" className="text-xl font-semibold">
+        <div className="flex items-center">
+          <Link to="/" className="text-xl font-semibold sm:pr-5 ">
             <img src={cueLogo} className="h-8" />
           </Link>
           <NavigationMenu>
@@ -31,25 +31,41 @@ export default function Header() {
               <NavigationMenuItem>
                 <NavigationMenuLink
                   className={navigationMenuTriggerStyle()}
-                  render={<Link to="/dashboard">Dashboard</Link>}
+                  render={
+                    <Link to="/dashboard" className="font-bold">
+                      DASHBOARD
+                    </Link>
+                  }
                 />
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink
                   className={navigationMenuTriggerStyle()}
-                  render={<Link to="/series">Séries</Link>}
+                  render={
+                    <Link to="/series" className="font-bold">
+                      SÉRIES
+                    </Link>
+                  }
                 />
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink
                   className={navigationMenuTriggerStyle()}
-                  render={<Link to="/calendar">Calendrier</Link>}
+                  render={
+                    <Link to="/calendar" className="font-bold">
+                      CALENDRIER
+                    </Link>
+                  }
                 />
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink
                   className={navigationMenuTriggerStyle()}
-                  render={<Link to="/search">Recherche</Link>}
+                  render={
+                    <Link to="/search" className="font-bold">
+                      RECHERCHE
+                    </Link>
+                  }
                 />
               </NavigationMenuItem>
             </NavigationMenuList>

@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "@/pages/dashboard.page";
 import Layout from "@/components/layout/layout";
 import Search from "./pages/search.page";
+import Series from "./pages/series.page";
 
 export default function Router() {
   return (
@@ -9,6 +10,7 @@ export default function Router() {
       <Routes>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/series" element={<Series />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
