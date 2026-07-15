@@ -6,7 +6,7 @@ export default function Layout({ children }: PropsWithChildren) {
     <div className="flex min-h-screen flex-col">
       <Header />
 
-      <main className="flex-1">{children}</main>
+      <main className="flex flex-1 flex-col">{children}</main>
     </div>
   );
 }
