@@ -1,8 +1,6 @@
-import { Menu } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import cueLogo from "@/assets/cue-logo.png";
-import { cn } from "@/lib/utils";
 
 import { Container } from "./container";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -14,29 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "../ui/navigation-menu";
-import { navigationMenuTriggerStyle } from "../ui/navigation-menu-variants";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../ui/sheet";
 import { Navigation, NavigationMobile } from "./navigation";
-
-const navigation = [
-  { label: "DASHBOARD", to: "/dashboard" },
-  { label: "SÉRIES", to: "/series" },
-  { label: "CALENDRIER", to: "/calendar" },
-  { label: "RECHERCHE", to: "/search" },
-];
 
 export default function Header() {
   return (

@@ -1,19 +1,9 @@
 import { Menu } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+import {  NavLink } from "react-router-dom";
 
-import cueLogo from "@/assets/cue-logo.png";
 import { cn } from "@/lib/utils";
 
-import { Container } from "./container";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import {
   NavigationMenu,
   NavigationMenuItem,
