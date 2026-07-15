@@ -13,10 +13,10 @@ import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle
+  NavigationMenuList
 } from "../ui/navigation-menu";
 import cueLogo from "@/assets/cue-logo.png";
+import { navigationMenuTriggerStyle } from "../ui/navigation-menu-variants";
 
 export default function Header() {
   return (

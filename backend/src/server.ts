@@ -14,10 +14,16 @@ import { authGuard } from "./shared/middlewares/require-auth.js";
 import { metadataRoutes } from "./modules/metadata/metadata.routes.js";
 import { seriesRoutes } from "./modules/series/series.routes.js";
 import { userRoutes } from "./modules/user/user.routes.js";
+import fastifyCors from "@fastify/cors";
 
 const app = Fastify({
   loggerInstance: logger
 }).withTypeProvider<ZodTypeProvider>();
+
+app.register(fastifyCors, {
+  origin: process.env.CLIENT_ORIGIN,
+  credentials: true
+});
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
