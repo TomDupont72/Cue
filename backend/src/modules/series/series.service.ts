@@ -8,16 +8,36 @@ import { networkRepository } from "../network/network.repository.js";
 import { peopleRepository } from "../people/people.repository.js";
 import { seasonRepository } from "../season/season.repository.js";
 import { seriesRepository } from "./series.repository.js";
-import type { SeriesImport } from "./series.schemas.js";
+import type { SeriesGet, SeriesImportPost } from "./series.schemas.js";
 import { dropKeys, getMany, joinBy } from "@/shared/utils/object/object.js";
 import { Prisma } from "@/generated/prisma/client.js";
 import type {
   TmdbEpisodeDetailsGuestStar,
   TmdbEpisodeDetailsResponse
 } from "@/external/tmdb/tmdb.types.js";
+import { notFound } from "@/shared/errors/errors.helpers.js";
 
 export const seriesService = {
-  async seriesImport(body: SeriesImport) {
+  async seriesGet(params: SeriesGet) {
+    const series = await seriesRepository.findOne(params);
+
+    if (!series) {
+      throw notFound("Series");
+    }
+
+    const [seasons, episodes] = await Promise.all([
+      seasonRepository.findMany({
+        seriesId: series.id
+      }),
+      episodeRepository.findMany({
+        seriesId: series.id
+      })
+    ]);
+
+    return { series, seasons, episodes };
+  },
+
+  async seriesImportPost(body: SeriesImportPost) {
     const existingSeries = await seriesRepository.findOne(body);
 
     if (existingSeries) return existingSeries;

@@ -4,6 +4,12 @@ import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
 export const seasonRepository = {
+  findMany(where: Prisma.SeasonWhereInput, db: PrismaTx = prisma) {
+    return db.season.findMany({
+      where
+    });
+  },
+
   async createMany(
     seriesId: number,
     data: Omit<Prisma.SeasonUncheckedCreateInput, "seriesId">[],
