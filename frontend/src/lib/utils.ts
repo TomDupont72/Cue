@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getYear(date: string | null): string | null {
+export function getYear(date: string | null | undefined): string | null {
   if (!date) {
     return null;
   }

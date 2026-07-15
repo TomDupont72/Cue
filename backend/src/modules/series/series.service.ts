@@ -16,31 +16,47 @@ import type {
   TmdbEpisodeDetailsResponse
 } from "@/external/tmdb/tmdb.types.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
+import { userRepository } from "../user/user.repository.js";
 
 export const seriesService = {
-  async seriesGet(params: SeriesGet) {
+  async seriesGet(userId: string, params: SeriesGet) {
     const series = await seriesRepository.findOne(params);
 
     if (!series) {
       throw notFound("Series");
     }
 
-    const [seasons, episodes] = await Promise.all([
+    const [seasons, episodes, userSeries, userEpisodes] = await Promise.all([
       seasonRepository.findMany({
         seriesId: series.id
       }),
       episodeRepository.findMany({
         seriesId: series.id
+      }),
+      userRepository.findOneSeries({
+        userId_seriesId: { userId, seriesId: series.id }
+      }),
+      userRepository.findManyEpisodes({
+        userId,
+        episode: {
+          seriesId: series.id
+        }
       })
     ]);
 
-    return { series, seasons, episodes };
+    return { series, seasons, episodes, userSeries, userEpisodes };
   },
 
-  async seriesImportPost(body: SeriesImportPost) {
-    const existingSeries = await seriesRepository.findOne(body);
+  async seriesImportPost(userId: string, body: SeriesImportPost) {
+    const series = await seriesRepository.findOne(body);
 
-    if (existingSeries) return existingSeries;
+    if (series) {
+      const userSeries = await userRepository.findOneSeries({
+        userId_seriesId: { userId, seriesId: series.id }
+      });
+
+      return { series, userSeries };
+    }
 
     const tmdbSeries = await tvDetails(body.tmdbId);
     const tmdbSeasons = await Promise.all(
@@ -193,7 +209,14 @@ export const seriesService = {
         tx
       );
 
-      return series;
+      const userSeries = await userRepository.findOneSeries(
+        {
+          userId_seriesId: { userId, seriesId: series.id }
+        },
+        tx
+      );
+
+      return { series, userSeries };
     });
   }
 };

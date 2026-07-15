@@ -1,12 +1,12 @@
 import { ImageOff } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTmdbImageUrl } from "@/lib/tmdbImage";
-import type { SeriesSearchResult } from "../types/series.types";
+import type { SeriesSearchGetResult } from "../types/series.types";
 import { getYear } from "@/lib/utils";
 
 type SeriesCardProps = {
-  series: SeriesSearchResult;
-  onClick?: (series: SeriesSearchResult) => void;
+  series: SeriesSearchGetResult;
+  onClick?: (series: SeriesSearchGetResult) => void;
 };
 
 export function SeriesCard({ series, onClick }: SeriesCardProps) {

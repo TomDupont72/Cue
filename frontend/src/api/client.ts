@@ -6,14 +6,59 @@ const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 type QueryValue = string | number | boolean | null | undefined;
 type QueryParams = Record<string, QueryValue>;
 
-type ApiClientOptions = Omit<RequestInit, "body"> & {
-  body?: unknown;
-  query?: QueryParams;
-  querySchema?: z.ZodType<QueryParams>;
+type PathValue = string | number;
+type PathParams = Record<string, PathValue>;
+
+type ApiClientOptions<
+  TBody = unknown,
+  TQuery extends QueryParams = QueryParams,
+  TParams extends PathParams = PathParams
+> = Omit<RequestInit, "body"> & {
+  body?: TBody;
+  bodySchema?: z.ZodType<TBody>;
+
+  query?: TQuery;
+  querySchema?: z.ZodType<TQuery>;
+
+  params?: TParams;
+  paramsSchema?: z.ZodType<TParams>;
 };
 
-function buildUrl(path: string, query?: Record<string, QueryValue>): string {
+function validateData<T>(data: T | undefined, schema: z.ZodType<T> | undefined): T | undefined {
+  if (data === undefined || schema === undefined) {
+    return data;
+  }
+
+  const result = schema.safeParse(data);
+
+  if (!result.success) {
+    const message = result.error.issues[0]?.message ?? "Les paramètres envoyés sont invalides.";
+
+    throw new ApiError(message, 400, "VALIDATION_ERROR", result.error.issues);
+  }
+
+  return result.data;
+}
+
+function buildPath(path: string, params?: PathParams): string {
+  if (!params) {
+    return path;
+  }
+
+  return Object.entries(params).reduce((resolvedPath, [key, value]) => {
+    const placeholder = `:${key}`;
+
+    if (!resolvedPath.includes(placeholder)) {
+      return resolvedPath;
+    }
+
+    return resolvedPath.replace(placeholder, encodeURIComponent(String(value)));
+  }, path);
+}
+
+function buildUrl(path: string, query?: QueryParams): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
   const url = new URL(`${API_URL}${normalizedPath}`, window.location.origin);
 
   if (query) {
@@ -71,34 +116,46 @@ function getErrorData(body: unknown): ApiErrorData {
   return {};
 }
 
-export async function apiClient<T>(path: string, options: ApiClientOptions = {}): Promise<T> {
-  const { query, querySchema, body, headers, ...requestOptions } = options;
+export async function apiClient<
+  TResponse,
+  TBody = unknown,
+  TQuery extends QueryParams = QueryParams,
+  TParams extends PathParams = PathParams
+>(path: string, options: ApiClientOptions<TBody, TQuery, TParams> = {}): Promise<TResponse> {
+  const { query, querySchema, params, paramsSchema, body, bodySchema, headers, ...requestOptions } =
+    options;
 
-  let validatedQuery = query;
+  const validatedQuery = validateData(query, querySchema);
 
-  if (query && querySchema) {
-    const result = querySchema.safeParse(query);
+  const validatedParams = validateData(params, paramsSchema);
 
-    if (!result.success) {
-      const message = result.error.issues[0]?.message ?? "Les paramètres envoyés sont invalides.";
+  const validatedBody = validateData(body, bodySchema);
 
-      throw new ApiError(message, 400, "VALIDATION_ERROR", result.error.issues);
-    }
+  const resolvedPath = buildPath(path, validatedParams);
 
-    validatedQuery = result.data;
-  }
+  const isFormData = validatedBody instanceof FormData;
 
-  const isFormData = body instanceof FormData;
-
-  const response = await fetch(buildUrl(path, validatedQuery), {
+  const response = await fetch(buildUrl(resolvedPath, validatedQuery), {
     ...requestOptions,
     credentials: "include",
     headers: {
       Accept: "application/json",
-      ...(!isFormData && body !== undefined ? { "Content-Type": "application/json" } : {}),
+
+      ...(!isFormData && validatedBody !== undefined
+        ? {
+            "Content-Type": "application/json"
+          }
+        : {}),
+
       ...headers
     },
-    body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body)
+
+    body:
+      validatedBody === undefined
+        ? undefined
+        : isFormData
+          ? validatedBody
+          : JSON.stringify(validatedBody)
   });
 
   const responseBody = await parseResponseBody(response);
@@ -114,5 +171,5 @@ export async function apiClient<T>(path: string, options: ApiClientOptions = {})
     );
   }
 
-  return responseBody as T;
+  return responseBody as TResponse;
 }

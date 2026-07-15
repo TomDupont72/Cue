@@ -5,7 +5,9 @@ export const queryKeys = {
     search: (query: string, page: number) =>
       [...queryKeys.series.all, "search", query, page] as const,
 
-    detail: (seriesId: number) => [...queryKeys.series.all, "detail", seriesId] as const
+    detail: (seriesId: number) => [...queryKeys.series.all, "detail", seriesId] as const,
+
+    overview: (seriesId: number) => [...queryKeys.series.all, "overview", seriesId] as const
   },
 
   userSeries: {

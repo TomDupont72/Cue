@@ -4,7 +4,7 @@ import { SeriesGet, SeriesImportPost } from "./series.schemas.js";
 
 export const seriesController = {
   async get(request: FastifyRequest<{ Params: SeriesGet }>, reply: FastifyReply) {
-    const results = await seriesService.seriesGet(request.params);
+    const results = await seriesService.seriesGet(request.user.id, request.params);
 
     return reply.send(results);
   }
@@ -12,7 +12,7 @@ export const seriesController = {
 
 export const seriesImportController = {
   async post(request: FastifyRequest<{ Body: SeriesImportPost }>, reply: FastifyReply) {
-    const results = await seriesService.seriesImportPost(request.body);
+    const results = await seriesService.seriesImportPost(request.user.id, request.body);
 
     return reply.send(results);
   }

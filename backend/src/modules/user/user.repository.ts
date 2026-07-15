@@ -9,6 +9,12 @@ export const userRepository = {
     });
   },
 
+  findManyEpisodes(where: Prisma.UserEpisodeWhereInput, db: PrismaTx = prisma) {
+    return db.userEpisode.findMany({
+      where
+    });
+  },
+
   upsertSeries(
     where: Prisma.UserSeriesWhereUniqueInput,
     data: Prisma.UserSeriesUncheckedCreateInput,
