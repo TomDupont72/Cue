@@ -10,7 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "../ui/dropdown-menu";
 import { Navigation, NavigationMobile } from "./navigation";
 
@@ -23,7 +23,7 @@ export default function Header() {
             <img src={cueLogo} alt="Cue" className="h-8 w-auto" />
           </Link>
 
-          <Navigation/>
+          <Navigation />
         </div>
 
         <div className="flex items-center gap-2">
@@ -37,10 +37,7 @@ export default function Header() {
                   aria-label="Ouvrir le menu utilisateur"
                 >
                   <Avatar className="size-8">
-                    <AvatarImage
-                      src="https://github.com/shadcn.png"
-                      alt=""
-                    />
+                    <AvatarImage src="https://github.com/shadcn.png" alt="" />
                     <AvatarFallback>TD</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -55,7 +52,7 @@ export default function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <NavigationMobile/>
+          <NavigationMobile />
         </div>
       </Container>
     </header>
