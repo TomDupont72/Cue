@@ -10,6 +10,12 @@ export const episodeRepository = {
     });
   },
 
+  findMany(where: Prisma.EpisodeWhereInput, db: PrismaTx = prisma) {
+    return db.episode.findMany({
+      where
+    });
+  },
+
   async createMany(episodes: Prisma.EpisodeUncheckedCreateInput[], db: PrismaTx = prisma) {
     return createManyAndFetch({
       data: episodes,

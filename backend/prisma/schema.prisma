@@ -126,6 +126,7 @@ model Season {
   series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
 
   @@unique([seriesId, seasonNumber])
+  @@index([seriesId])
 }
 
 model Episode {
@@ -153,6 +154,7 @@ model Episode {
   season Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
 
   @@unique([seriesId, seasonNumber, episodeNumber])
+  @@index([seriesId])
 }
 
 model Genre {
