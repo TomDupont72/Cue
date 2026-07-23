@@ -102,8 +102,5 @@ jobs:
             --build-arg VITE_API_URL=http://localhost:8000 \
             -t brainleaf-frontend ./frontend
 
-      - name: Build worker image
-        run: docker build -t brainleaf-worker ./worker
-
       - name: Validate production Compose
         run: docker compose -f compose.prod.yaml config --no-interpolate

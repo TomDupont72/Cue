@@ -15,7 +15,8 @@ const app = Fastify({
 }).withTypeProvider();
 app.register(fastifyCors, {
     origin: process.env.CLIENT_ORIGIN,
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"]
 });
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
@@ -25,7 +26,29 @@ if (env.NODE_ENV != "prod") {
             info: {
                 title: "Cue API",
                 version: "1.0.0"
-            }
+            },
+            tags: [
+                {
+                    name: "Health",
+                    description: "État de l'API"
+                },
+                {
+                    name: "Authentication",
+                    description: "Authentication"
+                },
+                {
+                    name: "Metadata",
+                    description: "Recherche de métadonnées"
+                },
+                {
+                    name: "Series",
+                    description: "Gestion des séries"
+                },
+                {
+                    name: "User",
+                    description: "Gestion des données utilisateur"
+                }
+            ]
         },
         transform: jsonSchemaTransform
     });

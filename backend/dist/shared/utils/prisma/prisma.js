@@ -1,4 +1,4 @@
-import { dropKeys } from "@/shared/utils/object/object.js";
+import { dropKeys } from "../../../shared/utils/object/object.js";
 function dropUnknownFields(source, scalarFields) {
     const allowedFields = new Set(Object.values(scalarFields));
     const unknownFields = Object.keys(source).filter((field) => !allowedFields.has(field));

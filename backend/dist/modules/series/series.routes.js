@@ -4,6 +4,7 @@ export async function seriesRoutes(app) {
     app.get("/:id", {
         preHandler: [app.requireAuth],
         schema: {
+            tags: ["Series"],
             params: seriesGetSchema
         },
         handler: seriesController.get
@@ -11,6 +12,7 @@ export async function seriesRoutes(app) {
     app.post("/import", {
         preHandler: [app.requireAuth],
         schema: {
+            tags: ["Series"],
             body: seriesImportPostSchema
         },
         handler: seriesImportController.post

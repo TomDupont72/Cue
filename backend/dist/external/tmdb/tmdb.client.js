@@ -1,5 +1,5 @@
-import { env } from "@/shared/config/env.js";
-import { logger } from "@/shared/logger/logger.js";
+import { env } from "../../shared/config/env.js";
+import { logger } from "../../shared/logger/logger.js";
 import pLimit from "p-limit";
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const limit = pLimit(3);

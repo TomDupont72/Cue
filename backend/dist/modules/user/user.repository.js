@@ -1,4 +1,4 @@
-import { prisma } from "@/shared/db/prisma.js";
+import { prisma } from "../../shared/db/prisma.js";
 export const userRepository = {
     findOneSeries(where, db = prisma) {
         return db.userSeries.findUnique({
