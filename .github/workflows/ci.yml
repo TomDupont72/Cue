@@ -48,6 +48,9 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    
+    env:
+        DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
 
     steps:
       - uses: actions/checkout@v6
