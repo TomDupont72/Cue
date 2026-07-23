@@ -290,7 +290,7 @@ model UserEpisode {
   userId    String
   episodeId Int
 
-  watchedAt DateTime?
+  watchedAt DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)

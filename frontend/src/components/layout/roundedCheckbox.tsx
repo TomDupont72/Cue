@@ -5,15 +5,17 @@ import { cn } from "@/lib/utils";
 type RoundedCheckboxProps = {
   checked: boolean;
   onChange?: (checked: boolean) => void;
+  disabled?: boolean;
   className?: string;
 };
 
-export function RoundedCheckbox({ checked, onChange, className }: RoundedCheckboxProps) {
+export function RoundedCheckbox({ checked, onChange, disabled, className }: RoundedCheckboxProps) {
   return (
     <button
       type="button"
       role="checkbox"
       aria-checked={checked}
+      disabled={disabled}
       onClick={() => onChange?.(!checked)}
       className={cn(
         "flex size-9 shrink-0 items-center justify-center rounded-full transition-colors",
