@@ -1,6 +1,6 @@
-import { Prisma } from "@/generated/prisma/client.js";
-import { prisma } from "@/shared/db/prisma.js";
-import { createManyAndFetch, deleteManyAndFetch } from "@/shared/utils/prisma/prisma.js";
+import { Prisma } from "../../generated/prisma/client.js";
+import { prisma } from "../../shared/db/prisma.js";
+import { createManyAndFetch, deleteManyAndFetch } from "../../shared/utils/prisma/prisma.js";
 export const episodeRepository = {
     findOne(where, db = prisma) {
         return db.episode.findUnique({
@@ -23,7 +23,7 @@ export const episodeRepository = {
     deleteMany(where, db = prisma) {
         return deleteManyAndFetch({
             where,
-            delegate: db.episode
+            delegate: db.userEpisode
         });
     },
     addPeople(data, db = prisma) {

@@ -4,6 +4,7 @@ export async function metadataRoutes(app) {
     app.get("/series/search", {
         preHandler: [app.requireAuth],
         schema: {
+            tags: ["Metadata"],
             querystring: metadataSeriesSearchSchema
         },
         handler: metadataSeriesSearchController.search

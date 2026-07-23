@@ -1,6 +1,6 @@
-import { seasonDetails } from "@/external/tmdb/tmdb.season-details.js";
-import { tvDetails } from "@/external/tmdb/tmdb.tv-details.js";
-import { prisma } from "@/shared/db/prisma.js";
+import { seasonDetails } from "../../external/tmdb/tmdb.season-details.js";
+import { tvDetails } from "../../external/tmdb/tmdb.tv-details.js";
+import { prisma } from "../../shared/db/prisma.js";
 import { characterRepository } from "../character/character.repository.js";
 import { episodeRepository } from "../episode/episode.repository.js";
 import { genreRepository } from "../genre/genre.repository.js";
@@ -8,8 +8,8 @@ import { networkRepository } from "../network/network.repository.js";
 import { peopleRepository } from "../people/people.repository.js";
 import { seasonRepository } from "../season/season.repository.js";
 import { seriesRepository } from "./series.repository.js";
-import { dropKeys, getMany, joinBy } from "@/shared/utils/object/object.js";
-import { notFound } from "@/shared/errors/errors.helpers.js";
+import { dropKeys, getMany, joinBy } from "../../shared/utils/object/object.js";
+import { notFound } from "../../shared/errors/errors.helpers.js";
 import { userRepository } from "../user/user.repository.js";
 export const seriesService = {
     async seriesGet(userId, params) {

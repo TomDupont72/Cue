@@ -1,7 +1,8 @@
-import { auth } from "@/shared/lib/auth.js";
+import { auth } from "../../shared/lib/auth.js";
 export async function authRoutes(app) {
     // Register authentication endpoint
     app.route({
+        schema: { tags: ["Authentication"] },
         method: ["GET", "POST"],
         url: "/*",
         async handler(request, reply) {

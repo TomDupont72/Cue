@@ -49,8 +49,9 @@ describe("POST /api/series/import", () => {
     });
 
     assert.equal(response.statusCode, 200);
-    assert.equal(response.json().tmdbId, ONE_PIECE_TMDB_ID);
-    assert.equal(response.json().name, "One Piece");
+    assert.equal(response.json().series.tmdbId, ONE_PIECE_TMDB_ID);
+    assert.equal(response.json().series.name, "One Piece");
+    assert.equal(response.json().userSeries, null);
     assert.equal(onePiecePrismaData.seasons.length, 2);
     assert.equal(onePiecePrismaData.episodes.length, 4);
     assert.equal(prismaMock.series.findUnique.mock.callCount(), 1);
@@ -73,7 +74,8 @@ describe("POST /api/series/import", () => {
     });
 
     assert.equal(response.statusCode, 200, response.body);
-    assert.equal(response.json().name, "One Piece");
+    assert.equal(response.json().series.name, "One Piece");
+    assert.equal(response.json().userSeries, null);
     assert.equal(data.series.length, 1);
     assert.equal(data.seasons.length, 2);
     assert.equal(data.episodes.length, 4);

@@ -1,0 +1,26 @@
+services:
+  backend:
+    image: ghcr.io/tomdupont72/cue-backend:${APP_VERSION:-latest}
+    container_name: cue-backend
+    env_file:
+      - /etc/cue-api.env
+    ports:
+      - "127.0.0.1:8004:8000"
+    networks:
+      - cue
+      - infrastructure
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/tomdupont72/cue-frontend:${APP_VERSION:-latest}
+    container_name: cue-frontend
+    ports:
+      - "127.0.0.1:5177:80"
+    networks:
+      - cue
+    restart: unless-stopped
+
+networks:
+  cue:
+  infrastructure:
+    external: true

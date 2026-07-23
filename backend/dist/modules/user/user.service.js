@@ -1,8 +1,8 @@
-import { prisma } from "@/shared/db/prisma.js";
+import { prisma } from "../../shared/db/prisma.js";
 import { userRepository } from "./user.repository.js";
-import { renameKeys } from "@/shared/utils/object/object.js";
+import { renameKeys } from "../../shared/utils/object/object.js";
 import { episodeRepository } from "../episode/episode.repository.js";
-import { notFound } from "@/shared/errors/errors.helpers.js";
+import { notFound } from "../../shared/errors/errors.helpers.js";
 export const userService = {
     async userSeriesPost(userId, params, body) {
         const userSeries = await userRepository.upsertSeries({ userId_seriesId: { userId, ...params } }, { userId, ...params, ...body });
@@ -20,7 +20,8 @@ export const userService = {
         });
     },
     async userEpisodeDelete(userId, params) {
-        const { seriesId, episodeId } = params;
-        const episode = await episodeRepository.deleteOne;
+        const { episodeId } = params;
+        const episode = await episodeRepository.deleteMany({ userId, episodeId });
+        return episode;
     }
 };

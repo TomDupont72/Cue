@@ -1,0 +1,28 @@
+services:
+  backend:
+    build: ./backend
+    container_name: cue-backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks:
+      - default
+      - dev-infrastructure
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8000
+    container_name: cue-frontend
+    ports:
+      - "127.0.0.1:5173:80"
+    networks:
+      - default
+    restart: unless-stopped
+
+networks:
+  dev-infrastructure:
+    external: true

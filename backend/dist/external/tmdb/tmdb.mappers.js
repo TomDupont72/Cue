@@ -1,4 +1,4 @@
-import { dropKeys } from "@/shared/utils/object/object.js";
+import { dropKeys } from "../../shared/utils/object/object.js";
 function toDate(value) {
     return value ? new Date(value) : null;
 }
