@@ -408,6 +408,7 @@ export function mockPrisma(t: TestContext, data: PrismaMockData = onePiecePrisma
     "episodeId",
     "characterId"
   ]);
+  const userSeriesFindUnique = t.mock.fn(async () => null);
   const transaction = t.mock.fn(
     async <TResult>(callback: (tx: typeof prisma) => Promise<TResult>) => callback(prisma)
   );
@@ -415,6 +416,7 @@ export function mockPrisma(t: TestContext, data: PrismaMockData = onePiecePrisma
   replaceMethod(t, prisma.series, "findUnique", seriesFindUnique);
   replaceMethod(t, prisma.series, "findMany", seriesFindMany);
   replaceMethod(t, prisma.series, "upsert", seriesUpsert);
+  replaceMethod(t, prisma.userSeries, "findUnique", userSeriesFindUnique);
   replaceMethod(t, prisma, "$transaction", transaction);
 
   return {
@@ -431,6 +433,7 @@ export function mockPrisma(t: TestContext, data: PrismaMockData = onePiecePrisma
     seriesNetwork,
     seriesPeople,
     episodePeople,
-    episodeCharacter
+    episodeCharacter,
+    userSeries: { findUnique: userSeriesFindUnique }
   };
 }
