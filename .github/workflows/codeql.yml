@@ -45,10 +45,13 @@ jobs:
 
       - name: Install & build (backend)
         working-directory: backend
+        env:
+            DATABASE_URL: postgresql://user:password@localhost:5432/test?schema=public
         run: |
           npm ci
           npx prisma generate
           npm run build
+          
       
       - name: Install & build (worker)
         working-directory: worker
