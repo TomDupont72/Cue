@@ -48,9 +48,14 @@ jobs:
     defaults:
       run:
         working-directory: backend
-    
+
     env:
-        DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+      BETTER_AUTH_SECRET: ci-test-secret-placeholder-32-characters
+      BETTER_AUTH_URL: http://localhost:8000
+      CLIENT_ORIGIN: http://localhost:5173
+      TMDB_API_TOKEN: ci-test-tmdb-token-placeholder-32-characters
+      TMDB_API_KEY: ci-test-api-key-placeholder
 
     steps:
       - uses: actions/checkout@v6
