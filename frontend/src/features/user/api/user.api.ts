@@ -1,6 +1,9 @@
 import { apiClient } from "@/api/client";
-import { userEpisodePostParamsSchema } from "../schemas/user.schemas";
-import type { UserEpisodePostResponse } from "../types/user.types";
+import {
+  userEpisodeDeleteParamsSchema,
+  userEpisodePostParamsSchema
+} from "../schemas/user.schemas";
+import type { UserEpisodeDeleteResponse, UserEpisodePostResponse } from "../types/user.types";
 
 export function userEpisodePost(
   seriesId: number,
@@ -13,5 +16,19 @@ export function userEpisodePost(
       episodeId
     },
     paramsSchema: userEpisodePostParamsSchema
+  });
+}
+
+export function userEpisodeDelete(
+  seriesId: number,
+  episodeId: number
+): Promise<UserEpisodeDeleteResponse> {
+  return apiClient("/user/series/:seriesId/episode/:episodeId", {
+    method: "DELETE",
+    params: {
+      seriesId,
+      episodeId
+    },
+    paramsSchema: userEpisodeDeleteParamsSchema
   });
 }

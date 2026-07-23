@@ -22,7 +22,8 @@ const app = Fastify({
 
 app.register(fastifyCors, {
   origin: process.env.CLIENT_ORIGIN,
-  credentials: true
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"]
 });
 
 app.setValidatorCompiler(validatorCompiler);

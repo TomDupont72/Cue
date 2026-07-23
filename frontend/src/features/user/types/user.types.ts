@@ -3,3 +3,5 @@ export type UserEpisodePostResponse = {
   episodeId: number;
   watchedAt: string;
 };
+
+export type UserEpisodeDeleteResponse = UserEpisodePostResponse;

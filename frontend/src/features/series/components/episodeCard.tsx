@@ -5,6 +5,7 @@ import { ImageOff } from "lucide-react";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
 import { Badge } from "@/components/ui/badge";
 import { useUserEpisodePost } from "@/features/user/hooks/useUserEpisodePost";
+import { useUserEpisodeDelete } from "@/features/user/hooks/useUserEpisodeDelete";
 
 type EpisodeCardProps = {
   seriesId: number;
@@ -17,16 +18,19 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
   const isWatched = watchedEpisodeIds.has(episode.id);
 
   const userEpisodePostMutation = useUserEpisodePost();
+  const userEpisodeDeleteMutation = useUserEpisodeDelete();
 
   function handleCheckedChange(checked: boolean) {
-    if (!checked || isWatched) {
-      return;
-    }
-
-    userEpisodePostMutation.mutate({
+    const params = {
       seriesId,
       episodeId: episode.id
-    });
+    };
+
+    if (checked) {
+      userEpisodePostMutation.mutate(params);
+    } else {
+      userEpisodeDeleteMutation.mutate(params);
+    }
   }
 
   return (
@@ -58,7 +62,7 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
       <RoundedCheckbox
         checked={isWatched}
         onChange={handleCheckedChange}
-        disabled={userEpisodePostMutation.isPending}
+        disabled={userEpisodePostMutation.isPending || userEpisodeDeleteMutation.isPending}
         className="mr-6 shrink-0 self-center"
       />
     </Card>
