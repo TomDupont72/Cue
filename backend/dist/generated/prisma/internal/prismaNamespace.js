@@ -250,7 +250,6 @@ export const UserSeriesScalarFieldEnum = {
 export const UserEpisodeScalarFieldEnum = {
     userId: 'userId',
     episodeId: 'episodeId',
-    watched: 'watched',
     watchedAt: 'watchedAt'
 };
 export const SortOrder = {

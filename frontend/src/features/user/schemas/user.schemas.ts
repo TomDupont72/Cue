@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const userEpisodePostParamsSchema = z.object({
-  seriesId: z.number().int().min(0),
+  seriesId: z.number().int().min(1),
   episodeId: z.number().int().min(1)
 });
 

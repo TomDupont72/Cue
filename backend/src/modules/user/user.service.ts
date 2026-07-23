@@ -1,6 +1,11 @@
 import { prisma } from "@/shared/db/prisma.js";
 import { userRepository } from "./user.repository.js";
-import { UserEpisodePostParams, UserSeriesPostBody, UserSeriesPostParams } from "./user.schemas.js";
+import {
+  UserEpisodePostParams,
+  UserSeriesPostBody,
+  UserSeriesPostParams,
+  UserEpisodeDeleteParams
+} from "./user.schemas.js";
 import { renameKeys } from "@/shared/utils/object/object.js";
 import { episodeRepository } from "../episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
@@ -37,5 +42,13 @@ export const userService = {
         tx
       );
     });
+  },
+
+  async userEpisodeDelete(userId: string, params: UserEpisodeDeleteParams) {
+    const { episodeId } = params;
+
+    const episode = await episodeRepository.deleteMany({ userId, episodeId });
+
+    return episode;
   }
 };

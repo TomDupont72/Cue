@@ -34,3 +34,13 @@ type CreateManyAndFetchDelegate<TInput extends object, TResult, TWhere> = {
   createMany(args: { data: TInput[]; skipDuplicates: boolean }): PromiseLike<unknown>;
   findMany(args: { where: TWhere }): PromiseLike<TResult[]>;
 };
+
+export type DeleteManyAndFetchOptions<TWhere, TResult> = {
+  where: TWhere;
+  delegate: DeleteManyAndFetchDelegate<TWhere, TResult>;
+};
+
+type DeleteManyAndFetchDelegate<TWhere, TResult> = {
+  findMany(args: { where: TWhere }): PromiseLike<TResult[]>;
+  deleteMany(args: { where: TWhere }): PromiseLike<unknown>;
+};

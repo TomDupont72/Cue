@@ -1,7 +1,7 @@
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
+import { createManyAndFetch, deleteManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
 export const episodeRepository = {
   findOne(where: Prisma.EpisodeWhereUniqueInput, db: PrismaTx = prisma) {
@@ -22,6 +22,13 @@ export const episodeRepository = {
       scalarFields: Prisma.EpisodeScalarFieldEnum,
       uniqueBy: "tmdbId",
       delegate: db.episode
+    });
+  },
+
+  deleteMany(where: Prisma.UserEpisodeWhereInput, db: PrismaTx = prisma) {
+    return deleteManyAndFetch({
+      where,
+      delegate: db.userEpisode
     });
   },
 

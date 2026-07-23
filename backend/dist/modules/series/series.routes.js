@@ -1,11 +1,18 @@
-import { seriesImportSchema } from "./series.schemas.js";
-import { seriesImportController } from "./series.controller.js";
+import { seriesGetSchema, seriesImportPostSchema } from "./series.schemas.js";
+import { seriesController, seriesImportController } from "./series.controller.js";
 export async function seriesRoutes(app) {
+    app.get("/:id", {
+        preHandler: [app.requireAuth],
+        schema: {
+            params: seriesGetSchema
+        },
+        handler: seriesController.get
+    });
     app.post("/import", {
         preHandler: [app.requireAuth],
         schema: {
-            body: seriesImportSchema
+            body: seriesImportPostSchema
         },
-        handler: seriesImportController.handle
+        handler: seriesImportController.post
     });
 }

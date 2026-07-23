@@ -6,6 +6,7 @@ export async function metadataRoutes(app: AppFastifyInstance) {
   app.get("/series/search", {
     preHandler: [app.requireAuth],
     schema: {
+      tags: ["Metadata"],
       querystring: metadataSeriesSearchSchema
     },
     handler: metadataSeriesSearchController.search

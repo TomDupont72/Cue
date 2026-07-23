@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { createManyAndFetch } from "../prisma.js";
+import { createManyAndFetch, deleteManyAndFetch } from "../prisma.js";
 
 describe("createManyAndFetch", () => {
   it("removes unknown fields, deduplicates input and fetches created records", async () => {
@@ -93,5 +93,57 @@ describe("createManyAndFetch", () => {
 
     assert.deepEqual(result, []);
     assert.equal(calls, 0);
+  });
+});
+
+describe("deleteManyAndFetch", () => {
+  it("fetches matching records before deleting them and returns them", async () => {
+    type Result = { id: number; userId: string };
+
+    const calls: unknown[] = [];
+    const stored: Result[] = [
+      { id: 1, userId: "user-1" },
+      { id: 2, userId: "user-1" }
+    ];
+    const delegate = {
+      async findMany(args: unknown) {
+        calls.push(["findMany", args]);
+        return stored;
+      },
+      async deleteMany(args: unknown) {
+        calls.push(["deleteMany", args]);
+      }
+    };
+
+    const result = await deleteManyAndFetch({
+      where: { userId: "user-1" },
+      delegate
+    });
+
+    assert.deepEqual(calls, [
+      ["findMany", { where: { userId: "user-1" } }],
+      ["deleteMany", { where: { userId: "user-1" } }]
+    ]);
+    assert.equal(result, stored);
+  });
+
+  it("does not delete when no record matches", async () => {
+    let deleteManyCalls = 0;
+    const delegate = {
+      async findMany() {
+        return [];
+      },
+      async deleteMany() {
+        deleteManyCalls += 1;
+      }
+    };
+
+    const result = await deleteManyAndFetch({
+      where: { id: { in: [] as number[] } },
+      delegate
+    });
+
+    assert.deepEqual(result, []);
+    assert.equal(deleteManyCalls, 0);
   });
 });

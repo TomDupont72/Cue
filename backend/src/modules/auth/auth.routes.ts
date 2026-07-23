@@ -4,6 +4,7 @@ import { auth } from "@/shared/lib/auth.js";
 export async function authRoutes(app: FastifyInstance) {
   // Register authentication endpoint
   app.route({
+    schema: { tags: ["Authentication"] },
     method: ["GET", "POST"],
     url: "/*",
     async handler(request, reply) {
