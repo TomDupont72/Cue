@@ -22,7 +22,7 @@ export function seriesSearchGet(query: string, page: number): Promise<SeriesSear
 }
 
 export function seriesGet(id: number): Promise<SeriesGetResponse> {
-  return apiClient<SeriesGetResponse>(`/series/:id`, {
+  return apiClient<SeriesGetResponse>("/series/:id", {
     params: {
       id
     },

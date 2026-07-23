@@ -5,12 +5,18 @@ import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
 import { useState } from "react";
 
 type SeasonCardProps = {
+  seriesId: number;
   season: SeriesGetSeason;
   episodes: SeriesGetEpisode[];
   watchedEpisodeIds: Set<number>;
 };
 
-export default function SeasonCard({ season, episodes, watchedEpisodeIds }: SeasonCardProps) {
+export default function SeasonCard({
+  seriesId,
+  season,
+  episodes,
+  watchedEpisodeIds
+}: SeasonCardProps) {
   const watchedCount = episodes.filter((episode) => watchedEpisodeIds.has(episode.id)).length;
 
   const [checked, setChecked] = useState(watchedCount === episodes.length);
@@ -48,7 +54,12 @@ export default function SeasonCard({ season, episodes, watchedEpisodeIds }: Seas
 
       <AccordionContent className="flex flex-col gap-4">
         {episodes.map((episode) => (
-          <EpisodeCard key={episode.id} episode={episode} watchedEpisodeIds={watchedEpisodeIds} />
+          <EpisodeCard
+            key={episode.id}
+            seriesId={seriesId}
+            episode={episode}
+            watchedEpisodeIds={watchedEpisodeIds}
+          />
         ))}
       </AccordionContent>
     </AccordionItem>

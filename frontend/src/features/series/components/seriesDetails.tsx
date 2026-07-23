@@ -20,7 +20,7 @@ export default function SeriesDetails({ id }: SeriesDetailsProps) {
     return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
   }
 
-  const { seasons, episodes, userEpisodes } = seriesQuery.data;
+  const { series, seasons, episodes, userEpisodes } = seriesQuery.data;
 
   const sortedEpisodes = [...episodes].sort((a, b) => a.episodeNumber - b.episodeNumber);
 
@@ -49,6 +49,7 @@ export default function SeriesDetails({ id }: SeriesDetailsProps) {
         {sortedSeasons.map((season) => (
           <SeasonCard
             key={season.id}
+            seriesId={series.id}
             season={season}
             episodes={episodesBySeason[season.seasonNumber] ?? []}
             watchedEpisodeIds={watchedEpisodeIds}
