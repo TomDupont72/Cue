@@ -51,13 +51,6 @@ jobs:
           npm ci
           npx prisma generate
           npm run build
-          
-      
-      - name: Install & build (worker)
-        working-directory: worker
-        run: |
-          npm ci
-          npm run build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
