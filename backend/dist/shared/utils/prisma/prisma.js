@@ -22,3 +22,11 @@ export async function createManyAndFetch({ data, scalarFields, uniqueBy, delegat
     await delegate.createMany({ data: uniqueData, skipDuplicates: true });
     return delegate.findMany({ where });
 }
+export async function deleteManyAndFetch({ where, delegate }) {
+    const records = await delegate.findMany({ where });
+    if (records.length === 0) {
+        return [];
+    }
+    await delegate.deleteMany({ where });
+    return records;
+}

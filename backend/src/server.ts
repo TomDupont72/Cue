@@ -34,8 +34,31 @@ if (env.NODE_ENV != "prod") {
       info: {
         title: "Cue API",
         version: "1.0.0"
-      }
+      },
+      tags: [
+        {
+          name: "Health",
+          description: "État de l'API"
+        },
+        {
+          name: "Authentication",
+          description: "Authentication"
+        },
+        {
+          name: "Metadata",
+          description: "Recherche de métadonnées"
+        },
+        {
+          name: "Series",
+          description: "Gestion des séries"
+        },
+        {
+          name: "User",
+          description: "Gestion des données utilisateur"
+        }
+      ]
     },
+
     transform: jsonSchemaTransform
   });
 

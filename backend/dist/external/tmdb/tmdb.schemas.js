@@ -19,12 +19,14 @@ const tmdbTvSearchResultsItemSchema = z
     .transform((series) => camelCaseKeys(series, {
     id: "tmdbId"
 }));
-export const tmdbTvSearchSchema = z.object({
+export const tmdbTvSearchSchema = z
+    .object({
     page: z.number(),
     results: z.array(tmdbTvSearchResultsItemSchema),
     total_pages: z.number(),
     total_results: z.number()
-});
+})
+    .transform((result) => camelCaseKeys(result));
 const tmdbPeopleItemSchema = z
     .object({
     adult: z.boolean().nullish(),

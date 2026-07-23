@@ -9,13 +9,43 @@ import { peopleRepository } from "../people/people.repository.js";
 import { seasonRepository } from "../season/season.repository.js";
 import { seriesRepository } from "./series.repository.js";
 import { dropKeys, getMany, joinBy } from "@/shared/utils/object/object.js";
+import { notFound } from "@/shared/errors/errors.helpers.js";
+import { userRepository } from "../user/user.repository.js";
 export const seriesService = {
-    async seriesImport(input) {
-        const existingSeries = await seriesRepository.findOne(input);
-        if (existingSeries)
-            return existingSeries;
-        const tmdbSeries = await tvDetails(input.tmdbId);
-        const tmdbSeasons = await Promise.all(tmdbSeries.seasons.map((season) => seasonDetails(input.tmdbId, season.seasonNumber)));
+    async seriesGet(userId, params) {
+        const series = await seriesRepository.findOne(params);
+        if (!series) {
+            throw notFound("Series");
+        }
+        const [seasons, episodes, userSeries, userEpisodes] = await Promise.all([
+            seasonRepository.findMany({
+                seriesId: series.id
+            }),
+            episodeRepository.findMany({
+                seriesId: series.id
+            }),
+            userRepository.findOneSeries({
+                userId_seriesId: { userId, seriesId: series.id }
+            }),
+            userRepository.findManyEpisodes({
+                userId,
+                episode: {
+                    seriesId: series.id
+                }
+            })
+        ]);
+        return { series, seasons, episodes, userSeries, userEpisodes };
+    },
+    async seriesImportPost(userId, body) {
+        const series = await seriesRepository.findOne(body);
+        if (series) {
+            const userSeries = await userRepository.findOneSeries({
+                userId_seriesId: { userId, seriesId: series.id }
+            });
+            return { series, userSeries };
+        }
+        const tmdbSeries = await tvDetails(body.tmdbId);
+        const tmdbSeasons = await Promise.all(tmdbSeries.seasons.map((season) => seasonDetails(body.tmdbId, season.seasonNumber)));
         const tmdbEpisodes = getMany({
             data: tmdbSeasons,
             fields: ["episodes"]
@@ -90,7 +120,10 @@ export const seriesService = {
                     characterId: character.id
                 })
             }), tx);
-            return series;
+            const userSeries = await userRepository.findOneSeries({
+                userId_seriesId: { userId, seriesId: series.id }
+            }, tx);
+            return { series, userSeries };
         });
     }
 };

@@ -6,6 +6,12 @@ export function dropKeys(object, keys) {
     }
     return result;
 }
+export function renameKeys(object, rename) {
+    return Object.fromEntries(Reflect.ownKeys(object).map((key) => {
+        const newKey = key in rename ? rename[key] : key;
+        return [newKey ?? key, object[key]];
+    }));
+}
 export function joinBy(source, target) {
     const getKey = (item, key) => typeof key === "function" ? key(item) : item[key];
     const targetsByKey = new Map(target.data.map((item) => [getKey(item, target.key), item]));

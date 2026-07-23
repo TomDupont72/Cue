@@ -1,5 +1,9 @@
 import { dropKeys } from "@/shared/utils/object/object.js";
-import type { CreateManyAndFetchOptions, UniqueWhere } from "./prisma.types.js";
+import type {
+  CreateManyAndFetchOptions,
+  DeleteManyAndFetchOptions,
+  UniqueWhere
+} from "./prisma.types.js";
 
 function dropUnknownFields<TInput extends object, TSource extends TInput>(
   source: TSource,
@@ -49,4 +53,19 @@ export async function createManyAndFetch<
   await delegate.createMany({ data: uniqueData, skipDuplicates: true });
 
   return delegate.findMany({ where });
+}
+
+export async function deleteManyAndFetch<TWhere, TResult>({
+  where,
+  delegate
+}: DeleteManyAndFetchOptions<TWhere, TResult>): Promise<TResult[]> {
+  const records = await delegate.findMany({ where });
+
+  if (records.length === 0) {
+    return [];
+  }
+
+  await delegate.deleteMany({ where });
+
+  return records;
 }
