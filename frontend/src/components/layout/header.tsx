@@ -13,8 +13,29 @@ import {
   DropdownMenuTrigger
 } from "../ui/dropdown-menu";
 import { Navigation, NavigationMobile } from "./navigation";
+import { authClient } from "@/lib/authClient";
+import { queryClient } from "@/lib/queryClient";
+
+function getInitials(name: string | undefined): string {
+  if (!name) return "NA";
+
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
 
 export default function Header() {
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  async function signOut() {
+    await authClient.signOut();
+    queryClient.clear();
+  }
+
   return (
     <header className="border-b border-border bg-background">
       <Container className="flex h-16 items-center justify-between">
@@ -37,8 +58,8 @@ export default function Header() {
                   aria-label="Ouvrir le menu utilisateur"
                 >
                   <Avatar className="size-8">
-                    <AvatarImage src="https://github.com/shadcn.png" alt="" />
-                    <AvatarFallback>TD</AvatarFallback>
+                    {user?.image && <AvatarImage src={user.image} alt="" />}
+                    <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
                   </Avatar>
                 </Button>
               }
@@ -46,8 +67,8 @@ export default function Header() {
 
             <DropdownMenuContent align="end">
               <DropdownMenuGroup>
-                <DropdownMenuItem>Profil</DropdownMenuItem>
-                <DropdownMenuItem>Se déconnecter</DropdownMenuItem>
+                <DropdownMenuItem disabled>{user?.name}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => void signOut()}>Se déconnecter</DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
