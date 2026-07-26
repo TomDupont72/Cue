@@ -1,3 +1,5 @@
+import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
+
 export const queryKeys = {
   series: {
     all: ["series"] as const,
@@ -13,7 +15,7 @@ export const queryKeys = {
   userSeries: {
     all: ["user-series"] as const,
 
-    list: () => [...queryKeys.userSeries.all, "list"] as const,
+    list: (status: UserSeriesStatus) => [...queryKeys.userSeries.all, "list", status] as const,
 
     detail: (seriesId: number) => [...queryKeys.userSeries.all, seriesId] as const
   }

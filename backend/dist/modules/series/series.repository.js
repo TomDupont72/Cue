@@ -5,6 +5,11 @@ export const seriesRepository = {
             where
         });
     },
+    findMany(where, db = prisma) {
+        return db.series.findMany({
+            where
+        });
+    },
     upsert(where, data, db = prisma) {
         return db.series.upsert({
             where,

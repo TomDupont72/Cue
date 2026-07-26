@@ -40,10 +40,7 @@ export async function findManyPaginated({ where, limit, cursor, cursorField, ord
         : {};
     const records = await delegate.findMany({
         where: {
-            AND: [
-                where,
-                cursorCondition
-            ]
+            AND: [where, cursorCondition]
         },
         orderBy: {
             [cursorField]: order
@@ -56,8 +53,6 @@ export async function findManyPaginated({ where, limit, cursor, cursorField, ord
     return {
         items,
         hasNextPage,
-        nextCursor: hasNextPage && lastItem
-            ? lastItem[cursorField]
-            : null
+        nextCursor: hasNextPage && lastItem ? lastItem[cursorField] : null
     };
 }
