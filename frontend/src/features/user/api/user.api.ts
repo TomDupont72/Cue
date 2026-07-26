@@ -1,9 +1,22 @@
 import { apiClient } from "@/api/client";
 import {
+  userSeriesGetQuerySchema,
   userEpisodeDeleteParamsSchema,
   userEpisodePostParamsSchema
 } from "../schemas/user.schemas";
-import type { UserEpisodeDeleteResponse, UserEpisodePostResponse } from "../types/user.types";
+import type { UserSeriesGetQuery } from "../schemas/user.schemas";
+import type {
+  UserEpisodeDeleteResponse,
+  UserEpisodePostResponse,
+  UserSeriesGetResponse
+} from "../types/user.types";
+
+export function userSeriesGet(query: UserSeriesGetQuery): Promise<UserSeriesGetResponse> {
+  return apiClient<UserSeriesGetResponse, unknown, UserSeriesGetQuery>("/user/series", {
+    query,
+    querySchema: userSeriesGetQuerySchema
+  });
+}
 
 export function userEpisodePost(
   seriesId: number,

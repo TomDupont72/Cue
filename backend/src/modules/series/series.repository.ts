@@ -9,6 +9,12 @@ export const seriesRepository = {
     });
   },
 
+  findMany(where: Prisma.SeriesWhereInput, db: PrismaTx = prisma) {
+    return db.series.findMany({
+      where
+    });
+  },
+
   upsert(
     where: Prisma.SeriesWhereUniqueInput,
     data: Prisma.SeriesCreateInput,

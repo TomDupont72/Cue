@@ -1,3 +1,5 @@
+import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
+
 export type SeriesSearchGetResult = {
   tmdbId: number;
   name: string;
@@ -71,7 +73,7 @@ export type SeriesGetEpisode = {
 export type SeriesGetUserSeries = {
   userId: string;
   seriesId: number;
-  status: "PLANNED" | "WATCHING" | "COMPLETED" | "DROPPED" | "PAUSED";
+  status: UserSeriesStatus;
   isFavorite: boolean;
   addedAt: string;
   lastWatchedAt: string;

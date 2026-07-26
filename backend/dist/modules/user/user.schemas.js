@@ -6,8 +6,9 @@ export const userSeriesStatuses = [
     "DROPPED",
     "PAUSED"
 ];
+export const userSeriesStatusSchema = z.enum(userSeriesStatuses);
 export const userSeriesPostBodySchema = z.object({
-    status: z.enum(userSeriesStatuses).optional(),
+    status: userSeriesStatusSchema.optional(),
     isFavorite: z.boolean().optional()
 });
 export const userSeriesPostParamsSchema = z.object({
@@ -16,5 +17,10 @@ export const userSeriesPostParamsSchema = z.object({
 export const userEpisodePostParamsSchema = z.object({
     seriesId: z.coerce.number().int().min(1),
     episodeId: z.coerce.number().int().min(1)
+});
+export const userSeriesGetParamsSchema = z.object({
+    status: userSeriesStatusSchema,
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+    cursor: z.string().optional()
 });
 export const userEpisodeDeleteParamsSchema = userEpisodePostParamsSchema;
