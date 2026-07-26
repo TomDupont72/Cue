@@ -37,11 +37,7 @@ export function UserSeriesSection({ status }: UserSeriesSectionProps) {
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (query.isPending) {
-    return <LoadingState />;
-  }
-
-  if (query.isError || items.length === 0) {
+  if (query.isPending || query.isError || items.length === 0) {
     return null;
   }
 
