@@ -13,6 +13,8 @@ export const queryKeys = {
   userSeries: {
     all: ["user-series"] as const,
 
+    list: () => [...queryKeys.userSeries.all, "list"] as const,
+
     detail: (seriesId: number) => [...queryKeys.userSeries.all, seriesId] as const
   }
 };

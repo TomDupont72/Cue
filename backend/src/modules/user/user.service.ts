@@ -10,6 +10,7 @@ import {
 import { renameKeys } from "@/shared/utils/object/object.js";
 import { episodeRepository } from "../episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
+import { seriesRepository } from "../series/series.repository.js";
 
 export const userService = {
   async userSeriesGet(userId: string, params: UserSeriesGetParams) {
@@ -17,7 +18,28 @@ export const userService = {
 
     const userSeries = await userRepository.findManySeries({ userId }, limit, cursor);
 
-    return userSeries;
+    const seriesDetails = await seriesRepository.findMany({
+      id: { in: userSeries.items.map((series) => series.seriesId) }
+    });
+
+    const seriesById = new Map(seriesDetails.map((series) => [series.id, series]));
+
+    const items = userSeries.items
+      .map((series) => {
+        const seriesDetails = seriesById.get(series.seriesId);
+
+        return {
+          ...series,
+          seriesDetails
+        };
+      })
+      .filter((item) => item !== null);
+
+    return {
+      items: items,
+      hasNextPage: userSeries.hasNextPage,
+      nextCursor: userSeries.nextCursor
+    };
   },
 
   async userSeriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {

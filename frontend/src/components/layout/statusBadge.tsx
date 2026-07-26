@@ -1,7 +1,8 @@
+import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
 import { Badge } from "../ui/badge";
 
 type StatusBadgeProps = {
-  status: "PLANNED" | "WATCHING" | "COMPLETED" | "DROPPED" | "PAUSED";
+  status: UserSeriesStatus;
 };
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
