@@ -30,3 +30,34 @@ export async function deleteManyAndFetch({ where, delegate }) {
     await delegate.deleteMany({ where });
     return records;
 }
+export async function findManyPaginated({ where, limit, cursor, cursorField, order = "desc", delegate }) {
+    const cursorCondition = cursor !== undefined
+        ? {
+            [cursorField]: {
+                [order === "desc" ? "lt" : "gt"]: cursor
+            }
+        }
+        : {};
+    const records = await delegate.findMany({
+        where: {
+            AND: [
+                where,
+                cursorCondition
+            ]
+        },
+        orderBy: {
+            [cursorField]: order
+        },
+        take: limit + 1
+    });
+    const hasNextPage = records.length > limit;
+    const items = records.slice(0, limit);
+    const lastItem = items.at(-1);
+    return {
+        items,
+        hasNextPage,
+        nextCursor: hasNextPage && lastItem
+            ? lastItem[cursorField]
+            : null
+    };
+}

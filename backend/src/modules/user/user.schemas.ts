@@ -25,8 +25,15 @@ export const userEpisodePostParamsSchema = z.object({
   episodeId: z.coerce.number().int().min(1)
 });
 
+export const userSeriesGetParamsSchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  cursor: z.string().optional()
+});
+
 export const userEpisodeDeleteParamsSchema = userEpisodePostParamsSchema;
 
 export type UserEpisodePostParams = z.infer<typeof userEpisodePostParamsSchema>;
 
 export type UserEpisodeDeleteParams = z.infer<typeof userEpisodeDeleteParamsSchema>;
+
+export type UserSeriesGetParams = z.infer<typeof userSeriesGetParamsSchema>;

@@ -2,12 +2,19 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import {
   UserEpisodeDeleteParams,
   UserEpisodePostParams,
+  UserSeriesGetParams,
   UserSeriesPostBody,
   UserSeriesPostParams
 } from "./user.schemas.js";
 import { userService } from "./user.service.js";
 
 export const userSeriesController = {
+  async get(request: FastifyRequest<{ Querystring: UserSeriesGetParams }>, reply: FastifyReply) {
+    const result = await userService.userSeriesGet(request.user.id, request.query);
+
+    return reply.send(result);
+  },
+
   async post(
     request: FastifyRequest<{ Params: UserSeriesPostParams; Body: UserSeriesPostBody }>,
     reply: FastifyReply

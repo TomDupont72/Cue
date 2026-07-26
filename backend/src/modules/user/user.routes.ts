@@ -2,12 +2,22 @@ import { AppFastifyInstance } from "@/shared/types/fastify.js";
 import {
   userEpisodeDeleteParamsSchema,
   userEpisodePostParamsSchema,
+  userSeriesGetParamsSchema,
   userSeriesPostBodySchema,
   userSeriesPostParamsSchema
 } from "./user.schemas.js";
 import { userEpisodeController, userSeriesController } from "./user.controller.js";
 
 export async function userRoutes(app: AppFastifyInstance) {
+  app.get("/series", {
+    preHandler: [app.requireAuth],
+    schema: {
+      tags: ["User"],
+      querystring: userSeriesGetParamsSchema
+    },
+    handler: userSeriesController.get
+  });
+
   app.post("/series/:seriesId", {
     preHandler: [app.requireAuth],
     schema: {
