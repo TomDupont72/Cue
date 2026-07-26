@@ -1,14 +1,13 @@
 import { Search } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { EmptyState } from "@/components/feedback/emptyState";
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
 import { useSeriesSearch } from "../hooks/useSeriesSearch";
-import { SeriesCard } from "./seriesCard";
 import Paginator from "@/components/layout/paginator";
+import SeriesDisplay from "./seriesDisplay";
 
 export function SeriesSearchResults() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const query = searchParams.get("query")?.trim() ?? "";
@@ -62,22 +61,7 @@ export function SeriesSearchResults() {
         </p>
       </div>
 
-      <div
-        className="
-          grid grid-cols-2 gap-4
-          sm:grid-cols-3
-          md:grid-cols-4
-          lg:grid-cols-5
-        "
-      >
-        {seriesQuery.data.results.map((series) => (
-          <SeriesCard
-            key={series.tmdbId}
-            series={series}
-            onClick={() => navigate(`/series?id=${series.tmdbId}`)}
-          />
-        ))}
-      </div>
+      <SeriesDisplay seriesData={seriesQuery.data.results} />
 
       <Paginator
         currentPage={page}
