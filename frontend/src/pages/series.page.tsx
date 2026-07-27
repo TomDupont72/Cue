@@ -1,6 +1,7 @@
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
 import { Container } from "@/components/layout/container";
+import { ScrollToTop } from "@/components/layout/scrollToTop";
 import { Button } from "@/components/ui/button";
 import SeriesDetails from "@/features/series/components/seriesDetails";
 import { SeriesOverview } from "@/features/series/components/seriesOverview";
@@ -32,32 +33,35 @@ export default function Series() {
   const { series, userSeries } = seriesImportQuery.data;
 
   return (
-    <Container className="flex flex-1 flex-col py-8 gap-4">
-      <div className="grid w-full grid-cols-2 gap-2">
-        <Button
-          variant={view === "overview" ? "secondary" : "ghost"}
-          onClick={() => setView("overview")}
-          className="text-lg font-bold"
-        >
-          À PROPOS
-        </Button>
+    <>
+      <ScrollToTop dependency={tmdbId} />
+      <Container className="flex flex-1 flex-col py-8 gap-4">
+        <div className="grid w-full grid-cols-2 gap-2">
+          <Button
+            variant={view === "overview" ? "secondary" : "ghost"}
+            onClick={() => setView("overview")}
+            className="text-lg font-bold"
+          >
+            À PROPOS
+          </Button>
 
-        <Button
-          variant={view === "details" ? "secondary" : "ghost"}
-          onClick={() => setView("details")}
-          className="text-lg font-bold"
-        >
-          ÉPISODES
-        </Button>
-      </div>
+          <Button
+            variant={view === "details" ? "secondary" : "ghost"}
+            onClick={() => setView("details")}
+            className="text-lg font-bold"
+          >
+            ÉPISODES
+          </Button>
+        </div>
 
-      <div className="flex flex-1 flex-col gap-8">
-        {view === "overview" ? (
-          <SeriesOverview series={series} userSeries={userSeries} />
-        ) : (
-          <SeriesDetails id={series.id} />
-        )}
-      </div>
-    </Container>
+        <div className="flex flex-1 flex-col gap-8">
+          {view === "overview" ? (
+            <SeriesOverview series={series} userSeries={userSeries} />
+          ) : (
+            <SeriesDetails id={series.id} />
+          )}
+        </div>
+      </Container>
+    </>
   );
 }
