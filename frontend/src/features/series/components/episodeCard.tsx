@@ -6,6 +6,8 @@ import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
 import { Badge } from "@/components/ui/badge";
 import { useUserEpisodePost } from "@/features/user/hooks/useUserEpisodePost";
 import { useUserEpisodeDelete } from "@/features/user/hooks/useUserEpisodeDelete";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import EpisodeCardDetails from "./episodeCardDetails";
 
 type EpisodeCardProps = {
   seriesId: number;
@@ -34,37 +36,58 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
   }
 
   return (
-    <Card className="flex flex-row h-24 group overflow-hidden p-0">
-      <div className="w-24 shrink-0 overflow-hidden bg-muted">
-        {stillUrl ? (
-          <img src={stillUrl} loading="lazy" className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full items-center justify-center text-muted-foreground">
-            <ImageOff className="size-8" />
-          </div>
-        )}
+    <Dialog>
+      <div className="group relative rounded-xl transition-transform hover:-translate-y-1 hover:shadow-md">
+        <DialogTrigger
+          render={
+            <Card className="cursor-pointer flex flex-row h-24 overflow-hidden p-0">
+              <div className="w-24 shrink-0 overflow-hidden bg-muted">
+                {stillUrl ? (
+                  <img
+                    src={stillUrl}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-muted-foreground">
+                    <ImageOff className="size-8" />
+                  </div>
+                )}
+              </div>
+              <CardContent className="flex min-w-0 flex-1 flex-col justify-center">
+                {episode.seasonNumber !== 0 ? (
+                  <>
+                    <h2 className="truncate font-bold text-xl">
+                      S{episode.seasonNumber} | E{episode.episodeNumber}
+                    </h2>
+                    <p className="truncate">{episode.name}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="truncate">{episode.name}</p>
+                    <Badge>Spécial</Badge>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          }
+        />
+        <RoundedCheckbox
+          checked={isWatched}
+          onChange={handleCheckedChange}
+          disabled={userEpisodePostMutation.isPending || userEpisodeDeleteMutation.isPending}
+          className="absolute right-3 top-1/2 z-10 -translate-y-1/2"
+        />
       </div>
-      <CardContent className="flex min-w-0 flex-1 flex-col justify-center">
-        {episode.seasonNumber !== 0 ? (
-          <>
-            <h2 className="truncate font-bold text-xl">
-              S{episode.seasonNumber} | E{episode.episodeNumber}
-            </h2>
-            <p className="truncate">{episode.name}</p>
-          </>
-        ) : (
-          <>
-            <p className="truncate">{episode.name}</p>
-            <Badge>Spécial</Badge>
-          </>
-        )}
-      </CardContent>
-      <RoundedCheckbox
-        checked={isWatched}
-        onChange={handleCheckedChange}
-        disabled={userEpisodePostMutation.isPending || userEpisodeDeleteMutation.isPending}
-        className="mr-6 shrink-0 self-center"
-      />
-    </Card>
+
+      <DialogContent className="overflow-hidden p-0">
+        <EpisodeCardDetails
+          episode={episode}
+          isWatched={isWatched}
+          onCheckedChange={handleCheckedChange}
+          isPending={userEpisodePostMutation.isPending || userEpisodeDeleteMutation.isPending}
+        />
+      </DialogContent>
+    </Dialog>
   );
 }
