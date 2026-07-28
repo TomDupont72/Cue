@@ -6,6 +6,7 @@ import {
 } from "../schemas/user.schemas";
 import type { UserSeriesGetQuery } from "../schemas/user.schemas";
 import type {
+  userDashboardSummaryGetResponse,
   UserEpisodeDeleteResponse,
   UserEpisodePostResponse,
   UserSeriesGetResponse
@@ -44,4 +45,8 @@ export function userEpisodeDelete(
     },
     paramsSchema: userEpisodeDeleteParamsSchema
   });
+}
+
+export function userDashboardSummaryGet(): Promise<userDashboardSummaryGetResponse> {
+  return apiClient("/user/dashboard/summary");
 }
