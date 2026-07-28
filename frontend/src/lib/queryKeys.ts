@@ -18,5 +18,11 @@ export const queryKeys = {
     list: (status: UserSeriesStatus) => [...queryKeys.userSeries.all, "list", status] as const,
 
     detail: (seriesId: number) => [...queryKeys.userSeries.all, seriesId] as const
+  },
+
+  userDashboard: {
+    all: ["user-dashboard"] as const,
+
+    summary: () => [...queryKeys.userDashboard.all, "summary"] as const
   }
 };

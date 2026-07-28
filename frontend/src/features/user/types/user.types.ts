@@ -24,3 +24,8 @@ export type UserSeriesGetResponse = {
   hasNextPage: boolean;
   nextCursor: string | null;
 };
+
+export type userDashboardSummaryGetResponse = {
+  totalWatchedMinutes: number;
+  totalWatchedEpisodes: number;
+};
