@@ -15,3 +15,14 @@
 
 - Réinitialisation du scroll lors de la navigation
 - Correction de la synchronisation des épisodes vus
+
+## [0.2.0] - 2026-07-29
+
+### Added
+
+- Ajout d’un endpoint dédié au résumé du dashboard
+- Ajout des statistiques globales de visionnage
+- Ajout du nombre total d’épisodes regardés
+- Ajout du temps total de visionnage
+- Ajout d’un widget de statistiques sur le dashboard
+- Ajout de la gestion globale du chargement du dashboard
