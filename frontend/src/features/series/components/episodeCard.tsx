@@ -54,7 +54,7 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
                   </div>
                 )}
               </div>
-              <CardContent className="flex min-w-0 flex-1 flex-col justify-center">
+              <CardContent className="flex min-w-0 mr-12 flex-1 flex-col justify-center">
                 {episode.seasonNumber !== 0 ? (
                   <>
                     <h2 className="truncate font-bold text-xl">
