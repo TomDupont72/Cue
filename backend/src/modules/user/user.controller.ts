@@ -38,3 +38,11 @@ export const userEpisodeController = {
     return reply.send(result);
   }
 };
+
+export const userDashboardSummaryController = {
+  async get(request: FastifyRequest, reply: FastifyReply) {
+    const result = await userService.userDashboardSummaryGet(request.user.id);
+
+    return reply.send(result);
+  }
+};

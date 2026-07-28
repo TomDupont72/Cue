@@ -2,6 +2,7 @@ import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
+import { DashboardSummaryRow } from "./user.types.js";
 
 export const userRepository = {
   findOneSeries(where: Prisma.UserSeriesWhereUniqueInput, db: PrismaTx = prisma) {
@@ -54,5 +55,19 @@ export const userRepository = {
       create: data,
       update: data
     });
+  },
+
+  async getDashboardSummary(userId: string, db: PrismaTx = prisma) {
+    const [summary] = await db.$queryRaw<DashboardSummaryRow[]>`
+        SELECT SUM(e.runtime) AS "totalWatchedMinutes", COUNT(e.id) AS "totalWatchedEpisodes" FROM "Episode" e
+        INNER JOIN "UserEpisode" ue 
+        ON ue."episodeId" = e.id
+        WHERE ue."userId" = ${userId};
+    `;
+
+    return {
+      totalWatchedMinutes: Number(summary.totalWatchedMinutes),
+      totalWatchedEpisodes: Number(summary.totalWatchedEpisodes)
+    };
   }
 };

@@ -81,5 +81,11 @@ export const userService = {
     const episode = await episodeRepository.deleteMany({ userId, episodeId });
 
     return episode;
+  },
+
+  async userDashboardSummaryGet(userId: string) {
+    const summary = await userRepository.getDashboardSummary(userId);
+
+    return summary;
   }
 };
