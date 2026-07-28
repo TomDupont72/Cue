@@ -6,7 +6,11 @@ import {
   userSeriesPostBodySchema,
   userSeriesPostParamsSchema
 } from "./user.schemas.js";
-import { userEpisodeController, userSeriesController } from "./user.controller.js";
+import {
+  userDashboardSummaryController,
+  userEpisodeController,
+  userSeriesController
+} from "./user.controller.js";
 
 export async function userRoutes(app: AppFastifyInstance) {
   app.get("/series", {
@@ -16,6 +20,14 @@ export async function userRoutes(app: AppFastifyInstance) {
       querystring: userSeriesGetParamsSchema
     },
     handler: userSeriesController.get
+  });
+
+  app.get("/dashboard/summary", {
+    preHandler: [app.requireAuth],
+    schema: {
+      tags: ["User"]
+    },
+    handler: userDashboardSummaryController.get
   });
 
   app.post("/series/:seriesId", {
