@@ -1,12 +1,18 @@
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
-import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
+import { deleteManyAndFetch, findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 import { DashboardSummaryRow } from "./user.types.js";
 
 export const userRepository = {
   findOneSeries(where: Prisma.UserSeriesWhereUniqueInput, db: PrismaTx = prisma) {
     return db.userSeries.findUnique({
+      where
+    });
+  },
+
+  findOneEpisode(where: Prisma.UserEpisodeWhereUniqueInput, db: PrismaTx = prisma) {
+    return db.userEpisode.findUnique({
       where
     });
   },
@@ -35,13 +41,14 @@ export const userRepository = {
 
   upsertSeries(
     where: Prisma.UserSeriesWhereUniqueInput,
-    data: Prisma.UserSeriesUncheckedCreateInput,
+    create: Prisma.UserSeriesUncheckedCreateInput,
+    update: Prisma.UserSeriesUncheckedUpdateInput,
     db: PrismaTx = prisma
   ) {
     return db.userSeries.upsert({
       where,
-      create: data,
-      update: data
+      create: create,
+      update: update
     });
   },
 
@@ -54,6 +61,13 @@ export const userRepository = {
       where,
       create: data,
       update: data
+    });
+  },
+
+  deleteManyEpisode(where: Prisma.UserEpisodeWhereInput, db: PrismaTx = prisma) {
+    return deleteManyAndFetch({
+      where,
+      delegate: db.userEpisode
     });
   },
 
