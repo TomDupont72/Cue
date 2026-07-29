@@ -17,6 +17,7 @@ type UserSeriesGetItems = {
   isFavorite: boolean;
   addedAt: string;
   lastWatchedAt: string | null;
+  watchCount: number;
 };
 
 export type UserSeriesGetResponse = {

@@ -1,12 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import type { SeriesSearchGetResult } from "../types/series.types";
 import { SeriesCard } from "./seriesCard";
+import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 
 type SeriesDisplayProps = {
   seriesData: SeriesSearchGetResult[];
+  userSeriesData?: UserSeriesGetResponse["items"];
+  isProgress?: boolean;
 };
 
-export default function SeriesDisplay({ seriesData }: SeriesDisplayProps) {
+export default function SeriesDisplay({
+  seriesData,
+  userSeriesData = [],
+  isProgress = false
+}: SeriesDisplayProps) {
   const navigate = useNavigate();
 
   return (
@@ -18,13 +25,26 @@ export default function SeriesDisplay({ seriesData }: SeriesDisplayProps) {
                   lg:grid-cols-5
                 "
     >
-      {seriesData.map((series) => (
-        <SeriesCard
-          key={series.tmdbId}
-          series={series}
-          onClick={() => navigate(`/series?id=${series.tmdbId}`)}
-        />
-      ))}
+      {seriesData.map((series) => {
+        const userSeries = userSeriesData.find(
+          (item) => item.seriesDetails.tmdbId === series.tmdbId
+        );
+
+        const watchProgress = userSeries
+          ? (userSeries.watchCount / series.numberOfEpisodes) * 100
+          : undefined;
+
+        return (
+          <SeriesCard
+            key={series.tmdbId}
+            series={series}
+            onClick={() => navigate(`/series?id=${series.tmdbId}`)}
+            isProgress={isProgress}
+            status={userSeries?.status}
+            watchProgress={watchProgress}
+          />
+        );
+      })}
     </div>
   );
 }
