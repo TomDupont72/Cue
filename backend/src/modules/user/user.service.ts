@@ -7,7 +7,6 @@ import {
   UserEpisodeDeleteParams,
   UserSeriesGetParams
 } from "./user.schemas.js";
-import { renameKeys } from "@/shared/utils/object/object.js";
 import { episodeRepository } from "../episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
 import { seriesRepository } from "../series/series.repository.js";
@@ -45,25 +44,55 @@ export const userService = {
   async userSeriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
     const userSeries = await userRepository.upsertSeries(
       { userId_seriesId: { userId, ...params } },
-      { userId, ...params, ...body }
+      { userId, ...params, ...body },
+      {}
     );
 
     return userSeries;
   },
 
   async userEpisodePost(userId: string, params: UserEpisodePostParams) {
-    return prisma.$transaction(async (tx) => {
-      const { seriesId, episodeId } = params;
+    const { seriesId, episodeId } = params;
 
-      const episode = await episodeRepository.findOne(renameKeys(params, { episodeId: "id" }), tx);
+    return prisma.$transaction(async (tx) => {
+      const episode = await episodeRepository.findOne({ id: episodeId, seriesId }, tx);
 
       if (!episode) {
         throw notFound("Episode");
       }
 
+      const series = await seriesRepository.findOne({ id: seriesId }, tx);
+
+      if (!series) {
+        throw notFound("Series");
+      }
+
+      const userSeries = await userRepository.findOneSeries(
+        { userId_seriesId: { userId: userId, seriesId: seriesId } },
+        tx
+      );
+
+      if (!userSeries) {
+        throw notFound("Series for this user");
+      }
+
+      const userEpisode = await userRepository.findOneEpisode(
+        { userId_episodeId: { userId: userId, episodeId: episodeId } },
+        tx
+      );
+
+      if (userEpisode) {
+        return userEpisode;
+      }
+
+      const incrementedWatchcount =
+        episode.seasonNumber !== 0 ? userSeries.watchCount + 1 : userSeries.watchCount;
+      const status = incrementedWatchcount >= series.numberOfEpisodes ? "COMPLETED" : "WATCHING";
+
       await userRepository.upsertSeries(
         { userId_seriesId: { userId, seriesId } },
-        { userId, seriesId },
+        { userId, seriesId, status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() },
+        { status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() },
         tx
       );
 
@@ -76,11 +105,52 @@ export const userService = {
   },
 
   async userEpisodeDelete(userId: string, params: UserEpisodeDeleteParams) {
-    const { episodeId } = params;
+    const { seriesId, episodeId } = params;
 
-    const episode = await episodeRepository.deleteMany({ userId, episodeId });
+    return prisma.$transaction(async (tx) => {
+      const episode = await episodeRepository.findOne({ id: episodeId, seriesId }, tx);
 
-    return episode;
+      if (!episode) {
+        throw notFound("Episode");
+      }
+
+      const series = await seriesRepository.findOne({ id: seriesId }, tx);
+
+      if (!series) {
+        throw notFound("Series");
+      }
+
+      const userSeries = await userRepository.findOneSeries(
+        { userId_seriesId: { userId: userId, seriesId: seriesId } },
+        tx
+      );
+
+      if (!userSeries) {
+        throw notFound("Series for this user");
+      }
+
+      const userEpisode = await userRepository.findOneEpisode(
+        { userId_episodeId: { userId: userId, episodeId: episodeId } },
+        tx
+      );
+
+      if (!userEpisode) {
+        throw notFound("Episode for this user");
+      }
+
+      const decrementedWatchcount =
+        episode.seasonNumber !== 0 ? userSeries.watchCount - 1 : userSeries.watchCount;
+      const status = decrementedWatchcount === 0 ? "PLANNED" : "WATCHING";
+
+      await userRepository.upsertSeries(
+        { userId_seriesId: { userId, seriesId } },
+        { userId, seriesId, status, watchCount: decrementedWatchcount },
+        { status, watchCount: decrementedWatchcount },
+        tx
+      );
+
+      return await userRepository.deleteManyEpisode({ userId, episodeId }, tx);
+    });
   },
 
   async userDashboardSummaryGet(userId: string) {

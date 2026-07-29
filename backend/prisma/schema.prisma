@@ -269,6 +269,7 @@ model UserSeries {
 
   status        UserSeriesStatus @default(PLANNED)
   isFavorite    Boolean          @default(false)
+  watchCount    Int              @default(0)
   addedAt       DateTime         @default(now())
   lastWatchedAt DateTime?
 
