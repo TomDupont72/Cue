@@ -10,6 +10,7 @@ export type SeriesSearchGetResult = {
   firstAirDate: string | null;
   popularity: number;
   voteAverage?: number;
+  numberOfEpisodes: number;
 };
 
 export type SeriesSearchGetResponse = {

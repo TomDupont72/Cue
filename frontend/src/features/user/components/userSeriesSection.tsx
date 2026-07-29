@@ -47,7 +47,11 @@ export function UserSeriesSection({ status }: UserSeriesSectionProps) {
 
       <div className="h-px w-full bg-border" />
 
-      <SeriesDisplay seriesData={items.map((item) => item.seriesDetails)} />
+      <SeriesDisplay
+        seriesData={items.map((item) => item.seriesDetails)}
+        userSeriesData={items}
+        isProgress
+      />
 
       {query.hasNextPage && (
         <div ref={loadMoreRef} className="flex h-24 items-center justify-center">
