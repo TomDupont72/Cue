@@ -72,10 +72,6 @@ export const userService = {
         tx
       );
 
-      if (!userSeries) {
-        throw notFound("Series for this user");
-      }
-
       const userEpisode = await userRepository.findOneEpisode(
         { userId_episodeId: { userId: userId, episodeId: episodeId } },
         tx
@@ -86,7 +82,9 @@ export const userService = {
       }
 
       const incrementedWatchcount =
-        episode.seasonNumber !== 0 ? userSeries.watchCount + 1 : userSeries.watchCount;
+        episode.seasonNumber !== 0
+          ? (userSeries?.watchCount ?? 0) + 1
+          : (userSeries?.watchCount ?? 0);
       const status = incrementedWatchcount >= series.numberOfEpisodes ? "COMPLETED" : "WATCHING";
 
       await userRepository.upsertSeries(
