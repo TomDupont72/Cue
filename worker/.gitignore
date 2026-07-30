@@ -201,3 +201,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+worker/.tmp_dagster_home_*/
