@@ -1,4 +1,5 @@
 import dagster as dg
+from sqlalchemy import text
 
 from orchestrator.resources.cue_api import CueApiResource
 from orchestrator.resources.database import DatabaseResource

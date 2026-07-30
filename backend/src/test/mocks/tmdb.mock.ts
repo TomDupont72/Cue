@@ -139,7 +139,16 @@ export const onePieceTmdbSeasonResponses = {
   }
 };
 
-export function mockTmdbFetch(t: TestContext) {
+export function mockTmdbFetch(
+  t: TestContext,
+  {
+    details = onePieceTmdbDetailsResponse,
+    seasons = onePieceTmdbSeasonResponses
+  }: {
+    details?: unknown;
+    seasons?: Record<number, unknown>;
+  } = {}
+) {
   return t.mock.method(globalThis, "fetch", async (input: string | URL | Request) => {
     const url = new URL(String(input));
     let responseBody: unknown;
@@ -147,11 +156,11 @@ export function mockTmdbFetch(t: TestContext) {
     if (url.pathname === "/3/search/tv") {
       responseBody = onePieceTmdbSearchResponse;
     } else if (url.pathname === "/3/tv/37854") {
-      responseBody = onePieceTmdbDetailsResponse;
+      responseBody = details;
     } else if (url.pathname === "/3/tv/37854/season/1") {
-      responseBody = onePieceTmdbSeasonResponses[1];
+      responseBody = seasons[1];
     } else if (url.pathname === "/3/tv/37854/season/2") {
-      responseBody = onePieceTmdbSeasonResponses[2];
+      responseBody = seasons[2];
     } else {
       return new Response(null, { status: 404 });
     }

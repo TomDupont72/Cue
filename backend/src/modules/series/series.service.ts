@@ -47,20 +47,10 @@ export const seriesService = {
     return { series, seasons, episodes, userSeries, userEpisodes };
   },
 
-  async seriesImportPost(userId: string, body: SeriesImportPost) {
-    const series = await seriesRepository.findOne(body);
-
-    if (series) {
-      const userSeries = await userRepository.findOneSeries({
-        userId_seriesId: { userId, seriesId: series.id }
-      });
-
-      return { series, userSeries };
-    }
-
-    const tmdbSeries = await tvDetails(body.tmdbId);
+  async syncTmdb(tmdbId: number) {
+    const tmdbSeries = await tvDetails(tmdbId);
     const tmdbSeasons = await Promise.all(
-      tmdbSeries.seasons.map((season) => seasonDetails(body.tmdbId, season.seasonNumber))
+      tmdbSeries.seasons.map((season) => seasonDetails(tmdbId, season.seasonNumber))
     );
     const tmdbEpisodes = getMany<TmdbEpisodeDetailsResponse>({
       data: tmdbSeasons,
@@ -74,21 +64,21 @@ export const seriesService = {
         tx
       );
 
-      const genres = await genreRepository.createMany(tmdbSeries.genres, tx);
-      await seriesRepository.addGenres(
+      const genres = await genreRepository.upsertMany(tmdbSeries.genres, tx);
+      await seriesRepository.replaceGenres(
         series.id,
         genres.map((genre) => genre.id),
         tx
       );
 
-      const networks = await networkRepository.createMany(tmdbSeries.networks, tx);
-      await seriesRepository.addNetworks(
+      const networks = await networkRepository.upsertMany(tmdbSeries.networks, tx);
+      await seriesRepository.replaceNetworks(
         series.id,
         networks.map((network) => network.id),
         tx
       );
 
-      const people = await peopleRepository.createMany(
+      const people = await peopleRepository.upsertMany(
         getMany<Prisma.PeopleCreateManyInput>(
           { data: tmdbSeries, fields: ["createdBy"] },
           { data: tmdbEpisodes, fields: ["crew", "guestStars"] }
@@ -100,7 +90,7 @@ export const seriesService = {
         { data: people, key: "tmdbId", value: "id" }
       );
 
-      await seriesRepository.addPeople(series.id, creatorIds, tx);
+      await seriesRepository.replacePeople(series.id, creatorIds, tx);
 
       const characters = await characterRepository.createMany(
         joinBy(
@@ -123,13 +113,13 @@ export const seriesService = {
         tx
       );
 
-      const seasons = await seasonRepository.createMany(
+      const seasons = await seasonRepository.upsertMany(
         series.id,
         tmdbSeasons.map((season) => dropKeys(season, ["episodes"] as const)),
         tx
       );
 
-      const episodes = await episodeRepository.createMany(
+      const episodes = await episodeRepository.upsertMany(
         joinBy(
           { data: tmdbEpisodes, key: "seasonNumber" },
           {
@@ -155,7 +145,8 @@ export const seriesService = {
         }
       );
 
-      await episodeRepository.addPeople(
+      await episodeRepository.replacePeople(
+        episodes.map((episode) => episode.id),
         joinBy(
           { data: episodeCrew, key: ({ person }) => person.tmdbId },
           {
@@ -191,7 +182,8 @@ export const seriesService = {
         }
       );
 
-      await episodeRepository.addCharacters(
+      await episodeRepository.replaceCharacters(
+        episodes.map((episode) => episode.id),
         joinBy(
           {
             data: episodeGuestStarsWithPeople,
@@ -209,14 +201,19 @@ export const seriesService = {
         tx
       );
 
-      const userSeries = await userRepository.findOneSeries(
-        {
-          userId_seriesId: { userId, seriesId: series.id }
-        },
-        tx
-      );
-
-      return { series, userSeries };
+      return series;
     });
+  },
+
+  async seriesImportPost(userId: string | null, body: SeriesImportPost, forceSync = false) {
+    const existingSeries = await seriesRepository.findOne(body);
+    const series = existingSeries && !forceSync ? existingSeries : await this.syncTmdb(body.tmdbId);
+    const userSeries = userId
+      ? await userRepository.findOneSeries({
+          userId_seriesId: { userId, seriesId: series.id }
+        })
+      : null;
+
+    return { series, userSeries };
   }
 };

@@ -4,7 +4,11 @@ import {
   ONE_PIECE_TMDB_ID,
   onePiecePrismaData
 } from "@/test/mocks/prisma.mock.js";
-import { mockTmdbFetch } from "@/test/mocks/tmdb.mock.js";
+import {
+  mockTmdbFetch,
+  onePieceTmdbDetailsResponse,
+  onePieceTmdbSeasonResponses
+} from "@/test/mocks/tmdb.mock.js";
 import Fastify from "fastify";
 import {
   serializerCompiler,
@@ -14,6 +18,18 @@ import {
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { seriesRoutes } from "../series.routes.js";
+import { env } from "@/shared/config/env.js";
+import type { TestContext } from "node:test";
+
+const WORKER_TOKEN = "worker-token-used-by-series-route-tests";
+
+function enableWorkerToken(t: TestContext) {
+  const previousWorkerToken = env.WORKER_TOKEN;
+  env.WORKER_TOKEN = WORKER_TOKEN;
+  t.after(() => {
+    env.WORKER_TOKEN = previousWorkerToken;
+  });
+}
 
 async function buildApp(authenticated = true) {
   const app = Fastify().withTypeProvider<ZodTypeProvider>();
@@ -37,8 +53,9 @@ async function buildApp(authenticated = true) {
 }
 
 describe("POST /api/series/import", () => {
-  it("returns an existing series without accessing the real database", async (t) => {
+  it("returns an existing series to a user without calling TMDB", async (t) => {
     const prismaMock = mockPrisma(t);
+    const fetchMock = t.mock.method(globalThis, "fetch");
     const app = await buildApp();
     t.after(() => app.close());
 
@@ -54,9 +71,15 @@ describe("POST /api/series/import", () => {
     assert.equal(response.json().userSeries, null);
     assert.equal(onePiecePrismaData.seasons.length, 2);
     assert.equal(onePiecePrismaData.episodes.length, 4);
-    assert.equal(prismaMock.series.findUnique.mock.callCount(), 1);
-    assert.deepEqual(prismaMock.series.findUnique.mock.calls[0]?.arguments, [
-      { where: { tmdbId: ONE_PIECE_TMDB_ID } }
+    assert.equal(prismaMock.series.upsert.mock.callCount(), 0);
+    assert.equal(fetchMock.mock.callCount(), 0);
+    assert.equal(prismaMock.transaction.mock.callCount(), 0);
+    assert.deepEqual(prismaMock.userSeries.findUnique.mock.calls[0]?.arguments, [
+      {
+        where: {
+          userId_seriesId: { userId: "test-user", seriesId: onePiecePrismaData.series[0]!.id }
+        }
+      }
     ]);
   });
 
@@ -129,6 +152,130 @@ describe("POST /api/series/import", () => {
     assert.equal(data.series.length, 1);
     assert.equal(data.episodes.length, 4);
     assert.equal(fetchMock.mock.callCount(), 3);
+    assert.equal(data.genres.length, 2);
+    assert.equal(data.networks.length, 1);
+    assert.equal(data.people.length, 3);
+    assert.equal(data.characters.length, 1);
+    assert.equal(data.seriesGenres.length, 2);
+    assert.equal(data.seriesNetworks.length, 1);
+    assert.equal(data.seriesPeople.length, 1);
+    assert.equal(data.episodePeople.length, 4);
+    assert.equal(data.episodeCharacters.length, 4);
+  });
+
+  it("updates catalogue data in place and adds new episodes", async (t) => {
+    enableWorkerToken(t);
+    const data = structuredClone(onePiecePrismaData);
+    data.series[0]!.name = "Ancien titre";
+    data.seasons[0]!.name = "Ancienne saison";
+    data.episodes[0]!.name = "Ancien épisode";
+    const seriesId = data.series[0]!.id;
+    const seasonId = data.seasons[0]!.id;
+    const episodeId = data.episodes[0]!.id;
+    const seasons = structuredClone(onePieceTmdbSeasonResponses);
+    seasons[1].episodes.push({
+      ...seasons[1].episodes[1],
+      id: 20005,
+      episode_number: 3,
+      name: "Un nouvel épisode"
+    });
+    const prismaMock = mockPrisma(t, data);
+    mockTmdbFetch(t, { seasons });
+    const app = await buildApp(false);
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/series/import",
+      headers: { authorization: `Bearer ${WORKER_TOKEN}` },
+      payload: { tmdbId: ONE_PIECE_TMDB_ID }
+    });
+
+    assert.equal(response.statusCode, 200, response.body);
+    assert.equal(data.series[0]!.id, seriesId);
+    assert.equal(data.series[0]!.name, "One Piece");
+    assert.equal(data.seasons[0]!.id, seasonId);
+    assert.equal(data.seasons[0]!.name, "East Blue");
+    assert.equal(data.episodes[0]!.id, episodeId);
+    assert.equal(data.episodes[0]!.name, "Je suis Luffy !");
+    assert.deepEqual(data.userEpisodes, [
+      { userId: "test-user", episodeId, watchedAt: new Date("2026-01-01T00:00:00.000Z") }
+    ]);
+    assert.equal(data.episodes.length, 5);
+    assert.equal(
+      data.episodes.find((episode) => episode.tmdbId === 20005)?.name,
+      "Un nouvel épisode"
+    );
+    assert.equal(prismaMock.series.upsert.mock.callCount(), 1);
+
+    const secondResponse = await app.inject({
+      method: "POST",
+      url: "/api/series/import",
+      headers: { authorization: `Bearer ${WORKER_TOKEN}` },
+      payload: { tmdbId: ONE_PIECE_TMDB_ID }
+    });
+
+    assert.equal(secondResponse.statusCode, 200, secondResponse.body);
+    assert.equal(data.episodes.length, 5);
+    assert.equal(data.episodePeople.length, 5);
+    assert.equal(data.episodeCharacters.length, 5);
+  });
+
+  it("removes stale TMDB relations without deleting catalogue entities", async (t) => {
+    enableWorkerToken(t);
+    const data = structuredClone(onePiecePrismaData);
+    const details = {
+      ...structuredClone(onePieceTmdbDetailsResponse),
+      created_by: [],
+      genres: [onePieceTmdbDetailsResponse.genres[0]],
+      networks: []
+    };
+    const seasons = structuredClone(onePieceTmdbSeasonResponses);
+    for (const season of Object.values(seasons)) {
+      for (const episode of season.episodes) {
+        episode.crew = [];
+        episode.guest_stars = [];
+      }
+    }
+    mockPrisma(t, data);
+    mockTmdbFetch(t, { details, seasons });
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/series/import",
+      headers: { authorization: `Bearer ${WORKER_TOKEN}` },
+      payload: { tmdbId: ONE_PIECE_TMDB_ID }
+    });
+
+    assert.equal(response.statusCode, 200, response.body);
+    assert.equal(data.seriesGenres.length, 1);
+    assert.equal(data.seriesNetworks.length, 0);
+    assert.equal(data.seriesPeople.length, 0);
+    assert.equal(data.episodePeople.length, 0);
+    assert.equal(data.episodeCharacters.length, 0);
+    assert.equal(data.seasons.length, 2);
+    assert.equal(data.episodes.length, 4);
+  });
+
+  it("treats an invalid worker token and a force field as a normal user request", async (t) => {
+    enableWorkerToken(t);
+    const prismaMock = mockPrisma(t);
+    const fetchMock = t.mock.method(globalThis, "fetch");
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/series/import",
+      headers: { authorization: "Bearer invalid-worker-token" },
+      payload: { tmdbId: ONE_PIECE_TMDB_ID, force: true }
+    });
+
+    assert.equal(response.statusCode, 200, response.body);
+    assert.equal(fetchMock.mock.callCount(), 0);
+    assert.equal(prismaMock.series.upsert.mock.callCount(), 0);
   });
 
   it("rejects an invalid TMDB identifier before calling Prisma", async (t) => {

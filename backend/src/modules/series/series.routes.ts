@@ -1,6 +1,7 @@
 import { AppFastifyInstance } from "@/shared/types/fastify.js";
 import { seriesGetSchema, seriesImportPostSchema } from "./series.schemas.js";
 import { seriesController, seriesImportController } from "./series.controller.js";
+import { isWorkerRequest } from "@/shared/middlewares/verify-worker-request.js";
 
 export async function seriesRoutes(app: AppFastifyInstance) {
   app.get("/:id", {
@@ -13,7 +14,13 @@ export async function seriesRoutes(app: AppFastifyInstance) {
   });
 
   app.post("/import", {
-    preHandler: [app.requireAuth],
+    preHandler: [
+      async (request, reply) => {
+        if (!isWorkerRequest(request)) {
+          await app.requireAuth(request, reply);
+        }
+      }
+    ],
     schema: {
       tags: ["Series"],
       body: seriesImportPostSchema

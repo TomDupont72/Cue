@@ -52,5 +52,20 @@ export const seriesRepository = {
       data: peopleIds.map((peopleId) => ({ seriesId, peopleId })),
       skipDuplicates: true
     });
+  },
+
+  async replaceGenres(seriesId: number, genreIds: number[], db: PrismaTx = prisma) {
+    await db.seriesGenre.deleteMany({ where: { seriesId } });
+    return this.addGenres(seriesId, genreIds, db);
+  },
+
+  async replaceNetworks(seriesId: number, networkIds: number[], db: PrismaTx = prisma) {
+    await db.seriesNetwork.deleteMany({ where: { seriesId } });
+    return this.addNetworks(seriesId, networkIds, db);
+  },
+
+  async replacePeople(seriesId: number, peopleIds: number[], db: PrismaTx = prisma) {
+    await db.seriesPeople.deleteMany({ where: { seriesId } });
+    return this.addPeople(seriesId, peopleIds, db);
   }
 };

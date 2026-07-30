@@ -10,7 +10,8 @@ import type {
   Series,
   SeriesGenre,
   SeriesNetwork,
-  SeriesPeople
+  SeriesPeople,
+  UserEpisode
 } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { TestContext } from "node:test";
@@ -33,6 +34,7 @@ export type PrismaMockData = {
   characters: Character[];
   episodePeople: EpisodePeople[];
   episodeCharacters: EpisodeCharacter[];
+  userEpisodes: UserEpisode[];
 };
 
 export const onePiecePrismaData: PrismaMockData = {
@@ -211,7 +213,8 @@ export const onePiecePrismaData: PrismaMockData = {
     { episodeId: 101, characterId: 50 },
     { episodeId: 102, characterId: 50 },
     { episodeId: 103, characterId: 50 }
-  ] satisfies EpisodeCharacter[]
+  ] satisfies EpisodeCharacter[],
+  userEpisodes: [{ userId: "test-user", episodeId: 100, watchedAt: createdAt }]
 };
 
 export function createEmptyPrismaMockData(): PrismaMockData {
@@ -227,7 +230,8 @@ export function createEmptyPrismaMockData(): PrismaMockData {
     seriesPeople: [],
     characters: [],
     episodePeople: [],
-    episodeCharacters: []
+    episodeCharacters: [],
+    userEpisodes: []
   };
 }
 
@@ -254,6 +258,12 @@ type FindManyArgs = {
 type CreateManyArgs = {
   data: Record<string, unknown>[];
   skipDuplicates: boolean;
+};
+
+type UpsertArgs = {
+  where: Record<string, unknown>;
+  create: Record<string, unknown>;
+  update: Record<string, unknown>;
 };
 
 function asRecord(value: object): Record<string, unknown> {
@@ -285,6 +295,19 @@ function mockModelDelegate<T extends ModelRow>(
   rows: T[],
   uniqueFields: (keyof T)[]
 ) {
+  const upsert = t.mock.fn(async ({ where, create, update }: UpsertArgs) => {
+    const existing = rows.find((row) => matchesWhere(row, where));
+
+    if (existing !== undefined) {
+      Object.assign(existing, update, { updatedAt });
+      return existing;
+    }
+
+    const id = Math.max(0, ...rows.map((row) => row.id)) + 1;
+    const created = { ...create, id, createdAt, updatedAt } as T;
+    rows.push(created);
+    return created;
+  });
   const createMany = t.mock.fn(async ({ data }: CreateManyArgs) => {
     let count = 0;
 
@@ -308,8 +331,9 @@ function mockModelDelegate<T extends ModelRow>(
 
   replaceMethod(t, delegate, "createMany", createMany);
   replaceMethod(t, delegate, "findMany", findMany);
+  replaceMethod(t, delegate, "upsert", upsert);
 
-  return { createMany, findMany };
+  return { createMany, findMany, upsert };
 }
 
 function mockJoinDelegate<T extends object>(
@@ -334,10 +358,17 @@ function mockJoinDelegate<T extends object>(
 
     return { count };
   });
+  const deleteMany = t.mock.fn(async ({ where }: { where: Record<string, unknown> }) => {
+    const retained = rows.filter((row) => !matchesWhere(row, where));
+    const count = rows.length - retained.length;
+    rows.splice(0, rows.length, ...retained);
+    return { count };
+  });
 
   replaceMethod(t, delegate, "createMany", createMany);
+  replaceMethod(t, delegate, "deleteMany", deleteMany);
 
-  return { createMany };
+  return { createMany, deleteMany };
 }
 
 export function mockPrisma(t: TestContext, data: PrismaMockData = onePiecePrismaData) {

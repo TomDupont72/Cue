@@ -10,6 +10,26 @@ export type CreateManyAndFetchOptions<
   delegate: CreateManyAndFetchDelegate<TInput, TResult, UniqueWhere<TInput, TUniqueBy>>;
 };
 
+export type UpsertManyAndFetchOptions<
+  TInput extends object,
+  TSource extends TInput,
+  TUniqueBy extends keyof TInput,
+  TResult
+> = {
+  data: readonly TSource[];
+  scalarFields: Readonly<Record<string, keyof TInput>>;
+  uniqueBy: TUniqueBy;
+  delegate: UpsertManyAndFetchDelegate<TInput, TResult, TUniqueBy>;
+};
+
+type UpsertManyAndFetchDelegate<TInput extends object, TResult, TUniqueBy extends keyof TInput> = {
+  upsert(args: {
+    where: { [Field in TUniqueBy]: TInput[Field] };
+    create: TInput;
+    update: TInput;
+  }): PromiseLike<TResult>;
+};
+
 export type UniqueFieldWhere<TInput extends object, TUniqueField extends keyof TInput> = {
   [Field in TUniqueField]: { in: TInput[Field][] };
 };
