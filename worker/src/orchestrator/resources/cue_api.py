@@ -8,7 +8,7 @@ class CueApiResource(dg.ConfigurableResource):
 
     def sync_series(self, tmdb_id: int) -> dict:
         response = httpx.post(
-            f"{self.base_url}/api/import",
+            f"{self.base_url}/api/series/import",
             headers={
                 "Authorization": f"Bearer {self.worker_token}"
             },

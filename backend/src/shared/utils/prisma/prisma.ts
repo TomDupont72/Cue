@@ -4,8 +4,11 @@ import type {
   DeleteManyAndFetchOptions,
   FindManyPaginatedOptions,
   FindManyPaginatedResult,
+  UpsertManyAndFetchOptions,
   UniqueWhere
 } from "./prisma.types.js";
+
+const UPSERT_BATCH_SIZE = 25;
 
 function dropUnknownFields<TInput extends object, TSource extends TInput>(
   source: TSource,
@@ -55,6 +58,42 @@ export async function createManyAndFetch<
   await delegate.createMany({ data: uniqueData, skipDuplicates: true });
 
   return delegate.findMany({ where });
+}
+
+export async function upsertManyAndFetch<
+  TInput extends object,
+  TSource extends TInput,
+  TUniqueBy extends keyof TInput,
+  TResult
+>({
+  data,
+  scalarFields,
+  uniqueBy,
+  delegate
+}: UpsertManyAndFetchOptions<TInput, TSource, TUniqueBy, TResult>): Promise<TResult[]> {
+  const sanitizedData = data.map((item) => dropUnknownFields<TInput, TSource>(item, scalarFields));
+  const uniqueData = [...new Map(sanitizedData.map((item) => [item[uniqueBy], item])).values()];
+
+  const results: TResult[] = [];
+
+  for (let index = 0; index < uniqueData.length; index += UPSERT_BATCH_SIZE) {
+    const batch = uniqueData.slice(index, index + UPSERT_BATCH_SIZE);
+    const batchResults = await Promise.all(
+      batch.map((item) =>
+        delegate.upsert({
+          where: { [uniqueBy]: item[uniqueBy] } as {
+            [Field in TUniqueBy]: TInput[Field];
+          },
+          create: item,
+          update: item
+        })
+      )
+    );
+
+    results.push(...batchResults);
+  }
+
+  return results;
 }
 
 export async function deleteManyAndFetch<TWhere, TResult>({

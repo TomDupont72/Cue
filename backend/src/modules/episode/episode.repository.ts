@@ -1,7 +1,7 @@
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
+import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
 export const episodeRepository = {
   findOne(where: Prisma.EpisodeWhereUniqueInput, db: PrismaTx = prisma) {
@@ -16,8 +16,8 @@ export const episodeRepository = {
     });
   },
 
-  async createMany(episodes: Prisma.EpisodeUncheckedCreateInput[], db: PrismaTx = prisma) {
-    return createManyAndFetch({
+  async upsertMany(episodes: Prisma.EpisodeUncheckedCreateInput[], db: PrismaTx = prisma) {
+    return upsertManyAndFetch({
       data: episodes,
       scalarFields: Prisma.EpisodeScalarFieldEnum,
       uniqueBy: "tmdbId",
@@ -37,5 +37,23 @@ export const episodeRepository = {
       data,
       skipDuplicates: true
     });
+  },
+
+  async replacePeople(
+    episodeIds: number[],
+    data: Prisma.EpisodePeopleCreateManyInput[],
+    db: PrismaTx = prisma
+  ) {
+    await db.episodePeople.deleteMany({ where: { episodeId: { in: episodeIds } } });
+    return this.addPeople(data, db);
+  },
+
+  async replaceCharacters(
+    episodeIds: number[],
+    data: Prisma.EpisodeCharacterCreateManyInput[],
+    db: PrismaTx = prisma
+  ) {
+    await db.episodeCharacter.deleteMany({ where: { episodeId: { in: episodeIds } } });
+    return this.addCharacters(data, db);
   }
 };

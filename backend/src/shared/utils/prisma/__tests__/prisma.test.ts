@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { createManyAndFetch, deleteManyAndFetch } from "../prisma.js";
+import { createManyAndFetch, deleteManyAndFetch, upsertManyAndFetch } from "../prisma.js";
 
 describe("createManyAndFetch", () => {
   it("removes unknown fields, deduplicates input and fetches created records", async () => {
@@ -145,5 +145,40 @@ describe("deleteManyAndFetch", () => {
 
     assert.deepEqual(result, []);
     assert.equal(deleteManyCalls, 0);
+  });
+});
+
+describe("upsertManyAndFetch", () => {
+  it("limits concurrent upserts to batches", async () => {
+    let activeUpserts = 0;
+    let maximumActiveUpserts = 0;
+    const delegate = {
+      async upsert({
+        create
+      }: {
+        where: { tmdbId: number };
+        create: { tmdbId: number; name: string };
+        update: { tmdbId: number; name: string };
+      }) {
+        activeUpserts += 1;
+        maximumActiveUpserts = Math.max(maximumActiveUpserts, activeUpserts);
+        await new Promise((resolve) => setImmediate(resolve));
+        activeUpserts -= 1;
+        return { ...create, id: create.tmdbId };
+      }
+    };
+
+    const results = await upsertManyAndFetch({
+      data: Array.from({ length: 26 }, (_, index) => ({
+        tmdbId: index + 1,
+        name: `Episode ${index + 1}`
+      })),
+      scalarFields: { tmdbId: "tmdbId", name: "name" } as const,
+      uniqueBy: "tmdbId",
+      delegate
+    });
+
+    assert.equal(results.length, 26);
+    assert.equal(maximumActiveUpserts, 25);
   });
 });
