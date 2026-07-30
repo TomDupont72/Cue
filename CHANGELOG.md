@@ -1,3 +1,9 @@
+## [0.3.1] - 2026-07-30
+
+### Fixed
+
+- Correction de l’ajout automatique d’une série lors du marquage de son premier épisode comme regardé
+
 ## [0.3.0] - 2026-07-30
 
 ### Added
