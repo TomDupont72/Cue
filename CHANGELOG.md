@@ -1,4 +1,10 @@
-## [0.4.0] - 2026-01-08
+## [0.4.1] - 2026-08-01
+
+### Fixed
+
+- Augmentation du délai maximal des transactions Prisma lors de la synchronisation des séries.
+
+## [0.4.0] - 2026-08-01
 
 ### Added
 
