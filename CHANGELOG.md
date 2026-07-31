@@ -1,3 +1,10 @@
+## [0.4.0] - 2026-01-08
+
+### Added
+
+- Ajout d’un worker Dagster pour les tâches en arrière-plan.
+- Ajout d’une synchronisation quotidienne des séries avec TMDB.
+
 ## [0.3.1] - 2026-07-30
 
 ### Fixed
