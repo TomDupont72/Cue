@@ -23,6 +23,52 @@ services:
       - default
     restart: unless-stopped
 
+  worker-webserver:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command:
+      [
+        "dagster-webserver",
+        "-h",
+        "0.0.0.0",
+        "-p",
+        "3000",
+        "-m",
+        "orchestrator.definitions",
+      ]
+    env_file:
+      - ./worker/.env
+    ports:
+      - "127.0.0.1:3001:3000"
+    networks:
+      - default
+      - dev-infrastructure
+    volumes:
+      - dagster_home:/opt/dagster/dagster_home
+    depends_on:
+      - backend
+
+  worker-daemon:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["dagster-daemon", "run"]
+    env_file:
+      - ./worker/.env
+    networks:
+      - default
+      - dev-infrastructure
+    volumes:
+      - dagster_home:/opt/dagster/dagster_home
+    depends_on:
+      - backend
+
+volumes:
+  dagster_home:
+
 networks:
   dev-infrastructure:
     external: true

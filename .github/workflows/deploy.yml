@@ -50,6 +50,15 @@ jobs:
             ${{ env.REGISTRY }}/${{ steps.meta.outputs.owner }}/cue-frontend:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ steps.meta.outputs.owner }}/cue-frontend:latest
 
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./worker
+          push: true
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ steps.meta.outputs.owner }}/cue-worker:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ steps.meta.outputs.owner }}/cue-worker:latest
+
       - run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
@@ -64,10 +73,16 @@ jobs:
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             set -e
             cd /var/www/cue
+
             echo APP_VERSION=${{ env.IMAGE_TAG }} > .env
-            docker-compose -f compose.prod.yaml pull
-            docker-compose -f compose.prod.yaml down
-            docker compose -f compose.prod.yaml run --rm backend npx prisma migrate deploy
-            docker-compose -f compose.prod.yaml up -d
+
+            docker compose -f compose.prod.yaml pull
+
+            docker compose -f compose.prod.yaml run --rm backend \
+              npx prisma migrate deploy
+
+            docker compose -f compose.prod.yaml up -d \
+              --remove-orphans
+
             docker image prune -f
           "
