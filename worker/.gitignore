@@ -203,3 +203,4 @@ __marimo__/
 .streamlit/secrets.toml
 
 worker/.tmp_dagster_home_*/
+*.pyc
