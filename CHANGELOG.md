@@ -1,3 +1,15 @@
+## [0.5.0] - 2026-08-02
+
+### Added
+
+- Ajout du nombre de séries regardées dans les statistiques utilisateur.
+- Ajout d’une barre de progression sur la page de détail d’une série.
+- Affichage du temps restant avant la diffusion des prochains épisodes.
+
+### Fixed
+
+- Amélioration du positionnement du badge de statut sur les écrans mobiles.
+
 ## [0.4.1] - 2026-08-01
 
 ### Fixed
