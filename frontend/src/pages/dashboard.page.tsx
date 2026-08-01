@@ -31,6 +31,8 @@ export default function Dashboard() {
     );
   }
 
+  console.log(dashboardSummaryQuery.data);
+
   return (
     <Container className="flex flex-1 flex-col py-8 items-center gap-18">
       <section className="w-full flex flex-col items-center gap-6">
@@ -38,6 +40,7 @@ export default function Dashboard() {
         <UserDashboardSummaryWidget
           totalWatchedMinutes={dashboardSummaryQuery.data.totalWatchedMinutes}
           totalWatchedEpisodes={dashboardSummaryQuery.data.totalWatchedEpisodes}
+          totalWatchedSeries={dashboardSummaryQuery.data.totalWatchedSeries}
         />
       </section>
 
