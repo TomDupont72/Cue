@@ -29,13 +29,12 @@ export function SeriesOverview({ series, userSeries }: SeriesOverviewProps) {
       </div>
 
       <CardContent className="flex flex-col gap-4 pb-4">
-        <div>
-          <div className="flex flex-row items-center gap-4">
-            <h2 className="font-medium text-3xl">
-              {series.name} ({series.originalName})
-            </h2>
-            {userSeries ? <StatusBadge status={userSeries.status} /> : null}
-          </div>
+        <div className="flex flex-col gap-4">
+          <h2 className="font-medium text-3xl">
+            {series.name} ({series.originalName})
+          </h2>
+
+          {userSeries ? <StatusBadge status={userSeries.status} /> : null}
           <p className="text-muted-foreground">
             {startYear} - {series.inProduction ? "présent" : endYear} • {series.numberOfSeasons}{" "}
             saison{series.numberOfSeasons > 1 ? "s" : ""} • {series.numberOfEpisodes} épisode
