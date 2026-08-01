@@ -4,11 +4,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 type UserDashboardSummaryWidgetProps = {
   totalWatchedMinutes: number;
   totalWatchedEpisodes: number;
+  totalWatchedSeries: number;
 };
 
 export default function UserDashboardSummaryWidget({
   totalWatchedMinutes,
-  totalWatchedEpisodes
+  totalWatchedEpisodes,
+  totalWatchedSeries
 }: UserDashboardSummaryWidgetProps) {
   const months = Math.floor(totalWatchedMinutes / 43_200);
   const days = Math.floor((totalWatchedMinutes % 43_200) / 1_440);
@@ -47,6 +49,14 @@ export default function UserDashboardSummaryWidget({
           </CardContent>
           <CardFooter className="flex flex-row justify-center items-center bg-background">
             <h1 className="font-bold text-xl">{totalWatchedEpisodes}</h1>
+          </CardFooter>
+        </Card>
+        <Card className="w-[calc(100vw-4.5rem)] shrink-0 bg-background border sm:w-96">
+          <CardContent>
+            <h1 className="font-bold text-xl text-center">SÉRIES TERMINÉES</h1>
+          </CardContent>
+          <CardFooter className="flex flex-row justify-center items-center bg-background">
+            <h1 className="font-bold text-xl">{totalWatchedSeries}</h1>
           </CardFooter>
         </Card>
       </div>

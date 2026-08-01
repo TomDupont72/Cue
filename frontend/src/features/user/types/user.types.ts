@@ -29,4 +29,5 @@ export type UserSeriesGetResponse = {
 export type userDashboardSummaryGetResponse = {
   totalWatchedMinutes: number;
   totalWatchedEpisodes: number;
+  totalWatchedSeries: number;
 };
