@@ -5,16 +5,11 @@ import type { UserSeriesStatus } from "../constants/userSeriesStatus";
 
 const DASHBOARD_MAX_FETCH = 20;
 
-export function useUserSeries(status: UserSeriesStatus) {
+export function useUserSeries(seriesId?: number, status?: UserSeriesStatus) {
   return useInfiniteQuery({
-    queryKey: queryKeys.userSeries.list(status),
+    queryKey: queryKeys.userSeries.list(seriesId, status),
 
-    queryFn: ({ pageParam }) =>
-      userSeriesGet({
-        status,
-        limit: DASHBOARD_MAX_FETCH,
-        cursor: pageParam
-      }),
+    queryFn: ({ pageParam }) => userSeriesGet(DASHBOARD_MAX_FETCH, seriesId, status, pageParam),
 
     initialPageParam: undefined as string | undefined,
 

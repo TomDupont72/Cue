@@ -2,7 +2,8 @@ import { z } from "zod";
 import { USER_SERIES_STATUS } from "../constants/userSeriesStatus";
 
 export const userSeriesGetQuerySchema = z.object({
-  status: z.enum(USER_SERIES_STATUS),
+  seriesId: z.number().int().min(1).optional(),
+  status: z.enum(USER_SERIES_STATUS).optional(),
   limit: z.number().int().min(1).max(50),
   cursor: z.string().optional()
 });
