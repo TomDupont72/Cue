@@ -32,6 +32,10 @@ export default function Series() {
 
   const { series, userSeries } = seriesImportQuery.data;
 
+  const watchProgress = userSeries
+    ? (userSeries.watchCount / series.numberOfEpisodes) * 100
+    : undefined;
+
   return (
     <>
       <ScrollToTop dependency={tmdbId} />
@@ -56,7 +60,12 @@ export default function Series() {
 
         <div className="flex flex-1 flex-col gap-8">
           {view === "overview" ? (
-            <SeriesOverview series={series} userSeries={userSeries} />
+            <SeriesOverview
+              series={series}
+              userSeries={userSeries}
+              isProgress={userSeries !== null}
+              watchProgress={watchProgress}
+            />
           ) : (
             <SeriesDetails id={series.id} />
           )}

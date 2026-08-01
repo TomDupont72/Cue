@@ -10,7 +10,7 @@ type UserSeriesSectionProps = {
 
 export function UserSeriesSection({ status }: UserSeriesSectionProps) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const query = useUserSeries(status);
+  const query = useUserSeries(undefined, status);
   const items = query.data?.pages.flatMap((page) => page.items) ?? [];
   const { fetchNextPage, hasNextPage, isFetchingNextPage } = query;
 

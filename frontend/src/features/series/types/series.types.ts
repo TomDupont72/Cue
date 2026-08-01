@@ -78,6 +78,7 @@ export type SeriesGetUserSeries = {
   isFavorite: boolean;
   addedAt: string;
   lastWatchedAt: string;
+  watchCount: number;
 };
 
 type SeriesGetUserEpisode = {

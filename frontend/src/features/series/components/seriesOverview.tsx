@@ -5,27 +5,40 @@ import { getYear } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/layout/statusBadge";
 import type { SeriesGetSeries, SeriesGetUserSeries } from "../types/series.types";
+import StatusProgressBar from "@/components/layout/statusProgressBar";
 
 type SeriesOverviewProps = {
   series: SeriesGetSeries;
   userSeries: SeriesGetUserSeries | null;
+  isProgress?: boolean;
+  watchProgress?: number;
 };
 
-export function SeriesOverview({ series, userSeries }: SeriesOverviewProps) {
+export function SeriesOverview({
+  series,
+  userSeries,
+  isProgress = false,
+  watchProgress
+}: SeriesOverviewProps) {
   const backdropUrl = getTmdbImageUrl(series.backdropPath, "original");
   const startYear = getYear(series.firstAirDate);
   const endYear = getYear(series.lastAirDate);
 
   return (
     <Card className="group overflow-hidden p-0">
-      <div className="h-56 sm:h-72 lg:h-96 aspect-video overflow-hidden bg-muted">
-        {backdropUrl ? (
-          <img src={backdropUrl} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full items-center justify-center text-muted-foreground">
-            <ImageOff className="size-8" />
-          </div>
-        )}
+      <div className="overflow-hidden bg-muted">
+        <div className="h-56 w-full overflow-hidden sm:h-72 lg:h-96">
+          {backdropUrl ? (
+            <img src={backdropUrl} className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+              <ImageOff className="size-8" />
+            </div>
+          )}
+        </div>
+        {isProgress ? (
+          <StatusProgressBar value={watchProgress ?? 0} status={userSeries?.status ?? "PLANNED"} />
+        ) : null}
       </div>
 
       <CardContent className="flex flex-col gap-4 pb-4">

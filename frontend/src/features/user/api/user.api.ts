@@ -4,17 +4,27 @@ import {
   userEpisodeDeleteParamsSchema,
   userEpisodePostParamsSchema
 } from "../schemas/user.schemas";
-import type { UserSeriesGetQuery } from "../schemas/user.schemas";
 import type {
   userDashboardSummaryGetResponse,
   UserEpisodeDeleteResponse,
   UserEpisodePostResponse,
   UserSeriesGetResponse
 } from "../types/user.types";
+import { type UserSeriesStatus } from "../constants/userSeriesStatus";
 
-export function userSeriesGet(query: UserSeriesGetQuery): Promise<UserSeriesGetResponse> {
-  return apiClient<UserSeriesGetResponse, unknown, UserSeriesGetQuery>("/user/series", {
-    query,
+export function userSeriesGet(
+  limit: number,
+  seriesId?: number,
+  status?: UserSeriesStatus,
+  cursor?: string
+): Promise<UserSeriesGetResponse> {
+  return apiClient("/user/series", {
+    query: {
+      ...(seriesId && { seriesId }),
+      ...(status && { status }),
+      limit,
+      ...(cursor && { cursor })
+    },
     querySchema: userSeriesGetQuerySchema
   });
 }
