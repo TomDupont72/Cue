@@ -2,7 +2,7 @@ import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
 import { deleteManyAndFetch, findManyPaginated } from "@/shared/utils/prisma/prisma.js";
-import { DashboardSummaryRow } from "./user.types.js";
+import { DashboardSummaryEpisodesRow, DashboardSummarySeriesRow } from "./user.types.js";
 
 export const userRepository = {
   findOneSeries(where: Prisma.UserSeriesWhereUniqueInput, db: PrismaTx = prisma) {
@@ -72,16 +72,23 @@ export const userRepository = {
   },
 
   async getDashboardSummary(userId: string, db: PrismaTx = prisma) {
-    const [summary] = await db.$queryRaw<DashboardSummaryRow[]>`
+    const [summaryEpisodes] = await db.$queryRaw<DashboardSummaryEpisodesRow[]>`
         SELECT SUM(e.runtime) AS "totalWatchedMinutes", COUNT(e.id) AS "totalWatchedEpisodes" FROM "Episode" e
-        INNER JOIN "UserEpisode" ue 
+        INNER JOIN "UserEpisode" ue         
         ON ue."episodeId" = e.id
         WHERE ue."userId" = ${userId};
     `;
 
+    const [summarySeries] = await db.$queryRaw<DashboardSummarySeriesRow[]>`
+        SELECT COUNT(us."seriesId") AS "totalWatchedSeries" FROM "UserSeries" us
+        WHERE us."userId"= ${userId}
+        AND us.status = 'COMPLETED';
+    `;
+
     return {
-      totalWatchedMinutes: Number(summary.totalWatchedMinutes),
-      totalWatchedEpisodes: Number(summary.totalWatchedEpisodes)
+      totalWatchedMinutes: Number(summaryEpisodes.totalWatchedMinutes),
+      totalWatchedEpisodes: Number(summaryEpisodes.totalWatchedEpisodes),
+      totalWatchedSeries: Number(summarySeries.totalWatchedSeries)
     };
   }
 };
