@@ -8,6 +8,7 @@ import { useUserEpisodePost } from "@/features/user/hooks/useUserEpisodePost";
 import { useUserEpisodeDelete } from "@/features/user/hooks/useUserEpisodeDelete";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import EpisodeCardDetails from "./episodeCardDetails";
+import { differenceInCalendarDays } from "date-fns";
 
 type EpisodeCardProps = {
   seriesId: number;
@@ -35,6 +36,10 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
     }
   }
 
+  const remainingDays = episode.airDate
+    ? differenceInCalendarDays(new Date(episode.airDate), new Date())
+    : 0;
+
   return (
     <Dialog>
       <div className="group relative rounded-xl transition-transform hover:-translate-y-1 hover:shadow-md">
@@ -54,7 +59,11 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
                   </div>
                 )}
               </div>
-              <CardContent className="flex min-w-0 mr-12 flex-1 flex-col justify-center">
+              <CardContent
+                className={`flex min-w-0 flex-1 flex-col justify-center ${
+                  remainingDays > 0 ? "mr-28" : "mr-16"
+                }`}
+              >
                 {episode.seasonNumber !== 0 ? (
                   <>
                     <h2 className="truncate font-bold text-xl">
@@ -72,12 +81,18 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
             </Card>
           }
         />
-        <RoundedCheckbox
-          checked={isWatched}
-          onChange={handleCheckedChange}
-          disabled={userEpisodePostMutation.isPending || userEpisodeDeleteMutation.isPending}
-          className="absolute right-3 top-1/2 z-10 -translate-y-1/2"
-        />
+        {remainingDays > 0 ? (
+          <h2 className="absolute right-4 top-1/2 z-10 -translate-y-1/2 font-bold text-xl">
+            {remainingDays} Jour{remainingDays > 1 ? "s" : ""}
+          </h2>
+        ) : (
+          <RoundedCheckbox
+            checked={isWatched}
+            onChange={handleCheckedChange}
+            disabled={userEpisodePostMutation.isPending || userEpisodeDeleteMutation.isPending}
+            className="absolute right-3 top-1/2 z-10 -translate-y-1/2"
+          />
+        )}
       </div>
 
       <DialogContent className="overflow-hidden p-0">
