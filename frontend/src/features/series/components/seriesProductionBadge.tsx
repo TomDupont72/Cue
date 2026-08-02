@@ -9,12 +9,12 @@ export default function SeriesProductionBadge({ inProduction }: SeriesProduction
     ? {
         text: "En production",
         color:
-          "border-teal-200 bg-teal-50 text-teal-700 dark:border-teal-800 dark:bg-teal-950 dark:text-teal-300"
+          "border-coral-200 bg-coral-50 text-coral-700 dark:border-coral-800 dark:bg-coral-950 dark:text-coral-300"
       }
     : {
         text: "Achevée",
         color:
-          "border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
+          "border-warm-gray-200 bg-warm-gray-50 text-warm-gray-700 dark:border-warm-gray-800 dark:bg-warm-gray-950 dark:text-warm-gray-300"
       };
 
   return <Badge className={productionValue.color}>{productionValue.text}</Badge>;
