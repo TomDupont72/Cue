@@ -38,7 +38,7 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
 
   const remainingDays = episode.airDate
     ? differenceInCalendarDays(new Date(episode.airDate), new Date())
-    : 0;
+    : null;
 
   return (
     <Dialog>
@@ -61,7 +61,7 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
               </div>
               <CardContent
                 className={`flex min-w-0 flex-1 flex-col justify-center ${
-                  remainingDays > 0 ? "mr-28" : "mr-16"
+                  remainingDays === null || remainingDays > 0 ? "mr-28" : "mr-16"
                 }`}
               >
                 {episode.seasonNumber !== 0 ? (
@@ -81,7 +81,11 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
             </Card>
           }
         />
-        {remainingDays > 0 ? (
+        {remainingDays === null ? (
+          <h2 className="absolute right-4 top-1/2 z-10 -translate-y-1/2 font-bold text-xl">
+            À venir
+          </h2>
+        ) : remainingDays > 0 ? (
           <h2 className="absolute right-4 top-1/2 z-10 -translate-y-1/2 font-bold text-xl">
             {remainingDays} Jour{remainingDays > 1 ? "s" : ""}
           </h2>
