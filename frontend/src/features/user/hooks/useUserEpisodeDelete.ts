@@ -12,6 +12,7 @@ export function useUserEpisodeDelete() {
     UserEpisodeDeleteResponse,
     Error,
     UserEpisodeDeleteParams,
+    void,
     SeriesGetResponse
   >({
     mutationFn: ({ seriesId, episodeId }) => userEpisodeDelete(seriesId, episodeId),

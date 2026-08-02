@@ -77,7 +77,7 @@ export type SeriesGetUserSeries = {
   status: UserSeriesStatus;
   isFavorite: boolean;
   addedAt: string;
-  lastWatchedAt: string;
+  lastWatchedAt: string | null;
   watchCount: number;
 };
 

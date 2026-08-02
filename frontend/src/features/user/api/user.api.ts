@@ -2,15 +2,18 @@ import { apiClient } from "@/api/client";
 import {
   userSeriesGetQuerySchema,
   userEpisodeDeleteParamsSchema,
-  userEpisodePostParamsSchema
-} from "../schemas/user.schemas";
+  userEpisodePostParamsSchema,
+  userSeriesPostParamsSchema,
+  userSeriesPostBodySchema
+} from "@/features/user/schemas/user.schemas";
 import type {
   userDashboardSummaryGetResponse,
   UserEpisodeDeleteResponse,
   UserEpisodePostResponse,
-  UserSeriesGetResponse
-} from "../types/user.types";
-import { type UserSeriesStatus } from "../constants/userSeriesStatus";
+  UserSeriesGetResponse,
+  UserSeriesPostResponse
+} from "@/features/user/types/user.types";
+import { type UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
 
 export function userSeriesGet(
   limit: number,
@@ -40,6 +43,25 @@ export function userEpisodePost(
       episodeId
     },
     paramsSchema: userEpisodePostParamsSchema
+  });
+}
+
+export function userSeriesPost(
+  seriesId: number,
+  status?: UserSeriesStatus,
+  isFavorite?: boolean
+): Promise<UserSeriesPostResponse> {
+  return apiClient("/user/series/:seriesId", {
+    method: "POST",
+    params: {
+      seriesId
+    },
+    body: {
+      status,
+      isFavorite
+    },
+    paramsSchema: userSeriesPostParamsSchema,
+    bodySchema: userSeriesPostBodySchema
   });
 }
 

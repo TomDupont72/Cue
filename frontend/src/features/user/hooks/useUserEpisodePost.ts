@@ -10,6 +10,7 @@ export function useUserEpisodePost() {
     UserEpisodePostResponse,
     Error,
     UserEpisodePostParams,
+    void,
     SeriesGetResponse
   >({
     mutationFn: ({ seriesId, episodeId }) => userEpisodePost(seriesId, episodeId),
