@@ -1,3 +1,15 @@
+## [0.6.0] - 2026-08-02
+
+### Added
+
+- Possibilité d’ajouter une série au suivi depuis sa fiche.
+- Ajout du statut de production des séries.
+
+### Fixed
+
+- Masquage des saisons ne contenant aucun épisode.
+- Ajout d’un texte spécifique pour les épisodes dont la diffusion n’est pas encore planifiée.
+
 ## [0.5.0] - 2026-08-02
 
 ### Added
