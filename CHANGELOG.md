@@ -1,3 +1,10 @@
+## [0.6.1] - 2026-08-02
+
+### Fixed
+
+- Correction des couleurs des badges de statut.
+- Masquage de la case à cocher pour les épisodes à venir sur leur page de détail.
+
 ## [0.6.0] - 2026-08-02
 
 ### Added
