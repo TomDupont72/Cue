@@ -5,6 +5,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --color-coral-50: #fff1ed;
+  --color-coral-200: #ffb4a3;
+  --color-coral-300: #ff8c75;
+  --color-coral-700: #d63f27;
+  --color-coral-800: #a92f1d;
+  --color-coral-950: #4a120b;
+
+  --color-warm-gray-50: #f7f3ef;
+  --color-warm-gray-200: #ded3ca;
+  --color-warm-gray-300: #c6b7ab;
+  --color-warm-gray-700: #74665c;
+  --color-warm-gray-800: #5b4f47;
+  --color-warm-gray-950: #302925;
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: "Geist Variable", sans-serif;
