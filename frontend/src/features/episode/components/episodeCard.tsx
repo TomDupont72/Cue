@@ -105,6 +105,7 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
           isWatched={isWatched}
           onCheckedChange={handleCheckedChange}
           isPending={userEpisodePostMutation.isPending || userEpisodeDeleteMutation.isPending}
+          remainingDays={remainingDays}
         />
       </DialogContent>
     </Dialog>

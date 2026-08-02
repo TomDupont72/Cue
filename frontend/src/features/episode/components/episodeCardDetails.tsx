@@ -9,13 +9,15 @@ type EpisodeCardDetailsProps = {
   isWatched: boolean;
   onCheckedChange: (checked: boolean) => void;
   isPending: boolean;
+  remainingDays: number | null;
 };
 
 export default function EpisodeCardDetails({
   episode,
   isWatched,
   onCheckedChange,
-  isPending
+  isPending,
+  remainingDays
 }: EpisodeCardDetailsProps) {
   const stillUrl = getTmdbImageUrl(episode.stillPath, "original");
 
@@ -29,12 +31,14 @@ export default function EpisodeCardDetails({
             <ImageOff className="size-8" />
           </div>
         )}
-        <RoundedCheckbox
-          checked={isWatched}
-          onChange={onCheckedChange}
-          disabled={isPending}
-          className="absolute right-3 bottom-3"
-        />
+        {remainingDays !== null && remainingDays <= 0 ? (
+          <RoundedCheckbox
+            checked={isWatched}
+            onChange={onCheckedChange}
+            disabled={isPending}
+            className="absolute right-3 bottom-3"
+          />
+        ) : null}
       </div>
 
       <DialogHeader className="flex px-4">
