@@ -21,6 +21,10 @@ export default function SeasonCard({
 
   const [checked, setChecked] = useState(watchedCount === episodes.length);
 
+  if (episodes.length === 0) {
+    return null;
+  }
+
   return (
     <AccordionItem className="mx-auto w-full sm:max-w-9/10 md:max-w-7/10 lg:max-w-7/10  border-none">
       <div className="relative my-3">
