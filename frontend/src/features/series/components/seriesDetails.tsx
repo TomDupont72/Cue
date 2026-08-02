@@ -2,7 +2,7 @@ import { LoadingState } from "@/components/feedback/loadingState";
 import { useSeries } from "../hooks/useSeries";
 import { ErrorState } from "@/components/feedback/errorState";
 import type { SeriesGetEpisode } from "../types/series.types";
-import SeasonCard from "./seasonCard";
+import SeasonCard from "../../season/components/seasonCard";
 import { Accordion } from "@/components/ui/accordion";
 
 type SeriesDetailsProps = {

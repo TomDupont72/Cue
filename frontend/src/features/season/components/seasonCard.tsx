@@ -1,6 +1,6 @@
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import type { SeriesGetEpisode, SeriesGetSeason } from "../types/series.types";
-import EpisodeCard from "./episodeCard";
+import type { SeriesGetEpisode, SeriesGetSeason } from "@/features/series/types/series.types";
+import EpisodeCard from "@/features/episode/components/episodeCard";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
 import { useState } from "react";
 

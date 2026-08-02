@@ -1,5 +1,5 @@
 import { getTmdbImageUrl } from "@/lib/tmdbImage";
-import type { SeriesGetEpisode } from "../types/series.types";
+import type { SeriesGetEpisode } from "@/features/series/types/series.types";
 import { ImageOff } from "lucide-react";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";

@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import type { SeriesGetEpisode } from "../types/series.types";
+import type { SeriesGetEpisode } from "@/features/series/types/series.types";
 import { getTmdbImageUrl } from "@/lib/tmdbImage";
 import { ImageOff } from "lucide-react";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useUserEpisodePost } from "@/features/user/hooks/useUserEpisodePost";
 import { useUserEpisodeDelete } from "@/features/user/hooks/useUserEpisodeDelete";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import EpisodeCardDetails from "./episodeCardDetails";
+import EpisodeCardDetails from "@/features/episode/components/episodeCardDetails";
 import { differenceInCalendarDays } from "date-fns";
 
 type EpisodeCardProps = {
