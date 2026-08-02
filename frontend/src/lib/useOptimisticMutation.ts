@@ -5,11 +5,19 @@ import {
   type UseMutationOptions
 } from "@tanstack/react-query";
 
-type OptimisticMutationOptions<TData, TError, TVariables, TCache> = Omit<
+type MutationVariables<TParams, TBody> = [TParams] extends [void]
+  ? [TBody] extends [void]
+    ? []
+    : [body: TBody]
+  : [TBody] extends [void]
+    ? [params: TParams]
+    : [params: TParams, body: TBody];
+
+type OptimisticMutationOptions<TData, TError, TParams, TBody, TCache> = Omit<
   UseMutationOptions<
     TData,
     TError,
-    TVariables,
+    MutationVariables<TParams, TBody>,
     {
       previousData: TCache | undefined;
       queryKey: QueryKey;
@@ -17,34 +25,40 @@ type OptimisticMutationOptions<TData, TError, TVariables, TCache> = Omit<
   >,
   "mutationFn" | "onMutate" | "onError"
 > & {
-  mutationFn: (variables: TVariables) => Promise<TData>;
-  getQueryKey: (variables: TVariables) => QueryKey;
-  updateCache: (currentData: TCache, variables: TVariables) => TCache;
+  mutationFn: (...variables: MutationVariables<TParams, TBody>) => Promise<TData>;
+  getQueryKey: (...variables: MutationVariables<TParams, TBody>) => QueryKey;
+  updateCache: (currentData: TCache, ...variables: MutationVariables<TParams, TBody>) => TCache;
 };
 
-export function useOptimisticMutation<TData, TError = Error, TVariables = void, TCache = unknown>({
+export function useOptimisticMutation<
+  TData,
+  TError = Error,
+  TParams = void,
+  TBody = void,
+  TCache = unknown
+>({
   mutationFn,
   getQueryKey,
   updateCache,
   onSuccess,
   onSettled,
   ...options
-}: OptimisticMutationOptions<TData, TError, TVariables, TCache>) {
+}: OptimisticMutationOptions<TData, TError, TParams, TBody, TCache>) {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const mutation = useMutation({
     ...options,
-    mutationFn,
+    mutationFn: (variables: MutationVariables<TParams, TBody>) => mutationFn(...variables),
 
     onMutate: async (variables) => {
-      const queryKey = getQueryKey(variables);
+      const queryKey = getQueryKey(...variables);
 
       await queryClient.cancelQueries({ queryKey });
 
       const previousData = queryClient.getQueryData<TCache>(queryKey);
 
       if (previousData !== undefined) {
-        queryClient.setQueryData<TCache>(queryKey, updateCache(previousData, variables));
+        queryClient.setQueryData<TCache>(queryKey, updateCache(previousData, ...variables));
       }
 
       return {
@@ -63,10 +77,17 @@ export function useOptimisticMutation<TData, TError = Error, TVariables = void, 
 
     onSettled: async (data, error, variables, onMutateResult, mutationContext) => {
       await queryClient.invalidateQueries({
-        queryKey: getQueryKey(variables)
+        queryKey: getQueryKey(...variables)
       });
 
       await onSettled?.(data, error, variables, onMutateResult, mutationContext);
     }
   });
+
+  return {
+    ...mutation,
+    mutate: (...variables: MutationVariables<TParams, TBody>): void => mutation.mutate(variables),
+    mutateAsync: (...variables: MutationVariables<TParams, TBody>): Promise<TData> =>
+      mutation.mutateAsync(variables)
+  };
 }

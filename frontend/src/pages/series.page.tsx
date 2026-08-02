@@ -5,15 +5,12 @@ import { ScrollToTop } from "@/components/layout/scrollToTop";
 import { Button } from "@/components/ui/button";
 import SeriesDetails from "@/features/series/components/seriesDetails";
 import { SeriesOverview } from "@/features/series/components/seriesOverview";
+import { useSeries } from "@/features/series/hooks/useSeries";
 import { useSeriesImport } from "@/features/series/hooks/useSeriesImport";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 export default function Series() {
-  type SeriesView = "overview" | "details";
-
-  const [view, setView] = useState<SeriesView>("overview");
-
   const [searchParams] = useSearchParams();
 
   const tmdbId = Number(searchParams.get("id")?.trim() ?? "");
@@ -30,7 +27,35 @@ export default function Series() {
     );
   }
 
-  const { series, userSeries } = seriesImportQuery.data;
+  return (
+    <SeriesContent
+      key={seriesImportQuery.data.series.id}
+      seriesId={seriesImportQuery.data.series.id}
+      scrollDependency={tmdbId}
+    />
+  );
+}
+
+type SeriesContentProps = {
+  seriesId: number;
+  scrollDependency: number;
+};
+
+function SeriesContent({ seriesId, scrollDependency }: SeriesContentProps) {
+  type SeriesView = "overview" | "details";
+
+  const [view, setView] = useState<SeriesView>("overview");
+  const seriesQuery = useSeries(seriesId);
+
+  if (seriesQuery.isPending) {
+    return <LoadingState />;
+  }
+
+  if (seriesQuery.isError) {
+    return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
+  }
+
+  const { series, userSeries } = seriesQuery.data;
 
   const watchProgress = userSeries
     ? (userSeries.watchCount / series.numberOfEpisodes) * 100
@@ -38,7 +63,7 @@ export default function Series() {
 
   return (
     <>
-      <ScrollToTop dependency={tmdbId} />
+      <ScrollToTop dependency={scrollDependency} />
       <Container className="flex flex-1 flex-col py-8 gap-4">
         <div className="grid w-full grid-cols-2 gap-2">
           <Button

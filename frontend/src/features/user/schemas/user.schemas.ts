@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { USER_SERIES_STATUS } from "../constants/userSeriesStatus";
+import { USER_SERIES_STATUS } from "@/features/user/constants/userSeriesStatus";
 
 export const userSeriesGetQuerySchema = z.object({
   seriesId: z.number().int().min(1).optional(),
@@ -15,8 +15,21 @@ export const userEpisodePostParamsSchema = z.object({
   episodeId: z.number().int().min(1)
 });
 
+export const userSeriesPostParamsSchema = z.object({
+  seriesId: z.number().int().min(1)
+});
+
+export const userSeriesPostBodySchema = z.object({
+  status: z.enum(USER_SERIES_STATUS).optional(),
+  isFavorite: z.boolean().optional()
+});
+
 export const userEpisodeDeleteParamsSchema = userEpisodePostParamsSchema;
 
 export type UserEpisodePostParams = z.infer<typeof userEpisodePostParamsSchema>;
 
 export type UserEpisodeDeleteParams = z.infer<typeof userEpisodeDeleteParamsSchema>;
+
+export type UserSeriesPostParams = z.infer<typeof userSeriesPostParamsSchema>;
+
+export type UserSeriesPostBody = z.infer<typeof userSeriesPostBodySchema>;

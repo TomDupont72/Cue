@@ -7,6 +7,7 @@ import StatusBadge from "@/features/user/components/statusBadge";
 import type { SeriesGetSeries, SeriesGetUserSeries } from "../types/series.types";
 import StatusProgressBar from "@/features/user/components/statusProgressBar";
 import SeriesProductionBadge from "./seriesProductionBadge";
+import { useUserSeriesPost } from "@/features/user/hooks/useUserSeriesPost";
 
 type SeriesOverviewProps = {
   series: SeriesGetSeries;
@@ -24,6 +25,8 @@ export function SeriesOverview({
   const backdropUrl = getTmdbImageUrl(series.backdropPath, "original");
   const startYear = getYear(series.firstAirDate);
   const endYear = getYear(series.lastAirDate);
+
+  const userSeriesPostMutation = useUserSeriesPost();
 
   return (
     <Card className="group overflow-hidden p-0">
@@ -62,7 +65,11 @@ export function SeriesOverview({
 
       <div>
         {!userSeries ? (
-          <Button variant="secondary" className="h-full w-full p-1 rounded-none text-lg">
+          <Button
+            variant="secondary"
+            className="h-full w-full p-1 rounded-none text-lg"
+            onClick={() => userSeriesPostMutation.mutate({ seriesId: series.id }, {})}
+          >
             Ajouter la série
           </Button>
         ) : null}

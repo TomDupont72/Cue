@@ -7,6 +7,16 @@ export type UserEpisodePostResponse = {
   watchedAt: string;
 };
 
+export type UserSeriesPostResponse = {
+  userId: string;
+  seriesId: number;
+  status: UserSeriesStatus;
+  isFavorite: boolean;
+  watchCount: number;
+  addedAt: string;
+  lastWatchedAt: string | null;
+};
+
 export type UserEpisodeDeleteResponse = UserEpisodePostResponse;
 
 type UserSeriesGetItems = {
