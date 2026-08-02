@@ -1,5 +1,5 @@
 import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
-import { Progress } from "../ui/progress";
+import { Progress } from "@/components/ui/progress";
 
 type StatusProgressBarProps = {
   value: number;

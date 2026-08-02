@@ -3,9 +3,10 @@ import { getTmdbImageUrl } from "@/lib/tmdbImage";
 import { ImageOff } from "lucide-react";
 import { getYear } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import StatusBadge from "@/components/layout/statusBadge";
+import StatusBadge from "@/features/user/components/statusBadge";
 import type { SeriesGetSeries, SeriesGetUserSeries } from "../types/series.types";
-import StatusProgressBar from "@/components/layout/statusProgressBar";
+import StatusProgressBar from "@/features/user/components/statusProgressBar";
+import SeriesProductionBadge from "./seriesProductionBadge";
 
 type SeriesOverviewProps = {
   series: SeriesGetSeries;
@@ -46,8 +47,10 @@ export function SeriesOverview({
           <h2 className="font-medium text-3xl">
             {series.name} ({series.originalName})
           </h2>
-
-          {userSeries ? <StatusBadge status={userSeries.status} /> : null}
+          <div className="flex flex-row gap-3">
+            <SeriesProductionBadge inProduction={series.inProduction} />
+            {userSeries ? <StatusBadge status={userSeries.status} /> : null}
+          </div>
           <p className="text-muted-foreground">
             {startYear} - {series.inProduction ? "présent" : endYear} • {series.numberOfSeasons}{" "}
             saison{series.numberOfSeasons > 1 ? "s" : ""} • {series.numberOfEpisodes} épisode

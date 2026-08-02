@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getTmdbImageUrl } from "@/lib/tmdbImage";
 import type { SeriesSearchGetResult } from "../types/series.types";
 import { getYear } from "@/lib/utils";
-import StatusProgressBar from "@/components/layout/statusProgressBar";
+import StatusProgressBar from "@/features/user/components/statusProgressBar";
 import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
 
 type SeriesCardProps = {
