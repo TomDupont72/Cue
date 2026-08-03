@@ -5,12 +5,14 @@ import {
   userEpisodePostParamsSchema,
   userSeriesPostParamsSchema,
   userSeriesPostBodySchema,
-  userSeasonPostParamsSchema
+  userSeasonPostParamsSchema,
+  userSeasonDeleteParamsSchema
 } from "@/features/user/schemas/user.schemas";
 import type {
   UserDashboardSummaryGetResponse,
   UserEpisodeDeleteResponse,
   UserEpisodePostResponse,
+  UserSeasonDeleteResponse,
   UserSeasonPostResponse,
   UserSeriesGetResponse,
   UserSeriesPostResponse
@@ -96,5 +98,19 @@ export function userSeasonPost(
       seasonId
     },
     paramsSchema: userSeasonPostParamsSchema
+  });
+}
+
+export function userSeasonDelete(
+  seriesId: number,
+  seasonId: number
+): Promise<UserSeasonDeleteResponse> {
+  return apiClient("/user/series/:seriesId/season/:seasonId", {
+    method: "DELETE",
+    params: {
+      seriesId,
+      seasonId
+    },
+    paramsSchema: userSeasonDeleteParamsSchema
   });
 }

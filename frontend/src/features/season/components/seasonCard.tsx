@@ -3,6 +3,7 @@ import type { SeriesGetEpisode, SeriesGetSeason } from "@/features/series/types/
 import EpisodeCard from "@/features/episode/components/episodeCard";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
 import { useUserSeasonPost } from "@/features/user/hooks/useUserSeasonPost";
+import { useUserSeasonDelete } from "@/features/user/hooks/useUserSeasonDelete";
 
 type SeasonCardProps = {
   seriesId: number;
@@ -20,6 +21,7 @@ export default function SeasonCard({
   const watchedCount = episodes.filter((episode) => watchedEpisodeIds.has(episode.id)).length;
 
   const userSeasonPostMutation = useUserSeasonPost();
+  const userSeasonDeleteMutation = useUserSeasonDelete();
 
   function handleCheckedChange(checked: boolean) {
     const params = {
@@ -29,6 +31,8 @@ export default function SeasonCard({
 
     if (checked) {
       userSeasonPostMutation.mutate(params);
+    } else {
+      userSeasonDeleteMutation.mutate(params);
     }
   }
 
