@@ -36,8 +36,19 @@ export type UserSeriesGetResponse = {
   nextCursor: string | null;
 };
 
-export type userDashboardSummaryGetResponse = {
+export type UserDashboardSummaryGetResponse = {
   totalWatchedMinutes: number;
   totalWatchedEpisodes: number;
   totalWatchedSeries: number;
+};
+
+export type UserSeasonPostResponse = {
+  userId: string;
+  episodeId: number;
+  watchedAt: string;
+}[];
+
+export type UserSeasonPostParams = {
+  seriesId: number;
+  seasonId: number;
 };
