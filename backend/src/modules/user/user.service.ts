@@ -207,8 +207,7 @@ export const userService = {
     });
   },
 
-  async userSeasonDelete(userId: string, params: UserSeasonDeleteParams
-  ) {
+  async userSeasonDelete(userId: string, params: UserSeasonDeleteParams) {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -255,7 +254,10 @@ export const userService = {
         tx
       );
 
-      return userRepository.deleteManyEpisode({ userId, episodeId: { in: userEpisodes.map((userEpisode) => userEpisode.episodeId) } }, tx);
+      return userRepository.deleteManyEpisode(
+        { userId, episodeId: { in: userEpisodes.map((userEpisode) => userEpisode.episodeId) } },
+        tx
+      );
     });
   },
 
