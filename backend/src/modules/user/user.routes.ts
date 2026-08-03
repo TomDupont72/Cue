@@ -2,6 +2,7 @@ import { AppFastifyInstance } from "@/shared/types/fastify.js";
 import {
   userEpisodeDeleteParamsSchema,
   userEpisodePostParamsSchema,
+  userSeasonDeleteParamsSchema,
   userSeasonPostParamsSchema,
   userSeriesGetParamsSchema,
   userSeriesPostBodySchema,
@@ -67,5 +68,14 @@ export async function userRoutes(app: AppFastifyInstance) {
       params: userSeasonPostParamsSchema
     },
     handler: userSeasonController.post
+  });
+
+  app.delete("/series/:seriesId/season/:seasonId", {
+    preHandler: [app.requireAuth],
+    schema: {
+      tags: ["User"],
+      params: userSeasonDeleteParamsSchema
+    },
+    handler: userSeasonController.delete
   });
 }

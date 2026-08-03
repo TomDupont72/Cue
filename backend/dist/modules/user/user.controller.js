@@ -23,6 +23,10 @@ export const userSeasonController = {
     async post(request, reply) {
         const result = await userService.userSeasonPost(request.user.id, request.params);
         return reply.send(result);
+    },
+    async delete(request, reply) {
+        const result = await userService.userSeasonDelete(request.user.id, request.params);
+        return reply.send(result);
     }
 };
 export const userDashboardSummaryController = {
