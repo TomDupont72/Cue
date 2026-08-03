@@ -1,4 +1,5 @@
 import { dropKeys } from "../../../shared/utils/object/object.js";
+const UPSERT_BATCH_SIZE = 25;
 function dropUnknownFields(source, scalarFields) {
     const allowedFields = new Set(Object.values(scalarFields));
     const unknownFields = Object.keys(source).filter((field) => !allowedFields.has(field));
@@ -21,6 +22,30 @@ export async function createManyAndFetch({ data, scalarFields, uniqueBy, delegat
         : { [uniqueField]: { in: uniqueData.map((item) => item[uniqueField]) } });
     await delegate.createMany({ data: uniqueData, skipDuplicates: true });
     return delegate.findMany({ where });
+}
+export async function upsertManyAndFetch({ data, scalarFields, uniqueBy, delegate }) {
+    const sanitizedData = data.map((item) => dropUnknownFields(item, scalarFields));
+    const uniqueFields = (Array.isArray(uniqueBy) ? uniqueBy : [uniqueBy]);
+    const uniqueField = uniqueBy;
+    const upsert = delegate.upsert;
+    const uniqueData = [
+        ...new Map(sanitizedData.map((item) => [JSON.stringify(uniqueFields.map((field) => item[field])), item])).values()
+    ];
+    const results = [];
+    for (let index = 0; index < uniqueData.length; index += UPSERT_BATCH_SIZE) {
+        const batch = uniqueData.slice(index, index + UPSERT_BATCH_SIZE);
+        const batchResults = await Promise.all(batch.map((item) => upsert({
+            where: (Array.isArray(uniqueBy)
+                ? {
+                    [uniqueFields.join("_")]: Object.fromEntries(uniqueFields.map((field) => [field, item[field]]))
+                }
+                : { [uniqueField]: item[uniqueField] }),
+            create: item,
+            update: item
+        })));
+        results.push(...batchResults);
+    }
+    return results;
 }
 export async function deleteManyAndFetch({ where, delegate }) {
     const records = await delegate.findMany({ where });

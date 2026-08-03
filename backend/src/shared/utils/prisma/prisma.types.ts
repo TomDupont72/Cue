@@ -12,22 +12,45 @@ export type CreateManyAndFetchOptions<
 
 export type UpsertManyAndFetchOptions<
   TInput extends object,
-  TSource extends TInput,
-  TUniqueBy extends keyof TInput,
+  TUniqueBy extends keyof TInput | readonly (keyof TInput)[],
   TResult
 > = {
-  data: readonly TSource[];
-  scalarFields: Readonly<Record<string, keyof TInput>>;
+  data: readonly TInput[];
+  scalarFields: Readonly<Record<string, keyof NoInfer<TInput>>>;
   uniqueBy: TUniqueBy;
-  delegate: UpsertManyAndFetchDelegate<TInput, TResult, TUniqueBy>;
+  delegate: UpsertManyAndFetchDelegate<NoInfer<TInput>, TResult, NoInfer<TUniqueBy>>;
 };
 
-type UpsertManyAndFetchDelegate<TInput extends object, TResult, TUniqueBy extends keyof TInput> = {
-  upsert(args: {
-    where: { [Field in TUniqueBy]: TInput[Field] };
-    create: TInput;
-    update: TInput;
-  }): PromiseLike<TResult>;
+type JoinUniqueFields<TFields extends readonly PropertyKey[]> = TFields extends readonly [
+  infer TFirst extends PropertyKey,
+  ...infer TRest extends PropertyKey[]
+]
+  ? TRest extends []
+    ? `${Extract<TFirst, string | number>}`
+    : `${Extract<TFirst, string | number>}_${JoinUniqueFields<TRest>}`
+  : never;
+
+export type UpsertUniqueWhere<
+  TInput extends object,
+  TUniqueBy extends keyof TInput | readonly (keyof TInput)[]
+> = TUniqueBy extends readonly (keyof TInput)[]
+  ? { [Field in JoinUniqueFields<TUniqueBy>]: Pick<TInput, TUniqueBy[number]> }
+  : TUniqueBy extends keyof TInput
+    ? { [Field in TUniqueBy]: TInput[Field] }
+    : never;
+
+type UpsertManyAndFetchDelegate<
+  TInput extends object,
+  TResult,
+  TUniqueBy extends keyof TInput | readonly (keyof TInput)[]
+> = {
+  upsert: {
+    bivarianceHack(args: {
+      where: UpsertUniqueWhere<TInput, TUniqueBy>;
+      create: TInput;
+      update: TInput;
+    }): PromiseLike<TResult>;
+  }["bivarianceHack"];
 };
 
 export type UniqueFieldWhere<TInput extends object, TUniqueField extends keyof TInput> = {

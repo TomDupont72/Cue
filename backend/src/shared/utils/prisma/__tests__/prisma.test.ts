@@ -149,6 +149,36 @@ describe("deleteManyAndFetch", () => {
 });
 
 describe("upsertManyAndFetch", () => {
+  it("builds Prisma compound unique inputs", async () => {
+    const receivedWhere: { userId_episodeId: { userId: string; episodeId: number } }[] = [];
+    const delegate = {
+      async upsert({
+        where,
+        create
+      }: {
+        where: { userId_episodeId: { userId: string; episodeId: number } };
+        create: { userId: string; episodeId: number };
+        update: { userId: string; episodeId: number };
+      }) {
+        receivedWhere.push(where);
+        return create;
+      }
+    };
+
+    const results = await upsertManyAndFetch({
+      data: [
+        { userId: "user-1", episodeId: 42 },
+        { userId: "user-1", episodeId: 42 }
+      ],
+      scalarFields: { userId: "userId", episodeId: "episodeId" } as const,
+      uniqueBy: ["userId", "episodeId"] as const,
+      delegate
+    });
+
+    assert.deepEqual(receivedWhere, [{ userId_episodeId: { userId: "user-1", episodeId: 42 } }]);
+    assert.equal(results.length, 1);
+  });
+
   it("limits concurrent upserts to batches", async () => {
     let activeUpserts = 0;
     let maximumActiveUpserts = 0;

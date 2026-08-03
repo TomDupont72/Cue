@@ -216,6 +216,7 @@ export const UserSeriesScalarFieldEnum = {
     seriesId: 'seriesId',
     status: 'status',
     isFavorite: 'isFavorite',
+    watchCount: 'watchCount',
     addedAt: 'addedAt',
     lastWatchedAt: 'lastWatchedAt'
 };

@@ -5,7 +5,8 @@ import {
   UserSeriesPostBody,
   UserSeriesPostParams,
   UserEpisodeDeleteParams,
-  UserSeriesGetParams
+  UserSeriesGetParams,
+  UserSeasonPostParams
 } from "./user.schemas.js";
 import { episodeRepository } from "../episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
@@ -94,7 +95,7 @@ export const userService = {
         tx
       );
 
-      return await userRepository.upsertEpisode(
+      return userRepository.upsertEpisode(
         { userId_episodeId: { userId, episodeId } },
         { userId, episodeId },
         tx
@@ -147,7 +148,61 @@ export const userService = {
         tx
       );
 
-      return await userRepository.deleteManyEpisode({ userId, episodeId }, tx);
+      return userRepository.deleteManyEpisode({ userId, episodeId }, tx);
+    });
+  },
+
+  async userSeasonPost(userId: string, params: UserSeasonPostParams) {
+    const { seriesId, seasonId } = params;
+
+    return prisma.$transaction(async (tx) => {
+      const episodes = await episodeRepository.findMany({ seriesId, seasonId }, tx);
+
+      if (episodes.length === 0) {
+        throw notFound("Episodes");
+      }
+
+      const series = await seriesRepository.findOne({ id: seriesId }, tx);
+
+      if (!series) {
+        throw notFound("Series");
+      }
+
+      const userSeries = await userRepository.findOneSeries(
+        { userId_seriesId: { userId: userId, seriesId: seriesId } },
+        tx
+      );
+
+      const userEpisodes = await userRepository.findManyEpisodes(
+        { userId, episodeId: { in: episodes.map((episode) => episode.id) } },
+        tx
+      );
+
+      const watchedEpisodeIds = new Set(userEpisodes.map((userEpisode) => userEpisode.episodeId));
+
+      const notWatchedEpisodes = episodes.filter((episode) => !watchedEpisodeIds.has(episode.id));
+
+      if (notWatchedEpisodes.length === 0) {
+        return userEpisodes;
+      }
+
+      const incrementedWatchcount =
+        episodes[0].seasonNumber !== 0
+          ? (userSeries?.watchCount ?? 0) + notWatchedEpisodes.length
+          : (userSeries?.watchCount ?? 0);
+      const status = incrementedWatchcount >= series.numberOfEpisodes ? "COMPLETED" : "WATCHING";
+
+      await userRepository.upsertSeries(
+        { userId_seriesId: { userId, seriesId } },
+        { userId, seriesId, status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() },
+        { status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() },
+        tx
+      );
+
+      return userRepository.upsertManyEpisodes(
+        notWatchedEpisodes.map((episode) => ({ userId, episodeId: episode.id })),
+        tx
+      );
     });
   },
 

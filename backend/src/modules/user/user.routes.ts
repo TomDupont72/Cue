@@ -2,15 +2,17 @@ import { AppFastifyInstance } from "@/shared/types/fastify.js";
 import {
   userEpisodeDeleteParamsSchema,
   userEpisodePostParamsSchema,
+  userSeasonPostParamsSchema,
   userSeriesGetParamsSchema,
   userSeriesPostBodySchema,
   userSeriesPostParamsSchema
-} from "./user.schemas.js";
+} from "@/modules/user/user.schemas.js";
 import {
   userDashboardSummaryController,
   userEpisodeController,
+  userSeasonController,
   userSeriesController
-} from "./user.controller.js";
+} from "@/modules/user/user.controller.js";
 
 export async function userRoutes(app: AppFastifyInstance) {
   app.get("/series", {
@@ -56,5 +58,14 @@ export async function userRoutes(app: AppFastifyInstance) {
       params: userEpisodeDeleteParamsSchema
     },
     handler: userEpisodeController.delete
+  });
+
+  app.post("/series/:seriesId/season/:seasonId", {
+    preHandler: [app.requireAuth],
+    schema: {
+      tags: ["User"],
+      params: userSeasonPostParamsSchema
+    },
+    handler: userSeasonController.post
   });
 }
