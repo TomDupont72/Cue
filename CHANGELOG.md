@@ -1,3 +1,11 @@
+## [0.7.0] - 2026-08-04
+
+### Added
+
+- Ajout d’une saison au suivi depuis la page d’une série.
+- Suppression d’une saison du suivi depuis la page d’une série.
+- Ajout des endpoints API permettant d’ajouter et de supprimer une saison.
+
 ## [0.6.1] - 2026-08-02
 
 ### Fixed
