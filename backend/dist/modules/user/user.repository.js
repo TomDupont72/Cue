@@ -1,8 +1,14 @@
+import { Prisma } from "../../generated/prisma/client.js";
 import { prisma } from "../../shared/db/prisma.js";
-import { findManyPaginated } from "../../shared/utils/prisma/prisma.js";
+import { deleteManyAndFetch, findManyPaginated, upsertManyAndFetch } from "../../shared/utils/prisma/prisma.js";
 export const userRepository = {
     findOneSeries(where, db = prisma) {
         return db.userSeries.findUnique({
+            where
+        });
+    },
+    findOneEpisode(where, db = prisma) {
+        return db.userEpisode.findUnique({
             where
         });
     },
@@ -21,11 +27,11 @@ export const userRepository = {
             where
         });
     },
-    upsertSeries(where, data, db = prisma) {
+    upsertSeries(where, create, update, db = prisma) {
         return db.userSeries.upsert({
             where,
-            create: data,
-            update: data
+            create: create,
+            update: update
         });
     },
     upsertEpisode(where, data, db = prisma) {
@@ -34,5 +40,37 @@ export const userRepository = {
             create: data,
             update: data
         });
+    },
+    upsertManyEpisode(data, db = prisma) {
+        return upsertManyAndFetch({
+            data,
+            scalarFields: Prisma.UserEpisodeScalarFieldEnum,
+            uniqueBy: ["userId", "episodeId"],
+            delegate: db.userEpisode
+        });
+    },
+    deleteManyEpisode(where, db = prisma) {
+        return deleteManyAndFetch({
+            where,
+            delegate: db.userEpisode
+        });
+    },
+    async getDashboardSummary(userId, db = prisma) {
+        const [summaryEpisodes] = await db.$queryRaw `
+        SELECT SUM(e.runtime) AS "totalWatchedMinutes", COUNT(e.id) AS "totalWatchedEpisodes" FROM "Episode" e
+        INNER JOIN "UserEpisode" ue         
+        ON ue."episodeId" = e.id
+        WHERE ue."userId" = ${userId};
+    `;
+        const [summarySeries] = await db.$queryRaw `
+        SELECT COUNT(us."seriesId") AS "totalWatchedSeries" FROM "UserSeries" us
+        WHERE us."userId"= ${userId}
+        AND us.status = 'COMPLETED';
+    `;
+        return {
+            totalWatchedMinutes: Number(summaryEpisodes.totalWatchedMinutes),
+            totalWatchedEpisodes: Number(summaryEpisodes.totalWatchedEpisodes),
+            totalWatchedSeries: Number(summarySeries.totalWatchedSeries)
+        };
     }
 };

@@ -2,11 +2,12 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import {
   UserEpisodeDeleteParams,
   UserEpisodePostParams,
+  UserSeasonPostParams,
   UserSeriesGetParams,
   UserSeriesPostBody,
   UserSeriesPostParams
-} from "./user.schemas.js";
-import { userService } from "./user.service.js";
+} from "@/modules/user/user.schemas.js";
+import { userService } from "@/modules/user/user.service.js";
 
 export const userSeriesController = {
   async get(request: FastifyRequest<{ Querystring: UserSeriesGetParams }>, reply: FastifyReply) {
@@ -34,6 +35,14 @@ export const userEpisodeController = {
 
   async delete(request: FastifyRequest<{ Params: UserEpisodeDeleteParams }>, reply: FastifyReply) {
     const result = await userService.userEpisodeDelete(request.user.id, request.params);
+
+    return reply.send(result);
+  }
+};
+
+export const userSeasonController = {
+  async post(request: FastifyRequest<{ Params: UserSeasonPostParams }>, reply: FastifyReply) {
+    const result = await userService.userSeasonPost(request.user.id, request.params);
 
     return reply.send(result);
   }

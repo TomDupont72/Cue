@@ -1,7 +1,11 @@
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
-import { deleteManyAndFetch, findManyPaginated } from "@/shared/utils/prisma/prisma.js";
+import {
+  deleteManyAndFetch,
+  findManyPaginated,
+  upsertManyAndFetch
+} from "@/shared/utils/prisma/prisma.js";
 import { DashboardSummaryEpisodesRow, DashboardSummarySeriesRow } from "./user.types.js";
 
 export const userRepository = {
@@ -61,6 +65,15 @@ export const userRepository = {
       where,
       create: data,
       update: data
+    });
+  },
+
+  upsertManyEpisodes(data: Prisma.UserEpisodeCreateManyInput[], db: PrismaTx = prisma) {
+    return upsertManyAndFetch({
+      data,
+      scalarFields: Prisma.UserEpisodeScalarFieldEnum,
+      uniqueBy: ["userId", "episodeId"] as const,
+      delegate: db.userEpisode
     });
   },
 

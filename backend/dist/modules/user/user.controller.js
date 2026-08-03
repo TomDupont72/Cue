@@ -1,4 +1,4 @@
-import { userService } from "./user.service.js";
+import { userService } from "../../modules/user/user.service.js";
 export const userSeriesController = {
     async get(request, reply) {
         const result = await userService.userSeriesGet(request.user.id, request.query);
@@ -16,6 +16,18 @@ export const userEpisodeController = {
     },
     async delete(request, reply) {
         const result = await userService.userEpisodeDelete(request.user.id, request.params);
+        return reply.send(result);
+    }
+};
+export const userSeasonController = {
+    async post(request, reply) {
+        const result = await userService.userSeasonPost(request.user.id, request.params);
+        return reply.send(result);
+    }
+};
+export const userDashboardSummaryController = {
+    async get(request, reply) {
+        const result = await userService.userDashboardSummaryGet(request.user.id);
         return reply.send(result);
     }
 };

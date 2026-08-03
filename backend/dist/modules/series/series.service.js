@@ -36,29 +36,22 @@ export const seriesService = {
         ]);
         return { series, seasons, episodes, userSeries, userEpisodes };
     },
-    async seriesImportPost(userId, body) {
-        const series = await seriesRepository.findOne(body);
-        if (series) {
-            const userSeries = await userRepository.findOneSeries({
-                userId_seriesId: { userId, seriesId: series.id }
-            });
-            return { series, userSeries };
-        }
-        const tmdbSeries = await tvDetails(body.tmdbId);
-        const tmdbSeasons = await Promise.all(tmdbSeries.seasons.map((season) => seasonDetails(body.tmdbId, season.seasonNumber)));
+    async syncTmdb(tmdbId) {
+        const tmdbSeries = await tvDetails(tmdbId);
+        const tmdbSeasons = await Promise.all(tmdbSeries.seasons.map((season) => seasonDetails(tmdbId, season.seasonNumber)));
         const tmdbEpisodes = getMany({
             data: tmdbSeasons,
             fields: ["episodes"]
         });
         return prisma.$transaction(async (tx) => {
             const series = await seriesRepository.upsert({ tmdbId: tmdbSeries.tmdbId }, dropKeys(tmdbSeries, ["createdBy", "genres", "networks", "seasons"]), tx);
-            const genres = await genreRepository.createMany(tmdbSeries.genres, tx);
-            await seriesRepository.addGenres(series.id, genres.map((genre) => genre.id), tx);
-            const networks = await networkRepository.createMany(tmdbSeries.networks, tx);
-            await seriesRepository.addNetworks(series.id, networks.map((network) => network.id), tx);
-            const people = await peopleRepository.createMany(getMany({ data: tmdbSeries, fields: ["createdBy"] }, { data: tmdbEpisodes, fields: ["crew", "guestStars"] }), tx);
+            const genres = await genreRepository.upsertMany(tmdbSeries.genres, tx);
+            await seriesRepository.replaceGenres(series.id, genres.map((genre) => genre.id), tx);
+            const networks = await networkRepository.upsertMany(tmdbSeries.networks, tx);
+            await seriesRepository.replaceNetworks(series.id, networks.map((network) => network.id), tx);
+            const people = await peopleRepository.upsertMany(getMany({ data: tmdbSeries, fields: ["createdBy"] }, { data: tmdbEpisodes, fields: ["crew", "guestStars"] }), tx);
             const creatorIds = joinBy({ data: tmdbSeries.createdBy, key: "tmdbId" }, { data: people, key: "tmdbId", value: "id" });
-            await seriesRepository.addPeople(series.id, creatorIds, tx);
+            await seriesRepository.replacePeople(series.id, creatorIds, tx);
             const characters = await characterRepository.createMany(joinBy({
                 data: getMany({
                     data: tmdbEpisodes,
@@ -73,8 +66,8 @@ export const seriesService = {
                 value: "id",
                 as: "peopleId"
             }), tx);
-            const seasons = await seasonRepository.createMany(series.id, tmdbSeasons.map((season) => dropKeys(season, ["episodes"])), tx);
-            const episodes = await episodeRepository.createMany(joinBy({ data: tmdbEpisodes, key: "seasonNumber" }, {
+            const seasons = await seasonRepository.upsertMany(series.id, tmdbSeasons.map((season) => dropKeys(season, ["episodes"])), tx);
+            const episodes = await episodeRepository.upsertMany(joinBy({ data: tmdbEpisodes, key: "seasonNumber" }, {
                 data: seasons,
                 key: "seasonNumber",
                 select: (season, episode) => ({
@@ -88,7 +81,7 @@ export const seriesService = {
                 key: "tmdbId",
                 select: (episode, tmdbEpisode) => tmdbEpisode.crew.map((person) => ({ episodeId: episode.id, person }))
             });
-            await episodeRepository.addPeople(joinBy({ data: episodeCrew, key: ({ person }) => person.tmdbId }, {
+            await episodeRepository.replacePeople(episodes.map((episode) => episode.id), joinBy({ data: episodeCrew, key: ({ person }) => person.tmdbId }, {
                 data: people,
                 key: "tmdbId",
                 select: (person, { episodeId }) => ({ episodeId, peopleId: person.id })
@@ -109,7 +102,7 @@ export const seriesService = {
                 key: "tmdbId",
                 select: (person, episodeGuestStar) => ({ ...episodeGuestStar, peopleId: person.id })
             });
-            await episodeRepository.addCharacters(joinBy({
+            await episodeRepository.replaceCharacters(episodes.map((episode) => episode.id), joinBy({
                 data: episodeGuestStarsWithPeople,
                 key: ({ peopleId, guestStar }) => `${peopleId}:${guestStar.character}`
             }, {
@@ -120,10 +113,20 @@ export const seriesService = {
                     characterId: character.id
                 })
             }), tx);
-            const userSeries = await userRepository.findOneSeries({
-                userId_seriesId: { userId, seriesId: series.id }
-            }, tx);
-            return { series, userSeries };
+            return series;
+        }, {
+            timeout: 30_000,
+            maxWait: 5_000
         });
+    },
+    async seriesImportPost(userId, body, forceSync = false) {
+        const existingSeries = await seriesRepository.findOne(body);
+        const series = existingSeries && !forceSync ? existingSeries : await this.syncTmdb(body.tmdbId);
+        const userSeries = userId
+            ? await userRepository.findOneSeries({
+                userId_seriesId: { userId, seriesId: series.id }
+            })
+            : null;
+        return { series, userSeries };
     }
 };

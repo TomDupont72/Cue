@@ -5,6 +5,7 @@ import type {
   FindManyPaginatedOptions,
   FindManyPaginatedResult,
   UpsertManyAndFetchOptions,
+  UpsertUniqueWhere,
   UniqueWhere
 } from "./prisma.types.js";
 
@@ -62,17 +63,23 @@ export async function createManyAndFetch<
 
 export async function upsertManyAndFetch<
   TInput extends object,
-  TSource extends TInput,
-  TUniqueBy extends keyof TInput,
+  TUniqueBy extends keyof TInput | readonly (keyof TInput)[],
   TResult
 >({
   data,
   scalarFields,
   uniqueBy,
   delegate
-}: UpsertManyAndFetchOptions<TInput, TSource, TUniqueBy, TResult>): Promise<TResult[]> {
-  const sanitizedData = data.map((item) => dropUnknownFields<TInput, TSource>(item, scalarFields));
-  const uniqueData = [...new Map(sanitizedData.map((item) => [item[uniqueBy], item])).values()];
+}: UpsertManyAndFetchOptions<TInput, TUniqueBy, TResult>): Promise<TResult[]> {
+  const sanitizedData = data.map((item) => dropUnknownFields<TInput, TInput>(item, scalarFields));
+  const uniqueFields = (Array.isArray(uniqueBy) ? uniqueBy : [uniqueBy]) as (keyof TInput)[];
+  const uniqueField = uniqueBy as keyof TInput;
+  const upsert = delegate.upsert;
+  const uniqueData = [
+    ...new Map(
+      sanitizedData.map((item) => [JSON.stringify(uniqueFields.map((field) => item[field])), item])
+    ).values()
+  ];
 
   const results: TResult[] = [];
 
@@ -80,10 +87,14 @@ export async function upsertManyAndFetch<
     const batch = uniqueData.slice(index, index + UPSERT_BATCH_SIZE);
     const batchResults = await Promise.all(
       batch.map((item) =>
-        delegate.upsert({
-          where: { [uniqueBy]: item[uniqueBy] } as {
-            [Field in TUniqueBy]: TInput[Field];
-          },
+        upsert({
+          where: (Array.isArray(uniqueBy)
+            ? {
+                [uniqueFields.join("_")]: Object.fromEntries(
+                  uniqueFields.map((field) => [field, item[field]])
+                )
+              }
+            : { [uniqueField]: item[uniqueField] }) as UpsertUniqueWhere<TInput, TUniqueBy>,
           create: item,
           update: item
         })
