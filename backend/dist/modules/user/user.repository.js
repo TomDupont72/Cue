@@ -41,7 +41,7 @@ export const userRepository = {
             update: data
         });
     },
-    upsertManyEpisode(data, db = prisma) {
+    upsertManyEpisodes(data, db = prisma) {
         return upsertManyAndFetch({
             data,
             scalarFields: Prisma.UserEpisodeScalarFieldEnum,

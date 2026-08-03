@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import {
   UserEpisodeDeleteParams,
   UserEpisodePostParams,
+  UserSeasonDeleteParams,
   UserSeasonPostParams,
   UserSeriesGetParams,
   UserSeriesPostBody,
@@ -43,6 +44,12 @@ export const userEpisodeController = {
 export const userSeasonController = {
   async post(request: FastifyRequest<{ Params: UserSeasonPostParams }>, reply: FastifyReply) {
     const result = await userService.userSeasonPost(request.user.id, request.params);
+
+    return reply.send(result);
+  },
+
+  async delete(request: FastifyRequest<{ Params: UserSeasonDeleteParams }>, reply: FastifyReply) {
+    const result = await userService.userSeasonDelete(request.user.id, request.params);
 
     return reply.send(result);
   }

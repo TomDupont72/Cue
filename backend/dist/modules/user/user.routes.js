@@ -1,4 +1,4 @@
-import { userEpisodeDeleteParamsSchema, userEpisodePostParamsSchema, userSeasonPostParamsSchema, userSeriesGetParamsSchema, userSeriesPostBodySchema, userSeriesPostParamsSchema } from "../../modules/user/user.schemas.js";
+import { userEpisodeDeleteParamsSchema, userEpisodePostParamsSchema, userSeasonDeleteParamsSchema, userSeasonPostParamsSchema, userSeriesGetParamsSchema, userSeriesPostBodySchema, userSeriesPostParamsSchema } from "../../modules/user/user.schemas.js";
 import { userDashboardSummaryController, userEpisodeController, userSeasonController, userSeriesController } from "../../modules/user/user.controller.js";
 export async function userRoutes(app) {
     app.get("/series", {
@@ -48,5 +48,13 @@ export async function userRoutes(app) {
             params: userSeasonPostParamsSchema
         },
         handler: userSeasonController.post
+    });
+    app.delete("/series/:seriesId/season/:seasonId", {
+        preHandler: [app.requireAuth],
+        schema: {
+            tags: ["User"],
+            params: userSeasonDeleteParamsSchema
+        },
+        handler: userSeasonController.delete
     });
 }

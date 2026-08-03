@@ -6,7 +6,8 @@ import {
   UserSeriesPostParams,
   UserEpisodeDeleteParams,
   UserSeriesGetParams,
-  UserSeasonPostParams
+  UserSeasonPostParams,
+  UserSeasonDeleteParams
 } from "./user.schemas.js";
 import { episodeRepository } from "../episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
@@ -201,6 +202,60 @@ export const userService = {
 
       return userRepository.upsertManyEpisodes(
         notWatchedEpisodes.map((episode) => ({ userId, episodeId: episode.id })),
+        tx
+      );
+    });
+  },
+
+  async userSeasonDelete(userId: string, params: UserSeasonDeleteParams) {
+    const { seriesId, seasonId } = params;
+
+    return prisma.$transaction(async (tx) => {
+      const episodes = await episodeRepository.findMany({ seriesId, seasonId }, tx);
+
+      if (episodes.length === 0) {
+        throw notFound("Episodes");
+      }
+
+      const series = await seriesRepository.findOne({ id: seriesId }, tx);
+
+      if (!series) {
+        throw notFound("Series");
+      }
+
+      const userSeries = await userRepository.findOneSeries(
+        { userId_seriesId: { userId: userId, seriesId: seriesId } },
+        tx
+      );
+
+      if (!userSeries) {
+        throw notFound("Series for this user");
+      }
+
+      const userEpisodes = await userRepository.findManyEpisodes(
+        { userId, episodeId: { in: episodes.map((episode) => episode.id) } },
+        tx
+      );
+
+      if (userEpisodes.length === 0) {
+        throw notFound("Episode for this user");
+      }
+
+      const decrementedWatchcount =
+        episodes[0].seasonNumber !== 0
+          ? (userSeries?.watchCount ?? 0) - userEpisodes.length
+          : (userSeries?.watchCount ?? 0);
+      const status = decrementedWatchcount === 0 ? "PLANNED" : "WATCHING";
+
+      await userRepository.upsertSeries(
+        { userId_seriesId: { userId, seriesId } },
+        { userId, seriesId, status, watchCount: decrementedWatchcount },
+        { status, watchCount: decrementedWatchcount },
+        tx
+      );
+
+      return userRepository.deleteManyEpisode(
+        { userId, episodeId: { in: userEpisodes.map((userEpisode) => userEpisode.episodeId) } },
         tx
       );
     });

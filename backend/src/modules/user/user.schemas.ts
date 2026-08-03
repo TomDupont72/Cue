@@ -41,6 +41,8 @@ export const userSeasonPostParamsSchema = z.object({
 
 export const userEpisodeDeleteParamsSchema = userEpisodePostParamsSchema;
 
+export const userSeasonDeleteParamsSchema = userSeasonPostParamsSchema;
+
 export type UserEpisodePostParams = z.infer<typeof userEpisodePostParamsSchema>;
 
 export type UserEpisodeDeleteParams = z.infer<typeof userEpisodeDeleteParamsSchema>;
@@ -48,3 +50,5 @@ export type UserEpisodeDeleteParams = z.infer<typeof userEpisodeDeleteParamsSche
 export type UserSeriesGetParams = z.infer<typeof userSeriesGetParamsSchema>;
 
 export type UserSeasonPostParams = z.infer<typeof userSeasonPostParamsSchema>;
+
+export type UserSeasonDeleteParams = z.infer<typeof userSeasonDeleteParamsSchema>;
