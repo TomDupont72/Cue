@@ -48,7 +48,4 @@ export type UserSeasonPostResponse = {
   watchedAt: string;
 }[];
 
-export type UserSeasonPostParams = {
-  seriesId: number;
-  seasonId: number;
-};
+export type UserSeasonDeleteResponse = UserSeasonPostResponse;

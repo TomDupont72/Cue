@@ -1,11 +1,9 @@
 import type { SeriesGetResponse } from "@/features/series/types/series.types";
 import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
-import type {
-  UserSeasonPostParams,
-  UserSeasonPostResponse
-} from "@/features/user/types/user.types";
+import type { UserSeasonPostResponse } from "@/features/user/types/user.types";
 import { userSeasonPost } from "@/features/user/api/user.api";
 import { queryKeys } from "@/lib/queryKeys";
+import type { UserSeasonPostParams } from "@/features/user/schemas/user.schemas";
 
 export function useUserSeasonPost() {
   return useOptimisticMutation<
