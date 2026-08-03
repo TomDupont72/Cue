@@ -2,7 +2,7 @@ import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/
 import type { SeriesGetEpisode, SeriesGetSeason } from "@/features/series/types/series.types";
 import EpisodeCard from "@/features/episode/components/episodeCard";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
-import { useState } from "react";
+import { useUserSeasonPost } from "@/features/user/hooks/useUserSeasonPost";
 
 type SeasonCardProps = {
   seriesId: number;
@@ -19,7 +19,18 @@ export default function SeasonCard({
 }: SeasonCardProps) {
   const watchedCount = episodes.filter((episode) => watchedEpisodeIds.has(episode.id)).length;
 
-  const [checked, setChecked] = useState(watchedCount === episodes.length);
+  const userSeasonPostMutation = useUserSeasonPost();
+
+  function handleCheckedChange(checked: boolean) {
+    const params = {
+      seriesId,
+      seasonId: season.id
+    };
+
+    if (checked) {
+      userSeasonPostMutation.mutate(params);
+    }
+  }
 
   if (episodes.length === 0) {
     return null;
@@ -50,8 +61,9 @@ export default function SeasonCard({
           }
         />
         <RoundedCheckbox
-          checked={checked}
-          onChange={setChecked}
+          checked={watchedCount === episodes.length}
+          onChange={handleCheckedChange}
+          disabled={userSeasonPostMutation.isPending}
           className="absolute right-3 top-1/2 z-10 -translate-y-1/2"
         />
       </div>

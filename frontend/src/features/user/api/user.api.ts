@@ -4,12 +4,14 @@ import {
   userEpisodeDeleteParamsSchema,
   userEpisodePostParamsSchema,
   userSeriesPostParamsSchema,
-  userSeriesPostBodySchema
+  userSeriesPostBodySchema,
+  userSeasonPostParamsSchema
 } from "@/features/user/schemas/user.schemas";
 import type {
-  userDashboardSummaryGetResponse,
+  UserDashboardSummaryGetResponse,
   UserEpisodeDeleteResponse,
   UserEpisodePostResponse,
+  UserSeasonPostResponse,
   UserSeriesGetResponse,
   UserSeriesPostResponse
 } from "@/features/user/types/user.types";
@@ -79,6 +81,20 @@ export function userEpisodeDelete(
   });
 }
 
-export function userDashboardSummaryGet(): Promise<userDashboardSummaryGetResponse> {
+export function userDashboardSummaryGet(): Promise<UserDashboardSummaryGetResponse> {
   return apiClient("/user/dashboard/summary");
+}
+
+export function userSeasonPost(
+  seriesId: number,
+  seasonId: number
+): Promise<UserSeasonPostResponse> {
+  return apiClient("/user/series/:seriesId/season/:seasonId", {
+    method: "POST",
+    params: {
+      seriesId,
+      seasonId
+    },
+    paramsSchema: userSeasonPostParamsSchema
+  });
 }
