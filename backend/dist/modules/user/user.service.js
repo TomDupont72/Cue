@@ -135,5 +135,21 @@ export const userService = {
     async userDashboardSummaryGet(userId) {
         const summary = await userRepository.getDashboardSummary(userId);
         return summary;
+    },
+    async userStatusRecalculatePost(params, now = new Date()) {
+        const inactiveSince = new Date(now);
+        inactiveSince.setUTCMonth(inactiveSince.getUTCMonth() - 2);
+        const result = await userRepository.updateManySeries({
+            userId: params.userId,
+            status: "WATCHING",
+            lastWatchedAt: {
+                lte: inactiveSince
+            }
+        }, {
+            status: "DROPPED"
+        });
+        return {
+            updatedCount: result.count
+        };
     }
 };

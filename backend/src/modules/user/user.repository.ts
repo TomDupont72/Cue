@@ -56,6 +56,17 @@ export const userRepository = {
     });
   },
 
+  updateManySeries(
+    where: Prisma.UserSeriesWhereInput,
+    data: Prisma.UserSeriesUpdateManyMutationInput,
+    db: PrismaTx = prisma
+  ) {
+    return db.userSeries.updateMany({
+      where,
+      data
+    });
+  },
+
   upsertEpisode(
     where: Prisma.UserEpisodeWhereUniqueInput,
     data: Prisma.UserEpisodeUncheckedCreateInput,

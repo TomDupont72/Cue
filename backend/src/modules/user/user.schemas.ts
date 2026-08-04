@@ -39,6 +39,10 @@ export const userSeasonPostParamsSchema = z.object({
   seasonId: z.coerce.number().int().min(1)
 });
 
+export const userStatusRecalculateSchema = z.object({
+  userId: z.string().min(1)
+});
+
 export const userEpisodeDeleteParamsSchema = userEpisodePostParamsSchema;
 
 export const userSeasonDeleteParamsSchema = userSeasonPostParamsSchema;
@@ -52,3 +56,5 @@ export type UserSeriesGetParams = z.infer<typeof userSeriesGetParamsSchema>;
 export type UserSeasonPostParams = z.infer<typeof userSeasonPostParamsSchema>;
 
 export type UserSeasonDeleteParams = z.infer<typeof userSeasonDeleteParamsSchema>;
+
+export type UserStatusRecalculate = z.infer<typeof userStatusRecalculateSchema>;
