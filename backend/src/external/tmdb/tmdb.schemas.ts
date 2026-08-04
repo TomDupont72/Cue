@@ -143,10 +143,17 @@ const tmdbTvChangesItemSchema = z.object({
   id: z.number()
 });
 
-export const tmdbTvChangesSchema = z.object({
-  results: z.array(tmdbTvChangesItemSchema),
-  page: z.number(),
-  total_pages: z.number(),
-  total_results: z.number()
-})
-.transform((changes) => camelCaseKeys(changes, { id: "tmbdId", total_pages: "totalPages", total_results: "totalResults" }));
+export const tmdbTvChangesSchema = z
+  .object({
+    results: z.array(tmdbTvChangesItemSchema),
+    page: z.number(),
+    total_pages: z.number(),
+    total_results: z.number()
+  })
+  .transform((changes) =>
+    camelCaseKeys(changes, {
+      id: "tmbdId",
+      total_pages: "totalPages",
+      total_results: "totalResults"
+    })
+  );

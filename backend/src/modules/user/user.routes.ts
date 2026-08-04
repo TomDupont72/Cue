@@ -2,6 +2,7 @@ import { AppFastifyInstance } from "@/shared/types/fastify.js";
 import {
   userEpisodeDeleteParamsSchema,
   userEpisodePostParamsSchema,
+  userStatusRecalculateSchema,
   userSeasonDeleteParamsSchema,
   userSeasonPostParamsSchema,
   userSeriesGetParamsSchema,
@@ -12,8 +13,11 @@ import {
   userDashboardSummaryController,
   userEpisodeController,
   userSeasonController,
-  userSeriesController
+  userSeriesController,
+  userStatusController
 } from "@/modules/user/user.controller.js";
+import { isWorkerRequest } from "@/shared/middlewares/verify-worker-request.js";
+import { unauthorized } from "@/shared/errors/errors.helpers.js";
 
 export async function userRoutes(app: AppFastifyInstance) {
   app.get("/series", {
@@ -77,5 +81,20 @@ export async function userRoutes(app: AppFastifyInstance) {
       params: userSeasonDeleteParamsSchema
     },
     handler: userSeasonController.delete
+  });
+
+  app.post("/status/:userId/recalculate", {
+    preHandler: [
+      async (request) => {
+        if (!isWorkerRequest(request)) {
+          throw unauthorized("Invalid worker token");
+        }
+      }
+    ],
+    schema: {
+      tags: ["User"],
+      params: userStatusRecalculateSchema
+    },
+    handler: userStatusController.post
   });
 }

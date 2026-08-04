@@ -6,7 +6,8 @@ import {
   UserSeasonPostParams,
   UserSeriesGetParams,
   UserSeriesPostBody,
-  UserSeriesPostParams
+  UserSeriesPostParams,
+  UserStatusRecalculate
 } from "@/modules/user/user.schemas.js";
 import { userService } from "@/modules/user/user.service.js";
 
@@ -58,6 +59,14 @@ export const userSeasonController = {
 export const userDashboardSummaryController = {
   async get(request: FastifyRequest, reply: FastifyReply) {
     const result = await userService.userDashboardSummaryGet(request.user.id);
+
+    return reply.send(result);
+  }
+};
+
+export const userStatusController = {
+  async post(request: FastifyRequest<{ Params: UserStatusRecalculate }>, reply: FastifyReply) {
+    const result = await userService.userStatusRecalculatePost(request.params);
 
     return reply.send(result);
   }

@@ -28,5 +28,8 @@ export const userSeasonPostParamsSchema = z.object({
     seriesId: z.coerce.number().int().min(1),
     seasonId: z.coerce.number().int().min(1)
 });
+export const userStatusRecalculateSchema = z.object({
+    userId: z.string().min(1)
+});
 export const userEpisodeDeleteParamsSchema = userEpisodePostParamsSchema;
 export const userSeasonDeleteParamsSchema = userSeasonPostParamsSchema;

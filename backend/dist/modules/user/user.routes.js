@@ -1,5 +1,7 @@
-import { userEpisodeDeleteParamsSchema, userEpisodePostParamsSchema, userSeasonDeleteParamsSchema, userSeasonPostParamsSchema, userSeriesGetParamsSchema, userSeriesPostBodySchema, userSeriesPostParamsSchema } from "../../modules/user/user.schemas.js";
-import { userDashboardSummaryController, userEpisodeController, userSeasonController, userSeriesController } from "../../modules/user/user.controller.js";
+import { userEpisodeDeleteParamsSchema, userEpisodePostParamsSchema, userStatusRecalculateSchema, userSeasonDeleteParamsSchema, userSeasonPostParamsSchema, userSeriesGetParamsSchema, userSeriesPostBodySchema, userSeriesPostParamsSchema } from "../../modules/user/user.schemas.js";
+import { userDashboardSummaryController, userEpisodeController, userSeasonController, userSeriesController, userStatusController } from "../../modules/user/user.controller.js";
+import { isWorkerRequest } from "../../shared/middlewares/verify-worker-request.js";
+import { unauthorized } from "../../shared/errors/errors.helpers.js";
 export async function userRoutes(app) {
     app.get("/series", {
         preHandler: [app.requireAuth],
@@ -56,5 +58,19 @@ export async function userRoutes(app) {
             params: userSeasonDeleteParamsSchema
         },
         handler: userSeasonController.delete
+    });
+    app.post("/status/:userId/recalculate", {
+        preHandler: [
+            async (request) => {
+                if (!isWorkerRequest(request)) {
+                    throw unauthorized("Invalid worker token");
+                }
+            }
+        ],
+        schema: {
+            tags: ["User"],
+            params: userStatusRecalculateSchema
+        },
+        handler: userStatusController.post
     });
 }

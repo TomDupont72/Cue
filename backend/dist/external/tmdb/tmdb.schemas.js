@@ -123,3 +123,13 @@ export const tmdbSeasonDetailsSchema = z
     vote_average: z.number()
 })
     .transform((season) => camelCaseKeys(season, { id: "tmdbId" }));
+const tmdbTvChangesItemSchema = z.object({
+    id: z.number()
+});
+export const tmdbTvChangesSchema = z.object({
+    results: z.array(tmdbTvChangesItemSchema),
+    page: z.number(),
+    total_pages: z.number(),
+    total_results: z.number()
+})
+    .transform((changes) => camelCaseKeys(changes, { id: "tmbdId", total_pages: "totalPages", total_results: "totalResults" }));

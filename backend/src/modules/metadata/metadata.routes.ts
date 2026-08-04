@@ -21,12 +21,12 @@ export async function metadataRoutes(app: AppFastifyInstance) {
 
   app.get("/series/changes", {
     preHandler: [
-  async (request, reply) => {
-    if (!isWorkerRequest(request)) {
-      await app.requireAuth(request, reply);
-    }
-  }
-],
+      async (request, reply) => {
+        if (!isWorkerRequest(request)) {
+          await app.requireAuth(request, reply);
+        }
+      }
+    ],
     schema: {
       tags: ["Metadata"],
       querystring: metadataSeriesChangesSchema

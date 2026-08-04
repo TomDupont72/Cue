@@ -35,3 +35,9 @@ export const userDashboardSummaryController = {
         return reply.send(result);
     }
 };
+export const userStatusController = {
+    async post(request, reply) {
+        const result = await userService.userStatusRecalculatePost(request.params);
+        return reply.send(result);
+    }
+};

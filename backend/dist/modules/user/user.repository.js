@@ -34,6 +34,12 @@ export const userRepository = {
             update: update
         });
     },
+    updateManySeries(where, data, db = prisma) {
+        return db.userSeries.updateMany({
+            where,
+            data
+        });
+    },
     upsertEpisode(where, data, db = prisma) {
         return db.userEpisode.upsert({
             where,
