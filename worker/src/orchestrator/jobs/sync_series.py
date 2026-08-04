@@ -111,10 +111,11 @@ def update_user_statuses(
     )
 
     for user_id in user_ids:
-        cue_api.post_user_status_recalculate(user_id)
+        result = cue_api.post_user_status_recalculate(user_id)
 
         context.log.info(
-            f"Status de l'utilisateur {user_id} à jour"
+            f"Statuts de l'utilisateur {user_id} à jour : "
+            f"{result['updatedCount']} série(s) passée(s) à DROPPED"
         )
 
 @dg.job

@@ -41,12 +41,9 @@ class CueApiResource(dg.ConfigurableResource):
 
     def post_user_status_recalculate(self, user_id: str) -> dict:
         response = httpx.post(
-            f"{self.base_url}/api/user/status/:userId/recalculate",
+            f"{self.base_url}/api/user/status/{user_id}/recalculate",
             headers={
                 "Authorization": f"Bearer {self.worker_token}"
-            },
-            params={
-                "userId": user_id
             },
             timeout=120
         )
