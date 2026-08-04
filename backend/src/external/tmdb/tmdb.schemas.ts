@@ -138,3 +138,11 @@ export const tmdbSeasonDetailsSchema = z
     vote_average: z.number()
   })
   .transform((season) => camelCaseKeys(season, { id: "tmdbId" } as const));
+
+const tmdbTvChangesItemSchema = z.object({
+  id: z.number()
+});
+
+export const tmdbTvChangesSchema = z.object({
+  results: z.array(tmdbTvChangesItemSchema)
+});
