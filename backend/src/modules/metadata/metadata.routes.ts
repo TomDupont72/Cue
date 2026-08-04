@@ -7,6 +7,7 @@ import {
   metadataSeriesChangesController,
   metadataSeriesSearchController
 } from "@/modules/metadata/metadata.controller.js";
+import { isWorkerRequest } from "@/shared/middlewares/verify-worker-request.js";
 
 export async function metadataRoutes(app: AppFastifyInstance) {
   app.get("/series/search", {
@@ -19,7 +20,13 @@ export async function metadataRoutes(app: AppFastifyInstance) {
   });
 
   app.get("/series/changes", {
-    preHandler: [app.requireAuth],
+    preHandler: [
+  async (request, reply) => {
+    if (!isWorkerRequest(request)) {
+      await app.requireAuth(request, reply);
+    }
+  }
+],
     schema: {
       tags: ["Metadata"],
       querystring: metadataSeriesChangesSchema
