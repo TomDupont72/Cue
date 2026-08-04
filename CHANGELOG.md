@@ -1,3 +1,12 @@
+## [0.8.0] - 2026-08-05
+
+### Added
+
+- Ajout d’une route API pour récupérer les séries modifiées sur TMDB.
+- Ajout d’une route API pour recalculer les statuts des séries suivies.
+- Mise à jour du worker pour synchroniser uniquement les séries modifiées.
+- Recalcul automatique des statuts utilisateur après la synchronisation.
+
 ## [0.7.0] - 2026-08-04
 
 ### Added
