@@ -4,11 +4,11 @@ import { TmdbEpisodeDetailsResponse } from "./tmdb.types.js";
 
 export async function episodeDetails(
   seriesId: number,
-  SeasonNumber: number,
-  EpisodeNumber: number
+  seasonNumber: number,
+  episodeNumber: number
 ): Promise<TmdbEpisodeDetailsResponse> {
   return tmdbGet(
-    `/tv/${seriesId}/season/${SeasonNumber}/episode/${EpisodeNumber}`,
+    `/tv/${seriesId}/season/${seasonNumber}/episode/${episodeNumber}`,
     tmdbEpisodeDetailsSchema
   );
 }
