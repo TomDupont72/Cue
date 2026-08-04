@@ -80,15 +80,48 @@ def sync_series(
     )
     
     for tmbd_id_to_sync in tmbd_ids_to_sync:
-        cue_api.sync_series(tmbd_id_to_sync)
+        cue_api.post_user_series_import(tmbd_id_to_sync)
 
         context.log.info(
             f"Série TMDB {tmbd_id_to_sync} synchronisée"
         )
 
+@dg.op(
+        ins={
+        "after_sync": dg.In(dg.Nothing)
+    }
+)
+def update_user_statuses(
+    context: dg.OpExecutionContext,
+    database: DatabaseResource,
+    cue_api: CueApiResource,
+) -> None:
+    with database.get_engine().connect() as connection:
+        rows = connection.execute(
+            text("""
+                SELECT "id"
+                FROM "user"
+            """)
+        )
+
+        user_ids = [row.id for row in rows]
+
+    context.log.info(
+        f"{len(user_ids)} utilisateurs récupérés"
+    )
+
+    for user_id in user_ids:
+        cue_api.post_user_status_recalculate(user_id)
+
+        context.log.info(
+            f"Status de l'utilisateur {user_id} à jour"
+        )
+
 @dg.job
 def sync_all_series_job():
-    sync_series(
-        get_series_changes(), 
-        get_all_series()
+    update_user_statuses(
+        sync_series(
+            get_series_changes(), 
+            get_all_series()
+        )
     )
