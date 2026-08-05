@@ -6,7 +6,11 @@ import {
   findManyPaginated,
   upsertManyAndFetch
 } from "@/shared/utils/prisma/prisma.js";
-import { DashboardSummaryEpisodesRow, DashboardSummarySeriesRow } from "./user.types.js";
+import {
+  DashboardSummaryEpisodesRow,
+  DashboardSummarySeriesRow,
+  EpisodeFeedRow
+} from "./user.types.js";
 
 export const userRepository = {
   findOneSeries(where: Prisma.UserSeriesWhereUniqueInput, db: PrismaTx = prisma) {
@@ -114,5 +118,70 @@ export const userRepository = {
       totalWatchedEpisodes: Number(summaryEpisodes.totalWatchedEpisodes),
       totalWatchedSeries: Number(summarySeries.totalWatchedSeries)
     };
+  },
+
+  async getEpisodesFeed(userId: string, db: PrismaTx = prisma) {
+    return db.$queryRaw<EpisodeFeedRow[]>`
+        SELECT
+        us."userId",
+        us."seriesId",
+        us.status,
+        us."lastWatchedAt",
+
+        s.name AS "seriesName",
+        s."posterPath" AS "seriesPosterPath",
+
+        next_episode.id AS "episodeId",
+        next_episode.name AS "episodeName",
+        next_episode."seasonNumber",
+        next_episode."episodeNumber",
+        next_episode."airDate",
+        next_episode."stillPath",
+        next_episode.runtime
+
+        FROM "UserSeries" us
+
+        JOIN "Series" s
+        ON s.id = us."seriesId"
+
+        JOIN LATERAL (
+        SELECT
+            e.id,
+            e.name,
+            e."seasonNumber",
+            e."episodeNumber",
+            e."airDate",
+            e."stillPath",
+            e.runtime
+        FROM "Episode" e
+
+        WHERE e."seriesId" = us."seriesId"
+            AND e."seasonNumber" <> 0
+
+            AND NOT EXISTS (
+            SELECT 1
+            FROM "UserEpisode" ue
+            WHERE ue."userId" = us."userId"
+                AND ue."episodeId" = e.id
+            )
+
+        ORDER BY
+            e."seasonNumber" ASC,
+            e."episodeNumber" ASC
+
+        LIMIT 1
+        ) next_episode ON TRUE
+
+        WHERE us."userId" = ${userId}
+        AND us.status IN (
+            'WATCHING',
+            'PAUSED',
+            'DROPPED'
+        )
+
+        ORDER BY
+        us."lastWatchedAt" DESC NULLS LAST,
+        s.name ASC
+    `;
   }
 };
