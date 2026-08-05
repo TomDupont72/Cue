@@ -1,3 +1,10 @@
+## [0.9.0] - 2026-08-06
+
+### Added
+
+- Ajout d’une route API pour récupérer le prochain épisode à regarder de chaque série suivie.
+- Ajout de la page À voir pour consulter et marquer les épisodes disponibles comme regardés.
+
 ## [0.8.0] - 2026-08-05
 
 ### Added
