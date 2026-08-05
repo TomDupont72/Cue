@@ -44,6 +44,16 @@ export const userService = {
     };
   },
 
+  async userEpisodeFeedGet(userId: string) {
+    const episodes = await userRepository.getEpisodesFeed(userId);
+
+    return {
+      watching: episodes.filter(({ status }) => status === "WATCHING"),
+      paused: episodes.filter(({ status }) => status === "PAUSED"),
+      dropped: episodes.filter(({ status }) => status === "DROPPED")
+    };
+  },
+
   async userSeriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
     const userSeries = await userRepository.upsertSeries(
       { userId_seriesId: { userId, ...params } },

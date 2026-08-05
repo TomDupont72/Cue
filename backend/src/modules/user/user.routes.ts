@@ -47,6 +47,14 @@ export async function userRoutes(app: AppFastifyInstance) {
     handler: userSeriesController.post
   });
 
+  app.get("/episodes/feed", {
+    preHandler: [app.requireAuth],
+    schema: {
+      tags: ["User"]
+    },
+    handler: userEpisodeController.getFeed
+  });
+
   app.post("/series/:seriesId/episode/:episodeId", {
     preHandler: [app.requireAuth],
     schema: {

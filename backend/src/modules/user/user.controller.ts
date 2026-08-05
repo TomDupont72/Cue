@@ -29,6 +29,12 @@ export const userSeriesController = {
 };
 
 export const userEpisodeController = {
+  async getFeed(request: FastifyRequest, reply: FastifyReply) {
+    const result = await userService.userEpisodeFeedGet(request.user.id);
+
+    return reply.send(result);
+  },
+
   async post(request: FastifyRequest<{ Params: UserEpisodePostParams }>, reply: FastifyReply) {
     const result = await userService.userEpisodePost(request.user.id, request.params);
 
