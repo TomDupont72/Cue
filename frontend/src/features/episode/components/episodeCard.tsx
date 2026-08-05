@@ -1,7 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
-import type { SeriesGetEpisode } from "@/features/series/types/series.types";
 import { getTmdbImageUrl } from "@/lib/tmdbImage";
-import { ImageOff } from "lucide-react";
+import { ChevronRight, ImageOff } from "lucide-react";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
 import { Badge } from "@/components/ui/badge";
 import { useUserEpisodePost } from "@/features/user/hooks/useUserEpisodePost";
@@ -9,23 +8,40 @@ import { useUserEpisodeDelete } from "@/features/user/hooks/useUserEpisodeDelete
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import EpisodeCardDetails from "@/features/episode/components/episodeCardDetails";
 import { differenceInCalendarDays } from "date-fns";
+import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/types/episode.types";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 type EpisodeCardProps = {
-  seriesId: number;
-  episode: SeriesGetEpisode;
+  series: EpisodeCardSeries;
+  episode: EpisodeCardEpisode;
   watchedEpisodeIds: Set<number>;
+  displayName?: boolean;
 };
 
-export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: EpisodeCardProps) {
+export default function EpisodeCard({
+  series,
+  episode,
+  watchedEpisodeIds,
+  displayName = false
+}: EpisodeCardProps) {
+  const navigate = useNavigate();
   const stillUrl = getTmdbImageUrl(episode.stillPath);
-  const isWatched = watchedEpisodeIds.has(episode.id);
+  const [optimisticWatched, setOptimisticWatched] = useState<boolean | null>(null);
 
   const userEpisodePostMutation = useUserEpisodePost();
   const userEpisodeDeleteMutation = useUserEpisodeDelete();
+  const mutationFailed = userEpisodePostMutation.isError || userEpisodeDeleteMutation.isError;
+  const isWatched = mutationFailed
+    ? watchedEpisodeIds.has(episode.id)
+    : (optimisticWatched ?? watchedEpisodeIds.has(episode.id));
 
   function handleCheckedChange(checked: boolean) {
+    setOptimisticWatched(checked);
+
     const params = {
-      seriesId,
+      seriesId: series.id,
       episodeId: episode.id
     };
 
@@ -33,6 +49,14 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
       userEpisodePostMutation.mutate(params);
     } else {
       userEpisodeDeleteMutation.mutate(params);
+    }
+  }
+
+  function handleSeriesClick(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+
+    if (series.tmdbId !== undefined) {
+      navigate(`/series?id=${series.tmdbId}`);
     }
   }
 
@@ -66,6 +90,18 @@ export default function EpisodeCard({ seriesId, episode, watchedEpisodeIds }: Ep
               >
                 {episode.seasonNumber !== 0 ? (
                   <>
+                    {displayName && series.name && series.tmdbId !== undefined ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSeriesClick}
+                        className="mb-1 h-6 w-fit max-w-full gap-0.5 rounded-full border-2 border-white bg-black px-2 text-xs font-semibold text-white hover:bg-black hover:text-white dark:border-white dark:bg-black dark:hover:bg-black"
+                      >
+                        <span className="truncate">{series.name}</span>
+                        <ChevronRight className="size-3.5 shrink-0" />
+                      </Button>
+                    ) : null}
                     <h2 className="truncate font-bold text-xl">
                       S{episode.seasonNumber} | E{episode.episodeNumber}
                     </h2>

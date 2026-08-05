@@ -26,6 +26,14 @@ export const userService = {
             nextCursor: userSeries.nextCursor
         };
     },
+    async userEpisodeFeedGet(userId) {
+        const episodes = await userRepository.getEpisodesFeed(userId);
+        return {
+            watching: episodes.filter(({ status }) => status === "WATCHING"),
+            paused: episodes.filter(({ status }) => status === "PAUSED"),
+            dropped: episodes.filter(({ status }) => status === "DROPPED")
+        };
+    },
     async userSeriesPost(userId, params, body) {
         const userSeries = await userRepository.upsertSeries({ userId_seriesId: { userId, ...params } }, { userId, ...params, ...body }, {});
         return userSeries;
@@ -44,14 +52,25 @@ export const userService = {
             const userSeries = await userRepository.findOneSeries({ userId_seriesId: { userId: userId, seriesId: seriesId } }, tx);
             const userEpisode = await userRepository.findOneEpisode({ userId_episodeId: { userId: userId, episodeId: episodeId } }, tx);
             if (userEpisode) {
-                return userEpisode;
+                const nextEpisode = await userRepository.getEpisodeFeedItem(userId, seriesId, tx);
+                return {
+                    ...userEpisode,
+                    seriesId,
+                    nextEpisode
+                };
             }
             const incrementedWatchcount = episode.seasonNumber !== 0
                 ? (userSeries?.watchCount ?? 0) + 1
                 : (userSeries?.watchCount ?? 0);
             const status = incrementedWatchcount >= series.numberOfEpisodes ? "COMPLETED" : "WATCHING";
             await userRepository.upsertSeries({ userId_seriesId: { userId, seriesId } }, { userId, seriesId, status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() }, { status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() }, tx);
-            return userRepository.upsertEpisode({ userId_episodeId: { userId, episodeId } }, { userId, episodeId }, tx);
+            const createdUserEpisode = await userRepository.upsertEpisode({ userId_episodeId: { userId, episodeId } }, { userId, episodeId }, tx);
+            const nextEpisode = await userRepository.getEpisodeFeedItem(userId, seriesId, tx);
+            return {
+                ...createdUserEpisode,
+                seriesId,
+                nextEpisode
+            };
         });
     },
     async userEpisodeDelete(userId, params) {

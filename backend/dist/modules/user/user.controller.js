@@ -10,6 +10,10 @@ export const userSeriesController = {
     }
 };
 export const userEpisodeController = {
+    async getFeed(request, reply) {
+        const result = await userService.userEpisodeFeedGet(request.user.id);
+        return reply.send(result);
+    },
     async post(request, reply) {
         const result = await userService.userEpisodePost(request.user.id, request.params);
         return reply.send(result);

@@ -22,7 +22,7 @@ import {
 
 const navigation = [
   { label: "DASHBOARD", to: "/dashboard" },
-  { label: "SÉRIES", to: "/series" },
+  { label: "À VOIR", to: "/watch" },
   { label: "CALENDRIER", to: "/calendar" },
   { label: "RECHERCHE", to: "/search" }
 ];
