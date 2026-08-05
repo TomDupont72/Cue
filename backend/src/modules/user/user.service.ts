@@ -91,7 +91,13 @@ export const userService = {
       );
 
       if (userEpisode) {
-        return userEpisode;
+        const nextEpisode = await userRepository.getEpisodeFeedItem(userId, seriesId, tx);
+
+        return {
+          ...userEpisode,
+          seriesId,
+          nextEpisode
+        };
       }
 
       const incrementedWatchcount =
@@ -107,11 +113,19 @@ export const userService = {
         tx
       );
 
-      return userRepository.upsertEpisode(
+      const createdUserEpisode = await userRepository.upsertEpisode(
         { userId_episodeId: { userId, episodeId } },
         { userId, episodeId },
         tx
       );
+
+      const nextEpisode = await userRepository.getEpisodeFeedItem(userId, seriesId, tx);
+
+      return {
+        ...createdUserEpisode,
+        seriesId,
+        nextEpisode
+      };
     });
   },
 

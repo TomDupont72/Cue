@@ -41,7 +41,7 @@ export default function SeasonCard({
   }
 
   return (
-    <AccordionItem className="mx-auto w-full sm:max-w-9/10 md:max-w-7/10 lg:max-w-7/10  border-none">
+    <AccordionItem className="mx-auto w-full sm:max-w-9/10 md:max-w-7/10 lg:max-w-7/10 border-none">
       <div className="relative my-3">
         <AccordionTrigger
           className="rounded-xl
@@ -76,7 +76,7 @@ export default function SeasonCard({
         {episodes.map((episode) => (
           <EpisodeCard
             key={episode.id}
-            seriesId={seriesId}
+            series={{ id: seriesId }}
             episode={episode}
             watchedEpisodeIds={watchedEpisodeIds}
           />

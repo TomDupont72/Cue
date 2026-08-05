@@ -13,16 +13,18 @@ export type EpisodeFeedRow = {
   userId: string;
   seriesId: number;
   status: UserSeriesStatus;
-  lastWatchedAt: Date | null;
+  lastWatchedAt: string | null;
 
   seriesName: string;
   seriesPosterPath: string | null;
+  seriesTmdbId: number;
 
-  episodeId: number;
-  episodeName: string;
+  id: number;
+  name: string;
   seasonNumber: number;
   episodeNumber: number;
-  airDate: Date | null;
+  airDate: string | null;
   stillPath: string | null;
   runtime: number;
+  remainingEpisodes: number;
 };

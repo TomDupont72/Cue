@@ -5,6 +5,8 @@ export type UserEpisodePostResponse = {
   userId: string;
   episodeId: number;
   watchedAt: string;
+  seriesId: number;
+  nextEpisode: UserEpisodesFeedGetItem | null;
 };
 
 export type UserSeriesPostResponse = {
@@ -17,7 +19,11 @@ export type UserSeriesPostResponse = {
   lastWatchedAt: string | null;
 };
 
-export type UserEpisodeDeleteResponse = UserEpisodePostResponse;
+export type UserEpisodeDeleteResponse = {
+  userId: string;
+  episodeId: number;
+  watchedAt: string;
+};
 
 type UserSeriesGetItems = {
   seriesDetails: SeriesSearchGetResult;
@@ -49,3 +55,29 @@ export type UserSeasonPostResponse = {
 }[];
 
 export type UserSeasonDeleteResponse = UserSeasonPostResponse;
+
+export type UserEpisodesFeedGetItem = {
+  userId: string;
+  seriesId: number;
+  status: UserSeriesStatus;
+  lastWatchedAt: string | null;
+
+  seriesName: string;
+  seriesPosterPath: string | null;
+  seriesTmdbId: number;
+
+  id: number;
+  name: string;
+  seasonNumber: number;
+  episodeNumber: number;
+  airDate: string | null;
+  stillPath: string | null;
+  runtime: number;
+  remainingEpisodes: number;
+};
+
+export type UserEpisodesFeedGetResponse = {
+  watching: UserEpisodesFeedGetItem[];
+  paused: UserEpisodesFeedGetItem[];
+  dropped: UserEpisodesFeedGetItem[];
+};

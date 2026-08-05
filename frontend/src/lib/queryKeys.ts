@@ -25,5 +25,11 @@ export const queryKeys = {
     all: ["user-dashboard"] as const,
 
     summary: () => [...queryKeys.userDashboard.all, "summary"] as const
+  },
+
+  userEpisodes: {
+    all: ["user-episodes"] as const,
+
+    feed: () => [...queryKeys.userEpisodes.all, "feed"] as const
   }
 };

@@ -12,6 +12,7 @@ import type {
   UserDashboardSummaryGetResponse,
   UserEpisodeDeleteResponse,
   UserEpisodePostResponse,
+  UserEpisodesFeedGetResponse,
   UserSeasonDeleteResponse,
   UserSeasonPostResponse,
   UserSeriesGetResponse,
@@ -113,4 +114,8 @@ export function userSeasonDelete(
     },
     paramsSchema: userSeasonDeleteParamsSchema
   });
+}
+
+export function userEpisodesFeedGet(): Promise<UserEpisodesFeedGetResponse> {
+  return apiClient("/user/episodes/feed");
 }

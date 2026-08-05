@@ -1,11 +1,11 @@
 import { getTmdbImageUrl } from "@/lib/tmdbImage";
-import type { SeriesGetEpisode } from "@/features/series/types/series.types";
 import { ImageOff } from "lucide-react";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
+import type { EpisodeCardEpisode } from "@/features/episode/types/episode.types";
 
 type EpisodeCardDetailsProps = {
-  episode: SeriesGetEpisode;
+  episode: EpisodeCardEpisode;
   isWatched: boolean;
   onCheckedChange: (checked: boolean) => void;
   isPending: boolean;
