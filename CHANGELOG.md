@@ -1,9 +1,16 @@
+## [0.9.1] - 2026-08-06
+
+### Fixed
+
+- Ajout du résumé des épisodes dans la section À VOIR.
+- Ajout du défilement dans la fenêtre de détails d’un épisode.
+
 ## [0.9.0] - 2026-08-06
 
 ### Added
 
 - Ajout d’une route API pour récupérer le prochain épisode à regarder de chaque série suivie.
-- Ajout de la page À voir pour consulter et marquer les épisodes disponibles comme regardés.
+- Ajout de la page À VOIR pour consulter et marquer les épisodes disponibles comme regardés.
 
 ## [0.8.0] - 2026-08-05
 
