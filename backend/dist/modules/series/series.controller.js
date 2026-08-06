@@ -1,5 +1,4 @@
 import { seriesService } from "./series.service.js";
-import { isWorkerRequest } from "../../shared/middlewares/verify-worker-request.js";
 export const seriesController = {
     async get(request, reply) {
         const results = await seriesService.seriesGet(request.user.id, request.params);
@@ -8,8 +7,8 @@ export const seriesController = {
 };
 export const seriesImportController = {
     async post(request, reply) {
-        const workerRequest = isWorkerRequest(request);
-        const results = await seriesService.seriesImportPost(workerRequest ? null : request.user.id, request.body, workerRequest);
+        const isWorker = request.worker?.isWorker ?? false;
+        const results = await seriesService.seriesImportPost(isWorker ? null : request.user.id, request.body, isWorker);
         return reply.send(results);
     }
 };

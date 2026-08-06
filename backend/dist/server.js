@@ -10,6 +10,8 @@ import { metadataRoutes } from "./modules/metadata/metadata.routes.js";
 import { seriesRoutes } from "./modules/series/series.routes.js";
 import { userRoutes } from "./modules/user/user.routes.js";
 import fastifyCors from "@fastify/cors";
+import { workerGuard } from "./shared/middlewares/require-worker.js";
+import fastifyAuth from "@fastify/auth";
 const app = Fastify({
     loggerInstance: logger
 }).withTypeProvider();
@@ -25,7 +27,7 @@ if (env.NODE_ENV != "prod") {
         openapi: {
             info: {
                 title: "Cue API",
-                version: "1.0.0"
+                version: "0.9.1"
             },
             tags: [
                 {
@@ -60,7 +62,9 @@ app.get("/health", async () => {
     return { status: "ok" };
 });
 await app.register(authRoutes, { prefix: "/api/auth" });
+await app.register(fastifyAuth);
 await app.register(authGuard);
+await app.register(workerGuard);
 await app.register(metadataRoutes, { prefix: "/api/metadata" });
 await app.register(seriesRoutes, { prefix: "/api/series" });
 await app.register(userRoutes, { prefix: "/api/user" });
