@@ -98,7 +98,8 @@ export const userRepository = {
         next_episode."airDate",
         next_episode."stillPath",
         next_episode.runtime,
-        next_episode."remainingEpisodes"
+        next_episode."remainingEpisodes",
+        next_episode.overview
 
         FROM "UserSeries" us
 
@@ -114,6 +115,7 @@ export const userRepository = {
             e."airDate",
             e."stillPath",
             e.runtime,
+            e.overview,
             (COUNT(*) OVER())::int AS "remainingEpisodes"
         FROM "Episode" e
 
@@ -166,7 +168,8 @@ export const userRepository = {
         next_episode."airDate",
         next_episode."stillPath",
         next_episode.runtime,
-        next_episode."remainingEpisodes"
+        next_episode."remainingEpisodes",
+        next_episode.overview
 
       FROM "UserSeries" us
 
@@ -182,6 +185,7 @@ export const userRepository = {
           e."airDate",
           e."stillPath",
           e.runtime,
+          e.overview,
           (COUNT(*) OVER())::int AS "remainingEpisodes"
         FROM "Episode" e
 
