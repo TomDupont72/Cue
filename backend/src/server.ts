@@ -1,20 +1,22 @@
 import Fastify from "fastify";
-import { env } from "./shared/config/env.js";
-import { logger } from "./shared/logger/logger.js";
+import { env } from "@/shared/config/env.js";
+import { logger } from "@/shared/logger/logger.js";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
-import { authRoutes } from "./modules/auth/auth.routes.js";
+import { authRoutes } from "@/modules/auth/auth.routes.js";
 import {
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider
 } from "fastify-type-provider-zod";
-import { authGuard } from "./shared/middlewares/require-auth.js";
-import { metadataRoutes } from "./modules/metadata/metadata.routes.js";
-import { seriesRoutes } from "./modules/series/series.routes.js";
-import { userRoutes } from "./modules/user/user.routes.js";
+import { authGuard } from "@/shared/middlewares/require-auth.js";
+import { metadataRoutes } from "@/modules/metadata/metadata.routes.js";
+import { seriesRoutes } from "@/modules/series/series.routes.js";
+import { userRoutes } from "@/modules/user/user.routes.js";
 import fastifyCors from "@fastify/cors";
+import { workerGuard } from "@/shared/middlewares/require-worker.js";
+import fastifyAuth from "@fastify/auth";
 
 const app = Fastify({
   loggerInstance: logger
@@ -34,7 +36,7 @@ if (env.NODE_ENV != "prod") {
     openapi: {
       info: {
         title: "Cue API",
-        version: "1.0.0"
+        version: "0.9.1"
       },
       tags: [
         {
@@ -74,7 +76,9 @@ app.get("/health", async () => {
 
 await app.register(authRoutes, { prefix: "/api/auth" });
 
+await app.register(fastifyAuth);
 await app.register(authGuard);
+await app.register(workerGuard);
 
 await app.register(metadataRoutes, { prefix: "/api/metadata" });
 await app.register(seriesRoutes, { prefix: "/api/series" });

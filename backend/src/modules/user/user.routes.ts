@@ -16,8 +16,6 @@ import {
   userSeriesController,
   userStatusController
 } from "@/modules/user/user.controller.js";
-import { isWorkerRequest } from "@/shared/middlewares/verify-worker-request.js";
-import { unauthorized } from "@/shared/errors/errors.helpers.js";
 
 export async function userRoutes(app: AppFastifyInstance) {
   app.get("/series", {
@@ -92,13 +90,7 @@ export async function userRoutes(app: AppFastifyInstance) {
   });
 
   app.post("/status/:userId/recalculate", {
-    preHandler: [
-      async (request) => {
-        if (!isWorkerRequest(request)) {
-          throw unauthorized("Invalid worker token");
-        }
-      }
-    ],
+    preHandler: [app.requireWorker],
     schema: {
       tags: ["User"],
       params: userStatusRecalculateSchema

@@ -1,7 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { seriesService } from "./series.service.js";
 import { SeriesGet, SeriesImportPost } from "./series.schemas.js";
-import { isWorkerRequest } from "@/shared/middlewares/verify-worker-request.js";
 
 export const seriesController = {
   async get(request: FastifyRequest<{ Params: SeriesGet }>, reply: FastifyReply) {
@@ -13,11 +12,11 @@ export const seriesController = {
 
 export const seriesImportController = {
   async post(request: FastifyRequest<{ Body: SeriesImportPost }>, reply: FastifyReply) {
-    const workerRequest = isWorkerRequest(request);
+    const isWorker = request.worker?.isWorker ?? false;
     const results = await seriesService.seriesImportPost(
-      workerRequest ? null : request.user.id,
+      isWorker ? null : request.user.id,
       request.body,
-      workerRequest
+      isWorker
     );
 
     return reply.send(results);
