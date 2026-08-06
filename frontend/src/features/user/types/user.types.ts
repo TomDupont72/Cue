@@ -73,6 +73,7 @@ export type UserEpisodesFeedGetItem = {
   airDate: string | null;
   stillPath: string | null;
   runtime: number;
+  overview: string | null;
   remainingEpisodes: number;
 };
 

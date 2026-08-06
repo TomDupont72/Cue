@@ -26,5 +26,6 @@ export type EpisodeFeedRow = {
   airDate: string | null;
   stillPath: string | null;
   runtime: number;
+  overview: string | null;
   remainingEpisodes: number;
 };
