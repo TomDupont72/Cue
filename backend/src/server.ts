@@ -31,7 +31,7 @@ app.register(fastifyCors, {
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
-if (env.NODE_ENV != "prod") {
+if (env.NODE_ENV != "production") {
   await app.register(swagger, {
     openapi: {
       info: {
