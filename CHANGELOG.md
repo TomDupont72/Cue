@@ -1,3 +1,12 @@
+## [0.9.2] - 2026-08-08
+
+### Fixed
+
+- Correction de la configuration et du nommage des variables d’environnement de l’API.
+- Correction et refactorisation de l’authentification du worker.
+- Correction de plusieurs problèmes dans l’API.
+- Correction de divers bugs mineurs.
+
 ## [0.9.1] - 2026-08-06
 
 ### Fixed
