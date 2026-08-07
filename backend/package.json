@@ -8,6 +8,7 @@
     "prebuild": "node --eval \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "build": "tsc && tsc-alias",
     "test": "tsc --noEmit -p tsconfig.test.json && node --import tsx --test src/modules/*/__tests__/*.test.ts src/shared/config/__tests__/*.test.ts src/shared/utils/*/__tests__/*.test.ts",
+    "test:integration": "tsc --noEmit -p tsconfig.test.json && node --import tsx --test src/integration/*.integration.test.ts",
     "start": "node dist/server.js",
     "lint": "eslint .",
     "format": "prettier --write ."

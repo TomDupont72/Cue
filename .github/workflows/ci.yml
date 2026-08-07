@@ -45,14 +45,29 @@ jobs:
   backend:
     name: Backend (lint/test/coverage/build)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: cue
+          POSTGRES_PASSWORD: cue
+          POSTGRES_DB: cue_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cue -d cue_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: backend
 
     env:
       NODE_ENV: test
+      INTEGRATION_TEST_DATABASE: "true"
       HOST: localhost
-      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+      DATABASE_URL: postgresql://cue:cue@localhost:5432/cue_test
       BETTER_AUTH_SECRET: ci-better-auth-secret-at-least-32-characters
       BETTER_AUTH_URL: http://localhost:8000
       CLIENT_ORIGIN: http://localhost:5173
@@ -75,11 +90,17 @@ jobs:
       - name: Prisma generate
         run: npx prisma generate
 
+      - name: Apply database migrations
+        run: npx prisma migrate deploy
+
       - name: Lint
         run: npm run lint --if-present
 
       - name: Test (with coverage)
         run: npm run test --if-present
+
+      - name: Integration tests
+        run: npm run test:integration
 
       - name: Build
         run: npm run build
