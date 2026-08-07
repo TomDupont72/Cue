@@ -21,21 +21,9 @@ export default function SeasonCard({
 }: SeasonCardProps) {
   const now = new Date();
   const releasedEpisodes = episodes.filter((episode) => isEpisodeReleased(episode.airDate, now));
-  const releasedEpisodeIds = new Set(releasedEpisodes.map((episode) => episode.id));
   const watchedCount = releasedEpisodes.filter((episode) =>
     watchedEpisodeIds.has(episode.id)
   ).length;
-  const watchedSeasonCount = episodes.filter((episode) => watchedEpisodeIds.has(episode.id)).length;
-  const hasWatchedUnreleasedEpisode = episodes.some(
-    (episode) => !releasedEpisodeIds.has(episode.id) && watchedEpisodeIds.has(episode.id)
-  );
-  const areAllReleasedEpisodesWatched =
-    releasedEpisodes.length > 0 && watchedCount === releasedEpisodes.length;
-  const checkboxState = areAllReleasedEpisodesWatched
-    ? true
-    : watchedSeasonCount > 0
-      ? "indeterminate"
-      : false;
 
   const userSeasonPostMutation = useUserSeasonPost();
   const userSeasonDeleteMutation = useUserSeasonDelete();
@@ -46,7 +34,7 @@ export default function SeasonCard({
       seasonId: season.id
     };
 
-    if (checked && !hasWatchedUnreleasedEpisode) {
+    if (checked) {
       userSeasonPostMutation.mutate(params);
     } else {
       userSeasonDeleteMutation.mutate(params);
@@ -82,10 +70,10 @@ export default function SeasonCard({
           }
         />
         <RoundedCheckbox
-          checked={checkboxState}
+          checked={releasedEpisodes.length > 0 && watchedCount === releasedEpisodes.length}
           onChange={handleCheckedChange}
           disabled={
-            (releasedEpisodes.length === 0 && watchedSeasonCount === 0) ||
+            releasedEpisodes.length === 0 ||
             userSeasonPostMutation.isPending ||
             userSeasonDeleteMutation.isPending
           }

@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import EpisodeCardDetails from "@/features/episode/components/episodeCardDetails";
 import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/types/episode.types";
 import { getEpisodeReleaseDayDifference } from "@/features/episode/utils/episodeRelease";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -28,18 +27,12 @@ export default function EpisodeCard({
 }: EpisodeCardProps) {
   const navigate = useNavigate();
   const stillUrl = getTmdbImageUrl(episode.stillPath);
-  const [optimisticWatched, setOptimisticWatched] = useState<boolean | null>(null);
 
   const userEpisodePostMutation = useUserEpisodePost();
   const userEpisodeDeleteMutation = useUserEpisodeDelete();
-  const mutationFailed = userEpisodePostMutation.isError || userEpisodeDeleteMutation.isError;
-  const isWatched = mutationFailed
-    ? watchedEpisodeIds.has(episode.id)
-    : (optimisticWatched ?? watchedEpisodeIds.has(episode.id));
+  const isWatched = watchedEpisodeIds.has(episode.id);
 
   function handleCheckedChange(checked: boolean) {
-    setOptimisticWatched(checked);
-
     const params = {
       seriesId: series.id,
       episodeId: episode.id
