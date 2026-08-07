@@ -17,6 +17,7 @@ async function buildApp() {
   app.decorate("requireAuth", async (request) => {
     request.user = { id: "test-user" };
   });
+  app.decorate("requireWorker", async () => {});
 
   await app.register(metadataRoutes, { prefix: "/api/metadata" });
   await app.ready();

@@ -15,10 +15,12 @@ import {
   validatorCompiler,
   type ZodTypeProvider
 } from "fastify-type-provider-zod";
+import fastifyAuth from "@fastify/auth";
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { seriesRoutes } from "../series.routes.js";
 import { env } from "@/shared/config/env.js";
+import { workerGuard } from "@/shared/middlewares/require-worker.js";
 import type { TestContext } from "node:test";
 
 const WORKER_TOKEN = "worker-token-used-by-series-route-tests";
@@ -46,6 +48,8 @@ async function buildApp(authenticated = true) {
     request.user = { id: "test-user" };
   });
 
+  await app.register(fastifyAuth);
+  await app.register(workerGuard);
   await app.register(seriesRoutes, { prefix: "/api/series" });
   await app.ready();
 
@@ -239,7 +243,7 @@ describe("POST /api/series/import", () => {
     }
     mockPrisma(t, data);
     mockTmdbFetch(t, { details, seasons });
-    const app = await buildApp();
+    const app = await buildApp(false);
     t.after(() => app.close());
 
     const response = await app.inject({

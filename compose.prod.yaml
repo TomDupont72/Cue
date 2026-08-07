@@ -1,5 +1,8 @@
 services:
   backend:
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
     image: ghcr.io/tomdupont72/cue-backend:${APP_VERSION:-latest}
     container_name: cue-backend
     env_file:
