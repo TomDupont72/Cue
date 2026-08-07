@@ -7,8 +7,8 @@ import { useUserEpisodePost } from "@/features/user/hooks/useUserEpisodePost";
 import { useUserEpisodeDelete } from "@/features/user/hooks/useUserEpisodeDelete";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import EpisodeCardDetails from "@/features/episode/components/episodeCardDetails";
-import { differenceInCalendarDays } from "date-fns";
 import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/types/episode.types";
+import { getEpisodeReleaseDayDifference } from "@/features/episode/utils/episodeRelease";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -60,9 +60,7 @@ export default function EpisodeCard({
     }
   }
 
-  const remainingDays = episode.airDate
-    ? differenceInCalendarDays(new Date(episode.airDate), new Date())
-    : null;
+  const remainingDays = getEpisodeReleaseDayDifference(episode.airDate);
 
   return (
     <Dialog>

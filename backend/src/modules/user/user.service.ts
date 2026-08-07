@@ -13,6 +13,90 @@ import {
 import { episodeRepository } from "../episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
 import { seriesRepository } from "../series/series.repository.js";
+import type { PrismaTx } from "@/shared/db/prisma.types.js";
+import type { UserSeries, UserSeriesStatus } from "@/generated/prisma/client.js";
+import { getEpisodeReleaseCutoff } from "../episode/episode.utils.js";
+
+type SeriesProgressParams = {
+  userId: string;
+  seriesId: number;
+  numberOfEpisodes: number;
+  delta: number;
+};
+
+function getStatusAfterAddingEpisodes(
+  watchCount: number,
+  numberOfEpisodes: number
+): UserSeriesStatus {
+  return watchCount >= numberOfEpisodes ? "COMPLETED" : "WATCHING";
+}
+
+function getStatusAfterRemovingEpisodes(watchCount: number): UserSeriesStatus {
+  return watchCount === 0 ? "PLANNED" : "WATCHING";
+}
+
+async function updateSeriesStatus(userSeries: UserSeries, status: UserSeriesStatus, tx: PrismaTx) {
+  if (status === userSeries.status) {
+    return userSeries;
+  }
+
+  return userRepository.updateSeries(
+    {
+      userId_seriesId: {
+        userId: userSeries.userId,
+        seriesId: userSeries.seriesId
+      }
+    },
+    { status },
+    tx
+  );
+}
+
+async function addSeriesProgress(
+  { userId, seriesId, numberOfEpisodes, delta }: SeriesProgressParams,
+  watchedAt: Date,
+  tx: PrismaTx
+) {
+  const userSeries = await userRepository.incrementSeriesProgress(
+    userId,
+    seriesId,
+    delta,
+    watchedAt,
+    tx
+  );
+
+  if (!userSeries) {
+    throw notFound("Series for this user");
+  }
+
+  return updateSeriesStatus(
+    userSeries,
+    getStatusAfterAddingEpisodes(userSeries.watchCount, numberOfEpisodes),
+    tx
+  );
+}
+
+async function removeSeriesProgress(
+  { userId, seriesId, delta }: Omit<SeriesProgressParams, "numberOfEpisodes">,
+  tx: PrismaTx
+) {
+  const updatedUserSeries = await userRepository.updateSeries(
+    {
+      userId_seriesId: {
+        userId,
+        seriesId
+      }
+    },
+    { watchCount: { decrement: delta } },
+    tx
+  );
+
+  return updateSeriesStatus(
+    updatedUserSeries,
+    getStatusAfterRemovingEpisodes(updatedUserSeries.watchCount),
+    tx
+  );
+}
 
 export const userService = {
   async userSeriesGet(userId: string, params: UserSeriesGetParams) {
@@ -58,17 +142,24 @@ export const userService = {
     const userSeries = await userRepository.upsertSeries(
       { userId_seriesId: { userId, ...params } },
       { userId, ...params, ...body },
-      {}
+      { ...body }
     );
 
     return userSeries;
   },
 
-  async userEpisodePost(userId: string, params: UserEpisodePostParams) {
+  async userEpisodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
-      const episode = await episodeRepository.findOne({ id: episodeId, seriesId }, tx);
+      const episode = await episodeRepository.findOne(
+        {
+          id: episodeId,
+          seriesId,
+          airDate: { lt: getEpisodeReleaseCutoff(now) }
+        },
+        tx
+      );
 
       if (!episode) {
         throw notFound("Episode");
@@ -80,17 +171,23 @@ export const userService = {
         throw notFound("Series");
       }
 
-      const userSeries = await userRepository.findOneSeries(
-        { userId_seriesId: { userId: userId, seriesId: seriesId } },
+      await userRepository.ensureSeries(userId, seriesId, tx);
+
+      const [createdUserEpisode] = await userRepository.createManyEpisodes(
+        [{ userId, episodeId, watchedAt: now }],
         tx
       );
 
-      const userEpisode = await userRepository.findOneEpisode(
-        { userId_episodeId: { userId: userId, episodeId: episodeId } },
-        tx
-      );
+      if (!createdUserEpisode) {
+        const userEpisode = await userRepository.findOneEpisode(
+          { userId_episodeId: { userId, episodeId } },
+          tx
+        );
 
-      if (userEpisode) {
+        if (!userEpisode) {
+          throw notFound("Episode for this user");
+        }
+
         const nextEpisode = await userRepository.getEpisodeFeedItem(userId, seriesId, tx);
 
         return {
@@ -100,22 +197,14 @@ export const userService = {
         };
       }
 
-      const incrementedWatchcount =
-        episode.seasonNumber !== 0
-          ? (userSeries?.watchCount ?? 0) + 1
-          : (userSeries?.watchCount ?? 0);
-      const status = incrementedWatchcount >= series.numberOfEpisodes ? "COMPLETED" : "WATCHING";
-
-      await userRepository.upsertSeries(
-        { userId_seriesId: { userId, seriesId } },
-        { userId, seriesId, status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() },
-        { status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() },
-        tx
-      );
-
-      const createdUserEpisode = await userRepository.upsertEpisode(
-        { userId_episodeId: { userId, episodeId } },
-        { userId, episodeId },
+      await addSeriesProgress(
+        {
+          userId,
+          seriesId,
+          numberOfEpisodes: series.numberOfEpisodes,
+          delta: episode.seasonNumber === 0 ? 0 : 1
+        },
+        now,
         tx
       );
 
@@ -154,35 +243,37 @@ export const userService = {
         throw notFound("Series for this user");
       }
 
-      const userEpisode = await userRepository.findOneEpisode(
-        { userId_episodeId: { userId: userId, episodeId: episodeId } },
-        tx
-      );
+      const deletedUserEpisodes = await userRepository.deleteEpisodes(userId, [episodeId], tx);
 
-      if (!userEpisode) {
+      if (deletedUserEpisodes.length === 0) {
         throw notFound("Episode for this user");
       }
 
-      const decrementedWatchcount =
-        episode.seasonNumber !== 0 ? userSeries.watchCount - 1 : userSeries.watchCount;
-      const status = decrementedWatchcount === 0 ? "PLANNED" : "WATCHING";
-
-      await userRepository.upsertSeries(
-        { userId_seriesId: { userId, seriesId } },
-        { userId, seriesId, status, watchCount: decrementedWatchcount },
-        { status, watchCount: decrementedWatchcount },
+      await removeSeriesProgress(
+        {
+          userId,
+          seriesId,
+          delta: episode.seasonNumber === 0 ? 0 : deletedUserEpisodes.length
+        },
         tx
       );
 
-      return userRepository.deleteManyEpisode({ userId, episodeId }, tx);
+      return deletedUserEpisodes;
     });
   },
 
-  async userSeasonPost(userId: string, params: UserSeasonPostParams) {
+  async userSeasonPost(userId: string, params: UserSeasonPostParams, now = new Date()) {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
-      const episodes = await episodeRepository.findMany({ seriesId, seasonId }, tx);
+      const episodes = await episodeRepository.findMany(
+        {
+          seriesId,
+          seasonId,
+          airDate: { lt: getEpisodeReleaseCutoff(now) }
+        },
+        tx
+      );
 
       if (episodes.length === 0) {
         throw notFound("Episodes");
@@ -194,41 +285,34 @@ export const userService = {
         throw notFound("Series");
       }
 
-      const userSeries = await userRepository.findOneSeries(
-        { userId_seriesId: { userId: userId, seriesId: seriesId } },
+      await userRepository.ensureSeries(userId, seriesId, tx);
+
+      const createdUserEpisodes = await userRepository.createManyEpisodes(
+        episodes.map((episode) => ({ userId, episodeId: episode.id, watchedAt: now })),
         tx
       );
 
-      const userEpisodes = await userRepository.findManyEpisodes(
-        { userId, episodeId: { in: episodes.map((episode) => episode.id) } },
-        tx
-      );
-
-      const watchedEpisodeIds = new Set(userEpisodes.map((userEpisode) => userEpisode.episodeId));
-
-      const notWatchedEpisodes = episodes.filter((episode) => !watchedEpisodeIds.has(episode.id));
-
-      if (notWatchedEpisodes.length === 0) {
-        return userEpisodes;
+      if (createdUserEpisodes.length === 0) {
+        return userRepository.findManyEpisodes(
+          { userId, episodeId: { in: episodes.map((episode) => episode.id) } },
+          tx
+        );
       }
 
-      const incrementedWatchcount =
-        episodes[0].seasonNumber !== 0
-          ? (userSeries?.watchCount ?? 0) + notWatchedEpisodes.length
-          : (userSeries?.watchCount ?? 0);
-      const status = incrementedWatchcount >= series.numberOfEpisodes ? "COMPLETED" : "WATCHING";
+      const regularEpisodeIds = new Set(
+        episodes.filter((episode) => episode.seasonNumber !== 0).map((episode) => episode.id)
+      );
+      const delta = createdUserEpisodes.filter((episode) =>
+        regularEpisodeIds.has(episode.episodeId)
+      ).length;
 
-      await userRepository.upsertSeries(
-        { userId_seriesId: { userId, seriesId } },
-        { userId, seriesId, status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() },
-        { status, watchCount: incrementedWatchcount, lastWatchedAt: new Date() },
+      await addSeriesProgress(
+        { userId, seriesId, numberOfEpisodes: series.numberOfEpisodes, delta },
+        now,
         tx
       );
 
-      return userRepository.upsertManyEpisodes(
-        notWatchedEpisodes.map((episode) => ({ userId, episodeId: episode.id })),
-        tx
-      );
+      return createdUserEpisodes;
     });
   },
 
@@ -257,32 +341,33 @@ export const userService = {
         throw notFound("Series for this user");
       }
 
-      const userEpisodes = await userRepository.findManyEpisodes(
-        { userId, episodeId: { in: episodes.map((episode) => episode.id) } },
+      const deletedUserEpisodes = await userRepository.deleteEpisodes(
+        userId,
+        episodes.map((episode) => episode.id),
         tx
       );
 
-      if (userEpisodes.length === 0) {
+      if (deletedUserEpisodes.length === 0) {
         throw notFound("Episode for this user");
       }
 
-      const decrementedWatchcount =
-        episodes[0].seasonNumber !== 0
-          ? (userSeries?.watchCount ?? 0) - userEpisodes.length
-          : (userSeries?.watchCount ?? 0);
-      const status = decrementedWatchcount === 0 ? "PLANNED" : "WATCHING";
+      const regularEpisodeIds = new Set(
+        episodes.filter((episode) => episode.seasonNumber !== 0).map((episode) => episode.id)
+      );
+      const delta = deletedUserEpisodes.filter((episode) =>
+        regularEpisodeIds.has(episode.episodeId)
+      ).length;
 
-      await userRepository.upsertSeries(
-        { userId_seriesId: { userId, seriesId } },
-        { userId, seriesId, status, watchCount: decrementedWatchcount },
-        { status, watchCount: decrementedWatchcount },
+      await removeSeriesProgress(
+        {
+          userId,
+          seriesId,
+          delta
+        },
         tx
       );
 
-      return userRepository.deleteManyEpisode(
-        { userId, episodeId: { in: userEpisodes.map((userEpisode) => userEpisode.episodeId) } },
-        tx
-      );
+      return deletedUserEpisodes;
     });
   },
 

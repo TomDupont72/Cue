@@ -4,6 +4,7 @@ import EpisodeCard from "@/features/episode/components/episodeCard";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
 import { useUserSeasonPost } from "@/features/user/hooks/useUserSeasonPost";
 import { useUserSeasonDelete } from "@/features/user/hooks/useUserSeasonDelete";
+import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
 
 type SeasonCardProps = {
   seriesId: number;
@@ -18,7 +19,23 @@ export default function SeasonCard({
   episodes,
   watchedEpisodeIds
 }: SeasonCardProps) {
-  const watchedCount = episodes.filter((episode) => watchedEpisodeIds.has(episode.id)).length;
+  const now = new Date();
+  const releasedEpisodes = episodes.filter((episode) => isEpisodeReleased(episode.airDate, now));
+  const releasedEpisodeIds = new Set(releasedEpisodes.map((episode) => episode.id));
+  const watchedCount = releasedEpisodes.filter((episode) =>
+    watchedEpisodeIds.has(episode.id)
+  ).length;
+  const watchedSeasonCount = episodes.filter((episode) => watchedEpisodeIds.has(episode.id)).length;
+  const hasWatchedUnreleasedEpisode = episodes.some(
+    (episode) => !releasedEpisodeIds.has(episode.id) && watchedEpisodeIds.has(episode.id)
+  );
+  const areAllReleasedEpisodesWatched =
+    releasedEpisodes.length > 0 && watchedCount === releasedEpisodes.length;
+  const checkboxState = areAllReleasedEpisodesWatched
+    ? true
+    : watchedSeasonCount > 0
+      ? "indeterminate"
+      : false;
 
   const userSeasonPostMutation = useUserSeasonPost();
   const userSeasonDeleteMutation = useUserSeasonDelete();
@@ -29,7 +46,7 @@ export default function SeasonCard({
       seasonId: season.id
     };
 
-    if (checked) {
+    if (checked && !hasWatchedUnreleasedEpisode) {
       userSeasonPostMutation.mutate(params);
     } else {
       userSeasonDeleteMutation.mutate(params);
@@ -59,15 +76,19 @@ export default function SeasonCard({
           right={
             <div className="flex items-center ml-auto gap-4">
               <p>
-                {watchedCount}/{episodes.length}
+                {watchedCount}/{releasedEpisodes.length}
               </p>
             </div>
           }
         />
         <RoundedCheckbox
-          checked={watchedCount === episodes.length}
+          checked={checkboxState}
           onChange={handleCheckedChange}
-          disabled={userSeasonPostMutation.isPending}
+          disabled={
+            (releasedEpisodes.length === 0 && watchedSeasonCount === 0) ||
+            userSeasonPostMutation.isPending ||
+            userSeasonDeleteMutation.isPending
+          }
           className="absolute right-3 top-1/2 z-10 -translate-y-1/2"
         />
       </div>

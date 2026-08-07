@@ -4,6 +4,7 @@ import type { UserSeasonPostResponse } from "@/features/user/types/user.types";
 import { userSeasonPost } from "@/features/user/api/user.api";
 import { queryKeys } from "@/lib/queryKeys";
 import type { UserSeasonPostParams } from "@/features/user/schemas/user.schemas";
+import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
 
 export function useUserSeasonPost() {
   return useOptimisticMutation<
@@ -21,9 +22,15 @@ export function useUserSeasonPost() {
       const watchedEpisodeIds = new Set(
         currentData.userEpisodes.map((userEpisode) => userEpisode.episodeId)
       );
-      const watchedAt = new Date().toISOString();
+      const now = new Date();
+      const watchedAt = now.toISOString();
       const newUserEpisodes = currentData.episodes
-        .filter((episode) => episode.seasonId === seasonId && !watchedEpisodeIds.has(episode.id))
+        .filter(
+          (episode) =>
+            episode.seasonId === seasonId &&
+            isEpisodeReleased(episode.airDate, now) &&
+            !watchedEpisodeIds.has(episode.id)
+        )
         .map((episode) => ({
           userId: "optimistic",
           episodeId: episode.id,

@@ -1,11 +1,7 @@
-import { Prisma } from "@/generated/prisma/client.js";
+import { Prisma, type UserEpisode, type UserSeries } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
-import {
-  deleteManyAndFetch,
-  findManyPaginated,
-  upsertManyAndFetch
-} from "@/shared/utils/prisma/prisma.js";
+import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 import {
   DashboardSummaryEpisodesRow,
   DashboardSummarySeriesRow,
@@ -60,6 +56,53 @@ export const userRepository = {
     });
   },
 
+  ensureSeries(userId: string, seriesId: number, db: PrismaTx = prisma) {
+    return db.userSeries.createMany({
+      data: [{ userId, seriesId }],
+      skipDuplicates: true
+    });
+  },
+
+  updateSeries(
+    where: Prisma.UserSeriesWhereUniqueInput,
+    data: Prisma.UserSeriesUncheckedUpdateInput,
+    db: PrismaTx = prisma
+  ) {
+    return db.userSeries.update({
+      where,
+      data
+    });
+  },
+
+  async incrementSeriesProgress(
+    userId: string,
+    seriesId: number,
+    delta: number,
+    watchedAt: Date,
+    db: PrismaTx = prisma
+  ) {
+    const [userSeries] = await db.$queryRaw<UserSeries[]>(Prisma.sql`
+      UPDATE "UserSeries"
+      SET "watchCount" = "watchCount" + ${delta},
+          "lastWatchedAt" = GREATEST(
+            COALESCE("lastWatchedAt", ${watchedAt}),
+            ${watchedAt}
+          )
+      WHERE "userId" = ${userId}
+        AND "seriesId" = ${seriesId}
+      RETURNING
+        "userId",
+        "seriesId",
+        "status",
+        "isFavorite",
+        "watchCount",
+        "addedAt",
+        "lastWatchedAt"
+    `);
+
+    return userSeries ?? null;
+  },
+
   updateManySeries(
     where: Prisma.UserSeriesWhereInput,
     data: Prisma.UserSeriesUpdateManyMutationInput,
@@ -71,32 +114,24 @@ export const userRepository = {
     });
   },
 
-  upsertEpisode(
-    where: Prisma.UserEpisodeWhereUniqueInput,
-    data: Prisma.UserEpisodeUncheckedCreateInput,
-    db: PrismaTx = prisma
-  ) {
-    return db.userEpisode.upsert({
-      where,
-      create: data,
-      update: data
-    });
-  },
-
-  upsertManyEpisodes(data: Prisma.UserEpisodeCreateManyInput[], db: PrismaTx = prisma) {
-    return upsertManyAndFetch({
+  createManyEpisodes(data: Prisma.UserEpisodeCreateManyInput[], db: PrismaTx = prisma) {
+    return db.userEpisode.createManyAndReturn({
       data,
-      scalarFields: Prisma.UserEpisodeScalarFieldEnum,
-      uniqueBy: ["userId", "episodeId"] as const,
-      delegate: db.userEpisode
+      skipDuplicates: true
     });
   },
 
-  deleteManyEpisode(where: Prisma.UserEpisodeWhereInput, db: PrismaTx = prisma) {
-    return deleteManyAndFetch({
-      where,
-      delegate: db.userEpisode
-    });
+  deleteEpisodes(userId: string, episodeIds: number[], db: PrismaTx = prisma) {
+    if (episodeIds.length === 0) {
+      return Promise.resolve<UserEpisode[]>([]);
+    }
+
+    return db.$queryRaw<UserEpisode[]>(Prisma.sql`
+      DELETE FROM "UserEpisode"
+      WHERE "userId" = ${userId}
+        AND "episodeId" IN (${Prisma.join(episodeIds)})
+      RETURNING "userId", "episodeId", "watchedAt"
+    `);
   },
 
   async getDashboardSummary(userId: string, db: PrismaTx = prisma) {
@@ -163,7 +198,8 @@ export const userRepository = {
         WHERE e."seriesId" = us."seriesId"
             AND e."seasonNumber" <> 0
             AND e."airDate" IS NOT NULL
-            AND e."airDate" < CURRENT_DATE + INTERVAL '1 day'
+            AND e."airDate" < date_trunc('day', CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
+              + INTERVAL '1 day'
             AND NOT EXISTS (
             SELECT 1
             FROM "UserEpisode" ue
@@ -234,7 +270,8 @@ export const userRepository = {
         WHERE e."seriesId" = us."seriesId"
           AND e."seasonNumber" <> 0
           AND e."airDate" IS NOT NULL
-          AND e."airDate" < CURRENT_DATE + INTERVAL '1 day'
+          AND e."airDate" < date_trunc('day', CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
+            + INTERVAL '1 day'
           AND NOT EXISTS (
             SELECT 1
             FROM "UserEpisode" ue

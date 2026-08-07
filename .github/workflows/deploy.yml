@@ -80,8 +80,16 @@ jobs:
 
             docker compose -f compose.prod.yaml pull
 
-            docker compose -f compose.prod.yaml run --rm backend \
-              npx prisma migrate deploy
+            # Prevent the previous backend from writing a stale absolute watchCount
+            # between the backfill migration and the new atomic implementation.
+            docker compose -f compose.prod.yaml stop backend
+
+            if ! docker compose -f compose.prod.yaml run --rm backend \
+              npx prisma migrate deploy; then
+              echo "Migration failed; restarting the previous backend container."
+              docker start cue-backend
+              exit 1
+            fi
 
             docker compose -f compose.prod.yaml up -d \
               --remove-orphans
