@@ -86,7 +86,7 @@ jobs:
 
             if ! docker compose -f compose.prod.yaml run --rm backend \
               npx prisma migrate deploy; then
-              echo "Migration failed; restarting the previous backend container."
+              echo 'Migration failed; restarting the previous backend container.'
               docker start cue-backend
               exit 1
             fi
