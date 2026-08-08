@@ -258,7 +258,7 @@ export const userService = {
         tx
       );
 
-      return deletedUserEpisodes;
+      return deletedUserEpisodes[0];
     });
   },
 

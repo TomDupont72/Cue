@@ -1,5 +1,10 @@
 import { AppFastifyInstance } from "@/shared/types/fastify.js";
-import { seriesGetSchema, seriesImportPostSchema } from "@/modules/series/series.schemas.js";
+import {
+  seriesGetResponseSchema,
+  seriesGetSchema,
+  seriesImportPostResponseSchema,
+  seriesImportPostSchema
+} from "@/modules/series/series.schemas.js";
 import { seriesController, seriesImportController } from "@/modules/series/series.controller.js";
 
 export async function seriesRoutes(app: AppFastifyInstance) {
@@ -7,7 +12,10 @@ export async function seriesRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireAuth],
     schema: {
       tags: ["Series"],
-      params: seriesGetSchema
+      params: seriesGetSchema,
+      response: {
+        200: seriesGetResponseSchema
+      }
     },
     handler: seriesController.get
   });
@@ -16,7 +24,10 @@ export async function seriesRoutes(app: AppFastifyInstance) {
     preHandler: app.auth([app.requireAuth, app.requireWorker], { relation: "or" }),
     schema: {
       tags: ["Series"],
-      body: seriesImportPostSchema
+      body: seriesImportPostSchema,
+      response: {
+        200: seriesImportPostResponseSchema
+      }
     },
     handler: seriesImportController.post
   });

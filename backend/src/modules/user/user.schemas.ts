@@ -1,4 +1,9 @@
 import z from "zod";
+import {
+  seriesResponseSchema,
+  userEpisodeResponseSchema,
+  userSeriesResponseSchema
+} from "@/modules/series/series.schemas.js";
 
 export const userSeriesStatuses = [
   "PLANNED",
@@ -46,6 +51,64 @@ export const userStatusRecalculateSchema = z.object({
 export const userEpisodeDeleteParamsSchema = userEpisodePostParamsSchema;
 
 export const userSeasonDeleteParamsSchema = userSeasonPostParamsSchema;
+
+export const userSeriesGetResponseSchema = z.object({
+  items: z.array(
+    userSeriesResponseSchema.extend({
+      seriesDetails: seriesResponseSchema
+    })
+  ),
+  hasNextPage: z.boolean(),
+  nextCursor: z.date().nullable()
+});
+
+export const userSeriesPostResponseSchema = userSeriesResponseSchema;
+
+export const userEpisodeFeedItemResponseSchema = z.object({
+  userId: z.string(),
+  seriesId: z.number().int(),
+  status: userSeriesStatusSchema,
+  lastWatchedAt: z.date().nullable(),
+  seriesName: z.string(),
+  seriesPosterPath: z.string().nullable(),
+  seriesTmdbId: z.number().int(),
+  id: z.number().int(),
+  name: z.string(),
+  seasonNumber: z.number().int(),
+  episodeNumber: z.number().int(),
+  airDate: z.date().nullable(),
+  stillPath: z.string().nullable(),
+  runtime: z.number().int(),
+  overview: z.string().nullable(),
+  remainingEpisodes: z.number().int().nonnegative()
+});
+
+export const userEpisodeFeedGetResponseSchema = z.object({
+  watching: z.array(userEpisodeFeedItemResponseSchema),
+  paused: z.array(userEpisodeFeedItemResponseSchema),
+  dropped: z.array(userEpisodeFeedItemResponseSchema)
+});
+
+export const userEpisodePostResponseSchema = userEpisodeResponseSchema.extend({
+  seriesId: z.number().int(),
+  nextEpisode: userEpisodeFeedItemResponseSchema.nullable()
+});
+
+export const userEpisodeDeleteResponseSchema = userEpisodeResponseSchema;
+
+export const userSeasonPostResponseSchema = z.array(userEpisodeResponseSchema);
+
+export const userSeasonDeleteResponseSchema = userSeasonPostResponseSchema;
+
+export const userDashboardSummaryGetResponseSchema = z.object({
+  totalWatchedMinutes: z.number().int().nonnegative(),
+  totalWatchedEpisodes: z.number().int().nonnegative(),
+  totalWatchedSeries: z.number().int().nonnegative()
+});
+
+export const userStatusRecalculateResponseSchema = z.object({
+  updatedCount: z.number().int().nonnegative()
+});
 
 export type UserEpisodePostParams = z.infer<typeof userEpisodePostParamsSchema>;
 

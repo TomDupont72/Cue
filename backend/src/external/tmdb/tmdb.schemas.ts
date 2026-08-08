@@ -152,7 +152,7 @@ export const tmdbTvChangesSchema = z
   })
   .transform((changes) =>
     camelCaseKeys(changes, {
-      id: "tmbdId",
+      id: "tmdbId",
       total_pages: "totalPages",
       total_results: "totalResults"
     })

@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import type { SeriesSearchGetResult } from "../types/series.types";
+import type { SeriesCardData } from "../types/series.types";
 import { SeriesCard } from "./seriesCard";
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 
 type SeriesDisplayProps = {
-  seriesData: SeriesSearchGetResult[];
+  seriesData: SeriesCardData[];
   userSeriesData?: UserSeriesGetResponse["items"];
   isProgress?: boolean;
 };
@@ -30,9 +30,11 @@ export default function SeriesDisplay({
           (item) => item.seriesDetails.tmdbId === series.tmdbId
         );
 
-        const watchProgress = userSeries
-          ? (userSeries.watchCount / series.numberOfEpisodes) * 100
-          : undefined;
+        const numberOfEpisodes = userSeries?.seriesDetails.numberOfEpisodes;
+        const watchProgress =
+          userSeries && numberOfEpisodes
+            ? (userSeries.watchCount / numberOfEpisodes) * 100
+            : undefined;
 
         return (
           <SeriesCard

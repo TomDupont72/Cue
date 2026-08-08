@@ -30,6 +30,13 @@ export const onePieceTmdbSearchResponse = {
   total_results: 2
 };
 
+export const onePieceTmdbChangesResponse = {
+  results: [{ id: 37854 }, { id: 111110 }],
+  page: 1,
+  total_pages: 1,
+  total_results: 2
+};
+
 const creator = {
   adult: false,
   gender: 2,
@@ -155,6 +162,8 @@ export function mockTmdbFetch(
 
     if (url.pathname === "/3/search/tv") {
       responseBody = onePieceTmdbSearchResponse;
+    } else if (url.pathname === "/3/tv/changes") {
+      responseBody = onePieceTmdbChangesResponse;
     } else if (url.pathname === "/3/tv/37854") {
       responseBody = details;
     } else if (url.pathname === "/3/tv/37854/season/1") {

@@ -27,7 +27,7 @@ def get_series_changes(
         1
     )
 
-    tmdb_ids += [result["tmbdId"] for result in first_page["results"]]
+    tmdb_ids += [result["tmdbId"] for result in first_page["results"]]
 
     for page in range(2, first_page["totalPages"] + 1):
         current_page = cue_api.get_series_changes(
@@ -36,7 +36,7 @@ def get_series_changes(
             page
         )
 
-        tmdb_ids += [result["tmbdId"] for result in current_page["results"]]
+        tmdb_ids += [result["tmdbId"] for result in current_page["results"]]
 
     context.log.info(
         f"{first_page["totalResults"]} changements TMDB"

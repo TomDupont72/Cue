@@ -1,6 +1,8 @@
 import type { AppFastifyInstance } from "@/shared/types/fastify.js";
 import {
+  metadataSeriesChangesResponseSchema,
   metadataSeriesChangesSchema,
+  metadataSeriesSearchResponseSchema,
   metadataSeriesSearchSchema
 } from "@/modules/metadata/metadata.schemas.js";
 import {
@@ -13,7 +15,10 @@ export async function metadataRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireAuth],
     schema: {
       tags: ["Metadata"],
-      querystring: metadataSeriesSearchSchema
+      querystring: metadataSeriesSearchSchema,
+      response: {
+        200: metadataSeriesSearchResponseSchema
+      }
     },
     handler: metadataSeriesSearchController.get
   });
@@ -22,7 +27,10 @@ export async function metadataRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireWorker],
     schema: {
       tags: ["Metadata"],
-      querystring: metadataSeriesChangesSchema
+      querystring: metadataSeriesChangesSchema,
+      response: {
+        200: metadataSeriesChangesResponseSchema
+      }
     },
     handler: metadataSeriesChangesController.get
   });
