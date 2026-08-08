@@ -63,3 +63,31 @@ describe("GET /api/metadata/series/search", () => {
     assert.equal(fetchMock.mock.callCount(), 0);
   });
 });
+
+describe("GET /api/metadata/series/changes", () => {
+  it("returns a Cue response with camelCase TMDB identifiers", async (t) => {
+    const fetchMock = mockTmdbFetch(t);
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/metadata/series/changes?startDate=2026-01-01&endDate=2026-01-14&page=1"
+    });
+
+    assert.equal(response.statusCode, 200, response.body);
+    assert.deepEqual(response.json(), {
+      results: [{ tmdbId: 37854 }, { tmdbId: 111110 }],
+      page: 1,
+      totalPages: 1,
+      totalResults: 2
+    });
+    assert.equal(fetchMock.mock.callCount(), 1);
+
+    const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.arguments[0]));
+    assert.equal(requestedUrl.pathname, "/3/tv/changes");
+    assert.equal(requestedUrl.searchParams.get("start_date"), "2026-01-01");
+    assert.equal(requestedUrl.searchParams.get("end_date"), "2026-01-14");
+    assert.equal(requestedUrl.searchParams.get("page"), "1");
+  });
+});

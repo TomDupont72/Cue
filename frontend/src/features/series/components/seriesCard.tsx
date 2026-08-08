@@ -1,14 +1,14 @@
 import { ImageOff } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTmdbImageUrl } from "@/lib/tmdbImage";
-import type { SeriesSearchGetResult } from "../types/series.types";
+import type { SeriesCardData } from "../types/series.types";
 import { getYear } from "@/lib/utils";
 import StatusProgressBar from "@/features/user/components/statusProgressBar";
 import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
 
 type SeriesCardProps = {
-  series: SeriesSearchGetResult;
-  onClick?: (series: SeriesSearchGetResult) => void;
+  series: SeriesCardData;
+  onClick?: (series: SeriesCardData) => void;
   isProgress?: boolean;
   status?: UserSeriesStatus;
   watchProgress?: number;

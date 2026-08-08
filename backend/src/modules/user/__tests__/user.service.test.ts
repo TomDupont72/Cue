@@ -257,7 +257,7 @@ describe("userService", { concurrency: false }, () => {
     assert.deepEqual(updateSeries.mock.calls[0]?.arguments[1], {
       watchCount: { decrement: 1 }
     });
-    assert.equal(result, deleted);
+    assert.equal(result, deleted[0]);
   });
 
   it("uses only actually deleted season rows for the decrement, without an airDate filter", async (t) => {

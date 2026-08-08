@@ -1,5 +1,12 @@
 import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
 
+export type SeriesCardData = {
+  tmdbId: number;
+  name: string;
+  posterPath: string | null;
+  firstAirDate: string | null;
+};
+
 export type SeriesSearchGetResult = {
   tmdbId: number;
   name: string;
@@ -8,9 +15,7 @@ export type SeriesSearchGetResult = {
   posterPath: string | null;
   backdropPath: string | null;
   firstAirDate: string | null;
-  popularity: number;
-  voteAverage?: number;
-  numberOfEpisodes: number;
+  voteAverage: number;
 };
 
 export type SeriesSearchGetResponse = {

@@ -17,6 +17,7 @@ import { userRoutes } from "@/modules/user/user.routes.js";
 import fastifyCors from "@fastify/cors";
 import { workerGuard } from "@/shared/middlewares/require-worker.js";
 import fastifyAuth from "@fastify/auth";
+import { z } from "zod";
 
 const app = Fastify({
   loggerInstance: logger
@@ -70,9 +71,20 @@ if (env.NODE_ENV !== "production") {
   });
 }
 
-app.get("/health", async () => {
-  return { status: "ok" };
-});
+app.get(
+  "/health",
+  {
+    schema: {
+      tags: ["Health"],
+      response: {
+        200: z.object({ status: z.literal("ok") })
+      }
+    }
+  },
+  async () => {
+    return { status: "ok" as const };
+  }
+);
 
 await app.register(authRoutes, { prefix: "/api/auth" });
 

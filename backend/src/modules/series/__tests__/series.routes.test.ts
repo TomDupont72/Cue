@@ -56,6 +56,37 @@ async function buildApp(authenticated = true) {
   return app;
 }
 
+describe("GET /api/series/:id", () => {
+  it("returns the catalogue records and serializes their dates", async (t) => {
+    mockPrisma(t);
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/series/1"
+    });
+
+    assert.equal(response.statusCode, 200, response.body);
+    const body = response.json();
+    assert.equal(body.series.tmdbId, ONE_PIECE_TMDB_ID);
+    assert.equal(body.series.firstAirDate, "1999-10-20T00:00:00.000Z");
+    assert.equal(body.series.createdAt, "2026-01-01T00:00:00.000Z");
+    assert.equal(body.seasons.length, 2);
+    assert.equal(body.seasons[0].airDate, "1999-10-20T00:00:00.000Z");
+    assert.equal(body.episodes.length, 4);
+    assert.equal(body.episodes[0].airDate, "1999-10-20T00:00:00.000Z");
+    assert.equal(body.userSeries, null);
+    assert.deepEqual(body.userEpisodes, [
+      {
+        userId: "test-user",
+        episodeId: 100,
+        watchedAt: "2026-01-01T00:00:00.000Z"
+      }
+    ]);
+  });
+});
+
 describe("POST /api/series/import", () => {
   it("returns an existing series to a user without calling TMDB", async (t) => {
     const prismaMock = mockPrisma(t);

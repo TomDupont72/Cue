@@ -1,4 +1,4 @@
-import type { SeriesSearchGetResult } from "@/features/series/types/series.types";
+import type { SeriesGetSeries } from "@/features/series/types/series.types";
 import type { UserSeriesStatus } from "../constants/userSeriesStatus";
 
 export type UserEpisodePostResponse = {
@@ -26,7 +26,7 @@ export type UserEpisodeDeleteResponse = {
 };
 
 type UserSeriesGetItems = {
-  seriesDetails: SeriesSearchGetResult;
+  seriesDetails: SeriesGetSeries;
   userId: string;
   seriesId: number;
   status: UserSeriesStatus;

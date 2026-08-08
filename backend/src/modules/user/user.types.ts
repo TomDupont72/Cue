@@ -13,7 +13,7 @@ export type EpisodeFeedRow = {
   userId: string;
   seriesId: number;
   status: UserSeriesStatus;
-  lastWatchedAt: string | null;
+  lastWatchedAt: Date | null;
 
   seriesName: string;
   seriesPosterPath: string | null;
@@ -23,7 +23,7 @@ export type EpisodeFeedRow = {
   name: string;
   seasonNumber: number;
   episodeNumber: number;
-  airDate: string | null;
+  airDate: Date | null;
   stillPath: string | null;
   runtime: number;
   overview: string | null;

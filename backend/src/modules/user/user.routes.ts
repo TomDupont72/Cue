@@ -1,13 +1,22 @@
 import { AppFastifyInstance } from "@/shared/types/fastify.js";
 import {
+  userDashboardSummaryGetResponseSchema,
   userEpisodeDeleteParamsSchema,
+  userEpisodeDeleteResponseSchema,
+  userEpisodeFeedGetResponseSchema,
   userEpisodePostParamsSchema,
+  userEpisodePostResponseSchema,
   userStatusRecalculateSchema,
+  userStatusRecalculateResponseSchema,
   userSeasonDeleteParamsSchema,
+  userSeasonDeleteResponseSchema,
   userSeasonPostParamsSchema,
+  userSeasonPostResponseSchema,
   userSeriesGetParamsSchema,
+  userSeriesGetResponseSchema,
   userSeriesPostBodySchema,
-  userSeriesPostParamsSchema
+  userSeriesPostParamsSchema,
+  userSeriesPostResponseSchema
 } from "@/modules/user/user.schemas.js";
 import {
   userDashboardSummaryController,
@@ -22,7 +31,10 @@ export async function userRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireAuth],
     schema: {
       tags: ["User"],
-      querystring: userSeriesGetParamsSchema
+      querystring: userSeriesGetParamsSchema,
+      response: {
+        200: userSeriesGetResponseSchema
+      }
     },
     handler: userSeriesController.get
   });
@@ -30,7 +42,10 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.get("/dashboard/summary", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"]
+      tags: ["User"],
+      response: {
+        200: userDashboardSummaryGetResponseSchema
+      }
     },
     handler: userDashboardSummaryController.get
   });
@@ -40,7 +55,10 @@ export async function userRoutes(app: AppFastifyInstance) {
     schema: {
       tags: ["User"],
       params: userSeriesPostParamsSchema,
-      body: userSeriesPostBodySchema
+      body: userSeriesPostBodySchema,
+      response: {
+        200: userSeriesPostResponseSchema
+      }
     },
     handler: userSeriesController.post
   });
@@ -48,7 +66,10 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.get("/episodes/feed", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"]
+      tags: ["User"],
+      response: {
+        200: userEpisodeFeedGetResponseSchema
+      }
     },
     handler: userEpisodeController.getFeed
   });
@@ -57,7 +78,10 @@ export async function userRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireAuth],
     schema: {
       tags: ["User"],
-      params: userEpisodePostParamsSchema
+      params: userEpisodePostParamsSchema,
+      response: {
+        200: userEpisodePostResponseSchema
+      }
     },
     handler: userEpisodeController.post
   });
@@ -66,7 +90,10 @@ export async function userRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireAuth],
     schema: {
       tags: ["User"],
-      params: userEpisodeDeleteParamsSchema
+      params: userEpisodeDeleteParamsSchema,
+      response: {
+        200: userEpisodeDeleteResponseSchema
+      }
     },
     handler: userEpisodeController.delete
   });
@@ -75,7 +102,10 @@ export async function userRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireAuth],
     schema: {
       tags: ["User"],
-      params: userSeasonPostParamsSchema
+      params: userSeasonPostParamsSchema,
+      response: {
+        200: userSeasonPostResponseSchema
+      }
     },
     handler: userSeasonController.post
   });
@@ -84,7 +114,10 @@ export async function userRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireAuth],
     schema: {
       tags: ["User"],
-      params: userSeasonDeleteParamsSchema
+      params: userSeasonDeleteParamsSchema,
+      response: {
+        200: userSeasonDeleteResponseSchema
+      }
     },
     handler: userSeasonController.delete
   });
@@ -93,7 +126,10 @@ export async function userRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireWorker],
     schema: {
       tags: ["User"],
-      params: userStatusRecalculateSchema
+      params: userStatusRecalculateSchema,
+      response: {
+        200: userStatusRecalculateResponseSchema
+      }
     },
     handler: userStatusController.post
   });
