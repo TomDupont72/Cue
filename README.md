@@ -50,6 +50,18 @@ service Docker `backend`. Dans le réseau Compose, le backend et le worker
 utilisent respectivement `postgres:5432` et `http://backend:8000`; aucune URL
 interne ne doit pointer vers `127.0.0.1`.
 
+### Installer Cue dans Chrome
+
+Cue est une Progressive Web App. Après avoir ouvert le frontend, Chrome propose
+`Installer l’application` dans la page ainsi que dans son menu d’installation.
+L’application s’ouvre ensuite dans sa propre fenêtre sur ordinateur ou depuis
+l’écran d’accueil sur Android. En production, le frontend doit être servi en
+HTTPS; `localhost` reste autorisé pour le développement.
+
+Le service worker met uniquement en cache l’interface et ses assets statiques.
+Les routes `/api` authentifiées restent toujours réseau afin de ne jamais
+conserver de réponse utilisateur dans le cache PWA.
+
 Pour arrêter les conteneurs en conservant les données :
 
 ```bash
