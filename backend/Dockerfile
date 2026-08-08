@@ -1,21 +1,24 @@
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm ci
 
-COPY . .
+COPY tsconfig.json prisma.config.ts ./
+COPY prisma ./prisma
+COPY src ./src
 
-ARG DATABASE_URL=postgresql://prisma:prisma@localhost:5432/prisma
-RUN npx prisma generate
+RUN DATABASE_URL=postgresql://prisma:prisma@postgres:5432/prisma npx prisma generate
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+ENV NODE_ENV=production
+
+COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
