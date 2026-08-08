@@ -202,5 +202,14 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-worker/.tmp_dagster_home_*/
+# Dagster local state and telemetry
+.dg/
+.telemetry/
+.dagster/
+.tmp_dagster_home_*/
+storage/
+compute_logs/
+history/
+schedules/
+
 *.pyc

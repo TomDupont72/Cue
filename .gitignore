@@ -1,0 +1,31 @@
+# Dependencies and generated build output.
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+coverage/
+**/coverage/
+
+# Generated Prisma clients are recreated from the schema.
+generated/prisma/
+src/generated/prisma/
+
+# Runtime environment files contain local credentials and must never be committed.
+.env
+.env.*
+!.env.local.example
+!.env.compose.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
+# Local Dagster state and telemetry.
+**/.dagster/
+worker/.dg/
+worker/.telemetry/
+worker/.tmp_dagster_home_*/
+worker/storage/
+worker/compute_logs/
+worker/history/
+worker/schedules/

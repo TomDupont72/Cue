@@ -46,8 +46,6 @@ jobs:
           context: ./frontend
           push: true
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
-          build-args: |
-            VITE_API_URL=${{ secrets.VITE_API_URL }}
           tags: |
             ${{ env.REGISTRY }}/${{ steps.meta.outputs.owner }}/cue-frontend:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ steps.meta.outputs.owner }}/cue-frontend:latest

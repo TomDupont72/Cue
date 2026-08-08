@@ -21,6 +21,8 @@ services:
       - "127.0.0.1:5177:80"
     networks:
       - cue
+    depends_on:
+      - backend
     restart: unless-stopped
 
   worker-webserver:
@@ -39,13 +41,18 @@ services:
       ]
     env_file:
       - /etc/cue-worker.env
+    environment:
+      API_URL: http://backend:8000
+      DAGSTER_HOME: /opt/dagster/dagster_home
+      DAGSTER_STORAGE_DIR: /opt/dagster/dagster_home/state/storage
+      DAGSTER_COMPUTE_LOGS_DIR: /opt/dagster/dagster_home/state/compute_logs
     ports:
       - "127.0.0.1:3001:3000"
     networks:
       - cue
       - infrastructure
     volumes:
-      - dagster_home:/opt/dagster/dagster_home
+      - dagster_home:/opt/dagster/dagster_home/state
     depends_on:
       - backend
 
@@ -56,11 +63,16 @@ services:
     command: ["dagster-daemon", "run"]
     env_file:
       - /etc/cue-worker.env
+    environment:
+      API_URL: http://backend:8000
+      DAGSTER_HOME: /opt/dagster/dagster_home
+      DAGSTER_STORAGE_DIR: /opt/dagster/dagster_home/state/storage
+      DAGSTER_COMPUTE_LOGS_DIR: /opt/dagster/dagster_home/state/compute_logs
     networks:
       - cue
       - infrastructure
     volumes:
-      - dagster_home:/opt/dagster/dagster_home
+      - dagster_home:/opt/dagster/dagster_home/state
     depends_on:
       - backend
 
