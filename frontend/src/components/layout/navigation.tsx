@@ -19,6 +19,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from "../ui/sheet";
+import { InstallAppButton } from "../pwa/installAppButton";
 
 const navigation = [
   { label: "DASHBOARD", to: "/dashboard" },
@@ -69,7 +70,7 @@ export function NavigationMobile() {
           <SheetTitle>Navigation</SheetTitle>
         </SheetHeader>
 
-        <nav className="flex flex-col gap-2 px-4">
+        <nav className="flex h-full flex-col gap-2 px-4">
           {navigation.map(({ label, to }) => (
             <SheetClose
               key={to}
@@ -90,6 +91,9 @@ export function NavigationMobile() {
               }
             />
           ))}
+          <div className="mt-auto pb-4">
+            <SheetClose render={<InstallAppButton className="w-full md:hidden" />} />
+          </div>
         </nav>
       </SheetContent>
     </Sheet>
