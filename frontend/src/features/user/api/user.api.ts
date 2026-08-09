@@ -1,4 +1,14 @@
-import { apiClient } from "@/api/client";
+import { getSdkData, sdkRequestOptions, validateRequest } from "@/api/client";
+import {
+  getUserDashboardSummary,
+  getUserEpisodesFeed,
+  getUserSeries,
+  markUserEpisodeWatched,
+  markUserSeasonWatched,
+  unmarkUserEpisodeWatched,
+  unmarkUserSeasonWatched,
+  upsertUserSeries
+} from "@/api/generated/cue-api";
 import {
   userSeriesGetQuerySchema,
   userEpisodeDeleteParamsSchema,
@@ -26,29 +36,36 @@ export function userSeriesGet(
   status?: UserSeriesStatus,
   cursor?: string
 ): Promise<UserSeriesGetResponse> {
-  return apiClient("/user/series", {
-    query: {
-      ...(seriesId && { seriesId }),
-      ...(status && { status }),
-      limit,
-      ...(cursor && { cursor })
-    },
-    querySchema: userSeriesGetQuerySchema
+  const query = validateRequest(userSeriesGetQuerySchema, {
+    seriesId,
+    status,
+    limit,
+    cursor
   });
+
+  return getSdkData(
+    getUserSeries({
+      ...sdkRequestOptions,
+      query
+    })
+  );
 }
 
 export function userEpisodePost(
   seriesId: number,
   episodeId: number
 ): Promise<UserEpisodePostResponse> {
-  return apiClient("/user/series/:seriesId/episode/:episodeId", {
-    method: "POST",
-    params: {
-      seriesId,
-      episodeId
-    },
-    paramsSchema: userEpisodePostParamsSchema
+  const path = validateRequest(userEpisodePostParamsSchema, {
+    seriesId,
+    episodeId
   });
+
+  return getSdkData(
+    markUserEpisodeWatched({
+      ...sdkRequestOptions,
+      path
+    })
+  );
 }
 
 export function userSeriesPost(
@@ -56,66 +73,78 @@ export function userSeriesPost(
   status?: UserSeriesStatus,
   isFavorite?: boolean
 ): Promise<UserSeriesPostResponse> {
-  return apiClient("/user/series/:seriesId", {
-    method: "POST",
-    params: {
-      seriesId
-    },
-    body: {
-      status,
-      isFavorite
-    },
-    paramsSchema: userSeriesPostParamsSchema,
-    bodySchema: userSeriesPostBodySchema
+  const path = validateRequest(userSeriesPostParamsSchema, {
+    seriesId
   });
+  const body = validateRequest(userSeriesPostBodySchema, {
+    status,
+    isFavorite
+  });
+
+  return getSdkData(
+    upsertUserSeries({
+      ...sdkRequestOptions,
+      path,
+      body
+    })
+  );
 }
 
 export function userEpisodeDelete(
   seriesId: number,
   episodeId: number
 ): Promise<UserEpisodeDeleteResponse> {
-  return apiClient("/user/series/:seriesId/episode/:episodeId", {
-    method: "DELETE",
-    params: {
-      seriesId,
-      episodeId
-    },
-    paramsSchema: userEpisodeDeleteParamsSchema
+  const path = validateRequest(userEpisodeDeleteParamsSchema, {
+    seriesId,
+    episodeId
   });
+
+  return getSdkData(
+    unmarkUserEpisodeWatched({
+      ...sdkRequestOptions,
+      path
+    })
+  );
 }
 
 export function userDashboardSummaryGet(): Promise<UserDashboardSummaryGetResponse> {
-  return apiClient("/user/dashboard/summary");
+  return getSdkData(getUserDashboardSummary(sdkRequestOptions));
 }
 
 export function userSeasonPost(
   seriesId: number,
   seasonId: number
 ): Promise<UserSeasonPostResponse> {
-  return apiClient("/user/series/:seriesId/season/:seasonId", {
-    method: "POST",
-    params: {
-      seriesId,
-      seasonId
-    },
-    paramsSchema: userSeasonPostParamsSchema
+  const path = validateRequest(userSeasonPostParamsSchema, {
+    seriesId,
+    seasonId
   });
+
+  return getSdkData(
+    markUserSeasonWatched({
+      ...sdkRequestOptions,
+      path
+    })
+  );
 }
 
 export function userSeasonDelete(
   seriesId: number,
   seasonId: number
 ): Promise<UserSeasonDeleteResponse> {
-  return apiClient("/user/series/:seriesId/season/:seasonId", {
-    method: "DELETE",
-    params: {
-      seriesId,
-      seasonId
-    },
-    paramsSchema: userSeasonDeleteParamsSchema
+  const path = validateRequest(userSeasonDeleteParamsSchema, {
+    seriesId,
+    seasonId
   });
+
+  return getSdkData(
+    unmarkUserSeasonWatched({
+      ...sdkRequestOptions,
+      path
+    })
+  );
 }
 
 export function userEpisodesFeedGet(): Promise<UserEpisodesFeedGetResponse> {
-  return apiClient("/user/episodes/feed");
+  return getSdkData(getUserEpisodesFeed(sdkRequestOptions));
 }

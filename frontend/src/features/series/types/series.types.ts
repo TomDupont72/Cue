@@ -1,4 +1,13 @@
-import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
+import type {
+  Episode,
+  GetSeriesResponse,
+  ImportSeriesResponse,
+  MetadataSeriesSearchResult,
+  SearchMetadataSeriesResponse,
+  Season,
+  Series,
+  UserSeries
+} from "@/api/generated/cue-api";
 
 export type SeriesCardData = {
   tmdbId: number;
@@ -7,100 +16,18 @@ export type SeriesCardData = {
   firstAirDate: string | null;
 };
 
-export type SeriesSearchGetResult = {
-  tmdbId: number;
-  name: string;
-  originalName: string;
-  overview: string;
-  posterPath: string | null;
-  backdropPath: string | null;
-  firstAirDate: string | null;
-  voteAverage: number;
-};
+export type SeriesSearchGetResult = MetadataSeriesSearchResult;
 
-export type SeriesSearchGetResponse = {
-  page: number;
-  results: SeriesSearchGetResult[];
-  totalPages: number;
-  totalResults: number;
-};
+export type SeriesSearchGetResponse = SearchMetadataSeriesResponse;
 
-export type SeriesGetSeries = {
-  id: number;
-  adult: boolean;
-  backdropPath: string | null;
-  firstAirDate: string | null;
-  tmdbId: number;
-  inProduction: boolean;
-  lastAirDate: string | null;
-  name: string;
-  numberOfEpisodes: number;
-  numberOfSeasons: number;
-  originalLanguage: string;
-  originalName: string;
-  overview: string | null;
-  popularity: number;
-  posterPath: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
+export type SeriesGetSeries = Series;
 
-export type SeriesGetSeason = {
-  id: number;
-  seriesId: number;
-  airDate: string | null;
-  name: string;
-  overview: string | null;
-  tmdbId: number;
-  posterPath: string | null;
-  seasonNumber: number;
-  voteAverage: number;
-  createdAt: string;
-  updatedAt: string;
-};
+export type SeriesGetSeason = Season;
 
-export type SeriesGetEpisode = {
-  id: number;
-  seriesId: number;
-  seasonId: number;
-  airDate: string | null;
-  episodeNumber: number;
-  name: string;
-  overview: string | null;
-  tmdbId: number;
-  stillPath: string | null;
-  runtime: number;
-  seasonNumber: number;
-  voteAverage: number;
-  createdAt: string;
-  updatedAt: string;
-};
+export type SeriesGetEpisode = Episode;
 
-export type SeriesGetUserSeries = {
-  userId: string;
-  seriesId: number;
-  status: UserSeriesStatus;
-  isFavorite: boolean;
-  addedAt: string;
-  lastWatchedAt: string | null;
-  watchCount: number;
-};
+export type SeriesGetUserSeries = UserSeries;
 
-type SeriesGetUserEpisode = {
-  userId: string;
-  episodeId: number;
-  watchedAt: string;
-};
+export type SeriesGetResponse = GetSeriesResponse;
 
-export type SeriesGetResponse = {
-  series: SeriesGetSeries;
-  seasons: SeriesGetSeason[];
-  episodes: SeriesGetEpisode[];
-  userSeries: SeriesGetUserSeries | null;
-  userEpisodes: SeriesGetUserEpisode[];
-};
-
-export type SeriesImportPostResponse = {
-  series: SeriesGetSeries;
-  userSeries: SeriesGetUserSeries | null;
-};
+export type SeriesImportPostResponse = ImportSeriesResponse;

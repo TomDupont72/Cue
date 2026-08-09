@@ -8,7 +8,16 @@ import {
   UserSeriesGetParams,
   UserSeasonPostParams,
   UserSeasonDeleteParams,
-  UserStatusRecalculate
+  UserStatusRecalculate,
+  UserDashboardSummaryGetResponse,
+  UserEpisodeDeleteResponse,
+  UserEpisodeFeedGetResponse,
+  UserEpisodePostResponse,
+  UserSeasonDeleteResponse,
+  UserSeasonPostResponse,
+  UserSeriesGetResponse,
+  UserSeriesPostResponse,
+  UserStatusRecalculateResponse
 } from "./user.schemas.js";
 import { episodeRepository } from "../episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
@@ -99,7 +108,7 @@ async function removeSeriesProgress(
 }
 
 export const userService = {
-  async userSeriesGet(userId: string, params: UserSeriesGetParams) {
+  async userSeriesGet(userId: string, params: UserSeriesGetParams): Promise<UserSeriesGetResponse> {
     const { seriesId, status, limit, cursor } = params;
 
     const userSeries = await userRepository.findManySeries(
@@ -114,16 +123,18 @@ export const userService = {
 
     const seriesById = new Map(seriesDetails.map((series) => [series.id, series]));
 
-    const items = userSeries.items
-      .map((series) => {
-        const seriesDetails = seriesById.get(series.seriesId);
+    const items = userSeries.items.flatMap((series) => {
+      const seriesDetails = seriesById.get(series.seriesId);
 
-        return {
-          ...series,
-          seriesDetails
-        };
-      })
-      .filter((item) => item !== null);
+      return seriesDetails
+        ? [
+            {
+              ...series,
+              seriesDetails
+            }
+          ]
+        : [];
+    });
 
     return {
       items: items,
@@ -132,7 +143,7 @@ export const userService = {
     };
   },
 
-  async userEpisodeFeedGet(userId: string) {
+  async userEpisodeFeedGet(userId: string): Promise<UserEpisodeFeedGetResponse> {
     const episodes = await userRepository.getEpisodesFeed(userId);
 
     return {
@@ -142,7 +153,11 @@ export const userService = {
     };
   },
 
-  async userSeriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
+  async userSeriesPost(
+    userId: string,
+    params: UserSeriesPostParams,
+    body: UserSeriesPostBody
+  ): Promise<UserSeriesPostResponse> {
     const userSeries = await userRepository.upsertSeries(
       { userId_seriesId: { userId, ...params } },
       { userId, ...params, ...body },
@@ -152,7 +167,11 @@ export const userService = {
     return userSeries;
   },
 
-  async userEpisodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
+  async userEpisodePost(
+    userId: string,
+    params: UserEpisodePostParams,
+    now = new Date()
+  ): Promise<UserEpisodePostResponse> {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -222,7 +241,10 @@ export const userService = {
     });
   },
 
-  async userEpisodeDelete(userId: string, params: UserEpisodeDeleteParams) {
+  async userEpisodeDelete(
+    userId: string,
+    params: UserEpisodeDeleteParams
+  ): Promise<UserEpisodeDeleteResponse> {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -266,7 +288,11 @@ export const userService = {
     });
   },
 
-  async userSeasonPost(userId: string, params: UserSeasonPostParams, now = new Date()) {
+  async userSeasonPost(
+    userId: string,
+    params: UserSeasonPostParams,
+    now = new Date()
+  ): Promise<UserSeasonPostResponse> {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -320,7 +346,10 @@ export const userService = {
     });
   },
 
-  async userSeasonDelete(userId: string, params: UserSeasonDeleteParams) {
+  async userSeasonDelete(
+    userId: string,
+    params: UserSeasonDeleteParams
+  ): Promise<UserSeasonDeleteResponse> {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -375,13 +404,16 @@ export const userService = {
     });
   },
 
-  async userDashboardSummaryGet(userId: string) {
+  async userDashboardSummaryGet(userId: string): Promise<UserDashboardSummaryGetResponse> {
     const summary = await userRepository.getDashboardSummary(userId);
 
     return summary;
   },
 
-  async userStatusRecalculatePost(params: UserStatusRecalculate, now = new Date()) {
+  async userStatusRecalculatePost(
+    params: UserStatusRecalculate,
+    now = new Date()
+  ): Promise<UserStatusRecalculateResponse> {
     const inactiveSince = new Date(now);
     inactiveSince.setUTCMonth(inactiveSince.getUTCMonth() - 2);
 

@@ -6,6 +6,7 @@ dependencies = [
     "dagster==1.13.16",
     "dagster-webserver>=1.13.16",
     "httpx>=0.28.1",
+    "pydantic>=2.13.4,<3",
     "psycopg[binary]>=3.3.4",
     "sqlalchemy>=2.0.51",
 ]
@@ -31,5 +32,4 @@ root_module = "orchestrator"
 registry_modules = [
     "worker.components.*",
 ]
-
 

@@ -1,0 +1,2450 @@
+{
+  "components": {
+    "schemas": {
+      "Episode": {
+        "additionalProperties": false,
+        "properties": {
+          "airDate": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "episodeNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "id": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overview": {
+            "nullable": true,
+            "type": "string"
+          },
+          "runtime": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seasonId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seasonNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "stillPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "voteAverage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "seriesId",
+          "seasonId",
+          "airDate",
+          "episodeNumber",
+          "name",
+          "overview",
+          "tmdbId",
+          "stillPath",
+          "runtime",
+          "seasonNumber",
+          "voteAverage",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "EpisodeInput": {
+        "properties": {
+          "airDate": {
+            "nullable": true
+          },
+          "createdAt": {},
+          "episodeNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "id": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overview": {
+            "nullable": true,
+            "type": "string"
+          },
+          "runtime": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seasonId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seasonNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "stillPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "updatedAt": {},
+          "voteAverage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "seriesId",
+          "seasonId",
+          "airDate",
+          "episodeNumber",
+          "name",
+          "overview",
+          "tmdbId",
+          "stillPath",
+          "runtime",
+          "seasonNumber",
+          "voteAverage",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "details": {},
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "statusCode": {
+            "maximum": 599,
+            "minimum": 400,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "statusCode",
+          "code",
+          "error",
+          "message"
+        ],
+        "type": "object"
+      },
+      "ErrorResponseInput": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "details": {},
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "statusCode": {
+            "maximum": 599,
+            "minimum": 400,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "statusCode",
+          "code",
+          "error",
+          "message"
+        ],
+        "type": "object"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "enum": [
+              "ok"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "HealthResponseInput": {
+        "properties": {
+          "status": {
+            "enum": [
+              "ok"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "MetadataSeriesChangesResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "page": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/MetadataSeriesChangesResult"
+            },
+            "type": "array"
+          },
+          "totalPages": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "totalResults": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "results",
+          "page",
+          "totalPages",
+          "totalResults"
+        ],
+        "type": "object"
+      },
+      "MetadataSeriesChangesResponseInput": {
+        "properties": {
+          "page": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/MetadataSeriesChangesResultInput"
+            },
+            "type": "array"
+          },
+          "totalPages": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "totalResults": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "results",
+          "page",
+          "totalPages",
+          "totalResults"
+        ],
+        "type": "object"
+      },
+      "MetadataSeriesChangesResult": {
+        "additionalProperties": false,
+        "properties": {
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tmdbId"
+        ],
+        "type": "object"
+      },
+      "MetadataSeriesChangesResultInput": {
+        "properties": {
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tmdbId"
+        ],
+        "type": "object"
+      },
+      "MetadataSeriesSearchResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "page": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/MetadataSeriesSearchResult"
+            },
+            "type": "array"
+          },
+          "totalPages": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "totalResults": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "page",
+          "results",
+          "totalPages",
+          "totalResults"
+        ],
+        "type": "object"
+      },
+      "MetadataSeriesSearchResponseInput": {
+        "properties": {
+          "page": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/MetadataSeriesSearchResultInput"
+            },
+            "type": "array"
+          },
+          "totalPages": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "totalResults": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "page",
+          "results",
+          "totalPages",
+          "totalResults"
+        ],
+        "type": "object"
+      },
+      "MetadataSeriesSearchResult": {
+        "additionalProperties": false,
+        "properties": {
+          "backdropPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "firstAirDate": {
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "originalLanguage": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "overview": {
+            "type": "string"
+          },
+          "posterPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "voteAverage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "tmdbId",
+          "name",
+          "originalName",
+          "overview",
+          "posterPath",
+          "backdropPath",
+          "firstAirDate",
+          "originalLanguage",
+          "voteAverage"
+        ],
+        "type": "object"
+      },
+      "MetadataSeriesSearchResultInput": {
+        "properties": {
+          "backdropPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "firstAirDate": {
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "originalLanguage": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "overview": {
+            "type": "string"
+          },
+          "posterPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "voteAverage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "tmdbId",
+          "name",
+          "originalName",
+          "overview",
+          "posterPath",
+          "backdropPath",
+          "firstAirDate",
+          "originalLanguage",
+          "voteAverage"
+        ],
+        "type": "object"
+      },
+      "Season": {
+        "additionalProperties": false,
+        "properties": {
+          "airDate": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overview": {
+            "nullable": true,
+            "type": "string"
+          },
+          "posterPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "seasonNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "voteAverage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "seriesId",
+          "airDate",
+          "name",
+          "overview",
+          "tmdbId",
+          "posterPath",
+          "seasonNumber",
+          "voteAverage",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "SeasonInput": {
+        "properties": {
+          "airDate": {
+            "nullable": true
+          },
+          "createdAt": {},
+          "id": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overview": {
+            "nullable": true,
+            "type": "string"
+          },
+          "posterPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "seasonNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "updatedAt": {},
+          "voteAverage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "seriesId",
+          "airDate",
+          "name",
+          "overview",
+          "tmdbId",
+          "posterPath",
+          "seasonNumber",
+          "voteAverage",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "Series": {
+        "additionalProperties": false,
+        "properties": {
+          "adult": {
+            "type": "boolean"
+          },
+          "backdropPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "firstAirDate": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "inProduction": {
+            "type": "boolean"
+          },
+          "lastAirDate": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "numberOfEpisodes": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "numberOfSeasons": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "originalLanguage": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "overview": {
+            "nullable": true,
+            "type": "string"
+          },
+          "popularity": {
+            "type": "number"
+          },
+          "posterPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "adult",
+          "backdropPath",
+          "firstAirDate",
+          "tmdbId",
+          "inProduction",
+          "lastAirDate",
+          "name",
+          "numberOfEpisodes",
+          "numberOfSeasons",
+          "originalLanguage",
+          "originalName",
+          "overview",
+          "popularity",
+          "posterPath",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "SeriesGetResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "episodes": {
+            "items": {
+              "$ref": "#/components/schemas/Episode"
+            },
+            "type": "array"
+          },
+          "seasons": {
+            "items": {
+              "$ref": "#/components/schemas/Season"
+            },
+            "type": "array"
+          },
+          "series": {
+            "$ref": "#/components/schemas/Series"
+          },
+          "userEpisodes": {
+            "items": {
+              "$ref": "#/components/schemas/UserEpisode"
+            },
+            "type": "array"
+          },
+          "userSeries": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserSeries"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "series",
+          "seasons",
+          "episodes",
+          "userSeries",
+          "userEpisodes"
+        ],
+        "type": "object"
+      },
+      "SeriesGetResponseInput": {
+        "properties": {
+          "episodes": {
+            "items": {
+              "$ref": "#/components/schemas/EpisodeInput"
+            },
+            "type": "array"
+          },
+          "seasons": {
+            "items": {
+              "$ref": "#/components/schemas/SeasonInput"
+            },
+            "type": "array"
+          },
+          "series": {
+            "$ref": "#/components/schemas/SeriesInput"
+          },
+          "userEpisodes": {
+            "items": {
+              "$ref": "#/components/schemas/UserEpisodeInput"
+            },
+            "type": "array"
+          },
+          "userSeries": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserSeriesInput"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "series",
+          "seasons",
+          "episodes",
+          "userSeries",
+          "userEpisodes"
+        ],
+        "type": "object"
+      },
+      "SeriesImportBody": {
+        "additionalProperties": false,
+        "properties": {
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tmdbId"
+        ],
+        "type": "object"
+      },
+      "SeriesImportBodyInput": {
+        "properties": {
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tmdbId"
+        ],
+        "type": "object"
+      },
+      "SeriesImportResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "series": {
+            "$ref": "#/components/schemas/Series"
+          },
+          "userSeries": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserSeries"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "series",
+          "userSeries"
+        ],
+        "type": "object"
+      },
+      "SeriesImportResponseInput": {
+        "properties": {
+          "series": {
+            "$ref": "#/components/schemas/SeriesInput"
+          },
+          "userSeries": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserSeriesInput"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "series",
+          "userSeries"
+        ],
+        "type": "object"
+      },
+      "SeriesInput": {
+        "properties": {
+          "adult": {
+            "type": "boolean"
+          },
+          "backdropPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {},
+          "firstAirDate": {
+            "nullable": true
+          },
+          "id": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "inProduction": {
+            "type": "boolean"
+          },
+          "lastAirDate": {
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "numberOfEpisodes": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "numberOfSeasons": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "originalLanguage": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "overview": {
+            "nullable": true,
+            "type": "string"
+          },
+          "popularity": {
+            "type": "number"
+          },
+          "posterPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "tmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "updatedAt": {}
+        },
+        "required": [
+          "id",
+          "adult",
+          "backdropPath",
+          "firstAirDate",
+          "tmdbId",
+          "inProduction",
+          "lastAirDate",
+          "name",
+          "numberOfEpisodes",
+          "numberOfSeasons",
+          "originalLanguage",
+          "originalName",
+          "overview",
+          "popularity",
+          "posterPath",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "UserDashboardSummaryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "totalWatchedEpisodes": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "totalWatchedMinutes": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "totalWatchedSeries": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "totalWatchedMinutes",
+          "totalWatchedEpisodes",
+          "totalWatchedSeries"
+        ],
+        "type": "object"
+      },
+      "UserDashboardSummaryResponseInput": {
+        "properties": {
+          "totalWatchedEpisodes": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "totalWatchedMinutes": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "totalWatchedSeries": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "totalWatchedMinutes",
+          "totalWatchedEpisodes",
+          "totalWatchedSeries"
+        ],
+        "type": "object"
+      },
+      "UserEpisode": {
+        "additionalProperties": false,
+        "properties": {
+          "episodeId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "watchedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "episodeId",
+          "watchedAt"
+        ],
+        "type": "object"
+      },
+      "UserEpisodeFeedItem": {
+        "additionalProperties": false,
+        "properties": {
+          "airDate": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "episodeNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "id": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "lastWatchedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overview": {
+            "nullable": true,
+            "type": "string"
+          },
+          "remainingEpisodes": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "runtime": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seasonNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seriesName": {
+            "type": "string"
+          },
+          "seriesPosterPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "seriesTmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/UserSeriesStatus"
+          },
+          "stillPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "seriesId",
+          "status",
+          "lastWatchedAt",
+          "seriesName",
+          "seriesPosterPath",
+          "seriesTmdbId",
+          "id",
+          "name",
+          "seasonNumber",
+          "episodeNumber",
+          "airDate",
+          "stillPath",
+          "runtime",
+          "overview",
+          "remainingEpisodes"
+        ],
+        "type": "object"
+      },
+      "UserEpisodeFeedItemInput": {
+        "properties": {
+          "airDate": {
+            "nullable": true
+          },
+          "episodeNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "id": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "lastWatchedAt": {
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "overview": {
+            "nullable": true,
+            "type": "string"
+          },
+          "remainingEpisodes": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "runtime": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seasonNumber": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "seriesName": {
+            "type": "string"
+          },
+          "seriesPosterPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "seriesTmdbId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/UserSeriesStatusInput"
+          },
+          "stillPath": {
+            "nullable": true,
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "seriesId",
+          "status",
+          "lastWatchedAt",
+          "seriesName",
+          "seriesPosterPath",
+          "seriesTmdbId",
+          "id",
+          "name",
+          "seasonNumber",
+          "episodeNumber",
+          "airDate",
+          "stillPath",
+          "runtime",
+          "overview",
+          "remainingEpisodes"
+        ],
+        "type": "object"
+      },
+      "UserEpisodeFeedResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "dropped": {
+            "items": {
+              "$ref": "#/components/schemas/UserEpisodeFeedItem"
+            },
+            "type": "array"
+          },
+          "paused": {
+            "items": {
+              "$ref": "#/components/schemas/UserEpisodeFeedItem"
+            },
+            "type": "array"
+          },
+          "watching": {
+            "items": {
+              "$ref": "#/components/schemas/UserEpisodeFeedItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "watching",
+          "paused",
+          "dropped"
+        ],
+        "type": "object"
+      },
+      "UserEpisodeFeedResponseInput": {
+        "properties": {
+          "dropped": {
+            "items": {
+              "$ref": "#/components/schemas/UserEpisodeFeedItemInput"
+            },
+            "type": "array"
+          },
+          "paused": {
+            "items": {
+              "$ref": "#/components/schemas/UserEpisodeFeedItemInput"
+            },
+            "type": "array"
+          },
+          "watching": {
+            "items": {
+              "$ref": "#/components/schemas/UserEpisodeFeedItemInput"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "watching",
+          "paused",
+          "dropped"
+        ],
+        "type": "object"
+      },
+      "UserEpisodeInput": {
+        "properties": {
+          "episodeId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "watchedAt": {}
+        },
+        "required": [
+          "userId",
+          "episodeId",
+          "watchedAt"
+        ],
+        "type": "object"
+      },
+      "UserEpisodePostResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "episodeId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "nextEpisode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserEpisodeFeedItem"
+              }
+            ],
+            "nullable": true
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "watchedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "episodeId",
+          "watchedAt",
+          "seriesId",
+          "nextEpisode"
+        ],
+        "type": "object"
+      },
+      "UserEpisodePostResponseInput": {
+        "properties": {
+          "episodeId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "nextEpisode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserEpisodeFeedItemInput"
+              }
+            ],
+            "nullable": true
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "watchedAt": {}
+        },
+        "required": [
+          "userId",
+          "episodeId",
+          "watchedAt",
+          "seriesId",
+          "nextEpisode"
+        ],
+        "type": "object"
+      },
+      "UserSeasonResponse": {
+        "items": {
+          "$ref": "#/components/schemas/UserEpisode"
+        },
+        "type": "array"
+      },
+      "UserSeasonResponseInput": {
+        "items": {
+          "$ref": "#/components/schemas/UserEpisodeInput"
+        },
+        "type": "array"
+      },
+      "UserSeries": {
+        "additionalProperties": false,
+        "properties": {
+          "addedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isFavorite": {
+            "type": "boolean"
+          },
+          "lastWatchedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "PLANNED",
+              "WATCHING",
+              "COMPLETED",
+              "DROPPED",
+              "PAUSED"
+            ],
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "watchCount": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "userId",
+          "seriesId",
+          "status",
+          "isFavorite",
+          "watchCount",
+          "addedAt",
+          "lastWatchedAt"
+        ],
+        "type": "object"
+      },
+      "UserSeriesGetItem": {
+        "additionalProperties": false,
+        "properties": {
+          "addedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isFavorite": {
+            "type": "boolean"
+          },
+          "lastWatchedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "seriesDetails": {
+            "$ref": "#/components/schemas/Series"
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "PLANNED",
+              "WATCHING",
+              "COMPLETED",
+              "DROPPED",
+              "PAUSED"
+            ],
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "watchCount": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "userId",
+          "seriesId",
+          "status",
+          "isFavorite",
+          "watchCount",
+          "addedAt",
+          "lastWatchedAt",
+          "seriesDetails"
+        ],
+        "type": "object"
+      },
+      "UserSeriesGetItemInput": {
+        "properties": {
+          "addedAt": {},
+          "isFavorite": {
+            "type": "boolean"
+          },
+          "lastWatchedAt": {
+            "nullable": true
+          },
+          "seriesDetails": {
+            "$ref": "#/components/schemas/SeriesInput"
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "PLANNED",
+              "WATCHING",
+              "COMPLETED",
+              "DROPPED",
+              "PAUSED"
+            ],
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "watchCount": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "userId",
+          "seriesId",
+          "status",
+          "isFavorite",
+          "watchCount",
+          "addedAt",
+          "lastWatchedAt",
+          "seriesDetails"
+        ],
+        "type": "object"
+      },
+      "UserSeriesGetResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "hasNextPage": {
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UserSeriesGetItem"
+            },
+            "type": "array"
+          },
+          "nextCursor": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "hasNextPage",
+          "nextCursor"
+        ],
+        "type": "object"
+      },
+      "UserSeriesGetResponseInput": {
+        "properties": {
+          "hasNextPage": {
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UserSeriesGetItemInput"
+            },
+            "type": "array"
+          },
+          "nextCursor": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "hasNextPage",
+          "nextCursor"
+        ],
+        "type": "object"
+      },
+      "UserSeriesInput": {
+        "properties": {
+          "addedAt": {},
+          "isFavorite": {
+            "type": "boolean"
+          },
+          "lastWatchedAt": {
+            "nullable": true
+          },
+          "seriesId": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "PLANNED",
+              "WATCHING",
+              "COMPLETED",
+              "DROPPED",
+              "PAUSED"
+            ],
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "watchCount": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "userId",
+          "seriesId",
+          "status",
+          "isFavorite",
+          "watchCount",
+          "addedAt",
+          "lastWatchedAt"
+        ],
+        "type": "object"
+      },
+      "UserSeriesPostBody": {
+        "additionalProperties": false,
+        "properties": {
+          "isFavorite": {
+            "type": "boolean"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserSeriesStatus"
+              }
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "UserSeriesPostBodyInput": {
+        "properties": {
+          "isFavorite": {
+            "type": "boolean"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserSeriesStatusInput"
+              }
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "UserSeriesStatus": {
+        "enum": [
+          "PLANNED",
+          "WATCHING",
+          "COMPLETED",
+          "DROPPED",
+          "PAUSED"
+        ],
+        "type": "string"
+      },
+      "UserSeriesStatusInput": {
+        "enum": [
+          "PLANNED",
+          "WATCHING",
+          "COMPLETED",
+          "DROPPED",
+          "PAUSED"
+        ],
+        "type": "string"
+      },
+      "UserStatusRecalculateResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "updatedCount": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "updatedCount"
+        ],
+        "type": "object"
+      },
+      "UserStatusRecalculateResponseInput": {
+        "properties": {
+          "updatedCount": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "updatedCount"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "sessionCookie": {
+        "description": "Cookie de session Better Auth en production (sans le préfixe __Secure- en HTTP local)",
+        "in": "cookie",
+        "name": "__Secure-better-auth.session_token",
+        "type": "apiKey"
+      },
+      "workerBearer": {
+        "description": "Jeton privé utilisé par le worker Cue",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "Cue API",
+    "version": "0.9.4"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/api/metadata/series/changes": {
+      "get": {
+        "operationId": "getMetadataSeriesChanges",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "startDate",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "endDate",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSeriesChangesResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "workerBearer": []
+          }
+        ],
+        "tags": [
+          "Metadata"
+        ]
+      }
+    },
+    "/api/metadata/series/search": {
+      "get": {
+        "operationId": "searchMetadataSeries",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "query",
+            "required": true,
+            "schema": {
+              "minLength": 2,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSeriesSearchResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "Metadata"
+        ]
+      }
+    },
+    "/api/series/import": {
+      "post": {
+        "operationId": "importSeries",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesImportBodyInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesImportResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          },
+          {
+            "workerBearer": []
+          }
+        ],
+        "tags": [
+          "Series"
+        ]
+      }
+    },
+    "/api/series/{id}": {
+      "get": {
+        "operationId": "getSeries",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesGetResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "Series"
+        ]
+      }
+    },
+    "/api/user/dashboard/summary": {
+      "get": {
+        "operationId": "getUserDashboardSummary",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDashboardSummaryResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/user/episodes/feed": {
+      "get": {
+        "operationId": "getUserEpisodesFeed",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserEpisodeFeedResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/user/series": {
+      "get": {
+        "operationId": "getUserSeries",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "seriesId",
+            "required": false,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/UserSeriesStatusInput"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSeriesGetResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/user/series/{seriesId}": {
+      "post": {
+        "operationId": "upsertUserSeries",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seriesId",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSeriesPostBodyInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSeries"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/user/series/{seriesId}/episode/{episodeId}": {
+      "delete": {
+        "operationId": "unmarkUserEpisodeWatched",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seriesId",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "episodeId",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserEpisode"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      },
+      "post": {
+        "operationId": "markUserEpisodeWatched",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seriesId",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "episodeId",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserEpisodePostResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/user/series/{seriesId}/season/{seasonId}": {
+      "delete": {
+        "operationId": "unmarkUserSeasonWatched",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seriesId",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "seasonId",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSeasonResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      },
+      "post": {
+        "operationId": "markUserSeasonWatched",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seriesId",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "seasonId",
+            "required": true,
+            "schema": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSeasonResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/user/status/{userId}/recalculate": {
+      "post": {
+        "operationId": "recalculateUserStatuses",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserStatusRecalculateResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "workerBearer": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "État de l'API",
+      "name": "Health"
+    },
+    {
+      "description": "Recherche de métadonnées",
+      "name": "Metadata"
+    },
+    {
+      "description": "Gestion des séries",
+      "name": "Series"
+    },
+    {
+      "description": "Gestion des données utilisateur",
+      "name": "User"
+    }
+  ]
+}

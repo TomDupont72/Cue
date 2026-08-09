@@ -52,6 +52,14 @@ dg dev
 
 Open http://localhost:3000 in your browser to see the project.
 
+### Running tests
+
+Run the worker contract tests from this directory:
+
+```bash
+PYTHONPATH=src python -m unittest discover -s src/tests -p "test_*.py"
+```
+
 ## Learn more
 
 To learn more about this template and Dagster in general:

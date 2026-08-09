@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { GetSeriesData, ImportSeriesData } from "@/api/generated/cue-api";
 
 export const SERIES_SEARCH_QUERY_MIN_LENGTH = 2;
 export const SERIES_SEARCH_QUERY_MAX_LENGTH = 100;
@@ -28,12 +29,12 @@ export type SeriesSearchParams = z.infer<typeof seriesSearchGetParamsSchema>;
 
 export const seriesGetParamsSchema = z.object({
   id: positiveIntegerSchema
-});
+}) satisfies z.ZodType<GetSeriesData["path"]>;
 
-export type SeriesGetParams = z.infer<typeof seriesGetParamsSchema>;
+export type SeriesGetParams = GetSeriesData["path"];
 
 export const seriesImportPostBodySchema = z.object({
   tmdbId: positiveIntegerSchema
-});
+}) satisfies z.ZodType<ImportSeriesData["body"]>;
 
-export type SeriesImportPostBody = z.infer<typeof seriesImportPostBodySchema>;
+export type SeriesImportPostBody = ImportSeriesData["body"];
