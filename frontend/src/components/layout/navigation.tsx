@@ -92,10 +92,8 @@ export function NavigationMobile() {
             />
           ))}
           <div className="mt-auto pb-4">
-    <SheetClose
-      render={<InstallAppButton className="w-full md:hidden" />}
-    />
-  </div>
+            <SheetClose render={<InstallAppButton className="w-full md:hidden" />} />
+          </div>
         </nav>
       </SheetContent>
     </Sheet>

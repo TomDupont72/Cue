@@ -4,8 +4,8 @@ import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type InstallAppButtonProps = {
-    className: string
-}
+  className: string;
+};
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -62,9 +62,7 @@ export function InstallAppButton({ className }: InstallAppButtonProps) {
       await installPrompt.prompt();
       await installPrompt.userChoice;
     } catch {
-      // Chrome keeps its own install menu available if the custom prompt fails.
     } finally {
-      // A beforeinstallprompt event can only be used once, even after dismissal.
       setInstallPrompt(null);
     }
   }
@@ -72,12 +70,7 @@ export function InstallAppButton({ className }: InstallAppButtonProps) {
   if (installed || !installPrompt) return null;
 
   return (
-    <Button
-      variant="ghost"
-      size="lg"
-      className={className}
-      onClick={() => void install()}
-    >
+    <Button variant="ghost" size="lg" className={className} onClick={() => void install()}>
       <Download aria-hidden="true" />
       INSTALLER L'APPLICATION
     </Button>

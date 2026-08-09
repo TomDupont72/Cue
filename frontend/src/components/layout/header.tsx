@@ -53,18 +53,18 @@ export default function Header() {
             <DropdownMenuTrigger
               render={
                 <>
-                <InstallAppButton className="hidden md:flex" />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full"
-                  aria-label="Ouvrir le menu utilisateur"
-                >
-                  <Avatar className="size-8">
-                    {user?.image && <AvatarImage src={user.image} alt="" />}
-                    <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
-                  </Avatar>
-                </Button>
+                  <InstallAppButton className="hidden md:flex" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    aria-label="Ouvrir le menu utilisateur"
+                  >
+                    <Avatar className="size-8">
+                      {user?.image && <AvatarImage src={user.image} alt="" />}
+                      <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
                 </>
               }
             />
