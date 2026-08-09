@@ -100,9 +100,13 @@ async function removeSeriesProgress(
 
 export const userService = {
   async userSeriesGet(userId: string, params: UserSeriesGetParams) {
-    const { status, limit, cursor } = params;
+    const { seriesId, status, limit, cursor } = params;
 
-    const userSeries = await userRepository.findManySeries({ userId, status }, limit, cursor);
+    const userSeries = await userRepository.findManySeries(
+      { userId, seriesId, status },
+      limit,
+      cursor
+    );
 
     const seriesDetails = await seriesRepository.findMany({
       id: { in: userSeries.items.map((series) => series.seriesId) }
