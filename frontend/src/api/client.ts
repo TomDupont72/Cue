@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ApiError, type ApiErrorData } from "./errors";
+import { handleUnauthorizedResponse } from "@/lib/sessionManager";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
@@ -162,12 +163,15 @@ export async function apiClient<
 
   if (!response.ok) {
     const errorData = getErrorData(responseBody);
+    const unauthorizedRecovery =
+      response.status === 401 ? await handleUnauthorizedResponse() : undefined;
 
     throw new ApiError(
       errorData.message ?? `Request failed with status ${response.status}`,
       response.status,
       errorData.code,
-      errorData.details
+      errorData.details,
+      unauthorizedRecovery === "session-expired"
     );
   }
 
