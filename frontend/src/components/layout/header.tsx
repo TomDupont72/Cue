@@ -15,6 +15,7 @@ import {
 import { Navigation, NavigationMobile } from "./navigation";
 import { authClient } from "@/lib/authClient";
 import { queryClient } from "@/lib/queryClient";
+import { invalidateSessionGeneration } from "@/lib/sessionGeneration";
 import { InstallAppButton } from "../pwa/installAppButton";
 
 function getInitials(name: string | undefined): string {
@@ -33,7 +34,13 @@ export default function Header() {
   const user = session?.user;
 
   async function signOut() {
-    await authClient.signOut();
+    const result = await authClient.signOut();
+
+    if (result.error) {
+      return;
+    }
+
+    invalidateSessionGeneration();
     queryClient.clear();
   }
 
