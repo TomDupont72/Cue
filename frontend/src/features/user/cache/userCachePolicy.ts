@@ -6,24 +6,37 @@ type UserCacheInvalidationPolicy = (seriesId: number) => readonly InvalidateQuer
 type UserCacheCommand =
   "episodeAdded" | "episodeRemoved" | "seasonAdded" | "seasonRemoved" | "seriesChanged";
 
-const invalidateUserProjections: UserCacheInvalidationPolicy = (seriesId) => [
-  {
-    queryKey: queryKeys.series.detail(seriesId),
-    exact: true
-  },
-  {
-    queryKey: queryKeys.userSeries.all
-  },
-  {
-    queryKey: queryKeys.userDashboard.all
-  },
-  {
-    queryKey: queryKeys.userEpisodes.all
-  }
-];
+type UserCacheInvalidationOptions = {
+  refetchEpisodesFeed?: boolean;
+};
+
+function invalidateUserProjections(
+  seriesId: number,
+  { refetchEpisodesFeed = true }: UserCacheInvalidationOptions = {}
+): readonly InvalidateQueryFilters[] {
+  return [
+    {
+      queryKey: queryKeys.series.detail(seriesId),
+      exact: true
+    },
+    {
+      queryKey: queryKeys.userSeries.all
+    },
+    {
+      queryKey: queryKeys.userDashboard.all
+    },
+    {
+      queryKey: queryKeys.userEpisodes.all,
+      ...(!refetchEpisodesFeed && { refetchType: "none" as const })
+    }
+  ];
+}
 
 export const userCachePolicy = {
-  episodeAdded: invalidateUserProjections,
+  // The response already patches the feed with the next episode. Refetching it here would
+  // reorder the clicked series by lastWatchedAt and make the row jump to the top.
+  episodeAdded: (seriesId: number) =>
+    invalidateUserProjections(seriesId, { refetchEpisodesFeed: false }),
   episodeRemoved: invalidateUserProjections,
   seasonAdded: invalidateUserProjections,
   seasonRemoved: invalidateUserProjections,
