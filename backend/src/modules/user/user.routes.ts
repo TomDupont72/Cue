@@ -30,6 +30,8 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.get("/series", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "getUserSeries",
+      security: [{ sessionCookie: [] }],
       tags: ["User"],
       querystring: userSeriesGetParamsSchema,
       response: {
@@ -42,6 +44,8 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.get("/dashboard/summary", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "getUserDashboardSummary",
+      security: [{ sessionCookie: [] }],
       tags: ["User"],
       response: {
         200: userDashboardSummaryGetResponseSchema
@@ -53,6 +57,8 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.post("/series/:seriesId", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "upsertUserSeries",
+      security: [{ sessionCookie: [] }],
       tags: ["User"],
       params: userSeriesPostParamsSchema,
       body: userSeriesPostBodySchema,
@@ -66,6 +72,8 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.get("/episodes/feed", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "getUserEpisodesFeed",
+      security: [{ sessionCookie: [] }],
       tags: ["User"],
       response: {
         200: userEpisodeFeedGetResponseSchema
@@ -77,6 +85,8 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.post("/series/:seriesId/episode/:episodeId", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "markUserEpisodeWatched",
+      security: [{ sessionCookie: [] }],
       tags: ["User"],
       params: userEpisodePostParamsSchema,
       response: {
@@ -89,6 +99,8 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.delete("/series/:seriesId/episode/:episodeId", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "unmarkUserEpisodeWatched",
+      security: [{ sessionCookie: [] }],
       tags: ["User"],
       params: userEpisodeDeleteParamsSchema,
       response: {
@@ -101,6 +113,8 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.post("/series/:seriesId/season/:seasonId", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "markUserSeasonWatched",
+      security: [{ sessionCookie: [] }],
       tags: ["User"],
       params: userSeasonPostParamsSchema,
       response: {
@@ -113,6 +127,8 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.delete("/series/:seriesId/season/:seasonId", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "unmarkUserSeasonWatched",
+      security: [{ sessionCookie: [] }],
       tags: ["User"],
       params: userSeasonDeleteParamsSchema,
       response: {
@@ -125,6 +141,8 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.post("/status/:userId/recalculate", {
     preHandler: [app.requireWorker],
     schema: {
+      operationId: "recalculateUserStatuses",
+      security: [{ workerBearer: [] }],
       tags: ["User"],
       params: userStatusRecalculateSchema,
       response: {

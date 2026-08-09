@@ -6,8 +6,20 @@ import {
   type ZodTypeProvider
 } from "fastify-type-provider-zod";
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it, type TestContext } from "node:test";
 import { metadataRoutes } from "../metadata.routes.js";
+import { env } from "@/shared/config/env.js";
+import { workerGuard } from "@/shared/middlewares/require-worker.js";
+
+const WORKER_TOKEN = "worker-token-used-by-metadata-route-tests";
+
+function enableWorkerToken(t: TestContext) {
+  const previousWorkerToken = env.WORKER_TOKEN;
+  env.WORKER_TOKEN = WORKER_TOKEN;
+  t.after(() => {
+    env.WORKER_TOKEN = previousWorkerToken;
+  });
+}
 
 async function buildApp() {
   const app = Fastify().withTypeProvider<ZodTypeProvider>();
@@ -17,8 +29,8 @@ async function buildApp() {
   app.decorate("requireAuth", async (request) => {
     request.user = { id: "test-user" };
   });
-  app.decorate("requireWorker", async () => {});
 
+  await app.register(workerGuard);
   await app.register(metadataRoutes, { prefix: "/api/metadata" });
   await app.ready();
 
@@ -66,13 +78,15 @@ describe("GET /api/metadata/series/search", () => {
 
 describe("GET /api/metadata/series/changes", () => {
   it("returns a Cue response with camelCase TMDB identifiers", async (t) => {
+    enableWorkerToken(t);
     const fetchMock = mockTmdbFetch(t);
     const app = await buildApp();
     t.after(() => app.close());
 
     const response = await app.inject({
       method: "GET",
-      url: "/api/metadata/series/changes?startDate=2026-01-01&endDate=2026-01-14&page=1"
+      url: "/api/metadata/series/changes?startDate=2026-01-01&endDate=2026-01-14&page=1",
+      headers: { authorization: `Bearer ${WORKER_TOKEN}` }
     });
 
     assert.equal(response.statusCode, 200, response.body);
@@ -89,5 +103,52 @@ describe("GET /api/metadata/series/changes", () => {
     assert.equal(requestedUrl.searchParams.get("start_date"), "2026-01-01");
     assert.equal(requestedUrl.searchParams.get("end_date"), "2026-01-14");
     assert.equal(requestedUrl.searchParams.get("page"), "1");
+  });
+
+  it("rejects a request without a worker token before calling TMDB", async (t) => {
+    enableWorkerToken(t);
+    const fetchMock = mockTmdbFetch(t);
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/metadata/series/changes?startDate=2026-01-01&endDate=2026-01-14&page=1"
+    });
+
+    assert.equal(response.statusCode, 401, response.body);
+    assert.equal(fetchMock.mock.callCount(), 0);
+  });
+
+  it("rejects an invalid worker token before calling TMDB", async (t) => {
+    enableWorkerToken(t);
+    const fetchMock = mockTmdbFetch(t);
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/metadata/series/changes?startDate=2026-01-01&endDate=2026-01-14&page=1",
+      headers: { authorization: "Bearer invalid-worker-token" }
+    });
+
+    assert.equal(response.statusCode, 401, response.body);
+    assert.equal(fetchMock.mock.callCount(), 0);
+  });
+
+  it("rejects malformed ISO dates without calling TMDB", async (t) => {
+    enableWorkerToken(t);
+    const fetchMock = mockTmdbFetch(t);
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/metadata/series/changes?startDate=invalid&endDate=2026-01-14&page=1",
+      headers: { authorization: `Bearer ${WORKER_TOKEN}` }
+    });
+
+    assert.equal(response.statusCode, 400);
+    assert.equal(fetchMock.mock.callCount(), 0);
   });
 });

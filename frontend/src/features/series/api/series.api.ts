@@ -1,4 +1,5 @@
-import { apiClient } from "@/api/client";
+import { getSdkData, sdkRequestOptions, validateRequest } from "@/api/client";
+import { getSeries, importSeries, searchMetadataSeries } from "@/api/generated/cue-api";
 import type {
   SeriesGetResponse,
   SeriesImportPostResponse,
@@ -12,28 +13,41 @@ import {
 } from "../schemas/series.schemas";
 
 export function seriesSearchGet(query: string, page: number): Promise<SeriesSearchGetResponse> {
-  return apiClient<SeriesSearchGetResponse>("/metadata/series/search", {
-    query: {
-      query,
-      page
-    },
-    querySchema: seriesSearchGetParamsSchema
+  const validatedQuery = validateRequest(seriesSearchGetParamsSchema, {
+    query,
+    page
   });
+
+  return getSdkData(
+    searchMetadataSeries({
+      ...sdkRequestOptions,
+      query: validatedQuery
+    })
+  );
 }
 
 export function seriesGet(id: number): Promise<SeriesGetResponse> {
-  return apiClient<SeriesGetResponse>("/series/:id", {
-    params: {
-      id
-    },
-    paramsSchema: seriesGetParamsSchema
+  const path = validateRequest(seriesGetParamsSchema, {
+    id
   });
+
+  return getSdkData(
+    getSeries({
+      ...sdkRequestOptions,
+      path
+    })
+  );
 }
 
 export function seriesImportPost(tmdbId: number): Promise<SeriesImportPostResponse> {
-  return apiClient<SeriesImportPostResponse, SeriesImportPostBody>("/series/import", {
-    method: "POST",
-    body: { tmdbId },
-    bodySchema: seriesImportPostBodySchema
+  const body = validateRequest<SeriesImportPostBody>(seriesImportPostBodySchema, {
+    tmdbId
   });
+
+  return getSdkData(
+    importSeries({
+      ...sdkRequestOptions,
+      body
+    })
+  );
 }

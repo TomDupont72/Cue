@@ -11,6 +11,8 @@ import assert from "node:assert/strict";
 import { describe, it, type TestContext } from "node:test";
 import { encodeUserSeriesCursor } from "../user.pagination.js";
 import { userRoutes } from "../user.routes.js";
+import { env } from "@/shared/config/env.js";
+import { workerGuard } from "@/shared/middlewares/require-worker.js";
 
 const USER_ID = "test-user";
 const SERIES_ID = 1;
@@ -19,6 +21,7 @@ const SEASON_ID = 10;
 const NOW = new Date("2026-08-08T15:30:00.000Z");
 const CREATED_AT = new Date("2026-01-01T00:00:00.000Z");
 const UPDATED_AT = new Date("2026-01-02T00:00:00.000Z");
+const WORKER_TOKEN = "worker-token-used-by-user-route-tests";
 const USER_SERIES_CURSOR = encodeUserSeriesCursor({
   lastWatchedAt: NOW,
   seriesId: SERIES_ID
@@ -79,6 +82,14 @@ const feedItem: EpisodeFeedRow = {
   remainingEpisodes: 11
 };
 
+function enableWorkerToken(t: TestContext) {
+  const previousWorkerToken = env.WORKER_TOKEN;
+  env.WORKER_TOKEN = WORKER_TOKEN;
+  t.after(() => {
+    env.WORKER_TOKEN = previousWorkerToken;
+  });
+}
+
 async function buildApp() {
   const app = Fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -87,10 +98,8 @@ async function buildApp() {
   app.decorate("requireAuth", async (request) => {
     request.user = { id: USER_ID };
   });
-  app.decorate("requireWorker", async (request) => {
-    request.worker = { isWorker: true };
-  });
 
+  await app.register(workerGuard);
   await app.register(userRoutes, { prefix: "/api/user" });
   await app.ready();
 
@@ -127,6 +136,7 @@ function mockSuccessfulResponses(t: TestContext) {
 
 describe("user route response contracts", { concurrency: false }, () => {
   it("serializes every successful route with its declared shape", async (t) => {
+    enableWorkerToken(t);
     mockSuccessfulResponses(t);
     const app = await buildApp();
     t.after(() => app.close());
@@ -189,6 +199,7 @@ describe("user route response contracts", { concurrency: false }, () => {
       {
         method: "POST",
         url: `/api/user/status/${USER_ID}/recalculate`,
+        headers: { authorization: `Bearer ${WORKER_TOKEN}` },
         expected: { updatedCount: 1 }
       }
     ] as const;
@@ -254,5 +265,61 @@ describe("user route response contracts", { concurrency: false }, () => {
 
     assert.equal(response.statusCode, 400, response.body);
     assert.equal(userSeriesGet.mock.callCount(), 0);
+  });
+});
+
+describe("POST /api/user/status/:userId/recalculate", { concurrency: false }, () => {
+  it("rejects a request without a worker token before calling the service", async (t) => {
+    enableWorkerToken(t);
+    const recalculate = t.mock.method(userService, "userStatusRecalculatePost", async () => ({
+      updatedCount: 1
+    }));
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "POST",
+      url: `/api/user/status/${USER_ID}/recalculate`
+    });
+
+    assert.equal(response.statusCode, 401, response.body);
+    assert.equal(recalculate.mock.callCount(), 0);
+  });
+
+  it("rejects an invalid worker token before calling the service", async (t) => {
+    enableWorkerToken(t);
+    const recalculate = t.mock.method(userService, "userStatusRecalculatePost", async () => ({
+      updatedCount: 1
+    }));
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "POST",
+      url: `/api/user/status/${USER_ID}/recalculate`,
+      headers: { authorization: "Bearer invalid-worker-token" }
+    });
+
+    assert.equal(response.statusCode, 401, response.body);
+    assert.equal(recalculate.mock.callCount(), 0);
+  });
+
+  it("accepts a valid worker token and forwards the user identifier", async (t) => {
+    enableWorkerToken(t);
+    const recalculate = t.mock.method(userService, "userStatusRecalculatePost", async () => ({
+      updatedCount: 1
+    }));
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "POST",
+      url: `/api/user/status/${USER_ID}/recalculate`,
+      headers: { authorization: `Bearer ${WORKER_TOKEN}` }
+    });
+
+    assert.equal(response.statusCode, 200, response.body);
+    assert.deepEqual(response.json(), { updatedCount: 1 });
+    assert.deepEqual(recalculate.mock.calls[0]?.arguments, [{ userId: USER_ID }]);
   });
 });

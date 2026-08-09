@@ -1,6 +1,7 @@
+import datetime
+
 import dagster as dg
 from sqlalchemy import text
-import datetime
 
 from orchestrator.resources.cue_api import CueApiResource
 from orchestrator.resources.database import DatabaseResource
@@ -9,40 +10,32 @@ from orchestrator.resources.database import DatabaseResource
 class SyncSeriesConfig(dg.Config):
     tmdb_id: int
 
+
 @dg.op
 def get_series_changes(
     context: dg.OpExecutionContext,
-    cue_api: CueApiResource
+    cue_api: CueApiResource,
 ) -> list[int]:
-    tmdb_ids = []
+    tmdb_ids: list[int] = []
 
     current_date = datetime.date.today()
 
-    start_date = (current_date - datetime.timedelta(days=2)).isoformat()
-    end_date = current_date.isoformat()
+    start_date = current_date - datetime.timedelta(days=2)
+    end_date = current_date
 
-    first_page = cue_api.get_series_changes(
-        start_date,
-        end_date,
-        1
-    )
+    first_page = cue_api.get_series_changes(start_date, end_date, 1)
 
-    tmdb_ids += [result["tmdbId"] for result in first_page["results"]]
+    tmdb_ids += [result.tmdb_id for result in first_page.results]
 
-    for page in range(2, first_page["totalPages"] + 1):
-        current_page = cue_api.get_series_changes(
-            start_date,
-            end_date,
-            page
-        )
+    for page in range(2, first_page.total_pages + 1):
+        current_page = cue_api.get_series_changes(start_date, end_date, page)
 
-        tmdb_ids += [result["tmdbId"] for result in current_page["results"]]
+        tmdb_ids += [result.tmdb_id for result in current_page.results]
 
-    context.log.info(
-        f"{first_page["totalResults"]} changements TMDB"
-    )
+    context.log.info(f"{first_page.total_results} changements TMDB")
 
     return tmdb_ids
+
 
 @dg.op
 def get_all_series(
@@ -51,20 +44,21 @@ def get_all_series(
 ) -> list[int]:
     with database.get_engine().connect() as connection:
         rows = connection.execute(
-            text("""
+            text(
+                """
                 SELECT "tmdbId"
                 FROM "Series"
                 ORDER BY "id"
-            """)
+                """
+            )
         )
 
         tmdb_ids = [row.tmdbId for row in rows]
 
-    context.log.info(
-        f"{len(tmdb_ids)} séries récupérées"
-    )
+    context.log.info(f"{len(tmdb_ids)} séries récupérées")
 
     return tmdb_ids
+
 
 @dg.op
 def sync_series(
@@ -73,24 +67,17 @@ def sync_series(
     series_ids: list[int],
     tmdb_ids: list[int],
 ) -> None:
-    tmbd_ids_to_sync = list(set(series_ids) & set(tmdb_ids))
+    tmdb_ids_to_sync = list(set(series_ids) & set(tmdb_ids))
 
-    context.log.info(
-        f"Synchronisation de {len(tmbd_ids_to_sync)} séries"
-    )
-    
-    for tmbd_id_to_sync in tmbd_ids_to_sync:
-        cue_api.post_user_series_import(tmbd_id_to_sync)
+    context.log.info(f"Synchronisation de {len(tmdb_ids_to_sync)} séries")
 
-        context.log.info(
-            f"Série TMDB {tmbd_id_to_sync} synchronisée"
-        )
+    for tmdb_id_to_sync in tmdb_ids_to_sync:
+        cue_api.post_user_series_import(tmdb_id_to_sync)
 
-@dg.op(
-        ins={
-        "after_sync": dg.In(dg.Nothing)
-    }
-)
+        context.log.info(f"Série TMDB {tmdb_id_to_sync} synchronisée")
+
+
+@dg.op(ins={"after_sync": dg.In(dg.Nothing)})
 def update_user_statuses(
     context: dg.OpExecutionContext,
     database: DatabaseResource,
@@ -98,31 +85,27 @@ def update_user_statuses(
 ) -> None:
     with database.get_engine().connect() as connection:
         rows = connection.execute(
-            text("""
+            text(
+                """
                 SELECT "id"
                 FROM "user"
-            """)
+                """
+            )
         )
 
         user_ids = [row.id for row in rows]
 
-    context.log.info(
-        f"{len(user_ids)} utilisateurs récupérés"
-    )
+    context.log.info(f"{len(user_ids)} utilisateurs récupérés")
 
     for user_id in user_ids:
         result = cue_api.post_user_status_recalculate(user_id)
 
         context.log.info(
             f"Statuts de l'utilisateur {user_id} à jour : "
-            f"{result['updatedCount']} série(s) passée(s) à DROPPED"
+            f"{result.updated_count} série(s) passée(s) à DROPPED"
         )
+
 
 @dg.job
 def sync_all_series_job():
-    update_user_statuses(
-        sync_series(
-            get_series_changes(), 
-            get_all_series()
-        )
-    )
+    update_user_statuses(sync_series(get_series_changes(), get_all_series()))

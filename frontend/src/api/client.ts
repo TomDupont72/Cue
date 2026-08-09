@@ -1,35 +1,26 @@
 import { z } from "zod";
-import { ApiError, type ApiErrorData } from "./errors";
+import { createClient } from "@/api/generated/client/cue-api";
+import { ApiError, normalizeApiClientError } from "@/api/errors";
 import { handleUnauthorizedResponse } from "@/lib/sessionManager";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
+const OPENAPI_PREFIX = "/api";
 
-type QueryValue = string | number | boolean | null | undefined;
-type QueryParams = Record<string, QueryValue>;
+function getClientBaseUrl(apiUrl: string): string {
+  const resolvedApiUrl = new URL(apiUrl, window.location.origin);
+  const normalizedPath = resolvedApiUrl.pathname.replace(/\/$/, "");
 
-type PathValue = string | number;
-type PathParams = Record<string, PathValue>;
-
-type ApiClientOptions<
-  TBody = unknown,
-  TQuery extends QueryParams = QueryParams,
-  TParams extends PathParams = PathParams
-> = Omit<RequestInit, "body"> & {
-  body?: TBody;
-  bodySchema?: z.ZodType<TBody>;
-
-  query?: TQuery;
-  querySchema?: z.ZodType<TQuery>;
-
-  params?: TParams;
-  paramsSchema?: z.ZodType<TParams>;
-};
-
-function validateData<T>(data: T | undefined, schema: z.ZodType<T> | undefined): T | undefined {
-  if (data === undefined || schema === undefined) {
-    return data;
+  if (normalizedPath.endsWith(OPENAPI_PREFIX)) {
+    resolvedApiUrl.pathname = normalizedPath.slice(0, -OPENAPI_PREFIX.length) || "/";
   }
 
+  resolvedApiUrl.search = "";
+  resolvedApiUrl.hash = "";
+
+  return resolvedApiUrl.toString().replace(/\/$/, "");
+}
+
+export function validateRequest<T>(schema: z.ZodType<T>, data: unknown): T {
   const result = schema.safeParse(data);
 
   if (!result.success) {
@@ -41,139 +32,23 @@ function validateData<T>(data: T | undefined, schema: z.ZodType<T> | undefined):
   return result.data;
 }
 
-function buildPath(path: string, params?: PathParams): string {
-  if (!params) {
-    return path;
+export const cueApiClient = createClient({
+  baseUrl: getClientBaseUrl(API_URL),
+  credentials: "include",
+  headers: {
+    Accept: "application/json"
   }
+});
 
-  return Object.entries(params).reduce((resolvedPath, [key, value]) => {
-    const placeholder = `:${key}`;
+cueApiClient.interceptors.error.use(async (error, response) => {
+  return normalizeApiClientError(error, response, handleUnauthorizedResponse);
+});
 
-    if (!resolvedPath.includes(placeholder)) {
-      return resolvedPath;
-    }
+export const sdkRequestOptions = {
+  client: cueApiClient,
+  throwOnError: true
+} as const;
 
-    return resolvedPath.replace(placeholder, encodeURIComponent(String(value)));
-  }, path);
-}
-
-function buildUrl(path: string, query?: QueryParams): string {
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-
-  const url = new URL(`${API_URL}${normalizedPath}`, window.location.origin);
-
-  if (query) {
-    Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        url.searchParams.set(key, String(value));
-      }
-    });
-  }
-
-  return url.toString();
-}
-
-async function parseResponseBody(response: Response): Promise<unknown> {
-  if (response.status === 204) {
-    return undefined;
-  }
-
-  const contentType = response.headers.get("content-type");
-
-  if (contentType?.includes("application/json")) {
-    return response.json();
-  }
-
-  const text = await response.text();
-
-  return text || undefined;
-}
-
-function getErrorData(body: unknown): ApiErrorData {
-  if (!body || typeof body !== "object") {
-    return {};
-  }
-
-  const data = body as Record<string, unknown>;
-
-  if (typeof data.message === "string" || typeof data.code === "string") {
-    return {
-      code: typeof data.code === "string" ? data.code : undefined,
-      message: typeof data.message === "string" ? data.message : undefined,
-      details: data.details
-    };
-  }
-
-  if (data.error && typeof data.error === "object") {
-    const error = data.error as Record<string, unknown>;
-
-    return {
-      code: typeof error.code === "string" ? error.code : undefined,
-      message: typeof error.message === "string" ? error.message : undefined,
-      details: error.details
-    };
-  }
-
-  return {};
-}
-
-export async function apiClient<
-  TResponse,
-  TBody = unknown,
-  TQuery extends QueryParams = QueryParams,
-  TParams extends PathParams = PathParams
->(path: string, options: ApiClientOptions<TBody, TQuery, TParams> = {}): Promise<TResponse> {
-  const { query, querySchema, params, paramsSchema, body, bodySchema, headers, ...requestOptions } =
-    options;
-
-  const validatedQuery = validateData(query, querySchema);
-
-  const validatedParams = validateData(params, paramsSchema);
-
-  const validatedBody = validateData(body, bodySchema);
-
-  const resolvedPath = buildPath(path, validatedParams);
-
-  const isFormData = validatedBody instanceof FormData;
-
-  const response = await fetch(buildUrl(resolvedPath, validatedQuery), {
-    ...requestOptions,
-    credentials: "include",
-    headers: {
-      Accept: "application/json",
-
-      ...(!isFormData && validatedBody !== undefined
-        ? {
-            "Content-Type": "application/json"
-          }
-        : {}),
-
-      ...headers
-    },
-
-    body:
-      validatedBody === undefined
-        ? undefined
-        : isFormData
-          ? validatedBody
-          : JSON.stringify(validatedBody)
-  });
-
-  const responseBody = await parseResponseBody(response);
-
-  if (!response.ok) {
-    const errorData = getErrorData(responseBody);
-    const unauthorizedRecovery =
-      response.status === 401 ? await handleUnauthorizedResponse() : undefined;
-
-    throw new ApiError(
-      errorData.message ?? `Request failed with status ${response.status}`,
-      response.status,
-      errorData.code,
-      errorData.details,
-      unauthorizedRecovery === "session-expired"
-    );
-  }
-
-  return responseBody as TResponse;
+export async function getSdkData<T>(request: Promise<{ data: T }>): Promise<T> {
+  return (await request).data;
 }
