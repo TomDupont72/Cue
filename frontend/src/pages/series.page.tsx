@@ -6,34 +6,56 @@ import { Button } from "@/components/ui/button";
 import SeriesDetails from "@/features/series/components/seriesDetails";
 import { SeriesOverview } from "@/features/series/components/seriesOverview";
 import { useSeries } from "@/features/series/hooks/useSeries";
-import { useSeriesImport } from "@/features/series/hooks/useSeriesImport";
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSeriesImportMutation } from "@/features/series/hooks/useSeriesImportMutation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Series() {
   const [searchParams] = useSearchParams();
+  const seriesIdParam = searchParams.get("seriesId")?.trim();
+
+  if (seriesIdParam) {
+    const seriesId = Number(seriesIdParam);
+
+    return <SeriesContent key={seriesId} seriesId={seriesId} scrollDependency={seriesId} />;
+  }
 
   const tmdbId = Number(searchParams.get("id")?.trim() ?? "");
 
-  const seriesImportQuery = useSeriesImport(tmdbId);
+  return <LegacySeriesImport key={tmdbId} tmdbId={tmdbId} />;
+}
 
-  if (seriesImportQuery.isPending) {
-    return <LoadingState />;
+type LegacySeriesImportProps = {
+  tmdbId: number;
+};
+
+function LegacySeriesImport({ tmdbId }: LegacySeriesImportProps) {
+  const navigate = useNavigate();
+  const importStartedRef = useRef(false);
+  const { mutate, isError, error } = useSeriesImportMutation();
+
+  const importSeries = useCallback(() => {
+    mutate(tmdbId, {
+      onSuccess: ({ series }) => {
+        navigate(`/series?seriesId=${series.id}`, { replace: true });
+      }
+    });
+  }, [mutate, navigate, tmdbId]);
+
+  useEffect(() => {
+    if (importStartedRef.current) {
+      return;
+    }
+
+    importStartedRef.current = true;
+    importSeries();
+  }, [importSeries]);
+
+  if (isError) {
+    return <ErrorState error={error} onRetry={importSeries} />;
   }
 
-  if (seriesImportQuery.isError) {
-    return (
-      <ErrorState error={seriesImportQuery.error} onRetry={() => seriesImportQuery.refetch()} />
-    );
-  }
-
-  return (
-    <SeriesContent
-      key={seriesImportQuery.data.series.id}
-      seriesId={seriesImportQuery.data.series.id}
-      scrollDependency={tmdbId}
-    />
-  );
+  return <LoadingState />;
 }
 
 type SeriesContentProps = {

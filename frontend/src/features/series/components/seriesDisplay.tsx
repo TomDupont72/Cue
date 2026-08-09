@@ -7,12 +7,14 @@ type SeriesDisplayProps = {
   seriesData: SeriesCardData[];
   userSeriesData?: UserSeriesGetResponse["items"];
   isProgress?: boolean;
+  onSeriesClick?: (series: SeriesCardData) => void;
 };
 
 export default function SeriesDisplay({
   seriesData,
   userSeriesData = [],
-  isProgress = false
+  isProgress = false,
+  onSeriesClick
 }: SeriesDisplayProps) {
   const navigate = useNavigate();
 
@@ -40,7 +42,13 @@ export default function SeriesDisplay({
           <SeriesCard
             key={series.tmdbId}
             series={series}
-            onClick={() => navigate(`/series?id=${series.tmdbId}`)}
+            onClick={
+              onSeriesClick
+                ? () => onSeriesClick(series)
+                : userSeries
+                  ? () => navigate(`/series?seriesId=${userSeries.seriesId}`)
+                  : undefined
+            }
             isProgress={isProgress}
             status={userSeries?.status}
             watchProgress={watchProgress}
