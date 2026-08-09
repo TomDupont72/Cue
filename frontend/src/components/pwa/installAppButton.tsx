@@ -1,72 +1,16 @@
-import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useInstallPrompt } from "@/components/pwa/useInstallPrompt";
 
 type InstallAppButtonProps = {
   className: string;
 };
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
-}
-
-interface NavigatorWithStandalone extends Navigator {
-  standalone?: boolean;
-}
-
-function isStandalone(): boolean {
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    Boolean((window.navigator as NavigatorWithStandalone).standalone)
-  );
-}
-
 export function InstallAppButton({ className }: InstallAppButtonProps) {
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [installed, setInstalled] = useState(isStandalone);
+  const { canInstall, install } = useInstallPrompt();
 
-  useEffect(() => {
-    const displayMode = window.matchMedia("(display-mode: standalone)");
-
-    function handleInstallPrompt(event: Event) {
-      event.preventDefault();
-      setInstallPrompt(event as BeforeInstallPromptEvent);
-    }
-
-    function handleInstalled() {
-      setInstallPrompt(null);
-      setInstalled(true);
-    }
-
-    function handleDisplayModeChange() {
-      setInstalled(isStandalone());
-    }
-
-    window.addEventListener("beforeinstallprompt", handleInstallPrompt);
-    window.addEventListener("appinstalled", handleInstalled);
-    displayMode.addEventListener("change", handleDisplayModeChange);
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
-      window.removeEventListener("appinstalled", handleInstalled);
-      displayMode.removeEventListener("change", handleDisplayModeChange);
-    };
-  }, []);
-
-  async function install() {
-    if (!installPrompt) return;
-
-    try {
-      await installPrompt.prompt();
-      await installPrompt.userChoice;
-    } finally {
-      setInstallPrompt(null);
-    }
-  }
-
-  if (installed || !installPrompt) return null;
+  if (!canInstall) return null;
 
   return (
     <Button variant="ghost" size="lg" className={className} onClick={() => void install()}>
