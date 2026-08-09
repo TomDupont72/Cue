@@ -7,22 +7,56 @@ import SeriesDetails from "@/features/series/components/seriesDetails";
 import { SeriesOverview } from "@/features/series/components/seriesOverview";
 import { useSeries } from "@/features/series/hooks/useSeries";
 import { useSeriesImportMutation } from "@/features/series/hooks/useSeriesImportMutation";
+import {
+  seriesGetParamsSchema,
+  seriesImportPostBodySchema
+} from "@/features/series/schemas/series.schemas";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
+const invalidSeriesLinkError = new Error("Le lien vers cette série est invalide.");
+
 export default function Series() {
   const [searchParams] = useSearchParams();
-  const seriesIdParam = searchParams.get("seriesId")?.trim();
+  const seriesIdParam = searchParams.get("seriesId");
 
-  if (seriesIdParam) {
-    const seriesId = Number(seriesIdParam);
+  if (seriesIdParam !== null) {
+    if (!seriesIdParam.trim()) {
+      return <InvalidSeriesLink />;
+    }
 
-    return <SeriesContent key={seriesId} seriesId={seriesId} scrollDependency={seriesId} />;
+    const seriesParams = seriesGetParamsSchema.safeParse({ id: seriesIdParam });
+
+    if (!seriesParams.success) {
+      return <InvalidSeriesLink />;
+    }
+
+    return (
+      <SeriesContent
+        key={seriesParams.data.id}
+        seriesId={seriesParams.data.id}
+        scrollDependency={seriesParams.data.id}
+      />
+    );
   }
 
-  const tmdbId = Number(searchParams.get("id")?.trim() ?? "");
+  const tmdbIdParam = searchParams.get("id");
 
-  return <LegacySeriesImport key={tmdbId} tmdbId={tmdbId} />;
+  if (tmdbIdParam === null || !tmdbIdParam.trim()) {
+    return <InvalidSeriesLink />;
+  }
+
+  const importBody = seriesImportPostBodySchema.safeParse({ tmdbId: tmdbIdParam });
+
+  if (!importBody.success) {
+    return <InvalidSeriesLink />;
+  }
+
+  return <LegacySeriesImport key={importBody.data.tmdbId} tmdbId={importBody.data.tmdbId} />;
+}
+
+function InvalidSeriesLink() {
+  return <ErrorState error={invalidSeriesLinkError} />;
 }
 
 type LegacySeriesImportProps = {

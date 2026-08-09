@@ -1,25 +1,39 @@
 import { z } from "zod";
 
-export const seriesSearchGetParamsSchema = z.object({
-  query: z
-    .string()
-    .trim()
-    .min(2, "La recherche doit contenir au moins 2 caractères")
-    .max(100, "La recherche est trop longue"),
+export const SERIES_SEARCH_QUERY_MIN_LENGTH = 2;
+export const SERIES_SEARCH_QUERY_MAX_LENGTH = 100;
 
-  page: z.coerce.number().int().min(1).default(1)
+const positiveIntegerSchema = z
+  .union([z.number(), z.string().trim().regex(/^\d+$/)])
+  .transform((value) => Number(value))
+  .pipe(z.number().int().positive());
+
+export const seriesSearchQuerySchema = z
+  .string()
+  .trim()
+  .min(
+    SERIES_SEARCH_QUERY_MIN_LENGTH,
+    `La recherche doit contenir au moins ${SERIES_SEARCH_QUERY_MIN_LENGTH} caractères`
+  )
+  .max(SERIES_SEARCH_QUERY_MAX_LENGTH, "La recherche est trop longue");
+
+export const seriesSearchPageSchema = positiveIntegerSchema.default(1);
+
+export const seriesSearchGetParamsSchema = z.object({
+  query: seriesSearchQuerySchema,
+  page: seriesSearchPageSchema
 });
 
 export type SeriesSearchParams = z.infer<typeof seriesSearchGetParamsSchema>;
 
 export const seriesGetParamsSchema = z.object({
-  id: z.coerce.number().min(1)
+  id: positiveIntegerSchema
 });
 
 export type SeriesGetParams = z.infer<typeof seriesGetParamsSchema>;
 
 export const seriesImportPostBodySchema = z.object({
-  tmdbId: z.coerce.number().min(1)
+  tmdbId: positiveIntegerSchema
 });
 
 export type SeriesImportPostBody = z.infer<typeof seriesImportPostBodySchema>;

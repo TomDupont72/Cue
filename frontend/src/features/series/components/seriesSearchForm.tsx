@@ -5,6 +5,10 @@ import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
+import {
+  SERIES_SEARCH_QUERY_MAX_LENGTH,
+  SERIES_SEARCH_QUERY_MIN_LENGTH
+} from "@/features/series/schemas/series.schemas";
 
 export function SeriesSearchForm() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,8 +19,15 @@ export function SeriesSearchForm() {
   const debouncedValue = useDebounce(value.trim(), 300);
 
   useEffect(() => {
-    if (!debouncedValue) {
-      setSearchParams({}, { replace: true });
+    if (debouncedValue.length < SERIES_SEARCH_QUERY_MIN_LENGTH) {
+      if (query) {
+        setSearchParams({}, { replace: true });
+      }
+
+      return;
+    }
+
+    if (debouncedValue.length > SERIES_SEARCH_QUERY_MAX_LENGTH) {
       return;
     }
 
@@ -37,6 +48,7 @@ export function SeriesSearchForm() {
         <InputGroupInput
           placeholder="Rechercher une serie..."
           value={value}
+          maxLength={SERIES_SEARCH_QUERY_MAX_LENGTH}
           onChange={(event) => setValue(event.target.value)}
         />
         <InputGroupAddon>
