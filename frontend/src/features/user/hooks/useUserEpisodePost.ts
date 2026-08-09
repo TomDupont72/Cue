@@ -7,6 +7,7 @@ import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
 import { useQueryClient } from "@tanstack/react-query";
 import type { UserEpisodesFeedGetResponse } from "../types/user.types";
 import { updateUserEpisodesFeedItem } from "../utils/userEpisodesFeedCache";
+import { userCachePolicy } from "../cache/userCachePolicy";
 
 export function useUserEpisodePost() {
   const queryClient = useQueryClient();
@@ -20,7 +21,9 @@ export function useUserEpisodePost() {
   >({
     mutationFn: ({ seriesId, episodeId }) => userEpisodePost(seriesId, episodeId),
 
-    getQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+    getOptimisticQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+
+    getInvalidationFilters: ({ seriesId }) => userCachePolicy.episodeAdded(seriesId),
 
     updateCache: (currentData, { episodeId }) => {
       const alreadyWatched = currentData.userEpisodes.some((item) => item.episodeId === episodeId);
@@ -42,7 +45,7 @@ export function useUserEpisodePost() {
       };
     },
 
-    onSuccess: async (result) => {
+    onSuccess: (result) => {
       queryClient.setQueryData<UserEpisodesFeedGetResponse>(
         queryKeys.userEpisodes.feed(),
         (current) =>
@@ -50,11 +53,6 @@ export function useUserEpisodePost() {
             ? updateUserEpisodesFeedItem(current, result.seriesId, result.nextEpisode)
             : current
       );
-
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.userEpisodes.feed(),
-        refetchType: "none"
-      });
     }
   });
 }

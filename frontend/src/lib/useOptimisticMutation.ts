@@ -1,6 +1,7 @@
 import {
   useMutation,
   useQueryClient,
+  type InvalidateQueryFilters,
   type QueryKey,
   type UseMutationOptions
 } from "@tanstack/react-query";
@@ -26,7 +27,10 @@ type OptimisticMutationOptions<TData, TError, TParams, TBody, TCache> = Omit<
   "mutationFn" | "onMutate" | "onError"
 > & {
   mutationFn: (...variables: MutationVariables<TParams, TBody>) => Promise<TData>;
-  getQueryKey: (...variables: MutationVariables<TParams, TBody>) => QueryKey;
+  getOptimisticQueryKey: (...variables: MutationVariables<TParams, TBody>) => QueryKey;
+  getInvalidationFilters: (
+    ...variables: MutationVariables<TParams, TBody>
+  ) => readonly InvalidateQueryFilters[];
   updateCache: (currentData: TCache, ...variables: MutationVariables<TParams, TBody>) => TCache;
 };
 
@@ -38,7 +42,8 @@ export function useOptimisticMutation<
   TCache = unknown
 >({
   mutationFn,
-  getQueryKey,
+  getOptimisticQueryKey,
+  getInvalidationFilters,
   updateCache,
   onSuccess,
   onSettled,
@@ -51,7 +56,7 @@ export function useOptimisticMutation<
     mutationFn: (variables: MutationVariables<TParams, TBody>) => mutationFn(...variables),
 
     onMutate: async (variables) => {
-      const queryKey = getQueryKey(...variables);
+      const queryKey = getOptimisticQueryKey(...variables);
 
       await queryClient.cancelQueries({ queryKey });
 
@@ -76,11 +81,15 @@ export function useOptimisticMutation<
     onSuccess,
 
     onSettled: async (data, error, variables, onMutateResult, mutationContext) => {
-      await queryClient.invalidateQueries({
-        queryKey: getQueryKey(...variables)
-      });
-
-      await onSettled?.(data, error, variables, onMutateResult, mutationContext);
+      try {
+        await onSettled?.(data, error, variables, onMutateResult, mutationContext);
+      } finally {
+        await Promise.all(
+          getInvalidationFilters(...variables).map((filters) =>
+            queryClient.invalidateQueries(filters)
+          )
+        );
+      }
     }
   });
 

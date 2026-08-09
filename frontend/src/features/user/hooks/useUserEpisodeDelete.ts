@@ -6,6 +6,7 @@ import type { UserEpisodeDeleteParams } from "../schemas/user.schemas";
 import type { UserEpisodeDeleteResponse } from "../types/user.types";
 
 import { userEpisodeDelete } from "../api/user.api";
+import { userCachePolicy } from "../cache/userCachePolicy";
 
 export function useUserEpisodeDelete() {
   return useOptimisticMutation<
@@ -17,7 +18,9 @@ export function useUserEpisodeDelete() {
   >({
     mutationFn: ({ seriesId, episodeId }) => userEpisodeDelete(seriesId, episodeId),
 
-    getQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+    getOptimisticQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+
+    getInvalidationFilters: ({ seriesId }) => userCachePolicy.episodeRemoved(seriesId),
 
     updateCache: (currentData, { episodeId }) => {
       const alreadyWatched = currentData.userEpisodes.some((item) => item.episodeId === episodeId);

@@ -5,6 +5,7 @@ import { userSeasonPost } from "@/features/user/api/user.api";
 import { queryKeys } from "@/lib/queryKeys";
 import type { UserSeasonPostParams } from "@/features/user/schemas/user.schemas";
 import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
+import { userCachePolicy } from "@/features/user/cache/userCachePolicy";
 
 export function useUserSeasonPost() {
   return useOptimisticMutation<
@@ -16,7 +17,9 @@ export function useUserSeasonPost() {
   >({
     mutationFn: ({ seriesId, seasonId }) => userSeasonPost(seriesId, seasonId),
 
-    getQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+    getOptimisticQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+
+    getInvalidationFilters: ({ seriesId }) => userCachePolicy.seasonAdded(seriesId),
 
     updateCache: (currentData, { seasonId }) => {
       const watchedEpisodeIds = new Set(

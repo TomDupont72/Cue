@@ -4,6 +4,7 @@ import type { UserSeasonDeleteResponse } from "@/features/user/types/user.types"
 import type { UserSeasonDeleteParams } from "@/features/user/schemas/user.schemas";
 import { userSeasonDelete } from "@/features/user/api/user.api";
 import { queryKeys } from "@/lib/queryKeys";
+import { userCachePolicy } from "@/features/user/cache/userCachePolicy";
 
 export function useUserSeasonDelete() {
   return useOptimisticMutation<
@@ -15,7 +16,9 @@ export function useUserSeasonDelete() {
   >({
     mutationFn: ({ seriesId, seasonId }) => userSeasonDelete(seriesId, seasonId),
 
-    getQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+    getOptimisticQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+
+    getInvalidationFilters: ({ seriesId }) => userCachePolicy.seasonRemoved(seriesId),
 
     updateCache: (currentData, { seasonId }) => {
       const seasonEpisodeIds = new Set(
