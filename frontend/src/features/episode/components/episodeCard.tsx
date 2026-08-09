@@ -47,10 +47,7 @@ export default function EpisodeCard({
 
   function handleSeriesClick(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
-
-    if (series.tmdbId !== undefined) {
-      navigate(`/series?id=${series.tmdbId}`);
-    }
+    navigate(`/series?seriesId=${series.id}`);
   }
 
   const remainingDays = getEpisodeReleaseDayDifference(episode.airDate);
@@ -81,7 +78,7 @@ export default function EpisodeCard({
               >
                 {episode.seasonNumber !== 0 ? (
                   <>
-                    {displayName && series.name && series.tmdbId !== undefined ? (
+                    {displayName && series.name ? (
                       <Button
                         type="button"
                         variant="outline"
