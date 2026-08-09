@@ -9,6 +9,7 @@ import {
 } from "fastify-type-provider-zod";
 import assert from "node:assert/strict";
 import { describe, it, type TestContext } from "node:test";
+import { encodeUserSeriesCursor } from "../user.pagination.js";
 import { userRoutes } from "../user.routes.js";
 
 const USER_ID = "test-user";
@@ -18,6 +19,10 @@ const SEASON_ID = 10;
 const NOW = new Date("2026-08-08T15:30:00.000Z");
 const CREATED_AT = new Date("2026-01-01T00:00:00.000Z");
 const UPDATED_AT = new Date("2026-01-02T00:00:00.000Z");
+const USER_SERIES_CURSOR = encodeUserSeriesCursor({
+  lastWatchedAt: NOW,
+  seriesId: SERIES_ID
+});
 
 const series: Series = {
   id: SERIES_ID,
@@ -96,7 +101,7 @@ function mockSuccessfulResponses(t: TestContext) {
   t.mock.method(userService, "userSeriesGet", async () => ({
     items: [{ ...userSeries, seriesDetails: series }],
     hasNextPage: true,
-    nextCursor: NOW
+    nextCursor: USER_SERIES_CURSOR
   }));
   t.mock.method(userService, "userDashboardSummaryGet", async () => ({
     totalWatchedMinutes: 25,
@@ -138,7 +143,7 @@ describe("user route response contracts", { concurrency: false }, () => {
             }
           ],
           hasNextPage: true,
-          nextCursor: NOW
+          nextCursor: USER_SERIES_CURSOR
         }
       },
       {
@@ -207,5 +212,47 @@ describe("user route response contracts", { concurrency: false }, () => {
     });
 
     assert.equal(response.statusCode, 500);
+  });
+
+  it("accepts and forwards an opaque pagination cursor", async (t) => {
+    const userSeriesGet = t.mock.method(userService, "userSeriesGet", async () => ({
+      items: [],
+      hasNextPage: false,
+      nextCursor: null
+    }));
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "GET",
+      url: `/api/user/series?cursor=${encodeURIComponent(USER_SERIES_CURSOR)}`
+    });
+
+    assert.equal(response.statusCode, 200, response.body);
+    assert.deepEqual(userSeriesGet.mock.calls[0]?.arguments, [
+      USER_ID,
+      {
+        limit: 20,
+        cursor: USER_SERIES_CURSOR
+      }
+    ]);
+  });
+
+  it("rejects a malformed pagination cursor before calling the service", async (t) => {
+    const userSeriesGet = t.mock.method(userService, "userSeriesGet", async () => ({
+      items: [],
+      hasNextPage: false,
+      nextCursor: null
+    }));
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/user/series?cursor=not-a-cursor"
+    });
+
+    assert.equal(response.statusCode, 400, response.body);
+    assert.equal(userSeriesGet.mock.callCount(), 0);
   });
 });
