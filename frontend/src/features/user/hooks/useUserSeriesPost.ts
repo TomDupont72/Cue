@@ -10,6 +10,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import type { UserEpisodesFeedGetResponse } from "@/features/user/types/user.types";
 import { updateUserEpisodesFeedItem } from "@/features/user/utils/userEpisodesFeedCache";
+import { userCachePolicy } from "@/features/user/cache/userCachePolicy";
 
 export function useUserSeriesPost() {
   const queryClient = useQueryClient();
@@ -24,7 +25,9 @@ export function useUserSeriesPost() {
     mutationFn: ({ seriesId }, { status, isFavorite }) =>
       userSeriesPost(seriesId, status, isFavorite),
 
-    getQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+    getOptimisticQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
+
+    getInvalidationFilters: ({ seriesId }) => userCachePolicy.seriesChanged(seriesId),
 
     updateCache: (currentData, { seriesId }, body) => ({
       ...currentData,
@@ -44,7 +47,7 @@ export function useUserSeriesPost() {
           }
     }),
 
-    onSuccess: async (result) => {
+    onSuccess: (result) => {
       queryClient.setQueryData<UserEpisodesFeedGetResponse>(
         queryKeys.userEpisodes.feed(),
         (current) => {
@@ -61,11 +64,6 @@ export function useUserSeriesPost() {
           );
         }
       );
-
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.userEpisodes.feed(),
-        refetchType: "none"
-      });
     }
   });
 }
