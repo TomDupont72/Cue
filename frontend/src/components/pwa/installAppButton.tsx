@@ -61,7 +61,6 @@ export function InstallAppButton({ className }: InstallAppButtonProps) {
     try {
       await installPrompt.prompt();
       await installPrompt.userChoice;
-    } catch {
     } finally {
       setInstallPrompt(null);
     }
