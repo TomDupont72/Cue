@@ -1,3 +1,9 @@
+## [0.9.4] - 2026-08-09
+
+### Fixed
+
+- Modification et déplacement du bouton d'installation de l'application
+
 ## [0.9.3] - 2026-08-08
 
 ### Fixed
