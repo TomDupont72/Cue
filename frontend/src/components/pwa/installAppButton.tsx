@@ -3,6 +3,10 @@ import { Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
+type InstallAppButtonProps = {
+    className: string
+}
+
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
@@ -19,7 +23,7 @@ function isStandalone(): boolean {
   );
 }
 
-export function InstallAppButton() {
+export function InstallAppButton({ className }: InstallAppButtonProps) {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(isStandalone);
 
@@ -69,14 +73,13 @@ export function InstallAppButton() {
 
   return (
     <Button
-      type="button"
-      variant="outline"
+      variant="ghost"
       size="lg"
-      className="fixed right-4 bottom-4 z-50 shadow-lg"
+      className={className}
       onClick={() => void install()}
     >
       <Download aria-hidden="true" />
-      Installer l’application
+      INSTALLER L'APPLICATION
     </Button>
   );
 }

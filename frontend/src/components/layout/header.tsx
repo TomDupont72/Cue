@@ -15,6 +15,7 @@ import {
 import { Navigation, NavigationMobile } from "./navigation";
 import { authClient } from "@/lib/authClient";
 import { queryClient } from "@/lib/queryClient";
+import { InstallAppButton } from "../pwa/installAppButton";
 
 function getInitials(name: string | undefined): string {
   if (!name) return "NA";
@@ -51,6 +52,8 @@ export default function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
+                <>
+                <InstallAppButton className="hidden md:flex" />
                 <Button
                   variant="ghost"
                   size="icon"
@@ -62,6 +65,7 @@ export default function Header() {
                     <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
                   </Avatar>
                 </Button>
+                </>
               }
             />
 
