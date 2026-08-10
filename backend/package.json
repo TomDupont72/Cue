@@ -14,7 +14,8 @@
     "test:integration": "tsc --noEmit -p tsconfig.test.json && node --import tsx --test src/integration/*.integration.test.ts",
     "start": "node dist/server.js",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@eslint/js": "^10.0.1",
