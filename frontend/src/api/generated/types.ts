@@ -722,6 +722,31 @@ export type MarkUserSeasonWatchedResponses = {
 
 export type MarkUserSeasonWatchedResponse = MarkUserSeasonWatchedResponses[keyof MarkUserSeasonWatchedResponses];
 
+export type RecalculateAllUserStatusesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/user/status/recalculate';
+};
+
+export type RecalculateAllUserStatusesErrors = {
+    /**
+     * Default Response
+     */
+    default: ErrorResponse;
+};
+
+export type RecalculateAllUserStatusesError = RecalculateAllUserStatusesErrors[keyof RecalculateAllUserStatusesErrors];
+
+export type RecalculateAllUserStatusesResponses = {
+    /**
+     * Default Response
+     */
+    200: UserStatusRecalculateResponse;
+};
+
+export type RecalculateAllUserStatusesResponse = RecalculateAllUserStatusesResponses[keyof RecalculateAllUserStatusesResponses];
+
 export type RecalculateUserStatusesData = {
     body?: never;
     path: {
