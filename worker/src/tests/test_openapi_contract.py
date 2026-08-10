@@ -169,10 +169,19 @@ class OpenApiWorkerContractTests(unittest.TestCase):
             "/api/user/status/{userId}/recalculate",
             "post",
         )
+        batch_status_schema = response_schema(
+            self.document,
+            "/api/user/status/recalculate",
+            "post",
+        )
 
         self.assert_model_fields_match(SeriesImportResponse, import_schema)
         self.assert_model_fields_match(SeriesChangesResponse, changes_schema)
         self.assert_model_fields_match(UserStatusRecalculateResponse, status_schema)
+        self.assert_model_fields_match(
+            UserStatusRecalculateResponse,
+            batch_status_schema,
+        )
 
         import_properties = import_schema["properties"]
         self.assert_model_fields_match(SeriesResponse, import_properties["series"])
@@ -255,6 +264,13 @@ class OpenApiWorkerContractTests(unittest.TestCase):
             {("path", "userId")},
         )
         self.assertTrue(all(parameter["required"] for parameter in status_parameters))
+
+        batch_status_operation = self.document["paths"][
+            "/api/user/status/recalculate"
+        ]["post"]
+        self.assertEqual(batch_status_operation["security"], [{"workerBearer": []}])
+        self.assertNotIn("parameters", batch_status_operation)
+        self.assertNotIn("requestBody", batch_status_operation)
 
 
 if __name__ == "__main__":

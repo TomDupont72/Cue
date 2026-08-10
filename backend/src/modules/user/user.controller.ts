@@ -101,6 +101,15 @@ export const userDashboardSummaryController = {
 };
 
 export const userStatusController = {
+  async postAll(
+    _request: FastifyRequest,
+    reply: FastifyReply<{ Reply: UserStatusRecalculateResponse }>
+  ) {
+    const result = await userService.allUserStatusesRecalculatePost();
+
+    return reply.send(result);
+  },
+
   async post(
     request: FastifyRequest<{ Params: UserStatusRecalculate }>,
     reply: FastifyReply<{ Reply: UserStatusRecalculateResponse }>

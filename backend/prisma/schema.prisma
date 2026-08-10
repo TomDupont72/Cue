@@ -277,6 +277,7 @@ model UserSeries {
   series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
 
   @@id([userId, seriesId])
+  @@index([status, lastWatchedAt])
 }
 
 enum UserSeriesStatus {

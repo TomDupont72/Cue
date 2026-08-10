@@ -9,3 +9,10 @@ compute_logs:
   config:
     base_dir:
       env: DAGSTER_COMPUTE_LOGS_DIR
+
+concurrency:
+  runs:
+    tag_concurrency_limits:
+      - key: cue/sync_series
+        value: "true"
+        limit: 1

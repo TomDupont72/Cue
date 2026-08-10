@@ -138,6 +138,19 @@ export async function userRoutes(app: AppFastifyInstance) {
     handler: userSeasonController.delete
   });
 
+  app.post("/status/recalculate", {
+    preHandler: [app.requireWorker],
+    schema: {
+      operationId: "recalculateAllUserStatuses",
+      security: [{ workerBearer: [] }],
+      tags: ["User"],
+      response: {
+        200: userStatusRecalculateResponseSchema
+      }
+    },
+    handler: userStatusController.postAll
+  });
+
   app.post("/status/:userId/recalculate", {
     preHandler: [app.requireWorker],
     schema: {
