@@ -131,6 +131,7 @@ function mockSuccessfulResponses(t: TestContext) {
   t.mock.method(userService, "userEpisodeDelete", async () => userEpisode);
   t.mock.method(userService, "userSeasonPost", async () => [userEpisode]);
   t.mock.method(userService, "userSeasonDelete", async () => [userEpisode]);
+  t.mock.method(userService, "allUserStatusesRecalculatePost", async () => ({ updatedCount: 2 }));
   t.mock.method(userService, "userStatusRecalculatePost", async () => ({ updatedCount: 1 }));
 }
 
@@ -195,6 +196,12 @@ describe("user route response contracts", { concurrency: false }, () => {
         method: "DELETE",
         url: `/api/user/series/${SERIES_ID}/season/${SEASON_ID}`,
         expected: [userEpisode]
+      },
+      {
+        method: "POST",
+        url: "/api/user/status/recalculate",
+        headers: { authorization: `Bearer ${WORKER_TOKEN}` },
+        expected: { updatedCount: 2 }
       },
       {
         method: "POST",
@@ -265,6 +272,63 @@ describe("user route response contracts", { concurrency: false }, () => {
 
     assert.equal(response.statusCode, 400, response.body);
     assert.equal(userSeriesGet.mock.callCount(), 0);
+  });
+});
+
+describe("POST /api/user/status/recalculate", { concurrency: false }, () => {
+  it("rejects a request without a worker token before calling the service", async (t) => {
+    enableWorkerToken(t);
+    const recalculate = t.mock.method(userService, "allUserStatusesRecalculatePost", async () => ({
+      updatedCount: 2
+    }));
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/user/status/recalculate"
+    });
+
+    assert.equal(response.statusCode, 401, response.body);
+    assert.equal(recalculate.mock.callCount(), 0);
+  });
+
+  it("rejects an invalid worker token before calling the service", async (t) => {
+    enableWorkerToken(t);
+    const recalculate = t.mock.method(userService, "allUserStatusesRecalculatePost", async () => ({
+      updatedCount: 2
+    }));
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/user/status/recalculate",
+      headers: { authorization: "Bearer invalid-worker-token" }
+    });
+
+    assert.equal(response.statusCode, 401, response.body);
+    assert.equal(recalculate.mock.callCount(), 0);
+  });
+
+  it("accepts a valid worker token and performs one global recalculation", async (t) => {
+    enableWorkerToken(t);
+    const recalculate = t.mock.method(userService, "allUserStatusesRecalculatePost", async () => ({
+      updatedCount: 2
+    }));
+    const app = await buildApp();
+    t.after(() => app.close());
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/user/status/recalculate",
+      headers: { authorization: `Bearer ${WORKER_TOKEN}` }
+    });
+
+    assert.equal(response.statusCode, 200, response.body);
+    assert.deepEqual(response.json(), { updatedCount: 2 });
+    assert.equal(recalculate.mock.callCount(), 1);
+    assert.deepEqual(recalculate.mock.calls[0]?.arguments, []);
   });
 });
 

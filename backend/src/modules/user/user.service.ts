@@ -107,6 +107,31 @@ async function removeSeriesProgress(
   );
 }
 
+async function recalculateUserStatuses(
+  userId: string | undefined,
+  now: Date
+): Promise<UserStatusRecalculateResponse> {
+  const inactiveSince = new Date(now);
+  inactiveSince.setUTCMonth(inactiveSince.getUTCMonth() - 2);
+
+  const result = await userRepository.updateManySeries(
+    {
+      ...(userId === undefined ? {} : { userId }),
+      status: "WATCHING",
+      lastWatchedAt: {
+        lte: inactiveSince
+      }
+    },
+    {
+      status: "DROPPED"
+    }
+  );
+
+  return {
+    updatedCount: result.count
+  };
+}
+
 export const userService = {
   async userSeriesGet(userId: string, params: UserSeriesGetParams): Promise<UserSeriesGetResponse> {
     const { seriesId, status, limit, cursor } = params;
@@ -414,24 +439,10 @@ export const userService = {
     params: UserStatusRecalculate,
     now = new Date()
   ): Promise<UserStatusRecalculateResponse> {
-    const inactiveSince = new Date(now);
-    inactiveSince.setUTCMonth(inactiveSince.getUTCMonth() - 2);
+    return recalculateUserStatuses(params.userId, now);
+  },
 
-    const result = await userRepository.updateManySeries(
-      {
-        userId: params.userId,
-        status: "WATCHING",
-        lastWatchedAt: {
-          lte: inactiveSince
-        }
-      },
-      {
-        status: "DROPPED"
-      }
-    );
-
-    return {
-      updatedCount: result.count
-    };
+  async allUserStatusesRecalculatePost(now = new Date()): Promise<UserStatusRecalculateResponse> {
+    return recalculateUserStatuses(undefined, now);
   }
 };

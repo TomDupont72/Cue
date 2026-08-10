@@ -128,7 +128,6 @@ jobs:
     env:
       API_URL: http://localhost:8000
       DATABASE_URL: postgresql://cue:cue@localhost:5432/cue_test
-      PYTHONPATH: src
       WORKER_TOKEN: ci-worker-token-at-least-32-characters
 
     steps:

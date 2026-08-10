@@ -2352,6 +2352,41 @@
         ]
       }
     },
+    "/api/user/status/recalculate": {
+      "post": {
+        "operationId": "recalculateAllUserStatuses",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserStatusRecalculateResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "workerBearer": []
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
     "/api/user/status/{userId}/recalculate": {
       "post": {
         "operationId": "recalculateUserStatuses",

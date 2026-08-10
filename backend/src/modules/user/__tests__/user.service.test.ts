@@ -337,4 +337,40 @@ describe("userService", { concurrency: false }, () => {
       watchCount: { decrement: 0 }
     });
   });
+
+  it("recalculates statuses for one user with the two-month inactivity cutoff", async (t) => {
+    const updateManySeries = t.mock.method(userRepository, "updateManySeries", async () => ({
+      count: 2
+    }));
+
+    const result = await userService.userStatusRecalculatePost({ userId: USER_ID }, NOW);
+
+    assert.deepEqual(updateManySeries.mock.calls[0]?.arguments, [
+      {
+        userId: USER_ID,
+        status: "WATCHING",
+        lastWatchedAt: { lte: new Date("2026-06-08T15:30:00.000Z") }
+      },
+      { status: "DROPPED" }
+    ]);
+    assert.deepEqual(result, { updatedCount: 2 });
+  });
+
+  it("recalculates statuses for all users in one updateMany", async (t) => {
+    const updateManySeries = t.mock.method(userRepository, "updateManySeries", async () => ({
+      count: 3
+    }));
+
+    const result = await userService.allUserStatusesRecalculatePost(NOW);
+
+    assert.equal(updateManySeries.mock.callCount(), 1);
+    assert.deepEqual(updateManySeries.mock.calls[0]?.arguments, [
+      {
+        status: "WATCHING",
+        lastWatchedAt: { lte: new Date("2026-06-08T15:30:00.000Z") }
+      },
+      { status: "DROPPED" }
+    ]);
+    assert.deepEqual(result, { updatedCount: 3 });
+  });
 });
