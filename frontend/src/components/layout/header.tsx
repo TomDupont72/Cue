@@ -56,22 +56,21 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-            <InstallAppButton className="hidden md:flex" />
+          <InstallAppButton className="hidden md:flex" />
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                  
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full"
-                    aria-label="Ouvrir le menu utilisateur"
-                  >
-                    <Avatar className="size-8">
-                      {user?.image && <AvatarImage src={user.image} alt="" />}
-                      <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
-                    </Avatar>
-                  </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  aria-label="Ouvrir le menu utilisateur"
+                >
+                  <Avatar className="size-8">
+                    {user?.image && <AvatarImage src={user.image} alt="" />}
+                    <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+                  </Avatar>
+                </Button>
               }
             />
 
