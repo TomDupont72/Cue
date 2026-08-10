@@ -14,6 +14,8 @@ export async function metadataRoutes(app: AppFastifyInstance) {
   app.get("/series/search", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "searchMetadataSeries",
+      security: [{ sessionCookie: [] }],
       tags: ["Metadata"],
       querystring: metadataSeriesSearchSchema,
       response: {
@@ -26,6 +28,8 @@ export async function metadataRoutes(app: AppFastifyInstance) {
   app.get("/series/changes", {
     preHandler: [app.requireWorker],
     schema: {
+      operationId: "getMetadataSeriesChanges",
+      security: [{ workerBearer: [] }],
       tags: ["Metadata"],
       querystring: metadataSeriesChangesSchema,
       response: {

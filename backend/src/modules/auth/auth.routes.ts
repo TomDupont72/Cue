@@ -4,7 +4,9 @@ import { auth } from "@/shared/lib/auth.js";
 export async function authRoutes(app: FastifyInstance) {
   // Register authentication endpoint
   app.route({
-    schema: { tags: ["Authentication"] },
+    // Better Auth owns this wildcard contract and exposes its own typed client.
+    // Hiding it prevents an invalid OpenAPI `/api/auth/{*}` path from being emitted.
+    schema: { hide: true },
     method: ["GET", "POST"],
     url: "/*",
     async handler(request, reply) {

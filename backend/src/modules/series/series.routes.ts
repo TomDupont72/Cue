@@ -11,6 +11,8 @@ export async function seriesRoutes(app: AppFastifyInstance) {
   app.get("/:id", {
     preHandler: [app.requireAuth],
     schema: {
+      operationId: "getSeries",
+      security: [{ sessionCookie: [] }],
       tags: ["Series"],
       params: seriesGetSchema,
       response: {
@@ -23,6 +25,8 @@ export async function seriesRoutes(app: AppFastifyInstance) {
   app.post("/import", {
     preHandler: app.auth([app.requireAuth, app.requireWorker], { relation: "or" }),
     schema: {
+      operationId: "importSeries",
+      security: [{ sessionCookie: [] }, { workerBearer: [] }],
       tags: ["Series"],
       body: seriesImportPostSchema,
       response: {

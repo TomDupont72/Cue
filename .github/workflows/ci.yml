@@ -14,7 +14,7 @@ jobs:
         working-directory: frontend
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v6
         with:
@@ -24,6 +24,9 @@ jobs:
 
       - name: Install
         run: npm ci
+
+      - name: Check generated API client
+        run: npm run api:check
 
       - name: Lint
         run: npm run lint --if-present
@@ -76,7 +79,7 @@ jobs:
       TMDB_API_KEY: ci-tmdb-api-key-placeholder
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v6
         with:
@@ -89,6 +92,9 @@ jobs:
 
       - name: Prisma generate
         run: npx prisma generate
+
+      - name: Check OpenAPI contract
+        run: npm run openapi:check
 
       - name: Apply database migrations
         run: npx prisma migrate deploy
@@ -113,13 +119,50 @@ jobs:
           path: backend/coverage/lcov.info
           if-no-files-found: warn
 
+  worker:
+    name: Worker (contracts/definitions)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    env:
+      API_URL: http://localhost:8000
+      DATABASE_URL: postgresql://cue:cue@localhost:5432/cue_test
+      PYTHONPATH: src
+      WORKER_TOKEN: ci-worker-token-at-least-32-characters
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          version: "0.12.0"
+          python-version: "3.14"
+          enable-cache: true
+          cache-dependency-glob: worker/uv.lock
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Contract tests
+        run: uv run --frozen python -m unittest discover -s src/tests -p "test_*.py"
+
+      - name: Validate Dagster definitions
+        env:
+          DAGSTER_HOME: ${{ runner.temp }}/cue-dagster
+          DAGSTER_STORAGE_DIR: ${{ runner.temp }}/cue-dagster/storage
+          DAGSTER_COMPUTE_LOGS_DIR: ${{ runner.temp }}/cue-dagster/compute-logs
+        run: |
+          mkdir -p "$DAGSTER_HOME" "$DAGSTER_STORAGE_DIR" "$DAGSTER_COMPUTE_LOGS_DIR"
+          uv run --frozen dg check defs
+
   docker:
     name: Docker builds
     runs-on: ubuntu-latest
-    needs: [frontend, backend]
+    needs: [frontend, backend, worker]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Build backend image
         run: docker build -t cue-backend ./backend

@@ -1,10 +1,14 @@
+import type { UserSeriesStatus as ApiUserSeriesStatus } from "@/api/generated/cue-api";
+
+export type UserSeriesStatus = ApiUserSeriesStatus;
+
 export const USER_SERIES_STATUS = {
   WATCHING: "WATCHING",
   PLANNED: "PLANNED",
   PAUSED: "PAUSED",
   COMPLETED: "COMPLETED",
   DROPPED: "DROPPED"
-} as const;
+} as const satisfies Record<UserSeriesStatus, UserSeriesStatus>;
 
 export const STATUS_TEXT_MAPPING = {
   WATCHING: "EN COURS",
@@ -12,6 +16,4 @@ export const STATUS_TEXT_MAPPING = {
   PAUSED: "EN PAUSE",
   COMPLETED: "TERMINÉES",
   DROPPED: "ARRÊTÉES"
-};
-
-export type UserSeriesStatus = (typeof USER_SERIES_STATUS)[keyof typeof USER_SERIES_STATUS];
+} satisfies Record<UserSeriesStatus, string>;

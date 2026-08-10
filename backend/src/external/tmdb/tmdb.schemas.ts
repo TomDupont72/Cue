@@ -155,5 +155,5 @@ export const tmdbTvChangesSchema = z
       id: "tmdbId",
       total_pages: "totalPages",
       total_results: "totalResults"
-    })
+    } as const)
   );

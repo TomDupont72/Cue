@@ -139,3 +139,21 @@ joignable sur le réseau Docker `infrastructure`, jamais `127.0.0.1` ou
 ```bash
 docker compose -f compose.prod.yaml config --quiet
 ```
+
+## Contrats API
+
+Les schémas Zod et les routes du backend produisent la source de vérité OpenAPI
+versionnée dans `contracts/openapi.json`. Après une modification d'endpoint :
+
+```bash
+cd backend
+npm run openapi:generate
+
+cd ../frontend
+npm run api:generate
+```
+
+Le frontend consomme le SDK généré dans `frontend/src/api/generated`. Le worker
+valide ses modèles Pydantic contre le même contrat. Les commandes
+`openapi:check`, `api:check` et les tests de contrat du worker sont exécutés par
+la CI afin de refuser tout artefact obsolète ou toute dérive de forme.
