@@ -1,3 +1,15 @@
+## [0.9.5] - 2026-08-10
+
+### Fixed
+
+- Correction du bouton utilisateur.
+- Correction de la pagination des séries.
+- Correction de la gestion des erreurs 401.
+- Correction de l’import des séries.
+- Blocage des requêtes invalides côté frontend.
+- Correction de l’ordre du feed après le visionnage d’un épisode.
+- Correction du bouton de téléchargement.
+
 ## [0.9.4] - 2026-08-09
 
 ### Fixed
