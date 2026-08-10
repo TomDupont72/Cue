@@ -7,7 +7,7 @@ import {
   UserSeriesGetParams,
   UserSeriesPostBody,
   UserSeriesPostParams,
-  UserStatusRecalculate
+  UserStatusPostParams
 } from "@/modules/user/user.schemas.js";
 import { userService } from "@/modules/user/user.service.js";
 
@@ -29,12 +29,6 @@ export const userSeriesController = {
 };
 
 export const userEpisodeController = {
-  async getFeed(request: FastifyRequest, reply: FastifyReply) {
-    const result = await userService.userEpisodeFeedGet(request.user.id);
-
-    return reply.send(result);
-  },
-
   async post(request: FastifyRequest<{ Params: UserEpisodePostParams }>, reply: FastifyReply) {
     const result = await userService.userEpisodePost(request.user.id, request.params);
 
@@ -71,8 +65,16 @@ export const userDashboardSummaryController = {
 };
 
 export const userStatusController = {
-  async post(request: FastifyRequest<{ Params: UserStatusRecalculate }>, reply: FastifyReply) {
+  async post(request: FastifyRequest<{ Params: UserStatusPostParams }>, reply: FastifyReply) {
     const result = await userService.userStatusRecalculatePost(request.params);
+
+    return reply.send(result);
+  }
+};
+
+export const userEpisodeFeedController = {
+  async get(request: FastifyRequest, reply: FastifyReply) {
+    const result = await userService.userEpisodeFeedGet(request.user.id);
 
     return reply.send(result);
   }

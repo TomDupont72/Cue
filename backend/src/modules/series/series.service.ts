@@ -8,7 +8,7 @@ import { networkRepository } from "../network/network.repository.js";
 import { peopleRepository } from "../people/people.repository.js";
 import { seasonRepository } from "../season/season.repository.js";
 import { seriesRepository } from "./series.repository.js";
-import type { SeriesGet, SeriesImportPost } from "./series.schemas.js";
+import type { SeriesGetParams, SeriesImportPostBody } from "./series.schemas.js";
 import { dropKeys, getMany, joinBy } from "@/shared/utils/object/object.js";
 import { Prisma } from "@/generated/prisma/client.js";
 import type {
@@ -19,7 +19,7 @@ import { notFound } from "@/shared/errors/errors.helpers.js";
 import { userRepository } from "../user/user.repository.js";
 
 export const seriesService = {
-  async seriesGet(userId: string, params: SeriesGet) {
+  async seriesGet(userId: string, params: SeriesGetParams) {
     const series = await seriesRepository.findOne(params);
 
     if (!series) {
@@ -211,7 +211,7 @@ export const seriesService = {
     );
   },
 
-  async seriesImportPost(userId: string | null, body: SeriesImportPost, forceSync = false) {
+  async seriesImportPost(userId: string | null, body: SeriesImportPostBody, forceSync = false) {
     const existingSeries = await seriesRepository.findOne(body);
     const series = existingSeries && !forceSync ? existingSeries : await this.syncTmdb(body.tmdbId);
     const userSeries = userId

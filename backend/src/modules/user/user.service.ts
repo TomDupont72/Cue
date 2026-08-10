@@ -8,7 +8,7 @@ import {
   UserSeriesGetParams,
   UserSeasonPostParams,
   UserSeasonDeleteParams,
-  UserStatusRecalculate
+  UserStatusPostParams
 } from "./user.schemas.js";
 import { episodeRepository } from "../episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
@@ -381,7 +381,7 @@ export const userService = {
     return summary;
   },
 
-  async userStatusRecalculatePost(params: UserStatusRecalculate, now = new Date()) {
+  async userStatusRecalculatePost(params: UserStatusPostParams, now = new Date()) {
     const inactiveSince = new Date(now);
     inactiveSince.setUTCMonth(inactiveSince.getUTCMonth() - 2);
 

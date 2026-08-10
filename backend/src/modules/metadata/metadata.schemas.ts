@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const metadataSeriesSearchResultSchema = z.object({
+const metadataSeriesSearchGetResultSchema = z.object({
   tmdbId: z.number().int(),
   name: z.string(),
   originalName: z.string(),
@@ -12,35 +12,35 @@ const metadataSeriesSearchResultSchema = z.object({
   voteAverage: z.number()
 });
 
-export const metadataSeriesSearchResponseSchema = z.object({
+export const metadataSeriesSearchGetResponseSchema = z.object({
   page: z.number().int(),
-  results: z.array(metadataSeriesSearchResultSchema),
+  results: z.array(metadataSeriesSearchGetResultSchema),
   totalPages: z.number().int(),
   totalResults: z.number().int()
 });
 
-const metadataSeriesChangesResultSchema = z.object({
+const metadataSeriesChangesGetResultSchema = z.object({
   tmdbId: z.number().int()
 });
 
-export const metadataSeriesChangesResponseSchema = z.object({
-  results: z.array(metadataSeriesChangesResultSchema),
+export const metadataSeriesChangesGetResponseSchema = z.object({
+  results: z.array(metadataSeriesChangesGetResultSchema),
   page: z.number().int(),
   totalPages: z.number().int(),
   totalResults: z.number().int()
 });
 
-export const metadataSeriesSearchSchema = z.object({
+export const metadataSeriesSearchGetSchema = z.object({
   query: z.string().trim().min(2),
   page: z.coerce.number().int().min(1).default(1)
 });
 
-export const metadataSeriesChangesSchema = z.object({
+export const metadataSeriesChangesGetSchema = z.object({
   startDate: z.string(),
   endDate: z.string(),
   page: z.coerce.number().int().min(1)
 });
 
-export type MetadataSeriesSearch = z.infer<typeof metadataSeriesSearchSchema>;
+export type MetadataSeriesSearchGet = z.infer<typeof metadataSeriesSearchGetSchema>;
 
-export type MetadataSeriesChanges = z.infer<typeof metadataSeriesChangesSchema>;
+export type MetadataSeriesChangesGet = z.infer<typeof metadataSeriesChangesGetSchema>;

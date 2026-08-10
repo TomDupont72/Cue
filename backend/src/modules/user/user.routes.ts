@@ -6,8 +6,8 @@ import {
   userEpisodeFeedGetResponseSchema,
   userEpisodePostParamsSchema,
   userEpisodePostResponseSchema,
-  userStatusRecalculateSchema,
-  userStatusRecalculateResponseSchema,
+  userStatusPostParamsSchema,
+  userStatusPostResponseSchema,
   userSeasonDeleteParamsSchema,
   userSeasonDeleteResponseSchema,
   userSeasonPostParamsSchema,
@@ -21,16 +21,18 @@ import {
 import {
   userDashboardSummaryController,
   userEpisodeController,
+  userEpisodeFeedController,
   userSeasonController,
   userSeriesController,
   userStatusController
 } from "@/modules/user/user.controller.js";
+import { Tags } from "@/shared/enums/tags.js";
 
 export async function userRoutes(app: AppFastifyInstance) {
   app.get("/series", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"],
+      tags: [Tags.USER],
       querystring: userSeriesGetParamsSchema,
       response: {
         200: userSeriesGetResponseSchema
@@ -42,7 +44,7 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.get("/dashboard/summary", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"],
+      tags: [Tags.USER],
       response: {
         200: userDashboardSummaryGetResponseSchema
       }
@@ -53,7 +55,7 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.post("/series/:seriesId", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"],
+      tags: [Tags.USER],
       params: userSeriesPostParamsSchema,
       body: userSeriesPostBodySchema,
       response: {
@@ -66,18 +68,18 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.get("/episodes/feed", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"],
+      tags: [Tags.USER],
       response: {
         200: userEpisodeFeedGetResponseSchema
       }
     },
-    handler: userEpisodeController.getFeed
+    handler: userEpisodeFeedController.get
   });
 
   app.post("/series/:seriesId/episode/:episodeId", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"],
+      tags: [Tags.USER],
       params: userEpisodePostParamsSchema,
       response: {
         200: userEpisodePostResponseSchema
@@ -89,7 +91,7 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.delete("/series/:seriesId/episode/:episodeId", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"],
+      tags: [Tags.USER],
       params: userEpisodeDeleteParamsSchema,
       response: {
         200: userEpisodeDeleteResponseSchema
@@ -101,7 +103,7 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.post("/series/:seriesId/season/:seasonId", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"],
+      tags: [Tags.USER],
       params: userSeasonPostParamsSchema,
       response: {
         200: userSeasonPostResponseSchema
@@ -113,7 +115,7 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.delete("/series/:seriesId/season/:seasonId", {
     preHandler: [app.requireAuth],
     schema: {
-      tags: ["User"],
+      tags: [Tags.USER],
       params: userSeasonDeleteParamsSchema,
       response: {
         200: userSeasonDeleteResponseSchema
@@ -125,10 +127,10 @@ export async function userRoutes(app: AppFastifyInstance) {
   app.post("/status/:userId/recalculate", {
     preHandler: [app.requireWorker],
     schema: {
-      tags: ["User"],
-      params: userStatusRecalculateSchema,
+      tags: [Tags.USER],
+      params: userStatusPostParamsSchema,
       response: {
-        200: userStatusRecalculateResponseSchema
+        200: userStatusPostResponseSchema
       }
     },
     handler: userStatusController.post
