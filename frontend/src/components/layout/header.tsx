@@ -56,11 +56,11 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+            <InstallAppButton className="hidden md:flex" />
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <>
-                  <InstallAppButton className="hidden md:flex" />
+                  
                   <Button
                     variant="ghost"
                     size="icon"
@@ -72,7 +72,6 @@ export default function Header() {
                       <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
                     </Avatar>
                   </Button>
-                </>
               }
             />
 
