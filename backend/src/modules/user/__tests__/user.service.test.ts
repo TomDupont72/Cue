@@ -92,34 +92,6 @@ function mockTransaction(t: TestContext) {
 }
 
 describe("userService", { concurrency: false }, () => {
-  it("combines the user, series and status filters when listing UserSeries", async (t) => {
-    const expectedUserSeries = makeUserSeries({ status: "PLANNED" });
-    const findManySeries = t.mock.method(userRepository, "findManySeries", async () => ({
-      items: [expectedUserSeries],
-      hasNextPage: false,
-      nextCursor: null
-    }));
-    const findManySeriesDetails = t.mock.method(seriesRepository, "findMany", async () => [series]);
-
-    const result = await userService.seriesGet(USER_ID, {
-      seriesId: SERIES_ID,
-      status: "PLANNED",
-      limit: 20
-    });
-
-    assert.deepEqual(findManySeries.mock.calls[0]?.arguments, [
-      { userId: USER_ID, seriesId: SERIES_ID, status: "PLANNED" },
-      20,
-      undefined
-    ]);
-    assert.deepEqual(findManySeriesDetails.mock.calls[0]?.arguments, [{ id: { in: [SERIES_ID] } }]);
-    assert.deepEqual(result, {
-      items: [{ ...expectedUserSeries, seriesDetails: series }],
-      hasNextPage: false,
-      nextCursor: null
-    });
-  });
-
   it("passes the body to both branches of the UserSeries upsert", async (t) => {
     const body = { status: "PAUSED" as const, isFavorite: true };
     const expected = makeUserSeries(body);

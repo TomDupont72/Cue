@@ -4,7 +4,6 @@ import {
   userEpisodeResponseSchema,
   userSeriesResponseSchema
 } from "@/modules/series/series.schemas.js";
-import { userSeriesCursorTokenSchema } from "./user.pagination.js";
 
 export const userSeriesStatuses = [
   "PLANNED",
@@ -37,7 +36,7 @@ export const userSeriesGetSchema = z.object({
   seriesId: z.coerce.number().int().min(1).optional(),
   status: userSeriesStatusSchema.optional(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
-  cursor: userSeriesCursorTokenSchema.optional()
+  cursor: z.string().optional()
 });
 
 export const userSeasonPostParamsSchema = z.object({
@@ -60,7 +59,7 @@ export const userSeriesGetResponseSchema = z.object({
     })
   ),
   hasNextPage: z.boolean(),
-  nextCursor: z.string().nullable()
+  nextCursor: z.date().nullable()
 });
 
 export const userSeriesPostResponseSchema = userSeriesResponseSchema;
