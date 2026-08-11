@@ -101,7 +101,7 @@ describe("userService", { concurrency: false }, () => {
     }));
     const findManySeriesDetails = t.mock.method(seriesRepository, "findMany", async () => [series]);
 
-    const result = await userService.userSeriesGet(USER_ID, {
+    const result = await userService.seriesGet(USER_ID, {
       seriesId: SERIES_ID,
       status: "PLANNED",
       limit: 20
@@ -125,7 +125,7 @@ describe("userService", { concurrency: false }, () => {
     const expected = makeUserSeries(body);
     const upsertSeries = t.mock.method(userRepository, "upsertSeries", async () => expected);
 
-    const result = await userService.userSeriesPost(USER_ID, { seriesId: SERIES_ID }, body);
+    const result = await userService.seriesPost(USER_ID, { seriesId: SERIES_ID }, body);
 
     assert.equal(result, expected);
     assert.deepEqual(upsertSeries.mock.calls[0]?.arguments, [
@@ -140,7 +140,7 @@ describe("userService", { concurrency: false }, () => {
     const expected = makeUserSeries(body);
     const upsertSeries = t.mock.method(userRepository, "upsertSeries", async () => expected);
 
-    await userService.userSeriesPost(USER_ID, { seriesId: SERIES_ID }, body);
+    await userService.seriesPost(USER_ID, { seriesId: SERIES_ID }, body);
 
     assert.deepEqual(upsertSeries.mock.calls[0]?.arguments, [
       { userId_seriesId: { userId: USER_ID, seriesId: SERIES_ID } },
@@ -172,7 +172,7 @@ describe("userService", { concurrency: false }, () => {
     t.mock.method(userRepository, "updateSeries", async () => makeUserSeries({ watchCount: 1 }));
     t.mock.method(userRepository, "getEpisodeFeedItem", async () => null);
 
-    const result = await userService.userEpisodePost(
+    const result = await userService.episodePost(
       USER_ID,
       { seriesId: SERIES_ID, episodeId: episode.id },
       NOW
@@ -208,7 +208,7 @@ describe("userService", { concurrency: false }, () => {
     t.mock.method(userRepository, "updateSeries", async () => makeUserSeries({ watchCount: 0 }));
     t.mock.method(userRepository, "getEpisodeFeedItem", async () => null);
 
-    await userService.userEpisodePost(USER_ID, { seriesId: SERIES_ID, episodeId: special.id }, NOW);
+    await userService.episodePost(USER_ID, { seriesId: SERIES_ID, episodeId: special.id }, NOW);
 
     assert.deepEqual(incrementSeriesProgress.mock.calls[0]?.arguments.slice(0, 4), [
       USER_ID,
@@ -240,7 +240,7 @@ describe("userService", { concurrency: false }, () => {
     );
     t.mock.method(userRepository, "updateSeries", async () => makeUserSeries({ watchCount: 2 }));
 
-    const result = await userService.userSeasonPost(
+    const result = await userService.seasonPost(
       USER_ID,
       { seriesId: SERIES_ID, seasonId: SEASON_ID },
       NOW
@@ -273,7 +273,7 @@ describe("userService", { concurrency: false }, () => {
       makeUserSeries({ watchCount: 1 })
     );
 
-    const result = await userService.userEpisodeDelete(USER_ID, {
+    const result = await userService.episodeDelete(USER_ID, {
       seriesId: SERIES_ID,
       episodeId: episode.id
     });
@@ -300,7 +300,7 @@ describe("userService", { concurrency: false }, () => {
       makeUserSeries({ watchCount: 1 })
     );
 
-    const result = await userService.userSeasonDelete(USER_ID, {
+    const result = await userService.seasonDelete(USER_ID, {
       seriesId: SERIES_ID,
       seasonId: SEASON_ID
     });
@@ -328,7 +328,7 @@ describe("userService", { concurrency: false }, () => {
       makeUserSeries({ watchCount: 4 })
     );
 
-    await userService.userSeasonDelete(USER_ID, {
+    await userService.seasonDelete(USER_ID, {
       seriesId: SERIES_ID,
       seasonId: SEASON_ID
     });

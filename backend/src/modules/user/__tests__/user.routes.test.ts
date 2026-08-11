@@ -98,31 +98,31 @@ async function buildApp() {
 }
 
 function mockSuccessfulResponses(t: TestContext) {
-  t.mock.method(userService, "userSeriesGet", async () => ({
+  t.mock.method(userService, "seriesGet", async () => ({
     items: [{ ...userSeries, seriesDetails: series }],
     hasNextPage: true,
     nextCursor: USER_SERIES_CURSOR
   }));
-  t.mock.method(userService, "userDashboardSummaryGet", async () => ({
+  t.mock.method(userService, "dashboardSummaryGet", async () => ({
     totalWatchedMinutes: 25,
     totalWatchedEpisodes: 1,
     totalWatchedSeries: 0
   }));
-  t.mock.method(userService, "userSeriesPost", async () => userSeries);
-  t.mock.method(userService, "userEpisodeFeedGet", async () => ({
+  t.mock.method(userService, "seriesPost", async () => userSeries);
+  t.mock.method(userService, "episodeFeedGet", async () => ({
     watching: [feedItem],
     paused: [],
     dropped: []
   }));
-  t.mock.method(userService, "userEpisodePost", async () => ({
+  t.mock.method(userService, "episodePost", async () => ({
     ...userEpisode,
     seriesId: SERIES_ID,
     nextEpisode: feedItem
   }));
-  t.mock.method(userService, "userEpisodeDelete", async () => userEpisode);
-  t.mock.method(userService, "userSeasonPost", async () => [userEpisode]);
-  t.mock.method(userService, "userSeasonDelete", async () => [userEpisode]);
-  t.mock.method(userService, "userStatusRecalculatePost", async () => ({ updatedCount: 1 }));
+  t.mock.method(userService, "episodeDelete", async () => userEpisode);
+  t.mock.method(userService, "seasonPost", async () => [userEpisode]);
+  t.mock.method(userService, "seasonDelete", async () => [userEpisode]);
+  t.mock.method(userService, "statusRecalculatePost", async () => ({ updatedCount: 1 }));
 }
 
 describe("user route response contracts", { concurrency: false }, () => {
@@ -202,7 +202,7 @@ describe("user route response contracts", { concurrency: false }, () => {
   });
 
   it("rejects a response that violates a user route contract", async (t) => {
-    t.mock.method(userService, "userEpisodeDelete", async () => [userEpisode] as never);
+    t.mock.method(userService, "episodeDelete", async () => [userEpisode] as never);
     const app = await buildApp();
     t.after(() => app.close());
 
@@ -215,7 +215,7 @@ describe("user route response contracts", { concurrency: false }, () => {
   });
 
   it("accepts and forwards an opaque pagination cursor", async (t) => {
-    const userSeriesGet = t.mock.method(userService, "userSeriesGet", async () => ({
+    const userSeriesGet = t.mock.method(userService, "seriesGet", async () => ({
       items: [],
       hasNextPage: false,
       nextCursor: null
@@ -239,7 +239,7 @@ describe("user route response contracts", { concurrency: false }, () => {
   });
 
   it("rejects a malformed pagination cursor before calling the service", async (t) => {
-    const userSeriesGet = t.mock.method(userService, "userSeriesGet", async () => ({
+    const userSeriesGet = t.mock.method(userService, "seriesGet", async () => ({
       items: [],
       hasNextPage: false,
       nextCursor: null

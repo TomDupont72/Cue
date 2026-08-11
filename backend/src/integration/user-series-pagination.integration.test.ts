@@ -60,7 +60,7 @@ type PaginationParams = {
   limit: number;
 };
 
-type UserSeriesPage = Awaited<ReturnType<typeof userService.userSeriesGet>>;
+type UserSeriesPage = Awaited<ReturnType<typeof userService.seriesGet>>;
 
 async function removeFixtures() {
   await prisma.user.deleteMany({ where: { id: { in: [USER_ID, OTHER_USER_ID] } } });
@@ -118,7 +118,7 @@ async function paginateAll(
   let cursor: string | undefined;
 
   for (let pageNumber = 0; pageNumber < maxPages; pageNumber += 1) {
-    const page = await userService.userSeriesGet(userId, { ...params, cursor });
+    const page = await userService.seriesGet(userId, { ...params, cursor });
     pages.push(page);
 
     assert.ok(page.items.length <= params.limit);
@@ -285,15 +285,15 @@ describe("user series pagination (PostgreSQL integration)", { concurrency: false
       ]
     });
 
-    const targetResult = await userService.userSeriesGet(USER_ID, {
+    const targetResult = await userService.seriesGet(USER_ID, {
       seriesId: targetSeriesId,
       limit: 20
     });
-    const inaccessibleResult = await userService.userSeriesGet(USER_ID, {
+    const inaccessibleResult = await userService.seriesGet(USER_ID, {
       seriesId: otherUserOnlySeriesId,
       limit: 20
     });
-    const otherUserResult = await userService.userSeriesGet(OTHER_USER_ID, {
+    const otherUserResult = await userService.seriesGet(OTHER_USER_ID, {
       seriesId: otherUserOnlySeriesId,
       limit: 20
     });

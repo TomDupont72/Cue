@@ -5,7 +5,7 @@ import {
   UserSeriesPostBody,
   UserSeriesPostParams,
   UserEpisodeDeleteParams,
-  UserSeriesGetParams,
+  UserSeriesGet,
   UserSeasonPostParams,
   UserSeasonDeleteParams,
   UserStatusPostParams
@@ -99,7 +99,7 @@ async function removeSeriesProgress(
 }
 
 export const userService = {
-  async seriesGet(userId: string, params: UserSeriesGetParams) {
+  async seriesGet(userId: string, params: UserSeriesGet) {
     const { seriesId, status, limit, cursor } = params;
 
     const userSeries = await userRepository.findManySeries(
