@@ -12,7 +12,7 @@ import {
   userSeasonDeleteResponseSchema,
   userSeasonPostParamsSchema,
   userSeasonPostResponseSchema,
-  userSeriesGetParamsSchema,
+  userSeriesGetSchema,
   userSeriesGetResponseSchema,
   userSeriesPostBodySchema,
   userSeriesPostParamsSchema,
@@ -33,7 +33,7 @@ export async function userRoutes(app: AppFastifyInstance) {
     preHandler: [app.requireAuth],
     schema: {
       tags: [Tags.USER],
-      querystring: userSeriesGetParamsSchema,
+      querystring: userSeriesGetSchema,
       response: {
         200: userSeriesGetResponseSchema
       }

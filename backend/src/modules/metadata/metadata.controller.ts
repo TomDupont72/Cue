@@ -10,7 +10,7 @@ export const metadataSeriesSearchController = {
     request: FastifyRequest<{ Querystring: MetadataSeriesSearchGet }>,
     reply: FastifyReply
   ) {
-    const results = await metadataService.metadataSeriesSearch(request.query);
+    const results = await metadataService.seriesSearchGet(request.query);
 
     return reply.send(results);
   }
@@ -21,7 +21,7 @@ export const metadataSeriesChangesController = {
     request: FastifyRequest<{ Querystring: MetadataSeriesChangesGet }>,
     reply: FastifyReply
   ) {
-    const results = await metadataService.metadataSeriesChanges(request.query);
+    const results = await metadataService.seriesChangesGet(request.query);
 
     return reply.send(results);
   }

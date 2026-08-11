@@ -99,7 +99,7 @@ async function removeSeriesProgress(
 }
 
 export const userService = {
-  async userSeriesGet(userId: string, params: UserSeriesGetParams) {
+  async seriesGet(userId: string, params: UserSeriesGetParams) {
     const { seriesId, status, limit, cursor } = params;
 
     const userSeries = await userRepository.findManySeries(
@@ -132,7 +132,7 @@ export const userService = {
     };
   },
 
-  async userEpisodeFeedGet(userId: string) {
+  async episodeFeedGet(userId: string) {
     const episodes = await userRepository.getEpisodesFeed(userId);
 
     return {
@@ -142,7 +142,7 @@ export const userService = {
     };
   },
 
-  async userSeriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
+  async seriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
     const userSeries = await userRepository.upsertSeries(
       { userId_seriesId: { userId, ...params } },
       { userId, ...params, ...body },
@@ -152,7 +152,7 @@ export const userService = {
     return userSeries;
   },
 
-  async userEpisodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
+  async episodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -222,7 +222,7 @@ export const userService = {
     });
   },
 
-  async userEpisodeDelete(userId: string, params: UserEpisodeDeleteParams) {
+  async episodeDelete(userId: string, params: UserEpisodeDeleteParams) {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -266,7 +266,7 @@ export const userService = {
     });
   },
 
-  async userSeasonPost(userId: string, params: UserSeasonPostParams, now = new Date()) {
+  async seasonPost(userId: string, params: UserSeasonPostParams, now = new Date()) {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -320,7 +320,7 @@ export const userService = {
     });
   },
 
-  async userSeasonDelete(userId: string, params: UserSeasonDeleteParams) {
+  async seasonDelete(userId: string, params: UserSeasonDeleteParams) {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -375,13 +375,13 @@ export const userService = {
     });
   },
 
-  async userDashboardSummaryGet(userId: string) {
+  async dashboardSummaryGet(userId: string) {
     const summary = await userRepository.getDashboardSummary(userId);
 
     return summary;
   },
 
-  async userStatusRecalculatePost(params: UserStatusPostParams, now = new Date()) {
+  async statusRecalculatePost(params: UserStatusPostParams, now = new Date()) {
     const inactiveSince = new Date(now);
     inactiveSince.setUTCMonth(inactiveSince.getUTCMonth() - 2);
 
