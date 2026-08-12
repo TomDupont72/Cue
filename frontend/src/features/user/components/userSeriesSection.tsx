@@ -48,8 +48,8 @@ export function UserSeriesSection({ status }: UserSeriesSectionProps) {
       <div className="h-px w-full bg-border" />
 
       <SeriesDisplay
-        seriesData={items.map((item) => item.seriesDetails)}
-        userSeriesData={items}
+        series={items.map((item) => item.seriesDetails)}
+        userSeries={items}
         isProgress
       />
 

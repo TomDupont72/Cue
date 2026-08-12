@@ -15,7 +15,9 @@ export type SeriesSearchGetResult = {
   posterPath: string | null;
   backdropPath: string | null;
   firstAirDate: string | null;
-  voteAverage: number;
+  popularity: number;
+  voteAverage?: number;
+  numberOfEpisodes: number;
 };
 
 export type SeriesSearchGetResponse = {
@@ -104,3 +106,11 @@ export type SeriesImportPostResponse = {
   series: SeriesGetSeries;
   userSeries: SeriesGetUserSeries | null;
 };
+
+export type SeriesDisplaySeries = {
+    tmdbId: number,
+    name: string,
+    firstAirDate: string | null;
+    posterPath: string | null;
+    numberOfEpisodes: number;
+}

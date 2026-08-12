@@ -5,10 +5,11 @@ import type { SeriesCardData } from "../types/series.types";
 import { getYear } from "@/lib/utils";
 import StatusProgressBar from "@/features/user/components/statusProgressBar";
 import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
+import { useNavigate } from "react-router-dom";
 
 type SeriesCardProps = {
   series: SeriesCardData;
-  onClick?: (series: SeriesCardData) => void;
+  seriesId?: number;
   isProgress?: boolean;
   status?: UserSeriesStatus;
   watchProgress?: number;
@@ -16,7 +17,7 @@ type SeriesCardProps = {
 
 export function SeriesCard({
   series,
-  onClick,
+  seriesId,
   isProgress = false,
   status,
   watchProgress
@@ -24,10 +25,23 @@ export function SeriesCard({
   const posterUrl = getTmdbImageUrl(series.posterPath);
   const year = getYear(series.firstAirDate);
 
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (seriesId) {
+        navigate(`/series?id=${seriesId}`);
+    } else {
+        navigate("/series", {
+        state: {
+        tmdbId: series.tmdbId
+        }})
+    }
+  }
+
   return (
     <Card
       className="group cursor-pointer overflow-hidden p-0 transition-transform hover:-translate-y-1 hover:shadow-md"
-      onClick={() => onClick?.(series)}
+      onClick={handleClick}
     >
       <div className="overflow-hidden rounded-xl bg-muted">
         <div className="aspect-[2/3]">
