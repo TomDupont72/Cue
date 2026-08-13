@@ -18,11 +18,7 @@ export default function Series() {
   const tmdbId = location.state?.tmdbId as number | undefined;
 
   const seriesQuery = useSeries(seriesId);
-  const seriesImportMutation = useSeriesImport()
-
-  if (!seriesId && tmdbId === undefined) {
-    return <ErrorState error="Requête invalide" />;
-  }
+  const seriesImportMutation = useSeriesImport();
 
   useEffect(() => {
     if (seriesId || tmdbId === undefined) {
@@ -30,11 +26,15 @@ export default function Series() {
     }
 
     seriesImportMutation.mutate(tmdbId);
-  }, [seriesId, tmdbId]);
-
-  type SeriesView = "overview" | "details";
+  }, [seriesId, tmdbId, seriesImportMutation]);
 
   const [view, setView] = useState<SeriesView>("overview");
+
+  if (!seriesId && tmdbId === undefined) {
+    return <ErrorState error="Requête invalide" />;
+  }
+
+  type SeriesView = "overview" | "details";
 
   if (seriesQuery.isPending) {
     return <LoadingState />;

@@ -7,7 +7,7 @@ import type { UserSeasonPostParams } from "@/features/user/schemas/user.schemas"
 import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
 import { userCachePolicy } from "@/features/user/cache/userCachePolicy";
 
-export function useUserSeasonPost() {
+export function useUserSeasonMutation() {
   return useOptimisticMutation<
     UserSeasonPostResponse,
     Error,

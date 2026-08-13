@@ -2,7 +2,7 @@ import { LoadingState } from "@/components/feedback/loadingState";
 import SeriesDisplay from "@/features/series/components/seriesDisplay";
 import { useEffect, useRef } from "react";
 import { STATUS_TEXT_MAPPING, type UserSeriesStatus } from "../constants/userSeriesStatus";
-import { useUserSeries } from "../hooks/useUserSeriesGet";
+import { useUserSeries } from "../hooks/useUserSeries";
 
 type UserSeriesSectionProps = {
   status: UserSeriesStatus;

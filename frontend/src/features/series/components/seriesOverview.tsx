@@ -7,7 +7,7 @@ import StatusBadge from "@/features/user/components/statusBadge";
 import type { SeriesGetSeries, SeriesGetUserSeries } from "../types/series.types";
 import StatusProgressBar from "@/features/user/components/statusProgressBar";
 import SeriesProductionBadge from "./seriesProductionBadge";
-import { useUserSeriesPost } from "@/features/user/hooks/useUserSeriesPost";
+import { useUserSeriesMutation } from "@/features/user/hooks/useUserSeriesMutation";
 
 type SeriesOverviewProps = {
   series: SeriesGetSeries;
@@ -26,7 +26,7 @@ export function SeriesOverview({
   const startYear = getYear(series.firstAirDate);
   const endYear = getYear(series.lastAirDate);
 
-  const userSeriesPostMutation = useUserSeriesPost();
+  const userSeriesPostMutation = useUserSeriesMutation();
 
   return (
     <Card className="group overflow-hidden p-0">

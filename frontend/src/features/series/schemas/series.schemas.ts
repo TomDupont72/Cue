@@ -24,8 +24,6 @@ export const seriesSearchGetParamsSchema = z.object({
   page: seriesSearchPageSchema
 });
 
-export type SeriesSearchParams = z.infer<typeof seriesSearchGetParamsSchema>;
-
 export const seriesGetParamsSchema = z.object({
   id: positiveIntegerSchema
 });

@@ -2,7 +2,7 @@ import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/
 import type { SeriesGetEpisode, SeriesGetSeason } from "@/features/series/types/series.types";
 import EpisodeCard from "@/features/episode/components/episodeCard";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
-import { useUserSeasonPost } from "@/features/user/hooks/useUserSeasonPost";
+import { useUserSeasonMutation } from "@/features/user/hooks/useUserSeasonMutation";
 import { useUserSeasonDelete } from "@/features/user/hooks/useUserSeasonDelete";
 import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
 
@@ -25,7 +25,7 @@ export default function SeasonCard({
     watchedEpisodeIds.has(episode.id)
   ).length;
 
-  const userSeasonPostMutation = useUserSeasonPost();
+  const userSeasonPostMutation = useUserSeasonMutation();
   const userSeasonDeleteMutation = useUserSeasonDelete();
 
   function handleCheckedChange(checked: boolean) {

@@ -9,6 +9,6 @@ export function useSeries(id: number) {
   return useQuery({
     queryKey: queryKeys.series.detail(id),
     queryFn: parsedParams.success ? () => seriesGet(parsedParams.data.id) : skipToken,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000
   });
 }

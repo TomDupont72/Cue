@@ -29,14 +29,15 @@ export function SeriesCard({
 
   const handleClick = () => {
     if (seriesId) {
-        navigate(`/series?id=${seriesId}`);
+      navigate(`/series?id=${seriesId}`);
     } else {
-        navigate("/series", {
+      navigate("/series", {
         state: {
-        tmdbId: series.tmdbId
-        }})
+          tmdbId: series.tmdbId
+        }
+      });
     }
-  }
+  };
 
   return (
     <Card

@@ -108,9 +108,9 @@ export type SeriesImportPostResponse = {
 };
 
 export type SeriesDisplaySeries = {
-    tmdbId: number,
-    name: string,
-    firstAirDate: string | null;
-    posterPath: string | null;
-    numberOfEpisodes: number;
-}
+  tmdbId: number;
+  name: string;
+  firstAirDate: string | null;
+  posterPath: string | null;
+  numberOfEpisodes: number;
+};

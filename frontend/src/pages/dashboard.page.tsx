@@ -4,7 +4,7 @@ import { Container } from "@/components/layout/container";
 import UserDashboardSummaryWidget from "@/features/user/components/userDashboardSummaryWidget";
 import { UserSeriesSection } from "@/features/user/components/userSeriesSection";
 import { USER_SERIES_STATUS } from "@/features/user/constants/userSeriesStatus";
-import { useDashboardSummary } from "@/features/user/hooks/useDashboardSummary";
+import { useUserDashboardSummary } from "@/features/user/hooks/useUserDashboardSummary";
 import { queryKeys } from "@/lib/queryKeys";
 import { useIsFetching } from "@tanstack/react-query";
 
@@ -14,7 +14,7 @@ export default function Dashboard() {
     predicate: (query) => query.state.data === undefined
   });
 
-  const dashboardSummaryQuery = useDashboardSummary();
+  const dashboardSummaryQuery = useUserDashboardSummary();
 
   const isPending = initialFetchingCount > 0 || dashboardSummaryQuery.isPending;
 
