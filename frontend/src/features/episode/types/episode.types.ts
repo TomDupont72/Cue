@@ -1,3 +1,29 @@
+// =============================================================================
+// DATABASE ROW TYPES
+// =============================================================================
+
+export type EpisodeRow = {
+  id: number;
+  seriesId: number;
+  seasonId: number;
+  airDate?: string;
+  episodeNumber: number;
+  name: string;
+  overview?: string;
+  tmdbId: number;
+  stillPath?: string;
+  runtime: number;
+  seasonNumber: number;
+  voteAverge: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// =============================================================================
+// COMPONENT TYPES
+// =============================================================================
+
+
 export type EpisodeCardEpisode = {
   id: number;
   airDate: string | null;

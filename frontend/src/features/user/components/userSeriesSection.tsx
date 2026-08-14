@@ -1,7 +1,7 @@
 import { LoadingState } from "@/components/feedback/loadingState";
 import SeriesDisplay from "@/features/series/components/seriesDisplay";
 import { useEffect, useRef } from "react";
-import { STATUS_TEXT_MAPPING, type UserSeriesStatus } from "../constants/userSeriesStatus";
+import { USER_SERIES_STATUS_LABELS, type UserSeriesStatus } from "../constants/userSeriesStatus";
 import { useUserSeries } from "../hooks/useUserSeries";
 
 type UserSeriesSectionProps = {
@@ -43,7 +43,7 @@ export function UserSeriesSection({ status }: UserSeriesSectionProps) {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold">{STATUS_TEXT_MAPPING[status]}</h2>
+      <h2 className="text-lg font-bold">{USER_SERIES_STATUS_LABELS[status]}</h2>
 
       <div className="h-px w-full bg-border" />
 
