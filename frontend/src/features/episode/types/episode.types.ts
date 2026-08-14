@@ -2,6 +2,9 @@
 // DATABASE ROW TYPES
 // =============================================================================
 
+import type { SeriesRow } from "@/features/series/types/series.types";
+import type { Optional } from "@/lib/types";
+
 export type EpisodeRow = {
   id: number;
   seriesId: number;
@@ -23,18 +26,12 @@ export type EpisodeRow = {
 // COMPONENT TYPES
 // =============================================================================
 
-export type EpisodeCardEpisode = {
-  id: number;
-  airDate: string | null;
-  episodeNumber: number;
-  name: string;
-  overview?: string | null;
-  stillPath: string | null;
-  seasonNumber: number;
-};
+export type EpisodeCardEpisode = Pick<
+  EpisodeRow,
+  "id" | "airDate" | "episodeNumber" | "name" | "overview" | "stillPath" | "seasonNumber"
+>;
 
-export type EpisodeCardSeries = {
-  id: number;
-  name?: string;
-  tmdbId?: number;
-};
+export type EpisodeCardSeries = Optional<
+  Pick<SeriesRow, "id" | "name" | "tmdbId">,
+  "name" | "tmdbId"
+>;

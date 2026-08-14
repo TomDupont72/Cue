@@ -3,9 +3,9 @@ import { useSearchParams } from "react-router-dom";
 import { EmptyState } from "@/components/feedback/emptyState";
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
-import { useSeriesSearch } from "../hooks/useSeriesSearch";
+import { useSeriesSearch } from "@/features/series/hooks/useSeriesSearch";
 import Paginator from "@/components/layout/paginator";
-import SeriesDisplay from "./seriesDisplay";
+import SeriesDisplay from "@/features/series/components/seriesDisplay";
 
 export function SeriesSearchResults() {
   const [searchParams, setSearchParams] = useSearchParams();

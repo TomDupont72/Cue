@@ -1,9 +1,9 @@
 import { LoadingState } from "@/components/feedback/loadingState";
-import { useSeries } from "../hooks/useSeries";
+import { useSeries } from "@/features/series/hooks/useSeries";
 import { ErrorState } from "@/components/feedback/errorState";
-import type { SeriesGetEpisode } from "../types/series.types";
-import SeasonCard from "../../season/components/seasonCard";
+import SeasonCard from "@/features/season/components/seasonCard";
 import { Accordion } from "@/components/ui/accordion";
+import type { EpisodeRow } from "@/features/episode/types/episode.types";
 
 type SeriesDetailsProps = {
   id: number;
@@ -24,7 +24,7 @@ export default function SeriesDetails({ id }: SeriesDetailsProps) {
 
   const sortedEpisodes = [...episodes].sort((a, b) => a.episodeNumber - b.episodeNumber);
 
-  const episodesBySeason = sortedEpisodes.reduce<Record<number, SeriesGetEpisode[]>>(
+  const episodesBySeason = sortedEpisodes.reduce<Record<number, EpisodeRow[]>>(
     (acc, episode) => {
       acc[episode.seasonNumber] ??= [];
       acc[episode.seasonNumber].push(episode);

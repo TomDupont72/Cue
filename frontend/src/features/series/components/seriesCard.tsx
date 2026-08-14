@@ -1,14 +1,14 @@
 import { ImageOff } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTmdbImageUrl } from "@/lib/tmdbImage";
-import type { SeriesCardData } from "../types/series.types";
+import type { SeriesCardSeries } from "@/features/series/types/series.types";
 import { getYear } from "@/lib/utils";
 import StatusProgressBar from "@/features/user/components/statusProgressBar";
 import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
 import { useNavigate } from "react-router-dom";
 
 type SeriesCardProps = {
-  series: SeriesCardData;
+  series: SeriesCardSeries;
   seriesId?: number;
   isProgress?: boolean;
   status?: UserSeriesStatus;

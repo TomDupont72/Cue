@@ -1,8 +1,8 @@
-import type { UserEpisodesFeedGetItem, UserEpisodesFeedGetResponse } from "../types/user.types";
+import type { UserEpisodesFeedGetResponse } from "@/features/user/types/user.types";
 
 function preserveSectionOrder(
-  previous: UserEpisodesFeedGetItem[],
-  next: UserEpisodesFeedGetItem[]
+  previous: UserEpisodesFeedGetResponse["watching"],
+  next: UserEpisodesFeedGetResponse["watching"]
 ) {
   const nextBySeriesId = new Map(next.map((item) => [item.seriesId, item]));
   const previousIds = new Set(previous.map((item) => item.seriesId));

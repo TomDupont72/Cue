@@ -1,6 +1,7 @@
 import type { EpisodeRow } from "@/features/episode/types/episode.types";
 import type { SeasonRow } from "@/features/season/types/season.types";
 import type { UserEpisodeRow, UserSeriesRow } from "@/features/user/types/user.types";
+import type { Optional } from "@/lib/types";
 
 // =============================================================================
 // DATABASE ROW TYPES
@@ -32,10 +33,10 @@ export type SeriesRow = {
 
 export type SeriesGetResponse = {
   series: SeriesRow;
-  seasons: SeasonRow;
-  episodes: EpisodeRow;
+  seasons: SeasonRow[];
+  episodes: EpisodeRow[];
   userSeries: UserSeriesRow;
-  userEpisodes: UserEpisodeRow;
+  userEpisodes: UserEpisodeRow[];
 };
 
 export type SeriesImportPostResponse = {
@@ -47,17 +48,9 @@ export type SeriesImportPostResponse = {
 // COMPONENT TYPES
 // =============================================================================
 
-export type SeriesCardSeries = {
-  tmdbId: number;
-  name: string;
-  posterPath: string | null;
-  firstAirDate: string | null;
-};
+export type SeriesCardSeries = Pick<SeriesRow, "tmdbId" | "name" | "posterPath" | "firstAirDate">;
 
-export type SeriesDisplaySeries = {
-  tmdbId: number;
-  name: string;
-  firstAirDate: string | null;
-  posterPath: string | null;
-  numberOfEpisodes: number;
-};
+export type SeriesDisplaySeries = Optional<Pick<
+  SeriesRow,
+  "tmdbId" | "name" | "posterPath" | "firstAirDate" | "numberOfEpisodes"
+>, "numberOfEpisodes">;

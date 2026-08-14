@@ -1,7 +1,7 @@
 import { skipToken, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/queryKeys";
-import { seriesSearchGet } from "../api/series.api";
-import { seriesSearchGetParamsSchema } from "../schemas/series.schemas";
+import { seriesSearchGet } from "@/features/series/api/series.api";
+import { seriesSearchGetParamsSchema } from "@/features/series/schemas/series.schemas";
 
 export function useSeriesSearch(query: string, page: number) {
   const normalizedQuery = query.trim();

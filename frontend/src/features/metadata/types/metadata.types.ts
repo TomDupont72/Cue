@@ -6,7 +6,7 @@ import type { SeriesRow } from "@/features/series/types/series.types";
 
 export type MetadataSeriesSearchGetResponse = {
   page: number;
-  results: Pick<
+  results: (Pick<
     SeriesRow,
     | "tmdbId"
     | "name"
@@ -18,7 +18,7 @@ export type MetadataSeriesSearchGetResponse = {
     | "originalLanguage"
   > & {
     voteAverage: number;
-  };
+  })[];
   totalPages: number;
   totalResults: number;
 };

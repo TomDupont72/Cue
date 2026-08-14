@@ -4,14 +4,15 @@ import { ImageOff } from "lucide-react";
 import { getYear } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/features/user/components/statusBadge";
-import type { SeriesGetSeries, SeriesGetUserSeries } from "../types/series.types";
+import type { SeriesRow } from "@/features/series/types/series.types";
 import StatusProgressBar from "@/features/user/components/statusProgressBar";
-import SeriesProductionBadge from "./seriesProductionBadge";
+import SeriesProductionBadge from "@/features/series/components/seriesProductionBadge";
 import { useUserSeriesMutation } from "@/features/user/hooks/useUserSeriesMutation";
+import type { UserSeriesRow } from "@/features/user/types/user.types";
 
 type SeriesOverviewProps = {
-  series: SeriesGetSeries;
-  userSeries: SeriesGetUserSeries | null;
+  series: SeriesRow;
+  userSeries?: UserSeriesRow;
   isProgress?: boolean;
   watchProgress?: number;
 };

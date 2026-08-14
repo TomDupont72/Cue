@@ -25,7 +25,7 @@ export default function SeriesDisplay({
       {series.map((data) => {
         const userData = userSeries.find((item) => item.seriesDetails.tmdbId === data.tmdbId);
 
-        const watchProgress = userData
+        const watchProgress = userData && data.numberOfEpisodes
           ? (userData.watchCount / data.numberOfEpisodes) * 100
           : undefined;
 

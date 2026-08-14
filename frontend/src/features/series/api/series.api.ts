@@ -2,17 +2,17 @@ import { apiClient } from "@/api/client";
 import type {
   SeriesGetResponse,
   SeriesImportPostResponse,
-  SeriesSearchGetResponse
-} from "../types/series.types";
-import type { SeriesImportPostBody } from "../schemas/series.schemas";
+} from "@/features/series/types/series.types";
+import type { SeriesImportPostBody } from "@/features/series/schemas/series.schemas";
 import {
   seriesGetParamsSchema,
   seriesImportPostBodySchema,
   seriesSearchGetParamsSchema
-} from "../schemas/series.schemas";
+} from "@/features/series/schemas/series.schemas";
+import type { MetadataSeriesSearchGetResponse } from "@/features/metadata/types/metadata.types";
 
-export function seriesSearchGet(query: string, page: number): Promise<SeriesSearchGetResponse> {
-  return apiClient<SeriesSearchGetResponse>("/metadata/series/search", {
+export function seriesSearchGet(query: string, page: number): Promise<MetadataSeriesSearchGetResponse> {
+  return apiClient<MetadataSeriesSearchGetResponse>("/metadata/series/search", {
     query: {
       query,
       page
