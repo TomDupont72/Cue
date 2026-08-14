@@ -24,15 +24,12 @@ export default function SeriesDetails({ id }: SeriesDetailsProps) {
 
   const sortedEpisodes = [...episodes].sort((a, b) => a.episodeNumber - b.episodeNumber);
 
-  const episodesBySeason = sortedEpisodes.reduce<Record<number, EpisodeRow[]>>(
-    (acc, episode) => {
-      acc[episode.seasonNumber] ??= [];
-      acc[episode.seasonNumber].push(episode);
+  const episodesBySeason = sortedEpisodes.reduce<Record<number, EpisodeRow[]>>((acc, episode) => {
+    acc[episode.seasonNumber] ??= [];
+    acc[episode.seasonNumber].push(episode);
 
-      return acc;
-    },
-    {}
-  );
+    return acc;
+  }, {});
 
   const watchedEpisodeIds = new Set(userEpisodes.map((userEpisode) => userEpisode.episodeId));
 

@@ -50,7 +50,7 @@ export type SeriesImportPostResponse = {
 
 export type SeriesCardSeries = Pick<SeriesRow, "tmdbId" | "name" | "posterPath" | "firstAirDate">;
 
-export type SeriesDisplaySeries = Optional<Pick<
-  SeriesRow,
-  "tmdbId" | "name" | "posterPath" | "firstAirDate" | "numberOfEpisodes"
->, "numberOfEpisodes">;
+export type SeriesDisplaySeries = Optional<
+  Pick<SeriesRow, "tmdbId" | "name" | "posterPath" | "firstAirDate" | "numberOfEpisodes">,
+  "numberOfEpisodes"
+>;
