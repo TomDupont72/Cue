@@ -23,7 +23,6 @@ export type EpisodeRow = {
 // COMPONENT TYPES
 // =============================================================================
 
-
 export type EpisodeCardEpisode = {
   id: number;
   airDate: string | null;
