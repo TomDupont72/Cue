@@ -12,7 +12,7 @@ import type { UserSeriesRow } from "@/features/user/types/user.types";
 
 type SeriesOverviewProps = {
   series: SeriesRow;
-  userSeries?: UserSeriesRow;
+  userSeries: UserSeriesRow | null;
   isProgress?: boolean;
   watchProgress?: number;
 };

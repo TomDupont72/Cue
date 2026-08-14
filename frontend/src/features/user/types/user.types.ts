@@ -28,12 +28,15 @@ export type UserSeriesRow = {
 
 export type UserEpisodePostResponse = UserEpisodeRow & {
   seriesId: number;
-  nextEpisode?: Omit<UserSeriesRow, "isFavorite" | "watchCount" | "addedAt"> &
-    Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
-      seriesName: string;
-      seriesPosterPath: string;
-      seriesTmdbId: string;
-    };
+  nextEpisode:
+    | (Omit<UserSeriesRow, "isFavorite" | "watchCount" | "addedAt"> &
+        Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
+          seriesName: string;
+          seriesPosterPath: string | null;
+          seriesTmdbId: number;
+          remainingEpisodes: number;
+        })
+    | null;
 };
 
 export type UserEpisodeDeleteResponse = UserEpisodeRow;
@@ -47,7 +50,7 @@ export type UserSeriesGetResponse = {
     seriesDetails: SeriesRow;
   })[];
   hasNextPage: boolean;
-  nextCursor?: string;
+  nextCursor: string | null;
 };
 
 export type UserSeriesPostResponse = UserSeriesRow;
@@ -66,9 +69,9 @@ export type UserEpisodesFeed<T> = {
 
 export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
   Omit<UserSeriesRow, "isFavorite" | "watchCount" | "addedAt"> &
-    Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverge" | "createdAt" | "updatedAt"> & {
+    Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
       seriesName: string;
-      seriesPosterPath?: string;
+      seriesPosterPath: string | null;
       seriesTmdbId: number;
       remainingEpisodes: number;
     }

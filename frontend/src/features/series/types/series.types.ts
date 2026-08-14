@@ -35,13 +35,13 @@ export type SeriesGetResponse = {
   series: SeriesRow;
   seasons: SeasonRow[];
   episodes: EpisodeRow[];
-  userSeries: UserSeriesRow;
+  userSeries: UserSeriesRow | null;
   userEpisodes: UserEpisodeRow[];
 };
 
 export type SeriesImportPostResponse = {
   series: SeriesRow;
-  userSeries: UserSeriesRow;
+  userSeries: UserSeriesRow | null;
 };
 
 // =============================================================================
