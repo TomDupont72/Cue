@@ -5,11 +5,7 @@ function getUtcDayTimestamp(date: Date) {
   return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 }
 
-function getAirDateUtcDayTimestamp(airDate?: string) {
-  if (!airDate) {
-    return null;
-  }
-
+function getAirDateUtcDayTimestamp(airDate: string) {
   const match = AIR_DATE_PATTERN.exec(airDate);
 
   if (!match || (airDate.length > 10 && Number.isNaN(Date.parse(airDate)))) {
@@ -32,7 +28,7 @@ function getAirDateUtcDayTimestamp(airDate?: string) {
 }
 
 export function getEpisodeReleaseDayDifference(
-  airDate?: string,
+  airDate: string | null,
   now: Date = new Date()
 ): number | null {
   if (airDate === null) {
@@ -48,7 +44,7 @@ export function getEpisodeReleaseDayDifference(
   return (airDateTimestamp - getUtcDayTimestamp(now)) / MILLISECONDS_PER_DAY;
 }
 
-export function isEpisodeReleased(airDate?: string, now: Date = new Date()) {
+export function isEpisodeReleased(airDate: string | null, now: Date = new Date()) {
   const remainingDays = getEpisodeReleaseDayDifference(airDate, now);
 
   return remainingDays !== null && remainingDays <= 0;

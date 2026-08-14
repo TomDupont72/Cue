@@ -19,7 +19,7 @@ export type UserSeriesRow = {
   isFavorite: boolean;
   watchCount: number;
   addedAt: string;
-  lastWatchedAt?: string;
+  lastWatchedAt: string | null;
 };
 
 // =============================================================================

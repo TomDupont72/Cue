@@ -7,11 +7,11 @@ import type { EpisodeRow } from "@/features/episode/types/episode.types";
 export type SeasonRow = {
   id: number;
   seriesId: number;
-  airDate?: string;
+  airDate: string | null;
   name: string;
-  overview?: string;
+  overview: string | null;
   tmdbId: number;
-  posterPath?: string;
+  posterPath: string | null;
   seasonNumber: number;
   voteAverage: number;
   createdAt: string;
@@ -26,5 +26,5 @@ export type SeasonCardSeason = Pick<SeasonRow, "id" | "seasonNumber">;
 
 export type SeasonCardEpisode = Pick<
   EpisodeRow,
-  "id" | "airDate" | "name" | "episodeNumber" | "seasonNumber"
+  "id" | "airDate" | "name" | "episodeNumber" | "seasonNumber" | "stillPath" | "overview"
 >;
