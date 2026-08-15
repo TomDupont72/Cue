@@ -9,6 +9,7 @@ import StatusProgressBar from "@/features/user/components/statusProgressBar";
 import SeriesProductionBadge from "@/features/series/components/seriesProductionBadge";
 import { useUserSeriesMutation } from "@/features/user/hooks/useUserSeriesMutation";
 import type { UserSeriesRow } from "@/features/user/types/user.types";
+import { useTranslation } from "react-i18next";
 
 type SeriesOverviewProps = {
   series: SeriesRow;
@@ -23,6 +24,8 @@ export function SeriesOverview({
   isProgress = false,
   watchProgress
 }: SeriesOverviewProps) {
+  const { t } = useTranslation();
+
   const backdropUrl = getTmdbImageUrl(series.backdropPath, "original");
   const startYear = getYear(series.firstAirDate);
   const endYear = getYear(series.lastAirDate);
@@ -56,9 +59,9 @@ export function SeriesOverview({
             {userSeries ? <StatusBadge status={userSeries.status} /> : null}
           </div>
           <p className="text-muted-foreground">
-            {startYear} - {series.inProduction ? "présent" : endYear} • {series.numberOfSeasons}{" "}
-            saison{series.numberOfSeasons > 1 ? "s" : ""} • {series.numberOfEpisodes} épisode
-            {series.numberOfEpisodes > 1 ? "s" : ""}
+            {startYear} - {series.inProduction ? t("series:dates.present") : endYear} •{" "}
+            {t("series:season", { count: series.numberOfSeasons })} •{" "}
+            {t("series:episode", { count: series.numberOfEpisodes })}
           </p>
         </div>
         <p>{series.overview}</p>
@@ -71,7 +74,7 @@ export function SeriesOverview({
             className="h-full w-full p-1 rounded-none text-lg"
             onClick={() => userSeriesPostMutation.mutate({ seriesId: series.id }, {})}
           >
-            Ajouter la série
+            {t("series:actions.addSeries").toUpperCase()}
           </Button>
         ) : null}
       </div>

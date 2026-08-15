@@ -8,11 +8,13 @@ import { SeriesOverview } from "@/features/series/components/seriesOverview";
 import { useSeries } from "@/features/series/hooks/useSeries";
 import { useSeriesImport } from "@/features/series/hooks/useSeriesImportMutation";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useSearchParams } from "react-router-dom";
 
 export default function Series() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const seriesId = Number(searchParams.get("id")?.trim() ?? "");
   const tmdbId = location.state?.tmdbId as number | undefined;
@@ -60,7 +62,7 @@ export default function Series() {
             onClick={() => setView("overview")}
             className="text-lg font-bold"
           >
-            À PROPOS
+            {t("series:tabs.about").toUpperCase()}
           </Button>
 
           <Button
@@ -68,7 +70,7 @@ export default function Series() {
             onClick={() => setView("details")}
             className="text-lg font-bold"
           >
-            ÉPISODES
+            {t("series:tabs.episodes").toUpperCase()}
           </Button>
         </div>
 

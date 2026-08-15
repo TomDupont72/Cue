@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthForm, type AuthMode } from "@/features/auth/hooks/useAuthForm";
+import { useTranslation } from "react-i18next";
 
 type FieldProps = React.ComponentProps<typeof Input> & {
   label: string;
@@ -35,6 +36,7 @@ export function AuthForm() {
     signIn,
     signUp
   } = useAuthForm();
+  const { t } = useTranslation();
 
   return (
     <Card className="w-full max-w-md shadow-xl shadow-black/5">
@@ -45,8 +47,8 @@ export function AuthForm() {
           className="gap-5"
         >
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sign-in">Connexion</TabsTrigger>
-            <TabsTrigger value="sign-up">Inscription</TabsTrigger>
+            <TabsTrigger value="sign-in">{t("user:auth.tabs.login")}</TabsTrigger>
+            <TabsTrigger value="sign-up">{t("user:auth.tabs.register")}</TabsTrigger>
           </TabsList>
 
           {error && (
@@ -63,7 +65,7 @@ export function AuthForm() {
             <form className="grid gap-4" onSubmit={signIn}>
               <Field
                 id="sign-in-email"
-                label="Email"
+                label={t("user:auth.fields.email")}
                 type="email"
                 autoComplete="email"
                 value={signInValues.email}
@@ -74,7 +76,7 @@ export function AuthForm() {
               />
               <Field
                 id="sign-in-password"
-                label="Mot de passe"
+                label={t("user:auth.fields.password")}
                 type="password"
                 autoComplete="current-password"
                 value={signInValues.password}
@@ -85,7 +87,7 @@ export function AuthForm() {
               />
               <Button type="submit" className="mt-1 w-full" disabled={isPending}>
                 {isPending && <Spinner />}
-                Se connecter
+                {t("user:auth.actions.login")}
               </Button>
             </form>
           </TabsContent>
@@ -94,7 +96,7 @@ export function AuthForm() {
             <form className="grid gap-4" onSubmit={signUp}>
               <Field
                 id="sign-up-name"
-                label="Nom"
+                label={t("user:auth.fields.name")}
                 autoComplete="name"
                 value={signUpValues.name}
                 onChange={(event) =>
@@ -104,7 +106,7 @@ export function AuthForm() {
               />
               <Field
                 id="sign-up-email"
-                label="Email"
+                label={t("user:auth.fields.email")}
                 type="email"
                 autoComplete="email"
                 value={signUpValues.email}
@@ -115,7 +117,7 @@ export function AuthForm() {
               />
               <Field
                 id="sign-up-password"
-                label="Mot de passe"
+                label={t("user:auth.fields.password")}
                 type="password"
                 autoComplete="new-password"
                 minLength={8}
@@ -127,7 +129,7 @@ export function AuthForm() {
               />
               <Field
                 id="sign-up-password-confirmation"
-                label="Confirmer le mot de passe"
+                label={t("user:auth.fields.confirmPassword")}
                 type="password"
                 autoComplete="new-password"
                 minLength={8}
@@ -142,7 +144,7 @@ export function AuthForm() {
               />
               <Button type="submit" className="mt-1 w-full" disabled={isPending}>
                 {isPending && <Spinner />}
-                Créer mon compte
+                {t("user:auth.actions.register")}
               </Button>
             </form>
           </TabsContent>

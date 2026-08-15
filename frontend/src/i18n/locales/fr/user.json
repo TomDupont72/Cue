@@ -1,0 +1,57 @@
+{
+  "auth": {
+    "tabs": {
+      "login": "Connexion",
+      "register": "Inscription"
+    },
+    "actions": {
+      "login": "Se connecter",
+      "register": "S'inscrire"
+    },
+    "fields": {
+      "name": "Nom",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe"
+    }
+  },
+  "stats": {
+    "title": "Statistiques",
+    "watchTime": "Temps de visionnage",
+    "month_one": "Mois",
+    "month_other": "Mois",
+    "day_one": "Jour",
+    "day_other": "Jours",
+    "hour_one": "Heure",
+    "hour_other": "Heures",
+    "minute_one": "Minute",
+    "minute_other": "Minutes",
+    "watchedEpisodes": "Épisodes visionnés",
+    "watchedSeries": "Séries terminées"
+  },
+  "series": {
+    "mySeries": "Mes séries",
+    "status": {
+      "WATCHING": {
+        "label": "En cours",
+        "section": "En cours"
+      },
+      "PLANNED": {
+        "label": "Pas commencée",
+        "section": "Pas commencées"
+      },
+      "PAUSED": {
+        "label": "En pause",
+        "section": "En pause"
+      },
+      "COMPLETED": {
+        "label": "Terminée",
+        "section": "Terminées"
+      },
+      "DROPPED": {
+        "label": "Arrêtée",
+        "section": "Arrêtées"
+      }
+    }
+  }
+}

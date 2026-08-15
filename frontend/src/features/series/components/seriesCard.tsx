@@ -6,6 +6,7 @@ import { getYear } from "@/lib/utils";
 import StatusProgressBar from "@/features/user/components/statusProgressBar";
 import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 type SeriesCardProps = {
   series: SeriesCardSeries;
@@ -22,6 +23,8 @@ export function SeriesCard({
   status,
   watchProgress
 }: SeriesCardProps) {
+  const { t } = useTranslation();
+
   const posterUrl = getTmdbImageUrl(series.posterPath);
   const year = getYear(series.firstAirDate);
 
@@ -69,7 +72,7 @@ export function SeriesCard({
         <h2 className="truncate font-medium">{series.name}</h2>
 
         <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          {year ? <span>{year}</span> : <span>Date inconnue</span>}
+          {year ? <span>{year}</span> : <span>{t("common:date.unknown")}</span>}
         </div>
       </CardContent>
     </Card>

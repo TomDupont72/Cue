@@ -1,0 +1,10 @@
+{
+  "seasonNumber": "Saison {{number}}",
+  "episodeNumber": "Épisode {{number}}",
+  "specialEpisodeNumber": "Épisode spécial {{number}}",
+  "special": "Spécial",
+  "day_one": "{{count}} Jour",
+  "day_other": "{{count}} Jours",
+  "incoming": "À venir",
+  "noDescription": "Pas de description disponible"
+}

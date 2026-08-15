@@ -11,6 +11,7 @@ import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/t
 import { getEpisodeReleaseDayDifference } from "@/features/episode/utils/episodeRelease";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 type EpisodeCardProps = {
   series: EpisodeCardSeries;
@@ -25,6 +26,7 @@ export default function EpisodeCard({
   watchedEpisodeIds,
   displayName = false
 }: EpisodeCardProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const stillUrl = getTmdbImageUrl(episode.stillPath);
 
@@ -47,7 +49,7 @@ export default function EpisodeCard({
 
   function handleSeriesClick(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
-    navigate(`/series?seriesId=${series.id}`);
+    navigate(`/series?id=${series.id}`);
   }
 
   const remainingDays = getEpisodeReleaseDayDifference(episode.airDate);
@@ -98,7 +100,7 @@ export default function EpisodeCard({
                 ) : (
                   <>
                     <p className="truncate">{episode.name}</p>
-                    <Badge>Spécial</Badge>
+                    <Badge>{t("episode:special")}</Badge>
                   </>
                 )}
               </CardContent>
@@ -107,11 +109,11 @@ export default function EpisodeCard({
         />
         {remainingDays === null ? (
           <h2 className="absolute right-4 top-1/2 z-10 -translate-y-1/2 font-bold text-xl">
-            À venir
+            {t("episode:incoming")}
           </h2>
         ) : remainingDays > 0 ? (
           <h2 className="absolute right-4 top-1/2 z-10 -translate-y-1/2 font-bold text-xl">
-            {remainingDays} Jour{remainingDays > 1 ? "s" : ""}
+            {t("episode:day", { count: remainingDays })}
           </h2>
         ) : (
           <RoundedCheckbox

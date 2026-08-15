@@ -6,8 +6,11 @@ import { LoadingState } from "@/components/feedback/loadingState";
 import { useSeriesSearch } from "@/features/series/hooks/useSeriesSearch";
 import Paginator from "@/components/layout/paginator";
 import SeriesDisplay from "@/features/series/components/seriesDisplay";
+import { useTranslation } from "react-i18next";
 
 export function SeriesSearchResults() {
+  const { t } = useTranslation();
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const query = searchParams.get("query")?.trim() ?? "";
@@ -28,8 +31,8 @@ export function SeriesSearchResults() {
     return (
       <EmptyState
         icon={<Search className="size-8" />}
-        title="Recherche une série"
-        description="Entre le nom d'une série pour afficher les résultats."
+        title={t("series:search.emptyQueryTitle")}
+        description={t("series:search.emptyQueryDescription")}
       />
     );
   }
@@ -46,8 +49,8 @@ export function SeriesSearchResults() {
     return (
       <EmptyState
         icon={<Search className="size-8" />}
-        title="Aucun résultat"
-        description={`Aucune série trouvée pour « ${query} ».`}
+        title={t("series:search.emptyResultTitle")}
+        description={t("series:search.emptyResultDescription", { query: query })}
       />
     );
   }
@@ -56,8 +59,7 @@ export function SeriesSearchResults() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {seriesQuery.data.totalResults} résultat
-          {seriesQuery.data.totalResults > 1 ? "s" : ""}
+          {t("series:search.result", { count: seriesQuery.data.totalResults })}
         </p>
       </div>
 

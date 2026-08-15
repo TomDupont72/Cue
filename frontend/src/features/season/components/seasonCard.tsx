@@ -5,6 +5,7 @@ import { useUserSeasonMutation } from "@/features/user/hooks/useUserSeasonMutati
 import { useUserSeasonDelete } from "@/features/user/hooks/useUserSeasonDelete";
 import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
 import type { SeasonCardEpisode, SeasonCardSeason } from "@/features/season/types/season.types";
+import { useTranslation } from "react-i18next";
 
 type SeasonCardProps = {
   seriesId: number;
@@ -19,6 +20,8 @@ export default function SeasonCard({
   episodes,
   watchedEpisodeIds
 }: SeasonCardProps) {
+  const { t } = useTranslation();
+
   const now = new Date();
   const releasedEpisodes = episodes.filter((episode) => isEpisodeReleased(episode.airDate, now));
   const watchedCount = releasedEpisodes.filter((episode) =>
@@ -58,7 +61,9 @@ export default function SeasonCard({
       hover:no-underline"
           left={
             <h2 className="font-bold text-xl">
-              {season.seasonNumber !== 0 ? `Saison ${season.seasonNumber}` : "Épisodes spéciaux"}
+              {season.seasonNumber !== 0
+                ? t("series:seasonNumber", { number: season.seasonNumber })
+                : t("series:specialEpisodes")}
             </h2>
           }
           right={

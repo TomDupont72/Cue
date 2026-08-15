@@ -7,8 +7,11 @@ import { USER_SERIES_STATUS } from "@/features/user/constants/userSeriesStatus";
 import { useUserDashboardSummary } from "@/features/user/hooks/useUserDashboardSummary";
 import { queryKeys } from "@/lib/queryKeys";
 import { useIsFetching } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
+  const { t } = useTranslation();
+
   const initialFetchingCount = useIsFetching({
     queryKey: queryKeys.userSeries.all,
     predicate: (query) => query.state.data === undefined
@@ -34,7 +37,9 @@ export default function Dashboard() {
   return (
     <Container className="flex flex-1 flex-col py-8 items-center gap-18">
       <section className="w-full flex flex-col items-center gap-6">
-        <h1 className="w-full text-left font-bold text-3xl">STATISTIQUES</h1>
+        <h1 className="w-full text-left font-bold text-3xl">
+          {t("user:stats.title").toUpperCase()}
+        </h1>
         <UserDashboardSummaryWidget
           totalWatchedMinutes={dashboardSummaryQuery.data.totalWatchedMinutes}
           totalWatchedEpisodes={dashboardSummaryQuery.data.totalWatchedEpisodes}
@@ -43,7 +48,9 @@ export default function Dashboard() {
       </section>
 
       <section className="w-full flex flex-col items-center gap-6">
-        <h1 className="w-full text-left font-bold text-3xl">MES SÉRIES</h1>
+        <h1 className="w-full text-left font-bold text-3xl">
+          {t("user:series.mySeries").toUpperCase()}
+        </h1>
         <div className={isPending ? "hidden" : "flex flex-col gap-4"}>
           {Object.values(USER_SERIES_STATUS).map((status) => (
             <UserSeriesSection key={status} status={status} />
