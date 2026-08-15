@@ -23,12 +23,16 @@ export default function Watch() {
   }
 
   return (
-        <PageContainer className="gap-4">
+    <PageContainer className="gap-4">
       <ContentColumn>
         {WATCH_SECTIONS.map((section) => (
-          <WatchSection key={section} status={section} items={userEpisodesFeedQuery.data[section]} />
+          <WatchSection
+            key={section}
+            status={section}
+            items={userEpisodesFeedQuery.data[section]}
+          />
         ))}
       </ContentColumn>
-      </PageContainer>
+    </PageContainer>
   );
 }

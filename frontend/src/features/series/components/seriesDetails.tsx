@@ -35,7 +35,7 @@ export default function SeriesDetails({ id, episodes, userEpisodes, seasons }: S
   });
 
   return (
-        <ContentColumn>
+    <ContentColumn>
       <Accordion multiple>
         {sortedSeasons.map((season) => (
           <SeasonCard
@@ -47,6 +47,6 @@ export default function SeriesDetails({ id, episodes, userEpisodes, seasons }: S
           />
         ))}
       </Accordion>
-      </ContentColumn>
+    </ContentColumn>
   );
 }
