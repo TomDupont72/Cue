@@ -1,0 +1,33 @@
+{
+  "tabs": {
+    "about": "À propos",
+    "episodes": "Épisodes"
+  },
+  "dates": {
+    "present": "Présent"
+  },
+  "actions": {
+    "addSeries": "Ajouter la série"
+  },
+  "productionStatus": {
+    "inProduction": "En production",
+    "finished": "Achevée"
+  },
+  "search": {
+    "title": "Recherche",
+    "emptyQueryTitle": "Rechercher une série",
+    "emptyQueryDescription": "Entre le nom d'une série pour afficher les résultats.",
+    "emptyResultTitle": "Aucun résultat",
+    "emptyResultDescription": "Aucune série trouvée pour « {{query}} ».",
+    "result_one": "{{count}} résultat",
+    "result_other": "{{count}} résultats",
+    "previous": "Précédent",
+    "next": "Suivant"
+  },
+  "season_one": "{{count}} saison",
+  "season_other": "{{count}} saisons",
+  "seasonNumber": "saison {{number}}",
+  "episode_one": "{{count}} épisode",
+  "episode_other": "{{count}} épisodes",
+  "specialEpisodes": "Épisodes spéciaux"
+}

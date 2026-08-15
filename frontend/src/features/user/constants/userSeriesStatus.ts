@@ -6,12 +6,4 @@ export const USER_SERIES_STATUS = {
   DROPPED: "DROPPED"
 } as const;
 
-export const STATUS_TEXT_MAPPING = {
-  WATCHING: "EN COURS",
-  PLANNED: "PAS COMMENCÉES",
-  PAUSED: "EN PAUSE",
-  COMPLETED: "TERMINÉES",
-  DROPPED: "ARRÊTÉES"
-};
-
 export type UserSeriesStatus = (typeof USER_SERIES_STATUS)[keyof typeof USER_SERIES_STATUS];

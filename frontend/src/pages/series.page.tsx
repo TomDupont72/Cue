@@ -6,102 +6,37 @@ import { Button } from "@/components/ui/button";
 import SeriesDetails from "@/features/series/components/seriesDetails";
 import { SeriesOverview } from "@/features/series/components/seriesOverview";
 import { useSeries } from "@/features/series/hooks/useSeries";
-import { useSeriesImportMutation } from "@/features/series/hooks/useSeriesImportMutation";
-import {
-  seriesGetParamsSchema,
-  seriesImportPostBodySchema
-} from "@/features/series/schemas/series.schemas";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-
-const invalidSeriesLinkError = new Error("Le lien vers cette série est invalide.");
+import { useSeriesImport } from "@/features/series/hooks/useSeriesImportMutation";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 export default function Series() {
   const [searchParams] = useSearchParams();
-  const seriesIdParam = searchParams.get("seriesId");
+  const location = useLocation();
+  const { t } = useTranslation();
 
-  if (seriesIdParam !== null) {
-    if (!seriesIdParam.trim()) {
-      return <InvalidSeriesLink />;
-    }
+  const seriesId = Number(searchParams.get("id")?.trim() ?? "");
+  const tmdbId = location.state?.tmdbId as number | undefined;
 
-    const seriesParams = seriesGetParamsSchema.safeParse({ id: seriesIdParam });
-
-    if (!seriesParams.success) {
-      return <InvalidSeriesLink />;
-    }
-
-    return (
-      <SeriesContent
-        key={seriesParams.data.id}
-        seriesId={seriesParams.data.id}
-        scrollDependency={seriesParams.data.id}
-      />
-    );
-  }
-
-  const tmdbIdParam = searchParams.get("id");
-
-  if (tmdbIdParam === null || !tmdbIdParam.trim()) {
-    return <InvalidSeriesLink />;
-  }
-
-  const importBody = seriesImportPostBodySchema.safeParse({ tmdbId: tmdbIdParam });
-
-  if (!importBody.success) {
-    return <InvalidSeriesLink />;
-  }
-
-  return <LegacySeriesImport key={importBody.data.tmdbId} tmdbId={importBody.data.tmdbId} />;
-}
-
-function InvalidSeriesLink() {
-  return <ErrorState error={invalidSeriesLinkError} />;
-}
-
-type LegacySeriesImportProps = {
-  tmdbId: number;
-};
-
-function LegacySeriesImport({ tmdbId }: LegacySeriesImportProps) {
-  const navigate = useNavigate();
-  const importStartedRef = useRef(false);
-  const { mutate, isError, error } = useSeriesImportMutation();
-
-  const importSeries = useCallback(() => {
-    mutate(tmdbId, {
-      onSuccess: ({ series }) => {
-        navigate(`/series?seriesId=${series.id}`, { replace: true });
-      }
-    });
-  }, [mutate, navigate, tmdbId]);
+  const seriesQuery = useSeries(seriesId);
+  const seriesImportMutation = useSeriesImport();
 
   useEffect(() => {
-    if (importStartedRef.current) {
+    if (seriesId || tmdbId === undefined) {
       return;
     }
 
-    importStartedRef.current = true;
-    importSeries();
-  }, [importSeries]);
-
-  if (isError) {
-    return <ErrorState error={error} onRetry={importSeries} />;
-  }
-
-  return <LoadingState />;
-}
-
-type SeriesContentProps = {
-  seriesId: number;
-  scrollDependency: number;
-};
-
-function SeriesContent({ seriesId, scrollDependency }: SeriesContentProps) {
-  type SeriesView = "overview" | "details";
+    seriesImportMutation.mutate(tmdbId);
+  }, [seriesId, tmdbId, seriesImportMutation]);
 
   const [view, setView] = useState<SeriesView>("overview");
-  const seriesQuery = useSeries(seriesId);
+
+  if (!seriesId && tmdbId === undefined) {
+    return <ErrorState error="Requête invalide" />;
+  }
+
+  type SeriesView = "overview" | "details";
 
   if (seriesQuery.isPending) {
     return <LoadingState />;
@@ -119,7 +54,7 @@ function SeriesContent({ seriesId, scrollDependency }: SeriesContentProps) {
 
   return (
     <>
-      <ScrollToTop dependency={scrollDependency} />
+      <ScrollToTop />
       <Container className="flex flex-1 flex-col py-8 gap-4">
         <div className="grid w-full grid-cols-2 gap-2">
           <Button
@@ -127,7 +62,7 @@ function SeriesContent({ seriesId, scrollDependency }: SeriesContentProps) {
             onClick={() => setView("overview")}
             className="text-lg font-bold"
           >
-            À PROPOS
+            {t("series:tabs.about").toUpperCase()}
           </Button>
 
           <Button
@@ -135,7 +70,7 @@ function SeriesContent({ seriesId, scrollDependency }: SeriesContentProps) {
             onClick={() => setView("details")}
             className="text-lg font-bold"
           >
-            ÉPISODES
+            {t("series:tabs.episodes").toUpperCase()}
           </Button>
         </div>
 

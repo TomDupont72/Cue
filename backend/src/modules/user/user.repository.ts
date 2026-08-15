@@ -6,31 +6,7 @@ import {
   DashboardSummarySeriesRow,
   EpisodeFeedRow
 } from "./user.types.js";
-import {
-  decodeUserSeriesCursor,
-  encodeUserSeriesCursor,
-  type UserSeriesCursor
-} from "./user.pagination.js";
-
-function getUserSeriesCursorCondition(cursor: UserSeriesCursor): Prisma.UserSeriesWhereInput {
-  if (cursor.lastWatchedAt === null) {
-    return {
-      lastWatchedAt: null,
-      seriesId: { lt: cursor.seriesId }
-    };
-  }
-
-  return {
-    OR: [
-      { lastWatchedAt: { lt: cursor.lastWatchedAt } },
-      {
-        lastWatchedAt: cursor.lastWatchedAt,
-        seriesId: { lt: cursor.seriesId }
-      },
-      { lastWatchedAt: null }
-    ]
-  };
-}
+import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 
 export const userRepository = {
   findOneSeries(where: Prisma.UserSeriesWhereUniqueInput, db: PrismaTx = prisma) {
@@ -45,37 +21,20 @@ export const userRepository = {
     });
   },
 
-  async findManySeries(
+  findManySeries(
     where: Prisma.UserSeriesWhereInput,
     limit: number,
     cursor: string | undefined,
     db: PrismaTx = prisma
   ) {
-    const decodedCursor = cursor === undefined ? undefined : decodeUserSeriesCursor(cursor);
-    const records = await db.userSeries.findMany({
-      where:
-        decodedCursor === undefined
-          ? where
-          : { AND: [where, getUserSeriesCursorCondition(decodedCursor)] },
-      orderBy: [{ lastWatchedAt: { sort: "desc", nulls: "last" } }, { seriesId: "desc" }],
-      take: limit + 1
+    return findManyPaginated({
+      where,
+      limit,
+      cursor: cursor ? new Date(cursor) : undefined,
+      cursorField: "lastWatchedAt",
+      order: "desc",
+      delegate: db.userSeries
     });
-
-    const hasNextPage = records.length > limit;
-    const items = records.slice(0, limit);
-    const lastItem = items.at(-1);
-
-    return {
-      items,
-      hasNextPage,
-      nextCursor:
-        hasNextPage && lastItem
-          ? encodeUserSeriesCursor({
-              lastWatchedAt: lastItem.lastWatchedAt,
-              seriesId: lastItem.seriesId
-            })
-          : null
-    };
   },
 
   findManyEpisodes(where: Prisma.UserEpisodeWhereInput, db: PrismaTx = prisma) {

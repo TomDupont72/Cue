@@ -7,6 +7,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis
 } from "@/components/ui/pagination";
+import { useTranslation } from "react-i18next";
 
 type PaginatorProps = {
   currentPage: number;
@@ -15,11 +16,16 @@ type PaginatorProps = {
 };
 
 export default function Paginator({ currentPage, pageNumber, setCurrentPage }: PaginatorProps) {
+  const { t } = useTranslation();
+
   return (
     <Pagination className="pb-3 flex justify-center">
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))} />
+          <PaginationPrevious
+            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+            text={t("series:search.previous")}
+          />
         </PaginationItem>
         <PaginationItem>
           <PaginationLink isActive={currentPage == 1} onClick={() => setCurrentPage(1)}>
@@ -66,7 +72,10 @@ export default function Paginator({ currentPage, pageNumber, setCurrentPage }: P
           </PaginationItem>
         ) : null}
         <PaginationItem>
-          <PaginationNext onClick={() => setCurrentPage(Math.min(currentPage + 1, pageNumber))} />
+          <PaginationNext
+            onClick={() => setCurrentPage(Math.min(currentPage + 1, pageNumber))}
+            text={t("series:search.next")}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

@@ -2,6 +2,8 @@ import { dropKeys } from "@/shared/utils/object/object.js";
 import type {
   CreateManyAndFetchOptions,
   DeleteManyAndFetchOptions,
+  FindManyPaginatedOptions,
+  FindManyPaginatedResult,
   UpsertManyAndFetchOptions,
   UpsertUniqueWhere,
   UniqueWhere
@@ -118,4 +120,50 @@ export async function deleteManyAndFetch<TWhere, TResult>({
   await delegate.deleteMany({ where });
 
   return records;
+}
+
+export async function findManyPaginated<
+  TWhere extends object,
+  TResult extends object,
+  TCursorField extends keyof TResult
+>({
+  where,
+  limit,
+  cursor,
+  cursorField,
+  order = "desc",
+  delegate
+}: FindManyPaginatedOptions<TWhere, TResult, TCursorField>): Promise<
+  FindManyPaginatedResult<TResult, TResult[TCursorField]>
+> {
+  const cursorCondition =
+    cursor !== undefined
+      ? {
+          [cursorField]: {
+            [order === "desc" ? "lt" : "gt"]: cursor
+          }
+        }
+      : {};
+
+  const records = await delegate.findMany({
+    where: {
+      AND: [where, cursorCondition]
+    },
+
+    orderBy: {
+      [cursorField]: order
+    },
+
+    take: limit + 1
+  });
+
+  const hasNextPage = records.length > limit;
+  const items = records.slice(0, limit);
+  const lastItem = items.at(-1);
+
+  return {
+    items,
+    hasNextPage,
+    nextCursor: hasNextPage && lastItem ? lastItem[cursorField] : null
+  };
 }

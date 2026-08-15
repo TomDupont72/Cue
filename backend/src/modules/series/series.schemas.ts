@@ -83,14 +83,14 @@ export const seriesImportPostResponseSchema = z.object({
   userSeries: userSeriesResponseSchema.nullable()
 });
 
-export const seriesImportPostSchema = z.object({
+export const seriesImportPostBodySchema = z.object({
   tmdbId: z.number().int().min(1)
 });
 
-export type SeriesImportPost = z.infer<typeof seriesImportPostSchema>;
+export type SeriesImportPostBody = z.infer<typeof seriesImportPostBodySchema>;
 
-export const seriesGetSchema = z.object({
+export const seriesGetParamsSchema = z.object({
   id: z.coerce.number().int().min(1)
 });
 
-export type SeriesGet = z.infer<typeof seriesGetSchema>;
+export type SeriesGetParams = z.infer<typeof seriesGetParamsSchema>;

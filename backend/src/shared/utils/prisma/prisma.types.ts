@@ -87,3 +87,29 @@ type DeleteManyAndFetchDelegate<TWhere, TResult> = {
   findMany(args: { where: TWhere }): PromiseLike<TResult[]>;
   deleteMany(args: { where: TWhere }): PromiseLike<unknown>;
 };
+
+export type PaginationOrder = "asc" | "desc";
+
+export type ComparableCursor = string | number | Date;
+
+export type FindManyPaginatedResult<TResult, TCursor> = {
+  items: TResult[];
+  nextCursor: TCursor | null;
+  hasNextPage: boolean;
+};
+
+export type FindManyPaginatedOptions<
+  TWhere extends object,
+  TResult extends object,
+  TCursorField extends keyof TResult
+> = {
+  where: TWhere;
+  limit: number;
+  cursor?: TResult[TCursorField];
+  cursorField: TCursorField;
+  order?: PaginationOrder;
+
+  delegate: {
+    findMany(args: { where: object; orderBy: object; take: number }): Promise<TResult[]>;
+  };
+};

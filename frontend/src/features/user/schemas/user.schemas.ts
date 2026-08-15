@@ -8,8 +8,6 @@ export const userSeriesGetQuerySchema = z.object({
   cursor: z.string().optional()
 });
 
-export type UserSeriesGetQuery = z.infer<typeof userSeriesGetQuerySchema>;
-
 export const userEpisodePostParamsSchema = z.object({
   seriesId: z.number().int().min(1),
   episodeId: z.number().int().min(1)

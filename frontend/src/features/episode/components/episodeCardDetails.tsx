@@ -3,6 +3,7 @@ import { ImageOff } from "lucide-react";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
 import type { EpisodeCardEpisode } from "@/features/episode/types/episode.types";
+import { useTranslation } from "react-i18next";
 
 type EpisodeCardDetailsProps = {
   episode: EpisodeCardEpisode;
@@ -19,6 +20,8 @@ export default function EpisodeCardDetails({
   isPending,
   remainingDays
 }: EpisodeCardDetailsProps) {
+  const { t } = useTranslation();
+
   const stillUrl = getTmdbImageUrl(episode.stillPath, "original");
 
   return (
@@ -45,13 +48,13 @@ export default function EpisodeCardDetails({
         <DialogTitle className="font-bold text-xl">{episode.name}</DialogTitle>
         <p className="font-semibold">
           {episode.seasonNumber === 0
-            ? `Épisode spécial ${episode.episodeNumber}`
-            : `Saison ${episode.seasonNumber} • Épisode ${episode.episodeNumber}`}
+            ? t("episode:specialEpisodeNumber", { number: episode.episodeNumber })
+            : `${t("episode:seasonNumber", { number: episode.seasonNumber })} • ${t("episode:episodeNumber", { number: episode.episodeNumber })}`}
         </p>
       </DialogHeader>
 
       <DialogDescription className="flex px-4 pb-4">
-        {episode.overview ? episode.overview : "Pas de description disponible"}
+        {episode.overview ? episode.overview : t("episode:noDescription")}
       </DialogDescription>
     </>
   );

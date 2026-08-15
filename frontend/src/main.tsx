@@ -8,6 +8,7 @@ import { InstallPromptProvider } from "@/components/pwa/installPromptProvider";
 import { startInstallPromptCapture } from "@/components/pwa/installPromptStore";
 import { queryClient } from "@/lib/queryClient";
 import "@/index.css";
+import "@/i18n";
 
 startInstallPromptCapture();
 

@@ -1,15 +1,18 @@
-import type { SeriesGetSeries } from "@/features/series/types/series.types";
+import type { SeriesRow } from "@/features/series/types/series.types";
 import type { UserSeriesStatus } from "../constants/userSeriesStatus";
+import type { EpisodeRow } from "@/features/episode/types/episode.types";
 
-export type UserEpisodePostResponse = {
+// =============================================================================
+// DATABASE ROW TYPES
+// =============================================================================
+
+export type UserEpisodeRow = {
   userId: string;
   episodeId: number;
   watchedAt: string;
-  seriesId: number;
-  nextEpisode: UserEpisodesFeedGetItem | null;
 };
 
-export type UserSeriesPostResponse = {
+export type UserSeriesRow = {
   userId: string;
   seriesId: number;
   status: UserSeriesStatus;
@@ -19,28 +22,38 @@ export type UserSeriesPostResponse = {
   lastWatchedAt: string | null;
 };
 
-export type UserEpisodeDeleteResponse = {
-  userId: string;
-  episodeId: number;
-  watchedAt: string;
+// =============================================================================
+// API RESPONSE TYPES
+// =============================================================================
+
+export type UserEpisodePostResponse = UserEpisodeRow & {
+  seriesId: number;
+  nextEpisode:
+    | (Omit<UserSeriesRow, "isFavorite" | "watchCount" | "addedAt"> &
+        Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
+          seriesName: string;
+          seriesPosterPath: string | null;
+          seriesTmdbId: number;
+          remainingEpisodes: number;
+        })
+    | null;
 };
 
-type UserSeriesGetItems = {
-  seriesDetails: SeriesGetSeries;
-  userId: string;
-  seriesId: number;
-  status: UserSeriesStatus;
-  isFavorite: boolean;
-  addedAt: string;
-  lastWatchedAt: string | null;
-  watchCount: number;
-};
+export type UserEpisodeDeleteResponse = UserEpisodeRow;
+
+export type UserSeasonPostResponse = UserEpisodeRow[];
+
+export type UserSeasonDeleteResponse = UserEpisodeRow[];
 
 export type UserSeriesGetResponse = {
-  items: UserSeriesGetItems[];
+  items: (UserSeriesRow & {
+    seriesDetails: SeriesRow;
+  })[];
   hasNextPage: boolean;
   nextCursor: string | null;
 };
+
+export type UserSeriesPostResponse = UserSeriesRow;
 
 export type UserDashboardSummaryGetResponse = {
   totalWatchedMinutes: number;
@@ -48,37 +61,18 @@ export type UserDashboardSummaryGetResponse = {
   totalWatchedSeries: number;
 };
 
-export type UserSeasonPostResponse = {
-  userId: string;
-  episodeId: number;
-  watchedAt: string;
-}[];
-
-export type UserSeasonDeleteResponse = UserSeasonPostResponse;
-
-export type UserEpisodesFeedGetItem = {
-  userId: string;
-  seriesId: number;
-  status: UserSeriesStatus;
-  lastWatchedAt: string | null;
-
-  seriesName: string;
-  seriesPosterPath: string | null;
-  seriesTmdbId: number;
-
-  id: number;
-  name: string;
-  seasonNumber: number;
-  episodeNumber: number;
-  airDate: string | null;
-  stillPath: string | null;
-  runtime: number;
-  overview: string | null;
-  remainingEpisodes: number;
+export type UserEpisodesFeed<T> = {
+  watching: T[];
+  paused: T[];
+  dropped: T[];
 };
 
-export type UserEpisodesFeedGetResponse = {
-  watching: UserEpisodesFeedGetItem[];
-  paused: UserEpisodesFeedGetItem[];
-  dropped: UserEpisodesFeedGetItem[];
-};
+export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
+  Omit<UserSeriesRow, "isFavorite" | "watchCount" | "addedAt"> &
+    Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
+      seriesName: string;
+      seriesPosterPath: string | null;
+      seriesTmdbId: number;
+      remainingEpisodes: number;
+    }
+>;

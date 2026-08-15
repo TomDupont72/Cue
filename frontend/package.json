@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -24,9 +24,11 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
+    "i18next": "^26.3.6",
     "lucide-react": "^1.23.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-i18next": "^17.0.11",
     "react-router-dom": "^7.18.1",
     "shadcn": "^4.13.0",
     "tailwind-merge": "^3.6.0",
@@ -43,6 +45,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "knip": "^6.32.2",
     "prettier": "^3.9.4",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.62.0",

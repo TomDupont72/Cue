@@ -2,7 +2,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { userDashboardSummaryGet } from "../api/user.api";
 
-export function useDashboardSummary() {
+export function useUserDashboardSummary() {
   return useQuery({
     queryKey: queryKeys.userDashboard.summary(),
     queryFn: () => userDashboardSummaryGet(),

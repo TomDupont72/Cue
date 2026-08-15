@@ -1,14 +1,17 @@
 import { LoadingState } from "@/components/feedback/loadingState";
 import SeriesDisplay from "@/features/series/components/seriesDisplay";
 import { useEffect, useRef } from "react";
-import { STATUS_TEXT_MAPPING, type UserSeriesStatus } from "../constants/userSeriesStatus";
-import { useUserSeries } from "../hooks/useUserSeriesGet";
+import type { UserSeriesStatus } from "../constants/userSeriesStatus";
+import { useUserSeries } from "../hooks/useUserSeries";
+import { useTranslation } from "react-i18next";
 
 type UserSeriesSectionProps = {
   status: UserSeriesStatus;
 };
 
 export function UserSeriesSection({ status }: UserSeriesSectionProps) {
+  const { t } = useTranslation();
+
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const query = useUserSeries(undefined, status);
   const items = query.data?.pages.flatMap((page) => page.items) ?? [];
@@ -43,13 +46,15 @@ export function UserSeriesSection({ status }: UserSeriesSectionProps) {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold">{STATUS_TEXT_MAPPING[status]}</h2>
+      <h2 className="text-lg font-bold">
+        {t(`user:series.status.${status}.section`).toUpperCase()}
+      </h2>
 
       <div className="h-px w-full bg-border" />
 
       <SeriesDisplay
-        seriesData={items.map((item) => item.seriesDetails)}
-        userSeriesData={items}
+        series={items.map((item) => item.seriesDetails)}
+        userSeries={items}
         isProgress
       />
 

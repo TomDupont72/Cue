@@ -255,7 +255,7 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
   it("atomically counts concurrent posts for distinct episodes", async () => {
     await Promise.all(
       seed.concurrentEpisodeIds.map((episodeId) =>
-        userService.userEpisodePost(USER_ID, { seriesId: seed.seriesId, episodeId }, NOW)
+        userService.episodePost(USER_ID, { seriesId: seed.seriesId, episodeId }, NOW)
       )
     );
 
@@ -267,7 +267,7 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
 
     await Promise.all(
       Array.from({ length: 8 }, () =>
-        userService.userEpisodePost(USER_ID, { seriesId: seed.seriesId, episodeId }, NOW)
+        userService.episodePost(USER_ID, { seriesId: seed.seriesId, episodeId }, NOW)
       )
     );
 
@@ -281,12 +281,12 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
     const olderWatchedAt = new Date(NOW);
     olderWatchedAt.setUTCHours(olderWatchedAt.getUTCHours() - 1);
 
-    await userService.userEpisodePost(
+    await userService.episodePost(
       USER_ID,
       { seriesId: seed.seriesId, episodeId: seed.concurrentEpisodeIds[0] },
       newerWatchedAt
     );
-    await userService.userEpisodePost(
+    await userService.episodePost(
       USER_ID,
       { seriesId: seed.seriesId, episodeId: seed.concurrentEpisodeIds[1] },
       olderWatchedAt
@@ -303,13 +303,13 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
   it("atomically counts concurrent deletes", async () => {
     await Promise.all(
       seed.concurrentEpisodeIds.map((episodeId) =>
-        userService.userEpisodePost(USER_ID, { seriesId: seed.seriesId, episodeId }, NOW)
+        userService.episodePost(USER_ID, { seriesId: seed.seriesId, episodeId }, NOW)
       )
     );
 
     await Promise.all(
       seed.concurrentEpisodeIds.map((episodeId) =>
-        userService.userEpisodeDelete(USER_ID, { seriesId: seed.seriesId, episodeId })
+        userService.episodeDelete(USER_ID, { seriesId: seed.seriesId, episodeId })
       )
     );
 
@@ -320,11 +320,11 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
   it("decrements only once when the same episode is deleted concurrently", async () => {
     const episodeId = seed.concurrentEpisodeIds[0];
 
-    await userService.userEpisodePost(USER_ID, { seriesId: seed.seriesId, episodeId }, NOW);
+    await userService.episodePost(USER_ID, { seriesId: seed.seriesId, episodeId }, NOW);
 
     const results = await Promise.allSettled(
       Array.from({ length: 8 }, () =>
-        userService.userEpisodeDelete(USER_ID, { seriesId: seed.seriesId, episodeId })
+        userService.episodeDelete(USER_ID, { seriesId: seed.seriesId, episodeId })
       )
     );
 
@@ -334,7 +334,7 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
   });
 
   it("does not count season zero episodes as series progress", async () => {
-    await userService.userSeasonPost(
+    await userService.seasonPost(
       USER_ID,
       { seriesId: seed.seriesId, seasonId: seed.specialSeasonId },
       NOW
@@ -348,7 +348,7 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
     );
     await assertWatchCountInvariant(0);
 
-    await userService.userSeasonDelete(USER_ID, {
+    await userService.seasonDelete(USER_ID, {
       seriesId: seed.seriesId,
       seasonId: seed.specialSeasonId
     });
@@ -356,21 +356,21 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
   });
 
   it("allows today's episode but refuses future and undated individual episodes", async () => {
-    await userService.userEpisodePost(
+    await userService.episodePost(
       USER_ID,
       { seriesId: seed.seriesId, episodeId: seed.todayEpisodeId },
       NOW
     );
 
     await assert.rejects(
-      userService.userEpisodePost(
+      userService.episodePost(
         USER_ID,
         { seriesId: seed.seriesId, episodeId: seed.futureEpisodeId },
         NOW
       )
     );
     await assert.rejects(
-      userService.userEpisodePost(
+      userService.episodePost(
         USER_ID,
         { seriesId: seed.seriesId, episodeId: seed.noDateEpisodeId },
         NOW
@@ -381,7 +381,7 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
   });
 
   it("posts only released season episodes and deletes a pre-existing future episode", async () => {
-    const created = await userService.userSeasonPost(
+    const created = await userService.seasonPost(
       USER_ID,
       { seriesId: seed.seriesId, seasonId: seed.regularSeasonId },
       NOW
@@ -415,7 +415,7 @@ describe("user progress (PostgreSQL integration)", { concurrency: false }, () =>
     ]);
     await assertWatchCountInvariant(expectedReleasedIds.size + 1);
 
-    const deleted = await userService.userSeasonDelete(USER_ID, {
+    const deleted = await userService.seasonDelete(USER_ID, {
       seriesId: seed.seriesId,
       seasonId: seed.regularSeasonId
     });

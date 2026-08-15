@@ -1,21 +1,21 @@
 import { prisma } from "@/shared/db/prisma.js";
-import { userRepository } from "./user.repository.js";
+import { userRepository } from "@/modules/user/user.repository.js";
 import {
   UserEpisodePostParams,
   UserSeriesPostBody,
   UserSeriesPostParams,
   UserEpisodeDeleteParams,
-  UserSeriesGetParams,
+  UserSeriesGet,
   UserSeasonPostParams,
   UserSeasonDeleteParams,
-  UserStatusRecalculate
-} from "./user.schemas.js";
-import { episodeRepository } from "../episode/episode.repository.js";
+  UserStatusPostParams
+} from "@/modules/user/user.schemas.js";
+import { episodeRepository } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import { seriesRepository } from "../series/series.repository.js";
+import { seriesRepository } from "@/modules/series/series.repository.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import type { UserSeries, UserSeriesStatus } from "@/generated/prisma/client.js";
-import { getEpisodeReleaseCutoff } from "../episode/episode.utils.js";
+import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
+import { getStatusAfterAddingEpisodes, getStatusAfterRemovingEpisodes, updateSeriesStatus } from "@/modules/user/user.rules.js";
 
 type SeriesProgressParams = {
   userId: string;
@@ -23,34 +23,6 @@ type SeriesProgressParams = {
   numberOfEpisodes: number;
   delta: number;
 };
-
-function getStatusAfterAddingEpisodes(
-  watchCount: number,
-  numberOfEpisodes: number
-): UserSeriesStatus {
-  return watchCount >= numberOfEpisodes ? "COMPLETED" : "WATCHING";
-}
-
-function getStatusAfterRemovingEpisodes(watchCount: number): UserSeriesStatus {
-  return watchCount === 0 ? "PLANNED" : "WATCHING";
-}
-
-async function updateSeriesStatus(userSeries: UserSeries, status: UserSeriesStatus, tx: PrismaTx) {
-  if (status === userSeries.status) {
-    return userSeries;
-  }
-
-  return userRepository.updateSeries(
-    {
-      userId_seriesId: {
-        userId: userSeries.userId,
-        seriesId: userSeries.seriesId
-      }
-    },
-    { status },
-    tx
-  );
-}
 
 async function addSeriesProgress(
   { userId, seriesId, numberOfEpisodes, delta }: SeriesProgressParams,
@@ -99,7 +71,7 @@ async function removeSeriesProgress(
 }
 
 export const userService = {
-  async userSeriesGet(userId: string, params: UserSeriesGetParams) {
+  async seriesGet(userId: string, params: UserSeriesGet) {
     const { seriesId, status, limit, cursor } = params;
 
     const userSeries = await userRepository.findManySeries(
@@ -132,7 +104,7 @@ export const userService = {
     };
   },
 
-  async userEpisodeFeedGet(userId: string) {
+  async episodeFeedGet(userId: string) {
     const episodes = await userRepository.getEpisodesFeed(userId);
 
     return {
@@ -142,7 +114,7 @@ export const userService = {
     };
   },
 
-  async userSeriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
+  async seriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
     const userSeries = await userRepository.upsertSeries(
       { userId_seriesId: { userId, ...params } },
       { userId, ...params, ...body },
@@ -152,7 +124,7 @@ export const userService = {
     return userSeries;
   },
 
-  async userEpisodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
+  async episodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -222,7 +194,7 @@ export const userService = {
     });
   },
 
-  async userEpisodeDelete(userId: string, params: UserEpisodeDeleteParams) {
+  async episodeDelete(userId: string, params: UserEpisodeDeleteParams) {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -266,7 +238,7 @@ export const userService = {
     });
   },
 
-  async userSeasonPost(userId: string, params: UserSeasonPostParams, now = new Date()) {
+  async seasonPost(userId: string, params: UserSeasonPostParams, now = new Date()) {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -320,7 +292,7 @@ export const userService = {
     });
   },
 
-  async userSeasonDelete(userId: string, params: UserSeasonDeleteParams) {
+  async seasonDelete(userId: string, params: UserSeasonDeleteParams) {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
@@ -375,13 +347,13 @@ export const userService = {
     });
   },
 
-  async userDashboardSummaryGet(userId: string) {
+  async dashboardSummaryGet(userId: string) {
     const summary = await userRepository.getDashboardSummary(userId);
 
     return summary;
   },
 
-  async userStatusRecalculatePost(params: UserStatusRecalculate, now = new Date()) {
+  async statusRecalculatePost(params: UserStatusPostParams, now = new Date()) {
     const inactiveSince = new Date(now);
     inactiveSince.setUTCMonth(inactiveSince.getUTCMonth() - 2);
 

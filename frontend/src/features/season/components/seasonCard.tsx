@@ -1,15 +1,16 @@
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import type { SeriesGetEpisode, SeriesGetSeason } from "@/features/series/types/series.types";
 import EpisodeCard from "@/features/episode/components/episodeCard";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
-import { useUserSeasonPost } from "@/features/user/hooks/useUserSeasonPost";
+import { useUserSeasonMutation } from "@/features/user/hooks/useUserSeasonMutation";
 import { useUserSeasonDelete } from "@/features/user/hooks/useUserSeasonDelete";
 import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
+import type { SeasonCardEpisode, SeasonCardSeason } from "@/features/season/types/season.types";
+import { useTranslation } from "react-i18next";
 
 type SeasonCardProps = {
   seriesId: number;
-  season: SeriesGetSeason;
-  episodes: SeriesGetEpisode[];
+  season: SeasonCardSeason;
+  episodes: SeasonCardEpisode[];
   watchedEpisodeIds: Set<number>;
 };
 
@@ -19,13 +20,15 @@ export default function SeasonCard({
   episodes,
   watchedEpisodeIds
 }: SeasonCardProps) {
+  const { t } = useTranslation();
+
   const now = new Date();
   const releasedEpisodes = episodes.filter((episode) => isEpisodeReleased(episode.airDate, now));
   const watchedCount = releasedEpisodes.filter((episode) =>
     watchedEpisodeIds.has(episode.id)
   ).length;
 
-  const userSeasonPostMutation = useUserSeasonPost();
+  const userSeasonPostMutation = useUserSeasonMutation();
   const userSeasonDeleteMutation = useUserSeasonDelete();
 
   function handleCheckedChange(checked: boolean) {
@@ -58,7 +61,9 @@ export default function SeasonCard({
       hover:no-underline"
           left={
             <h2 className="font-bold text-xl">
-              {season.seasonNumber !== 0 ? `Saison ${season.seasonNumber}` : "Épisodes spéciaux"}
+              {season.seasonNumber !== 0
+                ? t("series:seasonNumber", { number: season.seasonNumber })
+                : t("series:specialEpisodes")}
             </h2>
           }
           right={

@@ -1,23 +1,18 @@
-import { useNavigate } from "react-router-dom";
-import type { SeriesCardData } from "../types/series.types";
-import { SeriesCard } from "./seriesCard";
+import type { SeriesDisplaySeries } from "@/features/series/types/series.types";
+import { SeriesCard } from "@/features/series/components/seriesCard";
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 
 type SeriesDisplayProps = {
-  seriesData: SeriesCardData[];
-  userSeriesData?: UserSeriesGetResponse["items"];
+  series: SeriesDisplaySeries[];
+  userSeries?: UserSeriesGetResponse["items"];
   isProgress?: boolean;
-  onSeriesClick?: (series: SeriesCardData) => void;
 };
 
 export default function SeriesDisplay({
-  seriesData,
-  userSeriesData = [],
-  isProgress = false,
-  onSeriesClick
+  series,
+  userSeries = [],
+  isProgress = false
 }: SeriesDisplayProps) {
-  const navigate = useNavigate();
-
   return (
     <div
       className="
@@ -27,30 +22,21 @@ export default function SeriesDisplay({
                   lg:grid-cols-5
                 "
     >
-      {seriesData.map((series) => {
-        const userSeries = userSeriesData.find(
-          (item) => item.seriesDetails.tmdbId === series.tmdbId
-        );
+      {series.map((data) => {
+        const userData = userSeries.find((item) => item.seriesDetails.tmdbId === data.tmdbId);
 
-        const numberOfEpisodes = userSeries?.seriesDetails.numberOfEpisodes;
         const watchProgress =
-          userSeries && numberOfEpisodes
-            ? (userSeries.watchCount / numberOfEpisodes) * 100
+          userData && data.numberOfEpisodes
+            ? (userData.watchCount / data.numberOfEpisodes) * 100
             : undefined;
 
         return (
           <SeriesCard
-            key={series.tmdbId}
-            series={series}
-            onClick={
-              onSeriesClick
-                ? () => onSeriesClick(series)
-                : userSeries
-                  ? () => navigate(`/series?seriesId=${userSeries.seriesId}`)
-                  : undefined
-            }
+            key={data.tmdbId}
+            series={data}
+            seriesId={userData?.seriesId}
             isProgress={isProgress}
-            status={userSeries?.status}
+            status={userData?.status}
             watchProgress={watchProgress}
           />
         );

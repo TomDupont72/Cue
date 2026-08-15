@@ -9,7 +9,6 @@ import {
 } from "fastify-type-provider-zod";
 import assert from "node:assert/strict";
 import { describe, it, type TestContext } from "node:test";
-import { encodeUserSeriesCursor } from "../user.pagination.js";
 import { userRoutes } from "../user.routes.js";
 
 const USER_ID = "test-user";
@@ -19,10 +18,6 @@ const SEASON_ID = 10;
 const NOW = new Date("2026-08-08T15:30:00.000Z");
 const CREATED_AT = new Date("2026-01-01T00:00:00.000Z");
 const UPDATED_AT = new Date("2026-01-02T00:00:00.000Z");
-const USER_SERIES_CURSOR = encodeUserSeriesCursor({
-  lastWatchedAt: NOW,
-  seriesId: SERIES_ID
-});
 
 const series: Series = {
   id: SERIES_ID,
@@ -98,31 +93,31 @@ async function buildApp() {
 }
 
 function mockSuccessfulResponses(t: TestContext) {
-  t.mock.method(userService, "userSeriesGet", async () => ({
+  t.mock.method(userService, "seriesGet", async () => ({
     items: [{ ...userSeries, seriesDetails: series }],
     hasNextPage: true,
-    nextCursor: USER_SERIES_CURSOR
+    nextCursor: NOW
   }));
-  t.mock.method(userService, "userDashboardSummaryGet", async () => ({
+  t.mock.method(userService, "dashboardSummaryGet", async () => ({
     totalWatchedMinutes: 25,
     totalWatchedEpisodes: 1,
     totalWatchedSeries: 0
   }));
-  t.mock.method(userService, "userSeriesPost", async () => userSeries);
-  t.mock.method(userService, "userEpisodeFeedGet", async () => ({
+  t.mock.method(userService, "seriesPost", async () => userSeries);
+  t.mock.method(userService, "episodeFeedGet", async () => ({
     watching: [feedItem],
     paused: [],
     dropped: []
   }));
-  t.mock.method(userService, "userEpisodePost", async () => ({
+  t.mock.method(userService, "episodePost", async () => ({
     ...userEpisode,
     seriesId: SERIES_ID,
     nextEpisode: feedItem
   }));
-  t.mock.method(userService, "userEpisodeDelete", async () => userEpisode);
-  t.mock.method(userService, "userSeasonPost", async () => [userEpisode]);
-  t.mock.method(userService, "userSeasonDelete", async () => [userEpisode]);
-  t.mock.method(userService, "userStatusRecalculatePost", async () => ({ updatedCount: 1 }));
+  t.mock.method(userService, "episodeDelete", async () => userEpisode);
+  t.mock.method(userService, "seasonPost", async () => [userEpisode]);
+  t.mock.method(userService, "seasonDelete", async () => [userEpisode]);
+  t.mock.method(userService, "statusRecalculatePost", async () => ({ updatedCount: 1 }));
 }
 
 describe("user route response contracts", { concurrency: false }, () => {
@@ -143,7 +138,7 @@ describe("user route response contracts", { concurrency: false }, () => {
             }
           ],
           hasNextPage: true,
-          nextCursor: USER_SERIES_CURSOR
+          nextCursor: NOW
         }
       },
       {
@@ -202,7 +197,7 @@ describe("user route response contracts", { concurrency: false }, () => {
   });
 
   it("rejects a response that violates a user route contract", async (t) => {
-    t.mock.method(userService, "userEpisodeDelete", async () => [userEpisode] as never);
+    t.mock.method(userService, "episodeDelete", async () => [userEpisode] as never);
     const app = await buildApp();
     t.after(() => app.close());
 
@@ -212,47 +207,5 @@ describe("user route response contracts", { concurrency: false }, () => {
     });
 
     assert.equal(response.statusCode, 500);
-  });
-
-  it("accepts and forwards an opaque pagination cursor", async (t) => {
-    const userSeriesGet = t.mock.method(userService, "userSeriesGet", async () => ({
-      items: [],
-      hasNextPage: false,
-      nextCursor: null
-    }));
-    const app = await buildApp();
-    t.after(() => app.close());
-
-    const response = await app.inject({
-      method: "GET",
-      url: `/api/user/series?cursor=${encodeURIComponent(USER_SERIES_CURSOR)}`
-    });
-
-    assert.equal(response.statusCode, 200, response.body);
-    assert.deepEqual(userSeriesGet.mock.calls[0]?.arguments, [
-      USER_ID,
-      {
-        limit: 20,
-        cursor: USER_SERIES_CURSOR
-      }
-    ]);
-  });
-
-  it("rejects a malformed pagination cursor before calling the service", async (t) => {
-    const userSeriesGet = t.mock.method(userService, "userSeriesGet", async () => ({
-      items: [],
-      hasNextPage: false,
-      nextCursor: null
-    }));
-    const app = await buildApp();
-    t.after(() => app.close());
-
-    const response = await app.inject({
-      method: "GET",
-      url: "/api/user/series?cursor=not-a-cursor"
-    });
-
-    assert.equal(response.statusCode, 400, response.body);
-    assert.equal(userSeriesGet.mock.callCount(), 0);
   });
 });

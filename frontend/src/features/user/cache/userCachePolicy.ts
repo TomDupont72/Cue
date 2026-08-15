@@ -33,10 +33,7 @@ function invalidateUserProjections(
 }
 
 export const userCachePolicy = {
-  // The response already patches the feed with the next episode. Refetching it here would
-  // reorder the clicked series by lastWatchedAt and make the row jump to the top.
-  episodeAdded: (seriesId: number) =>
-    invalidateUserProjections(seriesId, { refetchEpisodesFeed: false }),
+  episodeAdded: invalidateUserProjections,
   episodeRemoved: invalidateUserProjections,
   seasonAdded: invalidateUserProjections,
   seasonRemoved: invalidateUserProjections,
