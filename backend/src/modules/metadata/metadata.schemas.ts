@@ -4,7 +4,7 @@ const metadataSeriesSearchGetResultSchema = z.object({
   tmdbId: z.number().int(),
   name: z.string(),
   originalName: z.string(),
-  overview: z.string(),
+  overview: z.string().nullable(),
   posterPath: z.string().nullable(),
   backdropPath: z.string().nullable(),
   firstAirDate: z.string().nullable(),

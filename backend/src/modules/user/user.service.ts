@@ -108,9 +108,9 @@ export const userService = {
     const episodes = await userRepository.getEpisodesFeed(userId);
 
     return {
-      watching: episodes.filter(({ status }) => status === "WATCHING"),
-      paused: episodes.filter(({ status }) => status === "PAUSED"),
-      dropped: episodes.filter(({ status }) => status === "DROPPED")
+      WATCHING: episodes.filter(({ status }) => status === "WATCHING"),
+      PAUSED: episodes.filter(({ status }) => status === "PAUSED"),
+      DROPPED: episodes.filter(({ status }) => status === "DROPPED")
     };
   },
 

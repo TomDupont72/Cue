@@ -84,9 +84,9 @@ export const userEpisodeFeedItemResponseSchema = z.object({
 });
 
 export const userEpisodeFeedGetResponseSchema = z.object({
-  watching: z.array(userEpisodeFeedItemResponseSchema),
-  paused: z.array(userEpisodeFeedItemResponseSchema),
-  dropped: z.array(userEpisodeFeedItemResponseSchema)
+  WATCHING: z.array(userEpisodeFeedItemResponseSchema),
+  PAUSED: z.array(userEpisodeFeedItemResponseSchema),
+  DROPPED: z.array(userEpisodeFeedItemResponseSchema)
 });
 
 export const userEpisodePostResponseSchema = userEpisodeResponseSchema.extend({
