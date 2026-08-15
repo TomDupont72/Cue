@@ -13,7 +13,11 @@ export function getStatusAfterRemovingEpisodes(watchCount: number): UserSeriesSt
   return watchCount === 0 ? "PLANNED" : "WATCHING";
 }
 
-export async function updateSeriesStatus(userSeries: UserSeries, status: UserSeriesStatus, tx: PrismaTx) {
+export async function updateSeriesStatus(
+  userSeries: UserSeries,
+  status: UserSeriesStatus,
+  tx: PrismaTx
+) {
   if (status === userSeries.status) {
     return userSeries;
   }

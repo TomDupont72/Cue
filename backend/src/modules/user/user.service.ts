@@ -15,7 +15,11 @@ import { notFound } from "@/shared/errors/errors.helpers.js";
 import { seriesRepository } from "@/modules/series/series.repository.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
-import { getStatusAfterAddingEpisodes, getStatusAfterRemovingEpisodes, updateSeriesStatus } from "@/modules/user/user.rules.js";
+import {
+  getStatusAfterAddingEpisodes,
+  getStatusAfterRemovingEpisodes,
+  updateSeriesStatus
+} from "@/modules/user/user.rules.js";
 
 type SeriesProgressParams = {
   userId: string;
