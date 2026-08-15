@@ -1,6 +1,8 @@
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
-import { Container } from "@/components/layout/container";
+import { Heading } from "@/components/layout/heading";
+import { PageContainer } from "@/components/layout/pageContainer";
+import { PageSection } from "@/components/layout/pageSection";
 import UserDashboardSummaryWidget from "@/features/user/components/userDashboardSummaryWidget";
 import { UserSeriesSection } from "@/features/user/components/userSeriesSection";
 import { USER_SERIES_STATUS } from "@/features/user/constants/userSeriesStatus";
@@ -35,28 +37,28 @@ export default function Dashboard() {
   }
 
   return (
-    <Container className="flex flex-1 flex-col py-8 items-center gap-18">
-      <section className="w-full flex flex-col items-center gap-6">
-        <h1 className="w-full text-left font-bold text-3xl">
-          {t("user:stats.title").toUpperCase()}
-        </h1>
+    <PageContainer className="gap-18">
+      <PageSection>
+        <Heading level={1} className="uppercase">
+          {t("user:stats.title")}
+        </Heading>
         <UserDashboardSummaryWidget
           totalWatchedMinutes={dashboardSummaryQuery.data.totalWatchedMinutes}
           totalWatchedEpisodes={dashboardSummaryQuery.data.totalWatchedEpisodes}
           totalWatchedSeries={dashboardSummaryQuery.data.totalWatchedSeries}
         />
-      </section>
+      </PageSection>
 
-      <section className="w-full flex flex-col items-center gap-6">
-        <h1 className="w-full text-left font-bold text-3xl">
-          {t("user:series.mySeries").toUpperCase()}
-        </h1>
+      <PageSection>
+        <Heading level={1} className="uppercase">
+          {t("user:series.mySeries")}
+        </Heading>
         <div className={isPending ? "hidden" : "flex flex-col gap-4"}>
           {Object.values(USER_SERIES_STATUS).map((status) => (
             <UserSeriesSection key={status} status={status} />
           ))}
         </div>
-      </section>
-    </Container>
+      </PageSection>
+    </PageContainer>
   );
 }

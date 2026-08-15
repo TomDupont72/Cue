@@ -1,4 +1,5 @@
-import { Container } from "@/components/layout/container";
+import { Heading } from "@/components/layout/heading";
+import { PageContainer } from "@/components/layout/pageContainer";
 import { SeriesSearchForm } from "@/features/series/components/seriesSearchForm";
 import { SeriesSearchResults } from "@/features/series/components/seriesSearchResults";
 import { useTranslation } from "react-i18next";
@@ -7,14 +8,14 @@ export default function Search() {
   const { t } = useTranslation();
 
   return (
-    <Container className="flex flex-1 flex-col py-8">
-      <div className="flex flex-1 flex-col gap-8">
-        <h1 className="text-3xl font-semibold">{t("series:search.title")}</h1>
+    <PageContainer className="gap-8">
+      <Heading level={1} className="uppercase">
+        {t("series:search.title")}
+      </Heading>
 
-        <SeriesSearchForm />
+      <SeriesSearchForm />
 
-        <SeriesSearchResults />
-      </div>
-    </Container>
+      <SeriesSearchResults />
+    </PageContainer>
   );
 }

@@ -4,10 +4,10 @@
   },
   "navigation": {
     "title": "Navigation",
-    "DASHBOARD": "Dashboard",
-    "WATCH": "À voir",
-    "CALENDAR": "Calendrier",
-    "SEARCH": "Recherche"
+    "dashboard": "Dashboard",
+    "watch": "À voir",
+    "calendar": "Calendrier",
+    "search": "Recherche"
   },
   "app": {
     "install": "Installer l'application"

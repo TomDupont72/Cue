@@ -6,6 +6,7 @@ import { useUserSeasonDelete } from "@/features/user/hooks/useUserSeasonDelete";
 import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
 import type { SeasonCardEpisode, SeasonCardSeason } from "@/features/season/types/season.types";
 import { useTranslation } from "react-i18next";
+import { Heading } from "@/components/layout/heading";
 
 type SeasonCardProps = {
   seriesId: number;
@@ -49,22 +50,16 @@ export default function SeasonCard({
   }
 
   return (
-    <AccordionItem className="mx-auto w-full sm:max-w-9/10 md:max-w-7/10 lg:max-w-7/10 border-none">
+    <AccordionItem className="border-none">
       <div className="relative my-3">
         <AccordionTrigger
-          className="rounded-xl
-      border
-      bg-card
-      px-4
-      py-4
-      pr-16
-      hover:no-underline"
+          variant="card"
           left={
-            <h2 className="font-bold text-xl">
+            <Heading level={2}>
               {season.seasonNumber !== 0
                 ? t("series:seasonNumber", { number: season.seasonNumber })
                 : t("series:specialEpisodes")}
-            </h2>
+            </Heading>
           }
           right={
             <div className="flex items-center ml-auto gap-4">
@@ -82,7 +77,7 @@ export default function SeasonCard({
             userSeasonPostMutation.isPending ||
             userSeasonDeleteMutation.isPending
           }
-          className="absolute right-3 top-1/2 z-10 -translate-y-1/2"
+          absolute="right-center"
         />
       </div>
 
@@ -92,7 +87,7 @@ export default function SeasonCard({
             key={episode.id}
             series={{ id: seriesId }}
             episode={episode}
-            watchedEpisodeIds={watchedEpisodeIds}
+            isWatched={watchedEpisodeIds.has(episode.id)}
           />
         ))}
       </AccordionContent>

@@ -4,5 +4,6 @@
   "500Error": "Une erreur est survenue sur le serveur.",
   "genericError": "Une erreur inattendue est survenue.",
   "unableFetch": "Impossible de charger les données",
-  "invalidRequest": "Requête invalide"
+  "invalidRequest": "Requête invalide",
+  "invalidParameters": "Les paramètres envoyés sont invalides."
 }

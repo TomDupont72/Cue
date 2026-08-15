@@ -1,6 +1,6 @@
 export const NAVIGATION_LINK = {
-  DASHBOARD: "/dashboard",
-  WATCH: "/watch",
-  CALENDAR: "/calendar",
-  SEARCH: "/search"
-};
+  DASHBOARD: { label: "dashboard", link: "/dashboard" },
+  WATCH: { label: "watch", link: "/watch" },
+  CALENDAR: { label: "calendar", link: "/calendar" },
+  SEARCH: { label: "search", link: "/search" }
+} as const;

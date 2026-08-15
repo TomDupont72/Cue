@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { StatePanel } from "@/components/feedback/statePanel";
 
 type EmptyStateProps = {
   title: string;
@@ -8,15 +9,5 @@ type EmptyStateProps = {
 };
 
 export function EmptyState({ title, description, icon, action }: EmptyStateProps) {
-  return (
-    <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed px-6 py-12 text-center">
-      {icon && <div className="mb-4 text-muted-foreground">{icon}</div>}
-
-      <h2 className="text-lg font-semibold">{title}</h2>
-
-      {description && <p className="mt-1 max-w-md text-sm text-muted-foreground">{description}</p>}
-
-      {action && <div className="mt-4">{action}</div>}
-    </div>
-  );
+  return <StatePanel title={title} description={description} icon={icon} action={action} />;
 }

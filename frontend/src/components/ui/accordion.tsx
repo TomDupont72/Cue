@@ -1,7 +1,9 @@
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion";
+import { type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { accordionTriggerVariants } from "./accordion-variants";
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
   return (
@@ -23,20 +25,26 @@ function AccordionItem({ className, ...props }: AccordionPrimitive.Item.Props) {
   );
 }
 
-type AccordionTriggerProps = React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
-  left?: React.ReactNode;
-  right?: React.ReactNode;
-};
+type AccordionTriggerProps = React.ComponentProps<typeof AccordionPrimitive.Trigger> &
+  VariantProps<typeof accordionTriggerVariants> & {
+    left?: React.ReactNode;
+    right?: React.ReactNode;
+  };
 
-function AccordionTrigger({ className, children, left, right, ...props }: AccordionTriggerProps) {
+function AccordionTrigger({
+  className,
+  children,
+  left,
+  right,
+  variant = "default",
+  ...props
+}: AccordionTriggerProps) {
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
-        className={cn(
-          "group/accordion-trigger relative flex flex-1 items-center rounded-lg border border-transparent py-2.5 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:after:border-ring aria-disabled:pointer-events-none aria-disabled:opacity-50",
-          className
-        )}
+        data-variant={variant}
+        className={cn(accordionTriggerVariants({ variant }), className)}
         {...props}
       >
         <div className="flex min-w-0 items-center gap-2">

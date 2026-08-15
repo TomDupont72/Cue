@@ -1,8 +1,8 @@
 import type { UserEpisodesFeedGetResponse } from "@/features/user/types/user.types";
 
 function preserveSectionOrder(
-  previous: UserEpisodesFeedGetResponse["watching"],
-  next: UserEpisodesFeedGetResponse["watching"]
+  previous: UserEpisodesFeedGetResponse["WATCHING"],
+  next: UserEpisodesFeedGetResponse["WATCHING"]
 ) {
   const nextBySeriesId = new Map(next.map((item) => [item.seriesId, item]));
   const previousIds = new Set(previous.map((item) => item.seriesId));
@@ -29,8 +29,8 @@ export function preserveFeedOrder(
   }
 
   return {
-    watching: preserveSectionOrder(previous.watching, next.watching),
-    paused: preserveSectionOrder(previous.paused, next.paused),
-    dropped: preserveSectionOrder(previous.dropped, next.dropped)
+    WATCHING: preserveSectionOrder(previous.WATCHING, next.WATCHING),
+    PAUSED: preserveSectionOrder(previous.PAUSED, next.PAUSED),
+    DROPPED: preserveSectionOrder(previous.DROPPED, next.DROPPED)
   };
 }

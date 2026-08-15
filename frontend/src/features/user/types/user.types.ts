@@ -1,5 +1,5 @@
 import type { SeriesRow } from "@/features/series/types/series.types";
-import type { UserSeriesStatus } from "../constants/userSeriesStatus";
+import { USER_SERIES_STATUS, type UserSeriesStatus } from "../constants/userSeriesStatus";
 import type { EpisodeRow } from "@/features/episode/types/episode.types";
 
 // =============================================================================
@@ -62,9 +62,9 @@ export type UserDashboardSummaryGetResponse = {
 };
 
 export type UserEpisodesFeed<T> = {
-  watching: T[];
-  paused: T[];
-  dropped: T[];
+  [USER_SERIES_STATUS.WATCHING]: T[];
+  [USER_SERIES_STATUS.PAUSED]: T[];
+  [USER_SERIES_STATUS.DROPPED]: T[];
 };
 
 export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
@@ -76,3 +76,17 @@ export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
       remainingEpisodes: number;
     }
 >;
+
+// =============================================================================
+// COMPONENT TYPES
+// =============================================================================
+
+export type WatchSectionStatus = Extract<UserSeriesStatus, "WATCHING" | "PAUSED" | "DROPPED">;
+
+export type WatchSectionItem = Omit<UserSeriesRow, "isFavorite" | "watchCount" | "addedAt"> &
+  Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
+    seriesName: string;
+    seriesPosterPath: string | null;
+    seriesTmdbId: number;
+    remainingEpisodes: number;
+  };

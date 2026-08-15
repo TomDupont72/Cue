@@ -1,6 +1,6 @@
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
-import { Container } from "@/components/layout/container";
+import { PageContainer } from "@/components/layout/pageContainer";
 import { ScrollToTop } from "@/components/layout/scrollToTop";
 import { Button } from "@/components/ui/button";
 import SeriesDetails from "@/features/series/components/seriesDetails";
@@ -46,7 +46,7 @@ export default function Series() {
     return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
   }
 
-  const { series, userSeries } = seriesQuery.data;
+  const { episodes, userEpisodes, seasons, series, userSeries } = seriesQuery.data;
 
   const watchProgress = userSeries
     ? (userSeries.watchCount / series.numberOfEpisodes) * 100
@@ -55,7 +55,7 @@ export default function Series() {
   return (
     <>
       <ScrollToTop />
-      <Container className="flex flex-1 flex-col py-8 gap-4">
+      <PageContainer className="gap-4">
         <div className="grid w-full grid-cols-2 gap-2">
           <Button
             variant={view === "overview" ? "secondary" : "ghost"}
@@ -83,10 +83,15 @@ export default function Series() {
               watchProgress={watchProgress}
             />
           ) : (
-            <SeriesDetails id={series.id} />
+            <SeriesDetails
+              id={series.id}
+              episodes={episodes}
+              userEpisodes={userEpisodes}
+              seasons={seasons}
+            />
           )}
         </div>
-      </Container>
+      </PageContainer>
     </>
   );
 }

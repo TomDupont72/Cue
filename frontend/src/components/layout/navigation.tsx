@@ -29,13 +29,13 @@ export function Navigation() {
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
-        {Object.entries(NAVIGATION_LINK).map(([key, to]) => (
-          <NavigationMenuItem key={to}>
+        {Object.values(NAVIGATION_LINK).map((navigation) => (
+          <NavigationMenuItem key={navigation.link}>
             <NavigationMenuLink
               className={navigationMenuTriggerStyle()}
               render={
-                <NavLink to={to} className="font-bold">
-                  {t(`common:navigation.${key}`).toUpperCase()}
+                <NavLink to={navigation.link} className="font-bold">
+                  {t(`common:navigation.${navigation.label}`).toUpperCase()}
                 </NavLink>
               }
             />
@@ -70,13 +70,13 @@ export function NavigationMobile() {
         </SheetHeader>
 
         <nav className="flex h-full flex-col gap-2 px-4">
-          {Object.entries(NAVIGATION_LINK).map(([key, to]) => (
+          {Object.values(NAVIGATION_LINK).map((navigation) => (
             <SheetClose
-              key={to}
+              key={navigation.link}
               nativeButton={false}
               render={
                 <NavLink
-                  to={to}
+                  to={navigation.link}
                   className={({ isActive }) =>
                     cn(
                       "rounded-lg px-4 py-3 font-bold transition-colors",
@@ -85,7 +85,7 @@ export function NavigationMobile() {
                     )
                   }
                 >
-                  {t(`common:navigation.${key}`).toUpperCase()}
+                  {t(`common:navigation.${navigation.label}`).toUpperCase()}
                 </NavLink>
               }
             />

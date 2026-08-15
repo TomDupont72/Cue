@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 
-import App from "./App";
+import App from "@/App";
 import { InstallPromptProvider } from "@/components/pwa/installPromptProvider";
 import { startInstallPromptCapture } from "@/components/pwa/installPromptStore";
 import { queryClient } from "@/lib/queryClient";

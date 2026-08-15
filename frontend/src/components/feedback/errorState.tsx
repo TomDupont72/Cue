@@ -2,6 +2,7 @@ import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isApiError } from "@/api/errors";
 import { useTranslation } from "react-i18next";
+import { StatePanel } from "@/components/feedback/statePanel";
 
 type ErrorStateProps = {
   error: unknown;
@@ -28,18 +29,18 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
   }
 
   return (
-    <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-destructive/30 bg-destructive/5 px-6 py-12 text-center">
-      <AlertCircle className="mb-4 size-8 text-destructive" />
-
-      <h2 className="text-lg font-semibold">{t("error:unableFetch")}</h2>
-
-      <p className="mt-1 max-w-md text-sm text-muted-foreground">{getErrorMessage(error)}</p>
-
-      {onRetry && (
-        <Button type="button" variant="outline" className="mt-4" onClick={onRetry}>
-          Réessayer
-        </Button>
-      )}
-    </div>
+    <StatePanel
+      title={t("error:unableFetch")}
+      description={getErrorMessage(error)}
+      icon={<AlertCircle className="size-8" />}
+      action={
+        onRetry ? (
+          <Button type="button" variant="outline" onClick={onRetry}>
+            Réessayer
+          </Button>
+        ) : undefined
+      }
+      tone="destructive"
+    />
   );
 }
