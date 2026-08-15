@@ -33,7 +33,7 @@ export default function Series() {
   const [view, setView] = useState<SeriesView>("overview");
 
   if (!seriesId && tmdbId === undefined) {
-    return <ErrorState error="Requête invalide" />;
+    return <ErrorState error={t("errors:invalidRequest")} />;
   }
 
   type SeriesView = "overview" | "details";

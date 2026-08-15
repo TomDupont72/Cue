@@ -20,25 +20,22 @@ import {
   SheetTrigger
 } from "../ui/sheet";
 import { InstallAppButton } from "../pwa/installAppButton";
-
-const navigation = [
-  { label: "DASHBOARD", to: "/dashboard" },
-  { label: "À VOIR", to: "/watch" },
-  { label: "CALENDRIER", to: "/calendar" },
-  { label: "RECHERCHE", to: "/search" }
-];
+import { NAVIGATION_LINK } from "../constants/navigationLink";
+import { useTranslation } from "react-i18next";
 
 export function Navigation() {
+  const { t } = useTranslation();
+
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
-        {navigation.map(({ label, to }) => (
+        {Object.entries(NAVIGATION_LINK).map(([key, to]) => (
           <NavigationMenuItem key={to}>
             <NavigationMenuLink
               className={navigationMenuTriggerStyle()}
               render={
                 <NavLink to={to} className="font-bold">
-                  {label}
+                  {t(`common:navigation.${key}`).toUpperCase()}
                 </NavLink>
               }
             />
@@ -50,6 +47,8 @@ export function Navigation() {
 }
 
 export function NavigationMobile() {
+  const { t } = useTranslation();
+
   return (
     <Sheet>
       <SheetTrigger
@@ -67,11 +66,11 @@ export function NavigationMobile() {
 
       <SheetContent side="right" className="w-72">
         <SheetHeader>
-          <SheetTitle>Navigation</SheetTitle>
+          <SheetTitle>{t("common:navigation.title")}</SheetTitle>
         </SheetHeader>
 
         <nav className="flex h-full flex-col gap-2 px-4">
-          {navigation.map(({ label, to }) => (
+          {Object.entries(NAVIGATION_LINK).map(([key, to]) => (
             <SheetClose
               key={to}
               nativeButton={false}
@@ -86,7 +85,7 @@ export function NavigationMobile() {
                     )
                   }
                 >
-                  {label}
+                  {t(`common:navigation.${key}`).toUpperCase()}
                 </NavLink>
               }
             />

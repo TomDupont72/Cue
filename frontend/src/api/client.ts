@@ -1,6 +1,9 @@
 import { z } from "zod";
-import { ApiError, type ApiErrorData } from "./errors";
+
+import i18n from "@/i18n";
 import { handleUnauthorizedResponse } from "@/lib/sessionManager";
+
+import { ApiError, type ApiErrorData } from "./errors";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
@@ -33,7 +36,8 @@ function validateData<T>(data: T | undefined, schema: z.ZodType<T> | undefined):
   const result = schema.safeParse(data);
 
   if (!result.success) {
-    const message = result.error.issues[0]?.message ?? "Les paramètres envoyés sont invalides.";
+    const message =
+      result.error.issues[0]?.message ?? i18n.t("invalidParameters", { ns: "errors" });
 
     throw new ApiError(message, 400, "VALIDATION_ERROR", result.error.issues);
   }
@@ -99,7 +103,9 @@ function getErrorData(body: unknown): ApiErrorData {
   if (typeof data.message === "string" || typeof data.code === "string") {
     return {
       code: typeof data.code === "string" ? data.code : undefined,
+
       message: typeof data.message === "string" ? data.message : undefined,
+
       details: data.details
     };
   }
@@ -109,7 +115,9 @@ function getErrorData(body: unknown): ApiErrorData {
 
     return {
       code: typeof error.code === "string" ? error.code : undefined,
+
       message: typeof error.message === "string" ? error.message : undefined,
+
       details: error.details
     };
   }
@@ -117,7 +125,7 @@ function getErrorData(body: unknown): ApiErrorData {
   return {};
 }
 
-export async function apiClient<
+export async function ApiClient<
   TResponse,
   TBody = unknown,
   TQuery extends QueryParams = QueryParams,
@@ -138,7 +146,9 @@ export async function apiClient<
 
   const response = await fetch(buildUrl(resolvedPath, validatedQuery), {
     ...requestOptions,
+
     credentials: "include",
+
     headers: {
       Accept: "application/json",
 
@@ -163,14 +173,20 @@ export async function apiClient<
 
   if (!response.ok) {
     const errorData = getErrorData(responseBody);
+
     const unauthorizedRecovery =
       response.status === 401 ? await handleUnauthorizedResponse() : undefined;
 
     throw new ApiError(
-      errorData.message ?? `Request failed with status ${response.status}`,
+      errorData.message ??
+        `${i18n.t("invalidRequest", {
+          ns: "errors"
+        })} : ${response.status}`,
+
       response.status,
       errorData.code,
       errorData.details,
+
       unauthorizedRecovery === "session-expired"
     );
   }

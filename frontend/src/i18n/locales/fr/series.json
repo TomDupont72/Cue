@@ -15,6 +15,7 @@
   },
   "search": {
     "title": "Recherche",
+    "placeholder": "Rechercher une série...",
     "emptyQueryTitle": "Rechercher une série",
     "emptyQueryDescription": "Entre le nom d'une série pour afficher les résultats.",
     "emptyResultTitle": "Aucun résultat",

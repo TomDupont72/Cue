@@ -6,7 +6,8 @@
     },
     "actions": {
       "login": "Se connecter",
-      "register": "S'inscrire"
+      "register": "S'inscrire",
+      "disconnect": "Se déconnecter"
     },
     "fields": {
       "name": "Nom",

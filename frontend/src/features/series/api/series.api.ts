@@ -1,4 +1,4 @@
-import { apiClient } from "@/api/client";
+import { ApiClient } from "@/api/client";
 import type {
   SeriesGetResponse,
   SeriesImportPostResponse
@@ -15,7 +15,7 @@ export function seriesSearchGet(
   query: string,
   page: number
 ): Promise<MetadataSeriesSearchGetResponse> {
-  return apiClient<MetadataSeriesSearchGetResponse>("/metadata/series/search", {
+  return ApiClient<MetadataSeriesSearchGetResponse>("/metadata/series/search", {
     query: {
       query,
       page
@@ -25,7 +25,7 @@ export function seriesSearchGet(
 }
 
 export function seriesGet(id: number): Promise<SeriesGetResponse> {
-  return apiClient<SeriesGetResponse>("/series/:id", {
+  return ApiClient<SeriesGetResponse>("/series/:id", {
     params: {
       id
     },
@@ -34,7 +34,7 @@ export function seriesGet(id: number): Promise<SeriesGetResponse> {
 }
 
 export function seriesImportPost(tmdbId: number): Promise<SeriesImportPostResponse> {
-  return apiClient<SeriesImportPostResponse, SeriesImportPostBody>("/series/import", {
+  return ApiClient<SeriesImportPostResponse, SeriesImportPostBody>("/series/import", {
     method: "POST",
     body: { tmdbId },
     bodySchema: seriesImportPostBodySchema

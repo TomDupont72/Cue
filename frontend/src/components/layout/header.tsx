@@ -17,6 +17,7 @@ import { authClient } from "@/lib/authClient";
 import { queryClient } from "@/lib/queryClient";
 import { invalidateSessionGeneration } from "@/lib/sessionGeneration";
 import { InstallAppButton } from "../pwa/installAppButton";
+import { useTranslation } from "react-i18next";
 
 function getInitials(name: string | undefined): string {
   if (!name) return "NA";
@@ -30,6 +31,8 @@ function getInitials(name: string | undefined): string {
 }
 
 export default function Header() {
+  const { t } = useTranslation();
+
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
@@ -77,7 +80,9 @@ export default function Header() {
             <DropdownMenuContent align="end">
               <DropdownMenuGroup>
                 <DropdownMenuItem disabled>{user?.name}</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => void signOut()}>Se déconnecter</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => void signOut()}>
+                  {t("user:auth.actions.disconnect")}
+                </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
