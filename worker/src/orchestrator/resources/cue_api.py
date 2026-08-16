@@ -50,3 +50,16 @@ class CueApiResource(dg.ConfigurableResource):
 
         response.raise_for_status()
         return response.json()
+
+    def post_series_reconcile(self, tmdb_ids: list[int]) -> dict:
+        response = httpx.post(
+            f"{self.base_url}/api/series/reconcile",
+            headers={"Authorization": f"Bearer {self.worker_token}"},
+            json={
+                "tmdbIds": tmdb_ids,
+            },
+            timeout=120,
+        )
+
+        response.raise_for_status()
+        return response.json()

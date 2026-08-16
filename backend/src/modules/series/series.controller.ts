@@ -1,6 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { seriesService } from "./series.service.js";
-import { SeriesGetParams, SeriesImportPostBody } from "./series.schemas.js";
+import {
+  SeriesGetParams,
+  SeriesImportPostBody,
+  SeriesReconcilePostBody
+} from "./series.schemas.js";
 
 export const seriesController = {
   async get(request: FastifyRequest<{ Params: SeriesGetParams }>, reply: FastifyReply) {
@@ -20,5 +24,13 @@ export const seriesImportController = {
     );
 
     return reply.send(results);
+  }
+};
+
+export const seriesReconcileController = {
+  async post(request: FastifyRequest<{ Body: SeriesReconcilePostBody }>, reply: FastifyReply) {
+    const result = await seriesService.reconcilePost(request.body);
+
+    return reply.send(result);
   }
 };
