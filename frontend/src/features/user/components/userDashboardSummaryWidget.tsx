@@ -41,7 +41,7 @@ export default function UserDashboardSummaryWidget({
               Object.values(stats[key as keyof typeof stats]).map((timePart) => (
                 <div key={timePart.label} className="flex flex-col items-center">
                   <Text>{timePart.value}</Text>
-                  <Heading level={4} className="uppercase">
+                  <Heading level={5} className="uppercase">
                     {t(`user:stats.${timePart.label}`, { count: timePart.value })}
                   </Heading>
                 </div>
