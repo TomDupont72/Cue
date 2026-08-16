@@ -63,6 +63,12 @@ export const userService = {
   },
 
   async seriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
+    const series = await seriesRepository.findOne({ id: params.seriesId });
+
+    if (!series) {
+      throw notFound("Series");
+    }
+
     const userSeries = await userRepository.upsertSeries(
       { userId_seriesId: { userId, ...params } },
       { userId, ...params, ...body },
@@ -351,7 +357,10 @@ export const userService = {
         );
       }
 
-      return createdUserEpisodes;
+      return userRepository.findManyEpisodes(
+        { userId, episodeId: { in: episodes.map((episode) => episode.id) } },
+        tx
+      );
     });
   },
 
@@ -454,7 +463,7 @@ export const userService = {
 
   async seriesReconcilePost(params: UserSeriesReconcilePostParams, now = new Date()) {
     const inactiveSince = new Date(now);
-    inactiveSince.setUTCMonth(inactiveSince.getUTCMonth() - 2);
+    inactiveSince.setUTCDate(inactiveSince.getUTCDate() - 60);
 
     return prisma.$transaction(async (tx) => {
       const seriesProgress = await userRepository.getSeriesProgress(params.userId, tx);
