@@ -40,7 +40,7 @@ if (env.NODE_ENV !== "production") {
     openapi: {
       info: {
         title: "Cue API",
-        version: "0.9.1"
+        version: "0.9.6"
       },
       tags: [
         {

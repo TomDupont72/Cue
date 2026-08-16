@@ -1,3 +1,12 @@
+## [0.9.6] - 2026-08-16
+
+### Fixed
+
+- Correction de la gestion des statuts des séries suivies.
+- Correction de la pagination des séries.
+- Correction de la cohérence des métriques utilisateur.
+- Correction de l’ordre des séries dans le feed À voir.
+
 ## [0.9.5] - 2026-08-10
 
 ### Fixed
