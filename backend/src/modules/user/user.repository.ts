@@ -231,7 +231,7 @@ export const userRepository = {
 
   async getDashboardSummary(userId: string, db: PrismaTx = prisma) {
     const [summaryEpisodes] = await db.$queryRaw<DashboardSummaryEpisodesRow[]>`
-        SELECT SUM(e.runtime) AS "totalWatchedMinutes", COUNT(e.id) AS "totalWatchedEpisodes" FROM "Episode" e
+        SELECT COALESCE(SUM(e.runtime), 0)::bigint AS "totalWatchedMinutes", COUNT(e.id) AS "totalWatchedEpisodes" FROM "Episode" e
         INNER JOIN "UserEpisode" ue         
         ON ue."episodeId" = e.id
         WHERE ue."userId" = ${userId};

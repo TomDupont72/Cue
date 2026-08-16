@@ -4,16 +4,7 @@ import {
   userEpisodeResponseSchema,
   userSeriesResponseSchema
 } from "@/modules/series/series.schemas.js";
-
-export const userSeriesStatuses = [
-  "PLANNED",
-  "WATCHING",
-  "COMPLETED",
-  "DROPPED",
-  "PAUSED"
-] as const;
-
-export const userSeriesStatusSchema = z.enum(userSeriesStatuses);
+import { UserSeriesStatus } from "@/generated/prisma/enums.js";
 
 export const userSeriesPostBodySchema = z.object({
   isFavorite: z.boolean().optional()
@@ -33,7 +24,7 @@ export const userEpisodePostParamsSchema = z.object({
 
 export const userSeriesGetSchema = z.object({
   seriesId: z.coerce.number().int().min(1).optional(),
-  status: userSeriesStatusSchema.optional(),
+  status: z.enum(UserSeriesStatus).optional(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
   cursor: z.iso
     .datetime()
@@ -69,7 +60,7 @@ export const userSeriesPostResponseSchema = userSeriesResponseSchema;
 export const userEpisodeFeedItemResponseSchema = z.object({
   userId: z.string(),
   seriesId: z.number().int(),
-  status: userSeriesStatusSchema,
+  status: z.enum(UserSeriesStatus),
   lastWatchedAt: z.date().nullable(),
   seriesName: z.string(),
   seriesPosterPath: z.string().nullable(),

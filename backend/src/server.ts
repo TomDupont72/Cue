@@ -26,7 +26,7 @@ const app = Fastify({
 }).withTypeProvider<ZodTypeProvider>();
 
 app.register(fastifyCors, {
-  origin: process.env.CLIENT_ORIGIN,
+  origin: env.CLIENT_ORIGIN,
   credentials: true,
   methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"]
 });
