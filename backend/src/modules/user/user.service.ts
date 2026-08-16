@@ -8,7 +8,7 @@ import {
   UserSeriesGet,
   UserSeasonPostParams,
   UserSeasonDeleteParams,
-  UserStatusPostParams
+  UserSeriesReconcilePostParams
 } from "@/modules/user/user.schemas.js";
 import { episodeRepository } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
@@ -452,17 +452,19 @@ export const userService = {
     return summary;
   },
 
-  async statusRecalculatePost(params: UserStatusPostParams, now = new Date()) {
+  async seriesReconcilePost(params: UserSeriesReconcilePostParams, now = new Date()) {
     const inactiveSince = new Date(now);
     inactiveSince.setUTCMonth(inactiveSince.getUTCMonth() - 2);
 
     return prisma.$transaction(async (tx) => {
+      const seriesProgress = await userRepository.getSeriesProgress(params.userId, tx);
+      const progressBySeriesId = new Map(
+        seriesProgress.map((progress) => [progress.seriesId, progress])
+      );
+
       const userSeries = await tx.userSeries.findMany({
         where: {
-          userId: params.userId,
-          status: {
-            not: "DROPPED"
-          }
+          userId: params.userId
         },
         include: {
           series: {
@@ -475,21 +477,33 @@ export const userService = {
       });
 
       const updates = userSeries.flatMap((item) => {
+        const progress = progressBySeriesId.get(item.seriesId);
+        const watchedEpisodeCount = progress?.watchedEpisodeCount ?? 0;
+        const watchCount = progress?.watchCount ?? 0;
+        const lastWatchedAt = progress?.lastWatchedAt ?? null;
         const calculatedStatus = getUserSeriesStatus(
-          item.watchedEpisodeCount,
-          item.watchCount,
+          watchedEpisodeCount,
+          watchCount,
           item.series.numberOfEpisodes,
           item.series.inProduction
         );
         const status =
-          item.status === "WATCHING" &&
-          calculatedStatus === "WATCHING" &&
-          item.lastWatchedAt !== null &&
-          item.lastWatchedAt <= inactiveSince
+          item.status === "DROPPED" && calculatedStatus !== "PLANNED"
             ? "DROPPED"
-            : calculatedStatus;
+            : item.status === "WATCHING" &&
+                calculatedStatus === "WATCHING" &&
+                lastWatchedAt !== null &&
+                lastWatchedAt <= inactiveSince
+              ? "DROPPED"
+              : calculatedStatus;
 
-        return status === item.status
+        const hasChanged =
+          item.watchedEpisodeCount !== watchedEpisodeCount ||
+          item.watchCount !== watchCount ||
+          (item.lastWatchedAt?.getTime() ?? null) !== (lastWatchedAt?.getTime() ?? null) ||
+          item.status !== status;
+
+        return !hasChanged
           ? []
           : [
               userRepository.updateSeries(
@@ -499,7 +513,12 @@ export const userService = {
                     seriesId: item.seriesId
                   }
                 },
-                { status },
+                {
+                  watchedEpisodeCount,
+                  watchCount,
+                  lastWatchedAt,
+                  status
+                },
                 tx
               )
             ];

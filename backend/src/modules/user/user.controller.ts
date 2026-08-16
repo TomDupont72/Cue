@@ -7,7 +7,7 @@ import {
   UserSeriesGet,
   UserSeriesPostBody,
   UserSeriesPostParams,
-  UserStatusPostParams
+  UserSeriesReconcilePostParams
 } from "@/modules/user/user.schemas.js";
 import { userService } from "@/modules/user/user.service.js";
 
@@ -64,9 +64,12 @@ export const userDashboardSummaryController = {
   }
 };
 
-export const userStatusController = {
-  async post(request: FastifyRequest<{ Params: UserStatusPostParams }>, reply: FastifyReply) {
-    const result = await userService.statusRecalculatePost(request.params);
+export const userSeriesReconcileController = {
+  async post(
+    request: FastifyRequest<{ Params: UserSeriesReconcilePostParams }>,
+    reply: FastifyReply
+  ) {
+    const result = await userService.seriesReconcilePost(request.params);
 
     return reply.send(result);
   }

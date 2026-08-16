@@ -9,6 +9,13 @@ export type DashboardSummarySeriesRow = {
   totalWatchedSeries: bigint;
 };
 
+export type UserSeriesProgressRow = {
+  seriesId: number;
+  watchCount: number;
+  watchedEpisodeCount: number;
+  lastWatchedAt: Date;
+};
+
 export type EpisodeFeedRow = {
   userId: string;
   seriesId: number;

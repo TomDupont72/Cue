@@ -4,7 +4,8 @@ import { PrismaTx } from "@/shared/db/prisma.types.js";
 import {
   DashboardSummaryEpisodesRow,
   DashboardSummarySeriesRow,
-  EpisodeFeedRow
+  EpisodeFeedRow,
+  UserSeriesProgressRow
 } from "./user.types.js";
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 
@@ -56,6 +57,20 @@ export const userRepository = {
         watchedAt: "desc"
       }
     });
+  },
+
+  getSeriesProgress(userId: string, db: PrismaTx = prisma) {
+    return db.$queryRaw<UserSeriesProgressRow[]>(Prisma.sql`
+      SELECT
+        e."seriesId",
+        COUNT(*)::int AS "watchedEpisodeCount",
+        (COUNT(*) FILTER (WHERE e."seasonNumber" <> 0))::int AS "watchCount",
+        MAX(ue."watchedAt") AS "lastWatchedAt"
+      FROM "UserEpisode" ue
+      JOIN "Episode" e ON e.id = ue."episodeId"
+      WHERE ue."userId" = ${userId}
+      GROUP BY e."seriesId"
+    `);
   },
 
   upsertSeries(
