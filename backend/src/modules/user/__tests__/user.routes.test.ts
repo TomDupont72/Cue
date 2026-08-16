@@ -106,9 +106,9 @@ function mockSuccessfulResponses(t: TestContext) {
   }));
   t.mock.method(userService, "seriesPost", async () => userSeries);
   t.mock.method(userService, "episodeFeedGet", async () => ({
-    watching: [feedItem],
-    paused: [],
-    dropped: []
+    WATCHING: [feedItem],
+    PAUSED: [],
+    DROPPED: []
   }));
   t.mock.method(userService, "episodePost", async () => ({
     ...userEpisode,
@@ -160,7 +160,7 @@ describe("user route response contracts", { concurrency: false }, () => {
       {
         method: "GET",
         url: "/api/user/episodes/feed",
-        expected: { watching: [feedItem], paused: [], dropped: [] }
+        expected: { WATCHING: [feedItem], PAUSED: [], DROPPED: [] }
       },
       {
         method: "POST",
