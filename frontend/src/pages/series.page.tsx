@@ -13,8 +13,8 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useSearchParams } from "react-router-dom";
 
 export default function Series() {
-    const { t } = useTranslation();
-    const location = useLocation();
+  const { t } = useTranslation();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
 
   const seriesId = Number(searchParams.get("id")?.trim() ?? "");
@@ -22,35 +22,35 @@ export default function Series() {
 
   const seriesQuery = useSeries(seriesId);
   const seriesImportMutation = useSeriesImport();
-  
+
   const [view, setView] = useState<"overview" | "details">("overview");
-  
+
   useEffect(() => {
-      if (seriesId || tmdbId === undefined) {
-          return;
-        }
-        
-        seriesImportMutation.mutate(tmdbId);
-    }, [seriesId, tmdbId, seriesImportMutation]);
-    
-    if (!seriesId && tmdbId === undefined) {
-        return <ErrorState error={t("errors:invalidRequest")} />;
+    if (seriesId || tmdbId === undefined) {
+      return;
     }
-    
-    if (seriesQuery.isPending) {
-        return <LoadingState />;
-    }
-    
-    if (seriesQuery.isError) {
-        return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
-    }
-    
-    const { episodes, userEpisodes, seasons, series, userSeries } = seriesQuery.data;
-  
-    const watchProgress = userSeries
-      ? getWatchProgress(userSeries?.watchCount, series.numberOfEpisodes)
-      : undefined;
-    console.log(watchProgress);
+
+    seriesImportMutation.mutate(tmdbId);
+  }, [seriesId, tmdbId, seriesImportMutation]);
+
+  if (!seriesId && tmdbId === undefined) {
+    return <ErrorState error={t("errors:invalidRequest")} />;
+  }
+
+  if (seriesQuery.isPending) {
+    return <LoadingState />;
+  }
+
+  if (seriesQuery.isError) {
+    return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
+  }
+
+  const { episodes, userEpisodes, seasons, series, userSeries } = seriesQuery.data;
+
+  const watchProgress = userSeries
+    ? getWatchProgress(userSeries?.watchCount, series.numberOfEpisodes)
+    : undefined;
+  console.log(watchProgress);
 
   return (
     <>

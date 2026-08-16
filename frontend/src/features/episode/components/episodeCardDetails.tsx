@@ -21,7 +21,7 @@ export default function EpisodeCardDetails({
   remainingDays
 }: EpisodeCardDetailsProps) {
   const { t } = useTranslation();
-  
+
   return (
     <>
       <div className="relative aspect-video w-full overflow-hidden bg-muted">

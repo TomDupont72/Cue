@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
   const { t } = useTranslation();
- 
+
   const dashboardSummaryQuery = useUserDashboardSummary();
 
   const initialFetchingCount = useIsFetching({
