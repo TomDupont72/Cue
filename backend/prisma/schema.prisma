@@ -267,11 +267,12 @@ model UserSeries {
   userId   String
   seriesId Int
 
-  status        UserSeriesStatus @default(PLANNED)
-  isFavorite    Boolean          @default(false)
-  watchCount    Int              @default(0)
-  addedAt       DateTime         @default(now())
-  lastWatchedAt DateTime?
+  status              UserSeriesStatus @default(PLANNED)
+  isFavorite          Boolean          @default(false)
+  watchCount          Int              @default(0)
+  watchedEpisodeCount Int              @default(0)
+  addedAt             DateTime         @default(now())
+  lastWatchedAt       DateTime?
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)

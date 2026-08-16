@@ -60,6 +60,7 @@ export const userSeriesResponseSchema = z.object({
   status: z.enum(UserSeriesStatus),
   isFavorite: z.boolean(),
   watchCount: z.number().int(),
+  watchedEpisodeCount: z.number().int(),
   addedAt: z.date(),
   lastWatchedAt: z.date().nullable()
 });

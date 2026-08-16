@@ -24,14 +24,15 @@ export const userRepository = {
   findManySeries(
     where: Prisma.UserSeriesWhereInput,
     limit: number,
-    cursor: string | undefined,
+    cursor: Date | undefined,
+    cursorField: "addedAt" | "lastWatchedAt",
     db: PrismaTx = prisma
   ) {
     return findManyPaginated({
       where,
       limit,
-      cursor: cursor ? new Date(cursor) : undefined,
-      cursorField: "lastWatchedAt",
+      cursor,
+      cursorField,
       order: "desc",
       delegate: db.userSeries
     });
@@ -40,6 +41,20 @@ export const userRepository = {
   findManyEpisodes(where: Prisma.UserEpisodeWhereInput, db: PrismaTx = prisma) {
     return db.userEpisode.findMany({
       where
+    });
+  },
+
+  findLatestWatchedEpisode(userId: string, seriesId: number, db: PrismaTx = prisma) {
+    return db.userEpisode.findFirst({
+      where: {
+        userId,
+        episode: {
+          seriesId
+        }
+      },
+      orderBy: {
+        watchedAt: "desc"
+      }
     });
   },
 
@@ -53,13 +68,6 @@ export const userRepository = {
       where,
       create: create,
       update: update
-    });
-  },
-
-  ensureSeries(userId: string, seriesId: number, db: PrismaTx = prisma) {
-    return db.userSeries.createMany({
-      data: [{ userId, seriesId }],
-      skipDuplicates: true
     });
   },
 

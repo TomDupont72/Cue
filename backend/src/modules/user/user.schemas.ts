@@ -16,7 +16,6 @@ export const userSeriesStatuses = [
 export const userSeriesStatusSchema = z.enum(userSeriesStatuses);
 
 export const userSeriesPostBodySchema = z.object({
-  status: userSeriesStatusSchema.optional(),
   isFavorite: z.boolean().optional()
 });
 
@@ -36,7 +35,10 @@ export const userSeriesGetSchema = z.object({
   seriesId: z.coerce.number().int().min(1).optional(),
   status: userSeriesStatusSchema.optional(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
-  cursor: z.string().optional()
+  cursor: z.iso
+    .datetime()
+    .transform((cursor) => new Date(cursor))
+    .optional()
 });
 
 export const userSeasonPostParamsSchema = z.object({
