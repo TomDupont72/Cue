@@ -51,11 +51,7 @@ export function UserSeriesSection({ status }: UserSeriesSectionProps) {
         {t(`user:series.status.${status}.section`)}
       </Heading>
       <div className="h-px w-full bg-border" />
-      <SeriesDisplay
-        series={items.map((item) => item.seriesDetails)}
-        userSeries={items}
-        isProgress
-      />
+      <SeriesDisplay series={items.map((item) => item.seriesDetails)} userSeries={items} />
 
       {query.hasNextPage && (
         <div ref={loadMoreRef} className="flex h-24 items-center justify-center">

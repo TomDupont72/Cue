@@ -1,18 +1,14 @@
 import type { SeriesDisplaySeries } from "@/features/series/types/series.types";
 import { SeriesCard } from "@/features/series/components/seriesCard";
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
+import { getWatchProgress } from "@/features/user/utils/watchProgress";
 
 type SeriesDisplayProps = {
   series: SeriesDisplaySeries[];
   userSeries?: UserSeriesGetResponse["items"];
-  isProgress?: boolean;
 };
 
-export default function SeriesDisplay({
-  series,
-  userSeries = [],
-  isProgress = false
-}: SeriesDisplayProps) {
+export default function SeriesDisplay({ series, userSeries = [] }: SeriesDisplayProps) {
   return (
     <div
       className="
@@ -25,9 +21,12 @@ export default function SeriesDisplay({
       {series.map((data) => {
         const userData = userSeries.find((item) => item.seriesDetails.tmdbId === data.tmdbId);
 
-        const watchProgress =
-          userData && data.numberOfEpisodes
-            ? (userData.watchCount / data.numberOfEpisodes) * 100
+        const progress =
+          userData && data.numberOfEpisodes !== undefined
+            ? {
+                status: userData.status,
+                value: getWatchProgress(userData.watchCount, data.numberOfEpisodes)
+              }
             : undefined;
 
         return (
@@ -35,9 +34,7 @@ export default function SeriesDisplay({
             key={data.tmdbId}
             series={data}
             seriesId={userData?.seriesId}
-            isProgress={isProgress}
-            status={userData?.status}
-            watchProgress={watchProgress}
+            progress={progress}
           />
         );
       })}

@@ -19,12 +19,7 @@ type SeriesOverviewProps = {
   watchProgress?: number;
 };
 
-export function SeriesOverview({
-  series,
-  userSeries,
-  isProgress = false,
-  watchProgress
-}: SeriesOverviewProps) {
+export function SeriesOverview({ series, userSeries, watchProgress }: SeriesOverviewProps) {
   const { t } = useTranslation();
 
   const startYear = getYear(series.firstAirDate);
@@ -38,7 +33,7 @@ export function SeriesOverview({
         <div className="h-56 w-full overflow-hidden sm:h-72 lg:h-96">
           <Picture path={series.backdropPath} size="original" />
         </div>
-        {isProgress ? (
+        {watchProgress !== undefined ? (
           <StatusProgressBar value={watchProgress ?? 0} status={userSeries?.status ?? "PLANNED"} />
         ) : null}
       </div>

@@ -7,6 +7,7 @@ import SeriesDetails from "@/features/series/components/seriesDetails";
 import { SeriesOverview } from "@/features/series/components/seriesOverview";
 import { useSeries } from "@/features/series/hooks/useSeries";
 import { useSeriesImport } from "@/features/series/hooks/useSeriesImportMutation";
+import { getWatchProgress } from "@/features/user/utils/watchProgress";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useSearchParams } from "react-router-dom";
@@ -49,8 +50,9 @@ export default function Series() {
   const { episodes, userEpisodes, seasons, series, userSeries } = seriesQuery.data;
 
   const watchProgress = userSeries
-    ? (userSeries.watchCount / series.numberOfEpisodes) * 100
+    ? getWatchProgress(userSeries?.watchCount, series.numberOfEpisodes)
     : undefined;
+  console.log(watchProgress);
 
   return (
     <>
@@ -76,12 +78,7 @@ export default function Series() {
 
         <div className="flex flex-1 flex-col gap-8">
           {view === "overview" ? (
-            <SeriesOverview
-              series={series}
-              userSeries={userSeries}
-              isProgress={userSeries !== null}
-              watchProgress={watchProgress}
-            />
+            <SeriesOverview series={series} userSeries={userSeries} watchProgress={watchProgress} />
           ) : (
             <SeriesDetails
               id={series.id}

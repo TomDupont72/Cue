@@ -4,6 +4,7 @@ import SummaryCard from "@/features/user/components/summaryCard";
 import { STATS } from "@/features/user/constants/stats";
 import { Heading } from "@/components/layout/heading";
 import { Text } from "@/components/layout/text";
+import { splitWatchedDuration } from "../utils/watchDuration";
 
 type UserDashboardSummaryWidgetProps = {
   totalWatchedMinutes: number;
@@ -18,10 +19,7 @@ export default function UserDashboardSummaryWidget({
 }: UserDashboardSummaryWidgetProps) {
   const { t } = useTranslation();
 
-  const months = Math.floor(totalWatchedMinutes / 43_200);
-  const days = Math.floor((totalWatchedMinutes % 43_200) / 1_440);
-  const hours = Math.floor((totalWatchedMinutes % 1_440) / 60);
-  const minutes = totalWatchedMinutes % 60;
+  const [months, days, hours, minutes] = splitWatchedDuration(totalWatchedMinutes);
 
   const stats = {
     WATCH_TIME: {
@@ -38,7 +36,7 @@ export default function UserDashboardSummaryWidget({
     <ScrollArea className="w-full min-w-0">
       <div className="flex w-max min-w-full flex-row justify-start gap-6 md:justify-center">
         {Object.entries(STATS).map(([key, stat]) => (
-          <SummaryCard key={stat.type} title={t(`user:stats.${stat.label}`)}>
+          <SummaryCard key={stat.label} title={t(`user:stats.${stat.label}`)}>
             {stat.type == "duration" ? (
               Object.values(stats[key as keyof typeof stats]).map((timePart) => (
                 <div key={timePart.label} className="flex flex-col items-center">

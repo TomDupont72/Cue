@@ -11,18 +11,13 @@ import Picture from "@/components/layout/picture";
 type SeriesCardProps = {
   series: SeriesCardSeries;
   seriesId?: number;
-  isProgress?: boolean;
-  status?: UserSeriesStatus;
-  watchProgress?: number;
+  progress?: {
+    status: UserSeriesStatus;
+    value: number;
+  };
 };
 
-export function SeriesCard({
-  series,
-  seriesId,
-  isProgress = false,
-  status,
-  watchProgress
-}: SeriesCardProps) {
+export function SeriesCard({ series, seriesId, progress }: SeriesCardProps) {
   const { t } = useTranslation();
 
   const year = getYear(series.firstAirDate);
@@ -43,8 +38,8 @@ export function SeriesCard({
             <Picture path={series.posterPath} hover />
           </div>
 
-          {isProgress ? (
-            <StatusProgressBar value={watchProgress ?? 0} status={status ?? "PLANNED"} />
+          {progress ? (
+            <StatusProgressBar value={progress.value ?? 0} status={progress.status ?? "PLANNED"} />
           ) : null}
         </div>
 
