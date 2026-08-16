@@ -50,7 +50,6 @@ export default function Series() {
   const watchProgress = userSeries
     ? getWatchProgress(userSeries?.watchCount, series.numberOfEpisodes)
     : undefined;
-  console.log(watchProgress);
 
   return (
     <>

@@ -18,6 +18,7 @@ export type UserSeriesRow = {
   status: UserSeriesStatus;
   isFavorite: boolean;
   watchCount: number;
+  watchedEpisodeCount: number;
   addedAt: string;
   lastWatchedAt: string | null;
 };
@@ -29,7 +30,7 @@ export type UserSeriesRow = {
 export type UserEpisodePostResponse = UserEpisodeRow & {
   seriesId: number;
   nextEpisode:
-    | (Omit<UserSeriesRow, "isFavorite" | "watchCount" | "addedAt"> &
+    | (Omit<UserSeriesRow, "isFavorite" | "watchCount" | "watchedEpisodeCount" | "addedAt"> &
         Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
           seriesName: string;
           seriesPosterPath: string | null;
@@ -68,7 +69,7 @@ export type UserEpisodesFeed<T> = {
 };
 
 export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
-  Omit<UserSeriesRow, "isFavorite" | "watchCount" | "addedAt"> &
+  Omit<UserSeriesRow, "isFavorite" | "watchCount" | "watchedEpisodeCount" | "addedAt"> &
     Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
       seriesName: string;
       seriesPosterPath: string | null;
@@ -83,7 +84,10 @@ export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
 
 export type WatchSectionStatus = Extract<UserSeriesStatus, "WATCHING" | "PAUSED" | "DROPPED">;
 
-export type WatchSectionItem = Omit<UserSeriesRow, "isFavorite" | "watchCount" | "addedAt"> &
+export type WatchSectionItem = Omit<
+  UserSeriesRow,
+  "isFavorite" | "watchCount" | "watchedEpisodeCount" | "addedAt"
+> &
   Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
     seriesName: string;
     seriesPosterPath: string | null;

@@ -15,7 +15,7 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
   function getErrorMessage(error: unknown): string {
     if (isApiError(error)) {
       if (error.status in [401, 404, 500]) {
-        return t(`error:${error.status}Error`);
+        return t(`errors:${error.status}Error`);
       }
 
       return error.message;
@@ -25,12 +25,12 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
       return error.message;
     }
 
-    return t("error:genericError");
+    return t("errors:genericError");
   }
 
   return (
     <StatePanel
-      title={t("error:unableFetch")}
+      title={t("errors:unableFetch")}
       description={getErrorMessage(error)}
       icon={<AlertCircle className="size-8" />}
       action={

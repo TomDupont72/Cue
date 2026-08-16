@@ -42,8 +42,8 @@
         "section": "Pas commencées"
       },
       "PAUSED": {
-        "label": "En pause",
-        "section": "En pause"
+        "label": "À jour",
+        "section": "À jour"
       },
       "COMPLETED": {
         "label": "Terminée",

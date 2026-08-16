@@ -53,7 +53,6 @@ export function userEpisodePost(
 
 export function userSeriesPost(
   seriesId: number,
-  status?: UserSeriesStatus,
   isFavorite?: boolean
 ): Promise<UserSeriesPostResponse> {
   return ApiClient("/user/series/:seriesId", {
@@ -62,7 +61,6 @@ export function userSeriesPost(
       seriesId
     },
     body: {
-      status,
       isFavorite
     },
     paramsSchema: userSeriesPostParamsSchema,
