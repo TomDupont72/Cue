@@ -22,10 +22,10 @@ type SeriesOverviewProps = {
 export function SeriesOverview({ series, userSeries, watchProgress }: SeriesOverviewProps) {
   const { t } = useTranslation();
 
+  const userSeriesPostMutation = useUserSeriesMutation();
+
   const startYear = getYear(series.firstAirDate);
   const endYear = getYear(series.lastAirDate);
-
-  const userSeriesPostMutation = useUserSeriesMutation();
 
   return (
     <Card className="group overflow-hidden p-0">

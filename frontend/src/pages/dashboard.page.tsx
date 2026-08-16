@@ -13,13 +13,13 @@ import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
   const { t } = useTranslation();
+ 
+  const dashboardSummaryQuery = useUserDashboardSummary();
 
   const initialFetchingCount = useIsFetching({
     queryKey: queryKeys.userSeries.all,
     predicate: (query) => query.state.data === undefined
   });
-
-  const dashboardSummaryQuery = useUserDashboardSummary();
 
   const isPending = initialFetchingCount > 0 || dashboardSummaryQuery.isPending;
 

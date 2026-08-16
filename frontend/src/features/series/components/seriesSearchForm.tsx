@@ -9,14 +9,13 @@ import { useTranslation } from "react-i18next";
 
 export function SeriesSearchForm() {
   const { t } = useTranslation();
-
   const [searchParams, setSearchParams] = useSearchParams();
-
+  
   const query = searchParams.get("query") ?? "";
   const [value, setValue] = useState(query);
-
+  
   const debouncedValue = useDebounce(value.trim(), 300);
-
+  
   useEffect(() => {
     if (!debouncedValue) {
       setSearchParams({}, { replace: true });

@@ -21,7 +21,6 @@ export function SeriesCard({ series, seriesId, progress }: SeriesCardProps) {
   const { t } = useTranslation();
 
   const year = getYear(series.firstAirDate);
-
   const isImported = seriesId !== undefined;
   const destination = isImported ? `/series?id=${seriesId}` : "/series";
   const navigationState = isImported ? undefined : { tmdbId: series.tmdbId };

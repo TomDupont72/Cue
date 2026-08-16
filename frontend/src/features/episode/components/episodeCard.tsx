@@ -31,6 +31,8 @@ export default function EpisodeCard({
 
   const userEpisodePostMutation = useUserEpisodePost();
   const userEpisodeDeleteMutation = useUserEpisodeDelete();
+  
+  const remainingDays = getEpisodeReleaseDayDifference(episode.airDate);
 
   function handleCheckedChange(checked: boolean) {
     const params = {
@@ -44,8 +46,6 @@ export default function EpisodeCard({
       userEpisodeDeleteMutation.mutate(params);
     }
   }
-
-  const remainingDays = getEpisodeReleaseDayDifference(episode.airDate);
 
   return (
     <Dialog>

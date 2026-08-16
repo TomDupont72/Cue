@@ -11,7 +11,6 @@ import { Text } from "@/components/layout/text";
 
 export function SeriesSearchResults() {
   const { t } = useTranslation();
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const query = searchParams.get("query")?.trim() ?? "";
