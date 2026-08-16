@@ -18,6 +18,8 @@ import fastifyCors from "@fastify/cors";
 import { workerGuard } from "@/shared/middlewares/require-worker.js";
 import fastifyAuth from "@fastify/auth";
 import { z } from "zod";
+import { apiErrorHandler } from "@/shared/errors/errors.handler.js";
+import type { FastifyError } from "fastify";
 
 const app = Fastify({
   loggerInstance: logger
@@ -31,6 +33,7 @@ app.register(fastifyCors, {
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+app.setErrorHandler<FastifyError>(apiErrorHandler);
 
 if (env.NODE_ENV !== "production") {
   await app.register(swagger, {

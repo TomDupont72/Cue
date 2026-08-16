@@ -66,7 +66,7 @@ export const userService = {
     const series = await seriesRepository.findOne({ id: params.seriesId });
 
     if (!series) {
-      throw notFound("Series");
+      throw notFound("SERIES_NOT_FOUND", "Series not found");
     }
 
     const userSeries = await userRepository.upsertSeries(
@@ -94,13 +94,13 @@ export const userService = {
       );
 
       if (!episode) {
-        throw notFound("Episode");
+        throw notFound("EPISODE_NOT_FOUND", "Episode not found");
       }
 
       const series = await seriesRepository.findOne({ id: seriesId }, tx);
 
       if (!series) {
-        throw notFound("Series");
+        throw notFound("SERIES_NOT_FOUND", "Series not found");
       }
 
       const [createdUserEpisode] = await userRepository.createManyEpisodes(
@@ -172,7 +172,7 @@ export const userService = {
       );
 
       if (!existingUserEpisode) {
-        throw notFound("Episode for this user");
+        throw notFound("USER_EPISODE_NOT_FOUND", "Episode for this user not found");
       }
 
       const nextEpisode = await userRepository.getEpisodeFeedItem(userId, seriesId, tx);
@@ -192,13 +192,13 @@ export const userService = {
       const episode = await episodeRepository.findOne({ id: episodeId, seriesId }, tx);
 
       if (!episode) {
-        throw notFound("Episode");
+        throw notFound("EPISODE_NOT_FOUND", "Episode not found");
       }
 
       const series = await seriesRepository.findOne({ id: seriesId }, tx);
 
       if (!series) {
-        throw notFound("Series");
+        throw notFound("SERIES_NOT_FOUND", "Series not found");
       }
 
       const userSeries = await userRepository.findOneSeries(
@@ -207,7 +207,7 @@ export const userService = {
       );
 
       if (!userSeries) {
-        throw notFound("Series for this user");
+        throw notFound("USER_SERIES_NOT_FOUND", "Series for this user not found");
       }
 
       const [deletedUserEpisode] = await userRepository.deleteEpisodes(userId, [episodeId], tx);
@@ -263,7 +263,7 @@ export const userService = {
         return deletedUserEpisode;
       }
 
-      throw notFound("Episode for this user");
+      throw notFound("USER_EPISODE_NOT_FOUND", "Episode for this user not found");
     });
   },
 
@@ -283,13 +283,13 @@ export const userService = {
       );
 
       if (episodes.length === 0) {
-        throw notFound("Episodes");
+        throw notFound("EPISODES_NOT_FOUND", "Episodes not found");
       }
 
       const series = await seriesRepository.findOne({ id: seriesId }, tx);
 
       if (!series) {
-        throw notFound("Series");
+        throw notFound("SERIES_NOT_FOUND", "Series not found");
       }
 
       const createdUserEpisodes = await userRepository.createManyEpisodes(
@@ -371,13 +371,13 @@ export const userService = {
       const episodes = await episodeRepository.findMany({ seriesId, seasonId }, tx);
 
       if (episodes.length === 0) {
-        throw notFound("Episodes");
+        throw notFound("EPISODES_NOT_FOUND", "Episodes not found");
       }
 
       const series = await seriesRepository.findOne({ id: seriesId }, tx);
 
       if (!series) {
-        throw notFound("Series");
+        throw notFound("SERIES_NOT_FOUND", "Series not found");
       }
 
       const userSeries = await userRepository.findOneSeries(
@@ -386,7 +386,7 @@ export const userService = {
       );
 
       if (!userSeries) {
-        throw notFound("Series for this user");
+        throw notFound("USER_SERIES_NOT_FOUND", "Series for this user not found");
       }
 
       const deletedUserEpisodes = await userRepository.deleteEpisodes(
@@ -396,7 +396,7 @@ export const userService = {
       );
 
       if (deletedUserEpisodes.length === 0) {
-        throw notFound("Episode for this user");
+        throw notFound("USER_EPISODE_NOT_FOUND", "Episode for this user not found");
       }
 
       const regularEpisodeIds = new Set(

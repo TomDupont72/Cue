@@ -11,7 +11,7 @@ export const seriesService = {
     const series = await seriesRepository.findOne(params);
 
     if (!series) {
-      throw notFound("Series");
+      throw notFound("SERIES_NOT_FOUND", "Series not found");
     }
 
     const [seasons, episodes, userSeries, userEpisodes] = await Promise.all([
