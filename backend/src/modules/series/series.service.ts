@@ -1,10 +1,15 @@
 import { episodeRepository } from "@/modules/episode/episode.repository.js";
 import { seasonRepository } from "@/modules/season/season.repository.js";
 import { seriesRepository } from "@/modules/series/series.repository.js";
-import type { SeriesGetParams, SeriesImportPostBody } from "@/modules/series/series.schemas.js";
+import type {
+  SeriesGetParams,
+  SeriesImportPostBody,
+  SeriesReconcilePostBody
+} from "@/modules/series/series.schemas.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
 import { userRepository } from "@/modules/user/user.repository.js";
 import { syncTmdb } from "@/modules/series/series.rules.js";
+import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 
 export const seriesService = {
   async get(userId: string, params: SeriesGetParams) {
@@ -45,5 +50,13 @@ export const seriesService = {
       : null;
 
     return { series, userSeries };
+  },
+
+  async reconcilePost(body: SeriesReconcilePostBody, now = new Date()) {
+    const tmdbIds = [...new Set(body.tmdbIds)];
+    const releaseCutoff = getEpisodeReleaseCutoff(now);
+    const updatedCount = await seriesRepository.reconcileEpisodeCounts(tmdbIds, releaseCutoff);
+
+    return { updatedCount };
   }
 };

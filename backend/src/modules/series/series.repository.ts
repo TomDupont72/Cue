@@ -1,6 +1,7 @@
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import type { Prisma } from "@/generated/prisma/client.js";
+import { Prisma } from "@/generated/prisma/client.js";
+import type { SeriesReconcileUpdatedCountRow } from "./series.types.js";
 
 export const seriesRepository = {
   findOne(where: Prisma.SeriesWhereUniqueInput, db: PrismaTx = prisma) {
@@ -25,6 +26,42 @@ export const seriesRepository = {
       create: data,
       update: data
     });
+  },
+
+  async reconcileEpisodeCounts(tmdbIds: number[], releaseCutoff: Date, db: PrismaTx = prisma) {
+    if (tmdbIds.length === 0) {
+      return 0;
+    }
+
+    const [result] = await db.$queryRaw<SeriesReconcileUpdatedCountRow[]>(Prisma.sql`
+      WITH episode_counts AS (
+        SELECT
+          s.id,
+          COUNT(e.id)::int AS "numberOfEpisodes"
+        FROM "Series" s
+        LEFT JOIN "Episode" e
+          ON e."seriesId" = s.id
+          AND e."seasonNumber" <> 0
+          AND e."airDate" IS NOT NULL
+          AND e."airDate" < ${releaseCutoff}
+        WHERE s."tmdbId" IN (${Prisma.join(tmdbIds)})
+        GROUP BY s.id
+      ),
+      updated_series AS (
+        UPDATE "Series" s
+        SET
+          "numberOfEpisodes" = episode_counts."numberOfEpisodes",
+          "updatedAt" = CURRENT_TIMESTAMP
+        FROM episode_counts
+        WHERE s.id = episode_counts.id
+          AND s."numberOfEpisodes" IS DISTINCT FROM episode_counts."numberOfEpisodes"
+        RETURNING s.id
+      )
+      SELECT COUNT(*)::int AS "updatedCount"
+      FROM updated_series
+    `);
+
+    return result?.updatedCount ?? 0;
   },
 
   async addGenres(seriesId: number, genreIds: number[], db: PrismaTx = prisma) {

@@ -90,6 +90,16 @@ export const seriesImportPostBodySchema = z.object({
 
 export type SeriesImportPostBody = z.infer<typeof seriesImportPostBodySchema>;
 
+export const seriesReconcilePostBodySchema = z.object({
+  tmdbIds: z.array(z.number().int().min(1))
+});
+
+export const seriesReconcilePostResponseSchema = z.object({
+  updatedCount: z.number().int().nonnegative()
+});
+
+export type SeriesReconcilePostBody = z.infer<typeof seriesReconcilePostBodySchema>;
+
 export const seriesGetParamsSchema = z.object({
   id: z.coerce.number().int().min(1)
 });

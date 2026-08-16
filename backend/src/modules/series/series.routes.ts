@@ -3,9 +3,15 @@ import {
   seriesGetResponseSchema,
   seriesGetParamsSchema,
   seriesImportPostResponseSchema,
-  seriesImportPostBodySchema
+  seriesImportPostBodySchema,
+  seriesReconcilePostBodySchema,
+  seriesReconcilePostResponseSchema
 } from "@/modules/series/series.schemas.js";
-import { seriesController, seriesImportController } from "@/modules/series/series.controller.js";
+import {
+  seriesController,
+  seriesImportController,
+  seriesReconcileController
+} from "@/modules/series/series.controller.js";
 import { Tags } from "@/shared/enums/tags.js";
 
 export async function seriesRoutes(app: AppFastifyInstance) {
@@ -31,5 +37,17 @@ export async function seriesRoutes(app: AppFastifyInstance) {
       }
     },
     handler: seriesImportController.post
+  });
+
+  app.post("/reconcile", {
+    preHandler: [app.requireWorker],
+    schema: {
+      tags: [Tags.SERIES],
+      body: seriesReconcilePostBodySchema,
+      response: {
+        200: seriesReconcilePostResponseSchema
+      }
+    },
+    handler: seriesReconcileController.post
   });
 }
