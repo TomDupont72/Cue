@@ -2,8 +2,7 @@ import { camelCaseKeys, excludeMissingFields } from "@/shared/utils/object/objec
 import { z } from "zod";
 
 const nullableDateSchema = z
-  .string()
-  .nullable()
+  .union([z.iso.date(), z.literal(""), z.null()])
   .transform((value) => (value ? new Date(value) : null));
 
 const tmdbTvSearchResultsItemSchema = z

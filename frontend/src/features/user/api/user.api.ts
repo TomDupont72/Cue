@@ -1,4 +1,4 @@
-import { apiClient } from "@/api/client";
+import { ApiClient } from "@/api/client";
 import {
   userSeriesGetQuerySchema,
   userEpisodeDeleteParamsSchema,
@@ -26,7 +26,7 @@ export function userSeriesGet(
   status?: UserSeriesStatus,
   cursor?: string
 ): Promise<UserSeriesGetResponse> {
-  return apiClient("/user/series", {
+  return ApiClient("/user/series", {
     query: {
       ...(seriesId && { seriesId }),
       ...(status && { status }),
@@ -41,7 +41,7 @@ export function userEpisodePost(
   seriesId: number,
   episodeId: number
 ): Promise<UserEpisodePostResponse> {
-  return apiClient("/user/series/:seriesId/episode/:episodeId", {
+  return ApiClient("/user/series/:seriesId/episode/:episodeId", {
     method: "POST",
     params: {
       seriesId,
@@ -53,16 +53,14 @@ export function userEpisodePost(
 
 export function userSeriesPost(
   seriesId: number,
-  status?: UserSeriesStatus,
   isFavorite?: boolean
 ): Promise<UserSeriesPostResponse> {
-  return apiClient("/user/series/:seriesId", {
+  return ApiClient("/user/series/:seriesId", {
     method: "POST",
     params: {
       seriesId
     },
     body: {
-      status,
       isFavorite
     },
     paramsSchema: userSeriesPostParamsSchema,
@@ -74,7 +72,7 @@ export function userEpisodeDelete(
   seriesId: number,
   episodeId: number
 ): Promise<UserEpisodeDeleteResponse> {
-  return apiClient("/user/series/:seriesId/episode/:episodeId", {
+  return ApiClient("/user/series/:seriesId/episode/:episodeId", {
     method: "DELETE",
     params: {
       seriesId,
@@ -85,14 +83,14 @@ export function userEpisodeDelete(
 }
 
 export function userDashboardSummaryGet(): Promise<UserDashboardSummaryGetResponse> {
-  return apiClient("/user/dashboard/summary");
+  return ApiClient("/user/dashboard/summary");
 }
 
 export function userSeasonPost(
   seriesId: number,
   seasonId: number
 ): Promise<UserSeasonPostResponse> {
-  return apiClient("/user/series/:seriesId/season/:seasonId", {
+  return ApiClient("/user/series/:seriesId/season/:seasonId", {
     method: "POST",
     params: {
       seriesId,
@@ -106,7 +104,7 @@ export function userSeasonDelete(
   seriesId: number,
   seasonId: number
 ): Promise<UserSeasonDeleteResponse> {
-  return apiClient("/user/series/:seriesId/season/:seasonId", {
+  return ApiClient("/user/series/:seriesId/season/:seasonId", {
     method: "DELETE",
     params: {
       seriesId,
@@ -117,5 +115,5 @@ export function userSeasonDelete(
 }
 
 export function userEpisodesFeedGet(): Promise<UserEpisodesFeedGetResponse> {
-  return apiClient("/user/episodes/feed");
+  return ApiClient("/user/episodes/feed");
 }

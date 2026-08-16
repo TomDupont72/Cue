@@ -4,7 +4,7 @@ const metadataSeriesSearchGetResultSchema = z.object({
   tmdbId: z.number().int(),
   name: z.string(),
   originalName: z.string(),
-  overview: z.string(),
+  overview: z.string().nullable(),
   posterPath: z.string().nullable(),
   backdropPath: z.string().nullable(),
   firstAirDate: z.string().nullable(),
@@ -35,11 +35,16 @@ export const metadataSeriesSearchGetSchema = z.object({
   page: z.coerce.number().int().min(1).default(1)
 });
 
-export const metadataSeriesChangesGetSchema = z.object({
-  startDate: z.string(),
-  endDate: z.string(),
-  page: z.coerce.number().int().min(1)
-});
+export const metadataSeriesChangesGetSchema = z
+  .object({
+    startDate: z.iso.date(),
+    endDate: z.iso.date(),
+    page: z.coerce.number().int().min(1)
+  })
+  .refine(({ startDate, endDate }) => startDate <= endDate, {
+    message: "endDate must be greater than or equal to startDate",
+    path: ["endDate"]
+  });
 
 export type MetadataSeriesSearchGet = z.infer<typeof metadataSeriesSearchGetSchema>;
 

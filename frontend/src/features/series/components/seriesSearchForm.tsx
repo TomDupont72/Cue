@@ -5,8 +5,10 @@ import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export function SeriesSearchForm() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const query = searchParams.get("query") ?? "";
@@ -35,7 +37,7 @@ export function SeriesSearchForm() {
     <div className="relative w-full max-w-2xl">
       <InputGroup>
         <InputGroupInput
-          placeholder="Rechercher une serie..."
+          placeholder={t("series:search.placeholder")}
           value={value}
           onChange={(event) => setValue(event.target.value)}
         />

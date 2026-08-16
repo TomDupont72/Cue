@@ -7,10 +7,10 @@ import { useSeriesSearch } from "@/features/series/hooks/useSeriesSearch";
 import Paginator from "@/components/layout/paginator";
 import SeriesDisplay from "@/features/series/components/seriesDisplay";
 import { useTranslation } from "react-i18next";
+import { Text } from "@/components/layout/text";
 
 export function SeriesSearchResults() {
   const { t } = useTranslation();
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const query = searchParams.get("query")?.trim() ?? "";
@@ -57,11 +57,9 @@ export function SeriesSearchResults() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {t("series:search.result", { count: seriesQuery.data.totalResults })}
-        </p>
-      </div>
+      <Text variant="muted">
+        {t("series:search.result", { count: seriesQuery.data.totalResults })}
+      </Text>
 
       <SeriesDisplay series={seriesQuery.data.results} />
 

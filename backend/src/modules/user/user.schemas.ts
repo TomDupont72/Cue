@@ -4,19 +4,9 @@ import {
   userEpisodeResponseSchema,
   userSeriesResponseSchema
 } from "@/modules/series/series.schemas.js";
-
-export const userSeriesStatuses = [
-  "PLANNED",
-  "WATCHING",
-  "COMPLETED",
-  "DROPPED",
-  "PAUSED"
-] as const;
-
-export const userSeriesStatusSchema = z.enum(userSeriesStatuses);
+import { UserSeriesStatus } from "@/generated/prisma/enums.js";
 
 export const userSeriesPostBodySchema = z.object({
-  status: userSeriesStatusSchema.optional(),
   isFavorite: z.boolean().optional()
 });
 
@@ -34,9 +24,12 @@ export const userEpisodePostParamsSchema = z.object({
 
 export const userSeriesGetSchema = z.object({
   seriesId: z.coerce.number().int().min(1).optional(),
-  status: userSeriesStatusSchema.optional(),
+  status: z.enum(UserSeriesStatus).optional(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
-  cursor: z.string().optional()
+  cursor: z.iso
+    .datetime()
+    .transform((cursor) => new Date(cursor))
+    .optional()
 });
 
 export const userSeasonPostParamsSchema = z.object({
@@ -44,7 +37,7 @@ export const userSeasonPostParamsSchema = z.object({
   seasonId: z.coerce.number().int().min(1)
 });
 
-export const userStatusPostParamsSchema = z.object({
+export const userSeriesReconcilePostParamsSchema = z.object({
   userId: z.string().min(1)
 });
 
@@ -67,7 +60,7 @@ export const userSeriesPostResponseSchema = userSeriesResponseSchema;
 export const userEpisodeFeedItemResponseSchema = z.object({
   userId: z.string(),
   seriesId: z.number().int(),
-  status: userSeriesStatusSchema,
+  status: z.enum(UserSeriesStatus),
   lastWatchedAt: z.date().nullable(),
   seriesName: z.string(),
   seriesPosterPath: z.string().nullable(),
@@ -84,9 +77,9 @@ export const userEpisodeFeedItemResponseSchema = z.object({
 });
 
 export const userEpisodeFeedGetResponseSchema = z.object({
-  watching: z.array(userEpisodeFeedItemResponseSchema),
-  paused: z.array(userEpisodeFeedItemResponseSchema),
-  dropped: z.array(userEpisodeFeedItemResponseSchema)
+  WATCHING: z.array(userEpisodeFeedItemResponseSchema),
+  PAUSED: z.array(userEpisodeFeedItemResponseSchema),
+  DROPPED: z.array(userEpisodeFeedItemResponseSchema)
 });
 
 export const userEpisodePostResponseSchema = userEpisodeResponseSchema.extend({
@@ -106,7 +99,7 @@ export const userDashboardSummaryGetResponseSchema = z.object({
   totalWatchedSeries: z.number().int().nonnegative()
 });
 
-export const userStatusPostResponseSchema = z.object({
+export const userSeriesReconcilePostResponseSchema = z.object({
   updatedCount: z.number().int().nonnegative()
 });
 
@@ -120,4 +113,4 @@ export type UserSeasonPostParams = z.infer<typeof userSeasonPostParamsSchema>;
 
 export type UserSeasonDeleteParams = z.infer<typeof userSeasonDeleteParamsSchema>;
 
-export type UserStatusPostParams = z.infer<typeof userStatusPostParamsSchema>;
+export type UserSeriesReconcilePostParams = z.infer<typeof userSeriesReconcilePostParamsSchema>;

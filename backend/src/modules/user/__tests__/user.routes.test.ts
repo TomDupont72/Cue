@@ -45,6 +45,7 @@ const userSeries: UserSeries = {
   status: "WATCHING",
   isFavorite: false,
   watchCount: 1,
+  watchedEpisodeCount: 1,
   addedAt: CREATED_AT,
   lastWatchedAt: NOW
 };
@@ -105,9 +106,9 @@ function mockSuccessfulResponses(t: TestContext) {
   }));
   t.mock.method(userService, "seriesPost", async () => userSeries);
   t.mock.method(userService, "episodeFeedGet", async () => ({
-    watching: [feedItem],
-    paused: [],
-    dropped: []
+    WATCHING: [feedItem],
+    PAUSED: [],
+    DROPPED: []
   }));
   t.mock.method(userService, "episodePost", async () => ({
     ...userEpisode,
@@ -117,7 +118,7 @@ function mockSuccessfulResponses(t: TestContext) {
   t.mock.method(userService, "episodeDelete", async () => userEpisode);
   t.mock.method(userService, "seasonPost", async () => [userEpisode]);
   t.mock.method(userService, "seasonDelete", async () => [userEpisode]);
-  t.mock.method(userService, "statusRecalculatePost", async () => ({ updatedCount: 1 }));
+  t.mock.method(userService, "seriesReconcilePost", async () => ({ updatedCount: 1 }));
 }
 
 describe("user route response contracts", { concurrency: false }, () => {
@@ -159,7 +160,7 @@ describe("user route response contracts", { concurrency: false }, () => {
       {
         method: "GET",
         url: "/api/user/episodes/feed",
-        expected: { watching: [feedItem], paused: [], dropped: [] }
+        expected: { WATCHING: [feedItem], PAUSED: [], DROPPED: [] }
       },
       {
         method: "POST",
@@ -183,7 +184,7 @@ describe("user route response contracts", { concurrency: false }, () => {
       },
       {
         method: "POST",
-        url: `/api/user/status/${USER_ID}/recalculate`,
+        url: `/api/user/${USER_ID}/series/reconcile`,
         expected: { updatedCount: 1 }
       }
     ] as const;

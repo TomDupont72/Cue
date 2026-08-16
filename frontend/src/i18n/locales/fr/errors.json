@@ -1,1 +1,9 @@
-{}
+{
+  "401Error": "Tu dois être connecté pour effectuer cette action.",
+  "404Error": "La ressource demandée est introuvable.",
+  "500Error": "Une erreur est survenue sur le serveur.",
+  "genericError": "Une erreur inattendue est survenue.",
+  "unableFetch": "Impossible de charger les données",
+  "invalidRequest": "Requête invalide",
+  "invalidParameters": "Les paramètres envoyés sont invalides."
+}

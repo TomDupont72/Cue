@@ -17,8 +17,7 @@ export function useUserSeriesMutation() {
     UserSeriesPostBody,
     SeriesGetResponse
   >({
-    mutationFn: ({ seriesId }, { status, isFavorite }) =>
-      userSeriesPost(seriesId, status, isFavorite),
+    mutationFn: ({ seriesId }, { isFavorite }) => userSeriesPost(seriesId, isFavorite),
 
     getOptimisticQueryKey: ({ seriesId }) => queryKeys.series.detail(seriesId),
 
@@ -34,9 +33,10 @@ export function useUserSeriesMutation() {
         : {
             userId: "optimistic",
             seriesId,
-            status: body.status ?? "PLANNED",
+            status: "PLANNED",
             isFavorite: body.isFavorite ?? false,
             watchCount: 0,
+            watchedEpisodeCount: 0,
             addedAt: new Date().toISOString(),
             lastWatchedAt: null
           }

@@ -1,5 +1,15 @@
 {
   "date": {
     "unknown": "Date inconnue"
+  },
+  "navigation": {
+    "title": "Navigation",
+    "dashboard": "Dashboard",
+    "watch": "À voir",
+    "calendar": "Calendrier",
+    "search": "Recherche"
+  },
+  "app": {
+    "install": "Installer l'application"
   }
 }

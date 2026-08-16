@@ -1,26 +1,29 @@
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
-import { Container } from "@/components/layout/container";
+import { PageContainer } from "@/components/layout/pageContainer";
 import { ScrollToTop } from "@/components/layout/scrollToTop";
 import { Button } from "@/components/ui/button";
 import SeriesDetails from "@/features/series/components/seriesDetails";
 import { SeriesOverview } from "@/features/series/components/seriesOverview";
 import { useSeries } from "@/features/series/hooks/useSeries";
 import { useSeriesImport } from "@/features/series/hooks/useSeriesImportMutation";
+import { getWatchProgress } from "@/features/user/utils/watchProgress";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useSearchParams } from "react-router-dom";
 
 export default function Series() {
-  const [searchParams] = useSearchParams();
-  const location = useLocation();
   const { t } = useTranslation();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const seriesId = Number(searchParams.get("id")?.trim() ?? "");
   const tmdbId = location.state?.tmdbId as number | undefined;
 
   const seriesQuery = useSeries(seriesId);
   const seriesImportMutation = useSeriesImport();
+
+  const [view, setView] = useState<"overview" | "details">("overview");
 
   useEffect(() => {
     if (seriesId || tmdbId === undefined) {
@@ -30,13 +33,9 @@ export default function Series() {
     seriesImportMutation.mutate(tmdbId);
   }, [seriesId, tmdbId, seriesImportMutation]);
 
-  const [view, setView] = useState<SeriesView>("overview");
-
   if (!seriesId && tmdbId === undefined) {
-    return <ErrorState error="Requête invalide" />;
+    return <ErrorState error={t("errors:invalidRequest")} />;
   }
-
-  type SeriesView = "overview" | "details";
 
   if (seriesQuery.isPending) {
     return <LoadingState />;
@@ -46,16 +45,16 @@ export default function Series() {
     return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
   }
 
-  const { series, userSeries } = seriesQuery.data;
+  const { episodes, userEpisodes, seasons, series, userSeries } = seriesQuery.data;
 
   const watchProgress = userSeries
-    ? (userSeries.watchCount / series.numberOfEpisodes) * 100
+    ? getWatchProgress(userSeries?.watchCount, series.numberOfEpisodes)
     : undefined;
 
   return (
     <>
       <ScrollToTop />
-      <Container className="flex flex-1 flex-col py-8 gap-4">
+      <PageContainer className="gap-4">
         <div className="grid w-full grid-cols-2 gap-2">
           <Button
             variant={view === "overview" ? "secondary" : "ghost"}
@@ -76,17 +75,17 @@ export default function Series() {
 
         <div className="flex flex-1 flex-col gap-8">
           {view === "overview" ? (
-            <SeriesOverview
-              series={series}
-              userSeries={userSeries}
-              isProgress={userSeries !== null}
-              watchProgress={watchProgress}
-            />
+            <SeriesOverview series={series} userSeries={userSeries} watchProgress={watchProgress} />
           ) : (
-            <SeriesDetails id={series.id} />
+            <SeriesDetails
+              id={series.id}
+              episodes={episodes}
+              userEpisodes={userEpisodes}
+              seasons={seasons}
+            />
           )}
         </div>
-      </Container>
+      </PageContainer>
     </>
   );
 }

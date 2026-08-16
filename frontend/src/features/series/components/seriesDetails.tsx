@@ -1,27 +1,21 @@
-import { LoadingState } from "@/components/feedback/loadingState";
-import { useSeries } from "@/features/series/hooks/useSeries";
-import { ErrorState } from "@/components/feedback/errorState";
 import SeasonCard from "@/features/season/components/seasonCard";
 import { Accordion } from "@/components/ui/accordion";
 import type { EpisodeRow } from "@/features/episode/types/episode.types";
+import type {
+  SeriesDetailsEpisode,
+  SeriesDetailsSeason,
+  SeriesDetailsUserEpisode
+} from "@/features/series/types/series.types";
+import ContentColumn from "@/components/layout/contentColumn";
 
 type SeriesDetailsProps = {
   id: number;
+  episodes: SeriesDetailsEpisode[];
+  userEpisodes: SeriesDetailsUserEpisode[];
+  seasons: SeriesDetailsSeason[];
 };
 
-export default function SeriesDetails({ id }: SeriesDetailsProps) {
-  const seriesQuery = useSeries(id);
-
-  if (seriesQuery.isPending) {
-    return <LoadingState />;
-  }
-
-  if (seriesQuery.isError) {
-    return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
-  }
-
-  const { series, seasons, episodes, userEpisodes } = seriesQuery.data;
-
+export default function SeriesDetails({ id, episodes, userEpisodes, seasons }: SeriesDetailsProps) {
   const sortedEpisodes = [...episodes].sort((a, b) => a.episodeNumber - b.episodeNumber);
 
   const episodesBySeason = sortedEpisodes.reduce<Record<number, EpisodeRow[]>>((acc, episode) => {
@@ -41,18 +35,18 @@ export default function SeriesDetails({ id }: SeriesDetailsProps) {
   });
 
   return (
-    <div className="flex flex-col items-center">
+    <ContentColumn>
       <Accordion multiple>
         {sortedSeasons.map((season) => (
           <SeasonCard
             key={season.id}
-            seriesId={series.id}
+            seriesId={id}
             season={season}
             episodes={episodesBySeason[season.seasonNumber] ?? []}
             watchedEpisodeIds={watchedEpisodeIds}
           />
         ))}
       </Accordion>
-    </div>
+    </ContentColumn>
   );
 }

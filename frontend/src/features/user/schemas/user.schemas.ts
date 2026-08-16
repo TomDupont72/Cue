@@ -18,7 +18,6 @@ export const userSeriesPostParamsSchema = z.object({
 });
 
 export const userSeriesPostBodySchema = z.object({
-  status: z.enum(USER_SERIES_STATUS).optional(),
   isFavorite: z.boolean().optional()
 });
 

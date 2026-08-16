@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { UserSeriesStatus } from "../constants/userSeriesStatus";
 import { useUserSeries } from "../hooks/useUserSeries";
 import { useTranslation } from "react-i18next";
+import { Heading } from "@/components/layout/heading";
 
 type UserSeriesSectionProps = {
   status: UserSeriesStatus;
@@ -46,17 +47,11 @@ export function UserSeriesSection({ status }: UserSeriesSectionProps) {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold">
-        {t(`user:series.status.${status}.section`).toUpperCase()}
-      </h2>
-
+      <Heading level={3} className="uppercase">
+        {t(`user:series.status.${status}.section`)}
+      </Heading>
       <div className="h-px w-full bg-border" />
-
-      <SeriesDisplay
-        series={items.map((item) => item.seriesDetails)}
-        userSeries={items}
-        isProgress
-      />
+      <SeriesDisplay series={items.map((item) => item.seriesDetails)} userSeries={items} />
 
       {query.hasNextPage && (
         <div ref={loadMoreRef} className="flex h-24 items-center justify-center">

@@ -91,7 +91,7 @@ def sync_series(
         "after_sync": dg.In(dg.Nothing)
     }
 )
-def update_user_statuses(
+def reconcile_user_series(
     context: dg.OpExecutionContext,
     database: DatabaseResource,
     cue_api: CueApiResource,
@@ -111,16 +111,16 @@ def update_user_statuses(
     )
 
     for user_id in user_ids:
-        result = cue_api.post_user_status_recalculate(user_id)
+        result = cue_api.post_user_series_reconcile(user_id)
 
         context.log.info(
-            f"Statuts de l'utilisateur {user_id} à jour : "
-            f"{result['updatedCount']} série(s) passée(s) à DROPPED"
+            f"Séries de l'utilisateur {user_id} réconciliées : "
+            f"{result['updatedCount']} série(s) modifiée(s)"
         )
 
 @dg.job
 def sync_all_series_job():
-    update_user_statuses(
+    reconcile_user_series(
         sync_series(
             get_series_changes(), 
             get_all_series()

@@ -18,19 +18,22 @@ import fastifyCors from "@fastify/cors";
 import { workerGuard } from "@/shared/middlewares/require-worker.js";
 import fastifyAuth from "@fastify/auth";
 import { z } from "zod";
+import { apiErrorHandler } from "@/shared/errors/errors.handler.js";
+import type { FastifyError } from "fastify";
 
 const app = Fastify({
   loggerInstance: logger
 }).withTypeProvider<ZodTypeProvider>();
 
 app.register(fastifyCors, {
-  origin: process.env.CLIENT_ORIGIN,
+  origin: env.CLIENT_ORIGIN,
   credentials: true,
   methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"]
 });
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+app.setErrorHandler<FastifyError>(apiErrorHandler);
 
 if (env.NODE_ENV !== "production") {
   await app.register(swagger, {

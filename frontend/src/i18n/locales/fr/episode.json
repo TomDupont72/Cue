@@ -6,5 +6,6 @@
   "day_one": "{{count}} Jour",
   "day_other": "{{count}} Jours",
   "incoming": "À venir",
+  "openDetails": "Voir les détails de {{name}}",
   "noDescription": "Pas de description disponible"
 }

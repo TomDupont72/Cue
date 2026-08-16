@@ -54,3 +54,9 @@ export type SeriesDisplaySeries = Optional<
   Pick<SeriesRow, "tmdbId" | "name" | "posterPath" | "firstAirDate" | "numberOfEpisodes">,
   "numberOfEpisodes"
 >;
+
+export type SeriesDetailsEpisode = EpisodeRow;
+
+export type SeriesDetailsUserEpisode = Pick<UserEpisodeRow, "episodeId">;
+
+export type SeriesDetailsSeason = Pick<SeasonRow, "id" | "seasonNumber">;

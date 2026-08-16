@@ -1,31 +1,18 @@
-import type { UserSeries, UserSeriesStatus } from "@/generated/prisma/client.js";
-import { userRepository } from "@/modules/user/user.repository.js";
-import type { PrismaTx } from "@/shared/db/prisma.types.js";
+import type { UserSeriesStatus } from "@/generated/prisma/client.js";
 
-export function getStatusAfterAddingEpisodes(
+export function getUserSeriesStatus(
+  watchedEpisodeCount: number,
   watchCount: number,
-  numberOfEpisodes: number
+  numberOfEpisodes: number,
+  inProduction: boolean
 ): UserSeriesStatus {
-  return watchCount >= numberOfEpisodes ? "COMPLETED" : "WATCHING";
-}
-
-export function getStatusAfterRemovingEpisodes(watchCount: number): UserSeriesStatus {
-  return watchCount === 0 ? "PLANNED" : "WATCHING";
-}
-
-export async function updateSeriesStatus(userSeries: UserSeries, status: UserSeriesStatus, tx: PrismaTx) {
-  if (status === userSeries.status) {
-    return userSeries;
+  if (watchedEpisodeCount === 0) {
+    return "PLANNED";
   }
 
-  return userRepository.updateSeries(
-    {
-      userId_seriesId: {
-        userId: userSeries.userId,
-        seriesId: userSeries.seriesId
-      }
-    },
-    { status },
-    tx
-  );
+  if (numberOfEpisodes > 0 && watchCount >= numberOfEpisodes) {
+    return inProduction ? "PAUSED" : "COMPLETED";
+  }
+
+  return "WATCHING";
 }

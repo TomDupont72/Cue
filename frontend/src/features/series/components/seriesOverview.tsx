@@ -1,6 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { getTmdbImageUrl } from "@/lib/tmdbImage";
-import { ImageOff } from "lucide-react";
 import { getYear } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/features/user/components/statusBadge";
@@ -10,6 +8,9 @@ import SeriesProductionBadge from "@/features/series/components/seriesProduction
 import { useUserSeriesMutation } from "@/features/user/hooks/useUserSeriesMutation";
 import type { UserSeriesRow } from "@/features/user/types/user.types";
 import { useTranslation } from "react-i18next";
+import { Heading } from "@/components/layout/heading";
+import { Text } from "@/components/layout/text";
+import Picture from "@/components/layout/picture";
 
 type SeriesOverviewProps = {
   series: SeriesRow;
@@ -18,51 +19,39 @@ type SeriesOverviewProps = {
   watchProgress?: number;
 };
 
-export function SeriesOverview({
-  series,
-  userSeries,
-  isProgress = false,
-  watchProgress
-}: SeriesOverviewProps) {
+export function SeriesOverview({ series, userSeries, watchProgress }: SeriesOverviewProps) {
   const { t } = useTranslation();
 
-  const backdropUrl = getTmdbImageUrl(series.backdropPath, "original");
+  const userSeriesPostMutation = useUserSeriesMutation();
+
   const startYear = getYear(series.firstAirDate);
   const endYear = getYear(series.lastAirDate);
-
-  const userSeriesPostMutation = useUserSeriesMutation();
 
   return (
     <Card className="group overflow-hidden p-0">
       <div className="overflow-hidden bg-muted">
         <div className="h-56 w-full overflow-hidden sm:h-72 lg:h-96">
-          {backdropUrl ? (
-            <img src={backdropUrl} className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full items-center justify-center text-muted-foreground">
-              <ImageOff className="size-8" />
-            </div>
-          )}
+          <Picture path={series.backdropPath} size="original" />
         </div>
-        {isProgress ? (
+        {watchProgress !== undefined ? (
           <StatusProgressBar value={watchProgress ?? 0} status={userSeries?.status ?? "PLANNED"} />
         ) : null}
       </div>
 
       <CardContent className="flex flex-col gap-4 pb-4">
         <div className="flex flex-col gap-4">
-          <h2 className="font-medium text-3xl">
+          <Heading level={1}>
             {series.name} ({series.originalName})
-          </h2>
+          </Heading>
           <div className="flex flex-row gap-3">
             <SeriesProductionBadge inProduction={series.inProduction} />
             {userSeries ? <StatusBadge status={userSeries.status} /> : null}
           </div>
-          <p className="text-muted-foreground">
+          <Text variant="muted">
             {startYear} - {series.inProduction ? t("series:dates.present") : endYear} •{" "}
             {t("series:season", { count: series.numberOfSeasons })} •{" "}
             {t("series:episode", { count: series.numberOfEpisodes })}
-          </p>
+          </Text>
         </div>
         <p>{series.overview}</p>
       </CardContent>

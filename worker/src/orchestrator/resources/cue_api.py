@@ -39,9 +39,9 @@ class CueApiResource(dg.ConfigurableResource):
         response.raise_for_status()
         return response.json()
 
-    def post_user_status_recalculate(self, user_id: str) -> dict:
+    def post_user_series_reconcile(self, user_id: str) -> dict:
         response = httpx.post(
-            f"{self.base_url}/api/user/status/{user_id}/recalculate",
+            f"{self.base_url}/api/user/{user_id}/series/reconcile",
             headers={
                 "Authorization": f"Bearer {self.worker_token}"
             },

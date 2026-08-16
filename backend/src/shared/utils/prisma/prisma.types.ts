@@ -90,8 +90,6 @@ type DeleteManyAndFetchDelegate<TWhere, TResult> = {
 
 export type PaginationOrder = "asc" | "desc";
 
-export type ComparableCursor = string | number | Date;
-
 export type FindManyPaginatedResult<TResult, TCursor> = {
   items: TResult[];
   nextCursor: TCursor | null;

@@ -6,8 +6,8 @@ import {
   userEpisodeFeedGetResponseSchema,
   userEpisodePostParamsSchema,
   userEpisodePostResponseSchema,
-  userStatusPostParamsSchema,
-  userStatusPostResponseSchema,
+  userSeriesReconcilePostParamsSchema,
+  userSeriesReconcilePostResponseSchema,
   userSeasonDeleteParamsSchema,
   userSeasonDeleteResponseSchema,
   userSeasonPostParamsSchema,
@@ -24,7 +24,7 @@ import {
   userEpisodeFeedController,
   userSeasonController,
   userSeriesController,
-  userStatusController
+  userSeriesReconcileController
 } from "@/modules/user/user.controller.js";
 import { Tags } from "@/shared/enums/tags.js";
 
@@ -124,15 +124,15 @@ export async function userRoutes(app: AppFastifyInstance) {
     handler: userSeasonController.delete
   });
 
-  app.post("/status/:userId/recalculate", {
+  app.post("/:userId/series/reconcile", {
     preHandler: [app.requireWorker],
     schema: {
       tags: [Tags.USER],
-      params: userStatusPostParamsSchema,
+      params: userSeriesReconcilePostParamsSchema,
       response: {
-        200: userStatusPostResponseSchema
+        200: userSeriesReconcilePostResponseSchema
       }
     },
-    handler: userStatusController.post
+    handler: userSeriesReconcileController.post
   });
 }
