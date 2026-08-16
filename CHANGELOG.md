@@ -5,7 +5,6 @@
 - Correction de la taille dans le temps de visionnage
 - Recalcul du nombre d'épisodes dans le worker
 
-
 ## [0.9.6] - 2026-08-16
 
 ### Fixed
