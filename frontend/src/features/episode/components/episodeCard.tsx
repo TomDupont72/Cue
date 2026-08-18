@@ -129,10 +129,12 @@ export default function EpisodeCard({
       <DialogContent className="overflow-hidden p-0">
         <EpisodeCardDetails
           episode={episode}
+          series={series}
           isWatched={isWatched}
           onCheckedChange={handleCheckedChange}
           isPending={userEpisodePostMutation.isPending || userEpisodeDeleteMutation.isPending}
           remainingDays={remainingDays}
+          displayName={displayName}
         />
       </DialogContent>
     </Dialog>
