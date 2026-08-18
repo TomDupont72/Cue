@@ -1,24 +1,29 @@
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
-import type { EpisodeCardEpisode } from "@/features/episode/types/episode.types";
+import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/types/episode.types";
 import { useTranslation } from "react-i18next";
 import { Heading } from "@/components/layout/heading";
 import Picture from "@/components/layout/picture";
+import { SeriesLinkBadge } from "@/features/series/components/seriesLinkBadge";
 
 type EpisodeCardDetailsProps = {
   episode: EpisodeCardEpisode;
+  series: EpisodeCardSeries;
   isWatched: boolean;
   onCheckedChange: (checked: boolean) => void;
   isPending: boolean;
   remainingDays: number | null;
+  displayName: boolean;
 };
 
 export default function EpisodeCardDetails({
   episode,
+  series,
   isWatched,
   onCheckedChange,
   isPending,
-  remainingDays
+  remainingDays,
+  displayName = false
 }: EpisodeCardDetailsProps) {
   const { t } = useTranslation();
 
@@ -37,6 +42,9 @@ export default function EpisodeCardDetails({
       </div>
 
       <DialogHeader className="flex px-4">
+        {displayName && series.name ? (
+          <SeriesLinkBadge seriesId={series.id} name={series.name} className="relative z-20 mb-1" />
+        ) : null}
         <DialogTitle className="font-bold text-xl">{episode.name}</DialogTitle>
         <Heading level={5}>
           {episode.seasonNumber === 0
