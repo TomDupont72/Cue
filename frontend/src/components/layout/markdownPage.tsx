@@ -59,7 +59,12 @@ export function MarkdownPage({ markdown }: MarkdownPageProps) {
 
             h5: ({ children }) => <Heading level={5}>{children}</Heading>,
 
-            p: ({ children }) => <Text>{children}</Text>
+            p: ({ children }) => <Text>{children}</Text>,
+
+            ul: ({ children }) => <ul className="list-disc pl-6 space-y-1">{children}</ul>,
+
+            ol: ({ children }) => <ol className="list-decimal pl-6 space-y-1">{children}</ol>,
+            li: ({ children }) => <li>{children}</li>
           }}
         >
           {content}
