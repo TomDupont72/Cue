@@ -14,71 +14,150 @@ function getEpisodesFeedQuery(userId: string, seriesId?: number) {
     seriesId === undefined ? Prisma.empty : Prisma.sql`AND us."seriesId" = ${seriesId}`;
 
   return Prisma.sql`
+  SELECT
+    us."userId",
+    us."seriesId",
+    us.status,
+    us."lastWatchedAt",
+
+    s.name AS "seriesName",
+    s."posterPath" AS "seriesPosterPath",
+    s."tmdbId" AS "seriesTmdbId",
+
+    next_episode.id,
+    next_episode.name,
+    next_episode."seasonNumber",
+    next_episode."episodeNumber",
+    next_episode."airDate",
+    next_episode."stillPath",
+    next_episode.runtime,
+    next_episode."remainingEpisodes",
+    next_episode.overview
+
+  FROM "UserSeries" us
+
+  JOIN "Series" s
+    ON s.id = us."seriesId"
+
+  JOIN LATERAL (
     SELECT
-      us."userId",
-      us."seriesId",
-      us.status,
-      us."lastWatchedAt",
+      candidate.id,
+      candidate.name,
+      candidate."seasonNumber",
+      candidate."episodeNumber",
+      candidate."airDate",
+      candidate."stillPath",
+      COALESCE(candidate.runtime, 0) AS runtime,
+      candidate.overview,
 
-      s.name AS "seriesName",
-      s."posterPath" AS "seriesPosterPath",
-      s."tmdbId" AS "seriesTmdbId",
+      (
+        SELECT COUNT(*)::int
+        FROM "Episode" remaining
 
-      next_episode.id,
-      next_episode.name,
-      next_episode."seasonNumber",
-      next_episode."episodeNumber",
-      next_episode."airDate",
-      next_episode."stillPath",
-      next_episode.runtime,
-      next_episode."remainingEpisodes",
-      next_episode.overview
+        WHERE remaining."seriesId" = us."seriesId"
 
-    FROM "UserSeries" us
+          AND remaining."seasonNumber" IS NOT NULL
+          AND remaining."episodeNumber" IS NOT NULL
+          AND remaining."seasonNumber" <> 0
 
-    JOIN "Series" s
-      ON s.id = us."seriesId"
+          AND remaining."airDate" IS NOT NULL
+          AND remaining."airDate" <
+            date_trunc(
+              'day',
+              CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+            ) + INTERVAL '1 day'
 
+          AND NOT EXISTS (
+            SELECT 1
+            FROM "UserEpisode" seen_remaining
+            WHERE seen_remaining."userId" = us."userId"
+              AND seen_remaining."episodeId" = remaining.id
+          )
+      ) AS "remainingEpisodes"
+
+    FROM "UserEpisode" watched
+
+    JOIN "Episode" current_episode
+      ON current_episode.id = watched."episodeId"
+
+    /*
+     * Pour chaque épisode regardé,
+     * on récupère son épisode suivant IMMÉDIAT.
+     */
     JOIN LATERAL (
-      SELECT
-        e.id,
-        e.name,
-        e."seasonNumber",
-        e."episodeNumber",
-        e."airDate",
-        e."stillPath",
-        e.runtime,
-        e.overview,
-        (COUNT(*) OVER())::int AS "remainingEpisodes"
-      FROM "Episode" e
+      SELECT next_e.*
 
-      WHERE e."seriesId" = us."seriesId"
-        AND e."seasonNumber" <> 0
-        AND e."airDate" IS NOT NULL
-        AND e."airDate" < date_trunc('day', CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
-          + INTERVAL '1 day'
-        AND NOT EXISTS (
-          SELECT 1
-          FROM "UserEpisode" ue
-          WHERE ue."userId" = us."userId"
-            AND ue."episodeId" = e.id
+      FROM "Episode" next_e
+
+      WHERE next_e."seriesId" = current_episode."seriesId"
+
+        AND next_e."seasonNumber" IS NOT NULL
+        AND next_e."episodeNumber" IS NOT NULL
+        AND next_e."seasonNumber" <> 0
+
+        AND next_e."airDate" IS NOT NULL
+        AND next_e."airDate" <
+          date_trunc(
+            'day',
+            CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+          ) + INTERVAL '1 day'
+
+        AND (
+          next_e."seasonNumber",
+          next_e."episodeNumber"
+        ) > (
+          current_episode."seasonNumber",
+          current_episode."episodeNumber"
         )
 
       ORDER BY
-        e."seasonNumber" ASC,
-        e."episodeNumber" ASC
+        next_e."seasonNumber" ASC,
+        next_e."episodeNumber" ASC
 
       LIMIT 1
-    ) next_episode ON TRUE
 
-    WHERE us."userId" = ${userId}
-      ${seriesFilter}
-      AND us.status IN ('WATCHING', 'PAUSED', 'DROPPED')
+    ) candidate ON TRUE
 
+    WHERE watched."userId" = us."userId"
+
+      AND current_episode."seriesId" = us."seriesId"
+
+      /*
+       * L'épisode suivant immédiat doit être NON VU.
+       */
+      AND NOT EXISTS (
+        SELECT 1
+
+        FROM "UserEpisode" seen
+
+        WHERE seen."userId" = us."userId"
+          AND seen."episodeId" = candidate.id
+      )
+
+    /*
+     * Parmi tous les épisodes regardés dont le suivant
+     * est non vu, on prend celui regardé le plus récemment.
+     */
     ORDER BY
-      us."lastWatchedAt" DESC NULLS LAST,
-      s.name ASC
-  `;
+      watched."watchedAt" DESC NULLS LAST,
+      current_episode.id DESC
+
+    LIMIT 1
+
+  ) next_episode ON TRUE
+
+  WHERE us."userId" = ${userId}
+    ${seriesFilter}
+    AND us.status IN (
+      'WATCHING',
+      'PAUSED',
+      'DROPPED'
+    )
+
+  ORDER BY
+    us."lastWatchedAt" DESC NULLS LAST,
+    s.name ASC
+`;
 }
 
 export const userRepository = {
