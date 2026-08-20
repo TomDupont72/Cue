@@ -1,5 +1,5 @@
 import { Menu } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
 
@@ -20,16 +20,17 @@ import {
   SheetTrigger
 } from "../ui/sheet";
 import { InstallAppButton } from "../pwa/installAppButton";
-import { NAVIGATION_LINK } from "../constants/navigationLink";
+import { NAVIGATION_FOOTER_LINK, NAVIGATION_HEADER_LINK } from "../constants/navigationLink";
 import { useTranslation } from "react-i18next";
+import { PageContainer } from "./pageContainer";
 
-export function Navigation() {
+export function NavigationHeader() {
   const { t } = useTranslation();
 
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
-        {Object.values(NAVIGATION_LINK).map((navigation) => (
+        {Object.values(NAVIGATION_HEADER_LINK).map((navigation) => (
           <NavigationMenuItem key={navigation.link}>
             <NavigationMenuLink
               className={navigationMenuTriggerStyle()}
@@ -46,7 +47,7 @@ export function Navigation() {
   );
 }
 
-export function NavigationMobile() {
+export function NavigationHeaderMobile() {
   const { t } = useTranslation();
 
   return (
@@ -70,7 +71,7 @@ export function NavigationMobile() {
         </SheetHeader>
 
         <nav className="flex h-full flex-col gap-2 px-4">
-          {Object.values(NAVIGATION_LINK).map((navigation) => (
+          {Object.values(NAVIGATION_HEADER_LINK).map((navigation) => (
             <SheetClose
               key={navigation.link}
               nativeButton={false}
@@ -96,5 +97,24 @@ export function NavigationMobile() {
         </nav>
       </SheetContent>
     </Sheet>
+  );
+}
+
+export function NavigationFooter() {
+  const { t } = useTranslation();
+
+  const links = Object.values(NAVIGATION_FOOTER_LINK);
+
+  return (
+    <PageContainer className="flex-row justify-center gap-2">
+      {links.map((navigation, index) => (
+        <>
+          <Link to={navigation.link} className="hover:underline">
+            {t(`common:navigation.${navigation.label}`)}
+          </Link>
+          {index < links.length - 1 && <span aria-hidden="true">·</span>}
+        </>
+      ))}
+    </PageContainer>
   );
 }

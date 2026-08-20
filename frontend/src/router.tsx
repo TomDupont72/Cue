@@ -4,6 +4,10 @@ import Layout from "@/components/layout/layout";
 import Search from "./pages/search.page";
 import Series from "./pages/series.page";
 import Watch from "./pages/watch.page";
+import Legal from "./pages/legal.page";
+import Privacy from "./pages/privacy.page";
+import Terms from "./pages/terms.page";
+import Credits from "./pages/credits.page";
 
 export default function Router() {
   return (
@@ -13,6 +17,10 @@ export default function Router() {
         <Route path="/search" element={<Search />} />
         <Route path="/series" element={<Series />} />
         <Route path="/watch" element={<Watch />} />
+        <Route path="/legal" element={<Legal />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/credits" element={<Credits />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>

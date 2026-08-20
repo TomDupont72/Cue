@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "../ui/dropdown-menu";
-import { Navigation, NavigationMobile } from "./navigation";
+import { NavigationHeader, NavigationHeaderMobile } from "./navigation";
 import { authClient } from "@/lib/authClient";
 import { queryClient } from "@/lib/queryClient";
 import { invalidateSessionGeneration } from "@/lib/sessionGeneration";
@@ -55,7 +55,7 @@ export default function Header() {
             <img src={cueLogo} alt="Cue" className="h-8 w-auto" />
           </Link>
 
-          <Navigation />
+          <NavigationHeader />
         </div>
 
         <div className="flex items-center gap-2">
@@ -87,7 +87,7 @@ export default function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <NavigationMobile />
+          <NavigationHeaderMobile />
         </div>
       </Container>
     </header>

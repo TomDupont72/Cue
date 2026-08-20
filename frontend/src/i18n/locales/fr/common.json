@@ -1,13 +1,18 @@
 {
   "date": {
-    "unknown": "Date inconnue"
+    "unknown": "Date inconnue",
+    "lastUpdate": "Dernière mise à jour"
   },
   "navigation": {
     "title": "Navigation",
     "dashboard": "Dashboard",
     "watch": "À voir",
     "calendar": "Calendrier",
-    "search": "Recherche"
+    "search": "Recherche",
+    "legal": "Légal",
+    "privacy": "Confidentialité",
+    "terms": "CGU",
+    "credits": "Crédits"
   },
   "app": {
     "install": "Installer l'application"
