@@ -9,5 +9,6 @@ export const NAVIGATION_FOOTER_LINK = {
   LEGAL: { label: "legal", link: "/legal" },
   PRIVACY: { label: "privacy", link: "/privacy" },
   TERMS: { label: "terms", link: "/terms" },
-  CREDITS: { label: "credits", link: "/credits" }
+  CREDITS: { label: "credits", link: "/credits" },
+  CHANGELOG: { label: "changelog", link: "/changelog" }
 } as const;

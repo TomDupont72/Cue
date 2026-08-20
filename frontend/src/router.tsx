@@ -8,6 +8,7 @@ import Legal from "./pages/legal.page";
 import Privacy from "./pages/privacy.page";
 import Terms from "./pages/terms.page";
 import Credits from "./pages/credits.page";
+import Changelog from "./pages/changelog.page";
 
 export default function Router() {
   return (
@@ -21,6 +22,7 @@ export default function Router() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/credits" element={<Credits />} />
+        <Route path="/changelog" element={<Changelog />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
