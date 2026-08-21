@@ -9,6 +9,7 @@ import Privacy from "./pages/privacy.page";
 import Terms from "./pages/terms.page";
 import Credits from "./pages/credits.page";
 import Changelog from "./pages/changelog.page";
+import Upcoming from "./pages/upcoming.page";
 
 export default function Router() {
   return (
@@ -18,6 +19,7 @@ export default function Router() {
         <Route path="/search" element={<Search />} />
         <Route path="/series" element={<Series />} />
         <Route path="/watch" element={<Watch />} />
+        <Route path="/upcoming" element={<Upcoming />} />
         <Route path="/legal" element={<Legal />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />

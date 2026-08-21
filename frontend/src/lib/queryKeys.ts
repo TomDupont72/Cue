@@ -28,6 +28,8 @@ export const queryKeys = {
   userEpisodes: {
     all: ["user-episodes"] as const,
 
-    feed: () => [...queryKeys.userEpisodes.all, "feed"] as const
+    feed: () => [...queryKeys.userEpisodes.all, "feed"] as const,
+
+    upcoming: () => [...queryKeys.userEpisodes.all, "upcoming"] as const
   }
 };
