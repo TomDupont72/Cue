@@ -62,6 +62,14 @@ export const userService = {
     };
   },
 
+  async episodeUpcomingGet(userId: string) {
+    const episodes = await userRepository.getEpisodesUpcoming(userId);
+
+    return {
+      episodes
+    };
+  },
+
   async seriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
     const series = await seriesRepository.findOne({ id: params.seriesId });
 

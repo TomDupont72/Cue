@@ -82,6 +82,23 @@ export const userEpisodeFeedGetResponseSchema = z.object({
   DROPPED: z.array(userEpisodeFeedItemResponseSchema)
 });
 
+export const userEpisodeUpcomingItemResponseSchema = z.object({
+  seriesId: z.number().int(),
+  seriesName: z.string(),
+  id: z.number().int(),
+  name: z.string(),
+  seasonNumber: z.number().int(),
+  episodeNumber: z.number().int(),
+  airDate: z.date().nullable(),
+  stillPath: z.string().nullable(),
+  runtime: z.number().int(),
+  overview: z.string().nullable()
+});
+
+export const userEpisodeUpcomingGetResponseSchema = z.object({
+  episodes: z.array(userEpisodeUpcomingItemResponseSchema)
+});
+
 export const userEpisodePostResponseSchema = userEpisodeResponseSchema.extend({
   seriesId: z.number().int(),
   nextEpisode: userEpisodeFeedItemResponseSchema.nullable()
