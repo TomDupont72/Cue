@@ -122,9 +122,6 @@ function getEpisodesFeedQuery(userId: string, seriesId?: number) {
 
       AND current_episode."seriesId" = us."seriesId"
 
-      /*
-       * L'épisode suivant immédiat doit être NON VU.
-       */
       AND NOT EXISTS (
         SELECT 1
 
@@ -134,10 +131,6 @@ function getEpisodesFeedQuery(userId: string, seriesId?: number) {
           AND seen."episodeId" = candidate.id
       )
 
-    /*
-     * Parmi tous les épisodes regardés dont le suivant
-     * est non vu, on prend celui regardé le plus récemment.
-     */
     ORDER BY
       watched."watchedAt" DESC NULLS LAST,
       current_episode.id DESC
@@ -337,5 +330,54 @@ export const userRepository = {
     const [episode] = await db.$queryRaw<EpisodeFeedRow[]>(getEpisodesFeedQuery(userId, seriesId));
 
     return episode ?? null;
+  },
+
+  async getEpisodesUpcoming(userId: string, db: PrismaTx = prisma) {
+    return db.$queryRaw<EpisodeFeedRow[]>(Prisma.sql`
+    SELECT
+      t."seriesId",
+      t."seriesName",
+      t.id,
+      t.name,
+      t."episodeNumber",
+      t."seasonNumber",
+      t."airDate",
+      t."stillPath",
+      t.runtime,
+      t.overview
+    FROM (
+      SELECT
+        s.id AS "seriesId",
+        s.name AS "seriesName",
+        e.id,
+        e.name,
+        e."episodeNumber",
+        e."seasonNumber",
+        e."airDate",
+        e."stillPath",
+        e.runtime,
+        e.overview,
+        ROW_NUMBER() OVER (
+          PARTITION BY e."seriesId"
+          ORDER BY
+            e."airDate",
+            e."seasonNumber",
+            e."episodeNumber"
+        ) AS rn
+
+      FROM "Episode" e
+
+      JOIN "Series" s
+        ON e."seriesId" = s.id
+
+      JOIN "UserSeries" us
+        ON s.id = us."seriesId"
+
+      WHERE e."airDate" > CURRENT_DATE
+        AND us."userId" = ${userId}
+    ) t
+
+    WHERE t.rn = 1
+  `);
   }
 };
