@@ -16,12 +16,14 @@ import {
   userSeriesGetResponseSchema,
   userSeriesPostBodySchema,
   userSeriesPostParamsSchema,
-  userSeriesPostResponseSchema
+  userSeriesPostResponseSchema,
+  userEpisodeUpcomingGetResponseSchema
 } from "@/modules/user/user.schemas.js";
 import {
   userDashboardSummaryController,
   userEpisodeController,
   userEpisodeFeedController,
+  userEpisodeUpcomingController,
   userSeasonController,
   userSeriesController,
   userSeriesReconcileController
@@ -74,6 +76,17 @@ export async function userRoutes(app: AppFastifyInstance) {
       }
     },
     handler: userEpisodeFeedController.get
+  });
+
+  app.get("/episodes/upcoming", {
+    preHandler: [app.requireAuth],
+    schema: {
+      tags: [Tags.USER],
+      response: {
+        200: userEpisodeUpcomingGetResponseSchema
+      }
+    },
+    handler: userEpisodeUpcomingController.get
   });
 
   app.post("/series/:seriesId/episode/:episodeId", {

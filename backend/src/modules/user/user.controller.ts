@@ -82,3 +82,11 @@ export const userEpisodeFeedController = {
     return reply.send(result);
   }
 };
+
+export const userEpisodeUpcomingController = {
+  async get(request: FastifyRequest, reply: FastifyReply) {
+    const result = await userService.episodeUpcomingGet(request.user.id);
+
+    return reply.send(result);
+  }
+};
