@@ -1,7 +1,7 @@
 export const NAVIGATION_HEADER_LINK = {
   DASHBOARD: { label: "dashboard", link: "/dashboard" },
   WATCH: { label: "watch", link: "/watch" },
-  CALENDAR: { label: "calendar", link: "/calendar" },
+  CALENDAR: { label: "upcoming", link: "/upcoming" },
   SEARCH: { label: "search", link: "/search" }
 } as const;
 

@@ -78,6 +78,23 @@ export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
     }
 >;
 
+export type UserEpisodesUpcomingGetResponse = {
+  episodes: (Pick<
+    EpisodeRow,
+    | "id"
+    | "name"
+    | "seasonNumber"
+    | "episodeNumber"
+    | "airDate"
+    | "stillPath"
+    | "runtime"
+    | "overview"
+  > & {
+    seriesId: number;
+    seriesName: string;
+  })[];
+};
+
 // =============================================================================
 // COMPONENT TYPES
 // =============================================================================
@@ -85,12 +102,8 @@ export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
 export type WatchSectionStatus = Extract<UserSeriesStatus, "WATCHING" | "PAUSED" | "DROPPED">;
 
 export type WatchSectionItem = Omit<
-  UserSeriesRow,
-  "isFavorite" | "watchCount" | "watchedEpisodeCount" | "addedAt"
-> &
-  Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
-    seriesName: string;
-    seriesPosterPath: string | null;
-    seriesTmdbId: number;
-    remainingEpisodes: number;
-  };
+  EpisodeRow,
+  "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"
+> & {
+  seriesName: string;
+};

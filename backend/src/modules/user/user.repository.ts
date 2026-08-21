@@ -356,7 +356,7 @@ export const userRepository = {
         e."airDate",
         e."stillPath",
         e.runtime,
-        e.overview,
+        e.overview
         ROW_NUMBER() OVER (
           PARTITION BY e."seriesId"
           ORDER BY
@@ -378,6 +378,9 @@ export const userRepository = {
     ) t
 
     WHERE t.rn = 1
+    ORDER BY
+        t."airDate" ASC,
+        t."seriesName" ASC;
   `);
   }
 };

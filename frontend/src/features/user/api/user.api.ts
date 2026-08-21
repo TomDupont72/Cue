@@ -13,6 +13,7 @@ import type {
   UserEpisodeDeleteResponse,
   UserEpisodePostResponse,
   UserEpisodesFeedGetResponse,
+  UserEpisodesUpcomingGetResponse,
   UserSeasonDeleteResponse,
   UserSeasonPostResponse,
   UserSeriesGetResponse,
@@ -116,4 +117,8 @@ export function userSeasonDelete(
 
 export function userEpisodesFeedGet(): Promise<UserEpisodesFeedGetResponse> {
   return ApiClient("/user/episodes/feed");
+}
+
+export function userEpisodesUpcomingGet(): Promise<UserEpisodesUpcomingGetResponse> {
+  return ApiClient("/user/episodes/upcoming");
 }
