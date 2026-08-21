@@ -337,6 +337,7 @@ export const userRepository = {
     SELECT
       t."seriesId",
       t."seriesName",
+      t."seriesPosterPath",
       t.id,
       t.name,
       t."episodeNumber",
@@ -349,6 +350,7 @@ export const userRepository = {
       SELECT
         s.id AS "seriesId",
         s.name AS "seriesName",
+        s."posterPath" AS "seriesPosterPath",
         e.id,
         e.name,
         e."episodeNumber",
@@ -378,6 +380,9 @@ export const userRepository = {
     ) t
 
     WHERE t.rn = 1
+    ORDER BY
+        t."airDate" ASC,
+        t."seriesName" ASC;
   `);
   }
 };

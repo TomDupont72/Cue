@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { WatchSectionItem, WatchSectionStatus } from "@/features/user/types/user.types";
 
 type WatchSectionProps = {
-  status: WatchSectionStatus;
+  status?: WatchSectionStatus;
   items: WatchSectionItem[];
 };
 
@@ -15,13 +15,19 @@ export default function WatchSection({ status, items }: WatchSectionProps) {
     <>
       {items.length > 0 ? (
         <>
-          <Heading level={3} className="uppercase">
-            {t(`user:series.status.${status}.section`)}
-          </Heading>
+          {status ? (
+            <Heading level={3} className="uppercase">
+              {t(`user:series.status.${status}.section`)}
+            </Heading>
+          ) : null}
           {items.map((item) => (
             <EpisodeCard
               key={item.id}
-              series={{ id: item.seriesId, name: item.seriesName, tmdbId: item.seriesTmdbId }}
+              series={{
+                id: item.seriesId,
+                name: item.seriesName,
+                posterPath: item.seriesPosterPath
+              }}
               episode={item}
               isWatched={false}
               displayName

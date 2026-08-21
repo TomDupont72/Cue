@@ -10,7 +10,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ### Ajouts
 
-- Ajout d’un bouton permettant d’accéder directement à la fiche d’un épisode depuis sa carte détaillée dans --À voir--.
+- Ajout d’un bouton permettant d’accéder directement à la fiche d’un épisode depuis sa carte détaillée dans **À voir**.
 
 ---
 
@@ -30,7 +30,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 - Correction de la gestion du statut des séries suivies.
 - Correction de la pagination des séries.
 - Correction de plusieurs incohérences dans les statistiques utilisateur.
-- Correction de l’ordre des séries dans --À voir--.
+- Correction de l’ordre des séries dans **À voir**.
 
 ---
 
@@ -82,7 +82,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ### Ajouts
 
-- Ajout du résumé des épisodes dans la section --À voir--.
+- Ajout du résumé des épisodes dans la section **À voir**.
 
 ### Améliorations
 
@@ -94,7 +94,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ### Ajouts
 
-- Ajout de la page --À voir-- pour retrouver le prochain épisode à regarder de chaque série suivie.
+- Ajout de la page **À voir** pour retrouver le prochain épisode à regarder de chaque série suivie.
 - Possibilité de marquer directement les épisodes disponibles comme vus depuis cette page.
 
 ---
