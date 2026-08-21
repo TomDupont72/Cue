@@ -34,7 +34,7 @@
     "fastify": "^5.10.0",
     "fastify-type-provider-zod": "^7.0.0",
     "globals": "^17.7.0",
-    "p-limit": "^7.3.0",
+    "p-limit": "^7.3.1",
     "pg": "^8.22.0",
     "pino": "^10.3.1",
     "pino-pretty": "^13.1.3",
