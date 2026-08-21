@@ -119,6 +119,7 @@ function SeriesContent({ seriesId }: SeriesContentProps) {
               episodes={episodes}
               userEpisodes={userEpisodes}
               seasons={seasons}
+              posterPath={series.posterPath}
             />
           )}
         </div>

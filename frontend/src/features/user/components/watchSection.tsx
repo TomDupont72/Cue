@@ -23,7 +23,11 @@ export default function WatchSection({ status, items }: WatchSectionProps) {
           {items.map((item) => (
             <EpisodeCard
               key={item.id}
-              series={{ id: item.seriesId, name: item.seriesName }}
+              series={{
+                id: item.seriesId,
+                name: item.seriesName,
+                posterPath: item.seriesPosterPath
+              }}
               episode={item}
               isWatched={false}
               displayName

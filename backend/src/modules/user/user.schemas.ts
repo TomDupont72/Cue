@@ -85,6 +85,7 @@ export const userEpisodeFeedGetResponseSchema = z.object({
 export const userEpisodeUpcomingItemResponseSchema = z.object({
   seriesId: z.number().int(),
   seriesName: z.string(),
+  seriesPosterPath: z.string().nullable(),
   id: z.number().int(),
   name: z.string(),
   seasonNumber: z.number().int(),

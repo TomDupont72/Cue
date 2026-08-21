@@ -33,6 +33,7 @@ export default function EpisodeCard({
   const userEpisodeDeleteMutation = useUserEpisodeDelete();
 
   const remainingDays = getEpisodeReleaseDayDifference(episode.airDate);
+  const path = episode.stillPath ?? series.posterPath;
 
   function handleCheckedChange(checked: boolean) {
     const params = {
@@ -52,7 +53,7 @@ export default function EpisodeCard({
       <div className="group relative rounded-xl transition-transform hover:-translate-y-1 hover:shadow-md">
         <Card className="flex h-24 flex-row overflow-hidden p-0">
           <div className="w-24 shrink-0 overflow-hidden bg-muted">
-            <Picture path={episode.stillPath} hover />
+            <Picture path={path} hover />
           </div>
 
           <CardContent

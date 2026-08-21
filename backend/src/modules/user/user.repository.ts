@@ -337,6 +337,7 @@ export const userRepository = {
     SELECT
       t."seriesId",
       t."seriesName",
+      t."seriesPosterPath",
       t.id,
       t.name,
       t."episodeNumber",
@@ -349,6 +350,7 @@ export const userRepository = {
       SELECT
         s.id AS "seriesId",
         s.name AS "seriesName",
+        s."posterPath" AS "seriesPosterPath",
         e.id,
         e.name,
         e."episodeNumber",
@@ -356,7 +358,7 @@ export const userRepository = {
         e."airDate",
         e."stillPath",
         e.runtime,
-        e.overview
+        e.overview,
         ROW_NUMBER() OVER (
           PARTITION BY e."seriesId"
           ORDER BY
