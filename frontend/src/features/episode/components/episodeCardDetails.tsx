@@ -27,10 +27,12 @@ export default function EpisodeCardDetails({
 }: EpisodeCardDetailsProps) {
   const { t } = useTranslation();
 
+  const path = episode.stillPath ?? series.posterPath;
+
   return (
     <>
       <div className="relative aspect-video w-full overflow-hidden bg-muted">
-        <Picture path={episode.stillPath} size="original" />
+        <Picture path={path} size="original" />
         {remainingDays !== null && remainingDays <= 0 ? (
           <RoundedCheckbox
             checked={isWatched}

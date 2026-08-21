@@ -13,9 +13,16 @@ type SeriesDetailsProps = {
   episodes: SeriesDetailsEpisode[];
   userEpisodes: SeriesDetailsUserEpisode[];
   seasons: SeriesDetailsSeason[];
+  posterPath: string | null;
 };
 
-export default function SeriesDetails({ id, episodes, userEpisodes, seasons }: SeriesDetailsProps) {
+export default function SeriesDetails({
+  id,
+  episodes,
+  userEpisodes,
+  seasons,
+  posterPath
+}: SeriesDetailsProps) {
   const sortedEpisodes = [...episodes].sort((a, b) => a.episodeNumber - b.episodeNumber);
 
   const episodesBySeason = sortedEpisodes.reduce<Record<number, EpisodeRow[]>>((acc, episode) => {
@@ -42,6 +49,7 @@ export default function SeriesDetails({ id, episodes, userEpisodes, seasons }: S
             key={season.id}
             seriesId={id}
             season={season}
+            posterPath={posterPath}
             episodes={episodesBySeason[season.seasonNumber] ?? []}
             watchedEpisodeIds={watchedEpisodeIds}
           />

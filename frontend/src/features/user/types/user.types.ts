@@ -92,6 +92,7 @@ export type UserEpisodesUpcomingGetResponse = {
   > & {
     seriesId: number;
     seriesName: string;
+    seriesPosterPath: string | null;
   })[];
 };
 
@@ -106,4 +107,5 @@ export type WatchSectionItem = Omit<
   "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"
 > & {
   seriesName: string;
+  seriesPosterPath: string | null;
 };
