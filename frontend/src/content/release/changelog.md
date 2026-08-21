@@ -6,6 +6,20 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ---
 
+## [1.0.0] · _22 août 2026_
+
+### Ajouts
+
+- Ajout de la page **À venir** pour consulter les prochains épisodes diffusés.
+- Ajout d’une page pour consulter les nouveautées.
+- Ajout des pages légales.
+
+### Correction
+
+- Correction de la sélection du prochain épisode dans **À voir**.
+
+---
+
 ## [0.10.0] · _17 août 2026_
 
 ### Ajouts
