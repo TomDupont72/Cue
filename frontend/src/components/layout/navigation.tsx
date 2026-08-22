@@ -103,16 +103,13 @@ export function NavigationHeaderMobile() {
 export function NavigationFooter() {
   const { t } = useTranslation();
 
-  const links = Object.values(NAVIGATION_FOOTER_LINK);
-
   return (
-    <PageContainer className="flex-row justify-center gap-2">
-      {links.map((navigation, index) => (
+    <PageContainer className="flex-row flex-wrap justify-center gap-4">
+      {Object.values(NAVIGATION_FOOTER_LINK).map((navigation) => (
         <>
           <Link to={navigation.link} className="hover:underline">
             {t(`common:navigation.${navigation.label}`)}
           </Link>
-          {index < links.length - 1 && <span aria-hidden="true">·</span>}
         </>
       ))}
     </PageContainer>
