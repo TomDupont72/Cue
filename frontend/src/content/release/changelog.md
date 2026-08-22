@@ -6,6 +6,16 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ---
 
+## [1.0.1] · _22 août 2026_
+
+### Correction
+
+- Correction de l’affichage des images des épisodes à venir.
+- Correction de l’accès à la série depuis les épisodes spéciaux.
+- Amélioration de l’affichage responsive du footer.
+
+---
+
 ## [1.0.0] · _22 août 2026_
 
 ### Ajouts
