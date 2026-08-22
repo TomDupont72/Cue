@@ -62,16 +62,15 @@ export default function EpisodeCard({
               remainingDays === null || remainingDays > 0 ? "mr-28" : "mr-16"
             )}
           >
+            {displayName && series.name ? (
+              <SeriesLinkBadge
+                seriesId={series.id}
+                name={series.name}
+                className="relative z-20 mb-1"
+              />
+            ) : null}
             {episode.seasonNumber !== 0 ? (
               <>
-                {displayName && series.name ? (
-                  <SeriesLinkBadge
-                    seriesId={series.id}
-                    name={series.name}
-                    className="relative z-20 mb-1"
-                  />
-                ) : null}
-
                 <Heading level={2} className="truncate">
                   S{episode.seasonNumber} | E{episode.episodeNumber}
                 </Heading>
