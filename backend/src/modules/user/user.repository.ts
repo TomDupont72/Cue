@@ -337,7 +337,7 @@ export const userRepository = {
     SELECT
       t."seriesId",
       t."seriesName",
-      t."seriesPosterPath",
+      t."seriesBackdropPath",
       t.id,
       t.name,
       t."episodeNumber",
@@ -350,7 +350,7 @@ export const userRepository = {
       SELECT
         s.id AS "seriesId",
         s.name AS "seriesName",
-        s."posterPath" AS "seriesPosterPath",
+        s."backdropPath" AS "seriesBackdropPath",
         e.id,
         e.name,
         e."episodeNumber",
