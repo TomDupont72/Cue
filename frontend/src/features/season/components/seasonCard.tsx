@@ -11,7 +11,7 @@ import { Heading } from "@/components/layout/heading";
 type SeasonCardProps = {
   seriesId: number;
   season: SeasonCardSeason;
-  posterPath: string | null;
+  backdropPath: string | null;
   episodes: SeasonCardEpisode[];
   watchedEpisodeIds: Set<number>;
 };
@@ -19,7 +19,7 @@ type SeasonCardProps = {
 export default function SeasonCard({
   seriesId,
   season,
-  posterPath,
+  backdropPath,
   episodes,
   watchedEpisodeIds
 }: SeasonCardProps) {
@@ -87,7 +87,7 @@ export default function SeasonCard({
         {episodes.map((episode) => (
           <EpisodeCard
             key={episode.id}
-            series={{ id: seriesId, posterPath }}
+            series={{ id: seriesId, backdropPath }}
             episode={episode}
             isWatched={watchedEpisodeIds.has(episode.id)}
           />

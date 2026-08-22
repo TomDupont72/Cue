@@ -27,7 +27,7 @@ export default function EpisodeCardDetails({
 }: EpisodeCardDetailsProps) {
   const { t } = useTranslation();
 
-  const path = episode.stillPath ?? series.posterPath;
+  const path = episode.stillPath ?? series.backdropPath;
 
   return (
     <>

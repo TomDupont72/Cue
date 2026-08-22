@@ -13,7 +13,7 @@ type SeriesDetailsProps = {
   episodes: SeriesDetailsEpisode[];
   userEpisodes: SeriesDetailsUserEpisode[];
   seasons: SeriesDetailsSeason[];
-  posterPath: string | null;
+  backdropPath: string | null;
 };
 
 export default function SeriesDetails({
@@ -21,7 +21,7 @@ export default function SeriesDetails({
   episodes,
   userEpisodes,
   seasons,
-  posterPath
+  backdropPath
 }: SeriesDetailsProps) {
   const sortedEpisodes = [...episodes].sort((a, b) => a.episodeNumber - b.episodeNumber);
 
@@ -49,7 +49,7 @@ export default function SeriesDetails({
             key={season.id}
             seriesId={id}
             season={season}
-            posterPath={posterPath}
+            backdropPath={backdropPath}
             episodes={episodesBySeason[season.seasonNumber] ?? []}
             watchedEpisodeIds={watchedEpisodeIds}
           />
