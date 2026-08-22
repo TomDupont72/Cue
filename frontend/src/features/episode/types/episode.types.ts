@@ -32,6 +32,6 @@ export type EpisodeCardEpisode = Pick<
 >;
 
 export type EpisodeCardSeries = Optional<
-  Pick<SeriesRow, "id" | "name" | "tmdbId" | "posterPath">,
+  Pick<SeriesRow, "id" | "name" | "tmdbId" | "backdropPath">,
   "name" | "tmdbId"
 >;

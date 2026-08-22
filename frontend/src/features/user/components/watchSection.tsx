@@ -26,7 +26,7 @@ export default function WatchSection({ status, items }: WatchSectionProps) {
               series={{
                 id: item.seriesId,
                 name: item.seriesName,
-                posterPath: item.seriesPosterPath
+                backdropPath: item.seriesBackdropPath
               }}
               episode={item}
               isWatched={false}

@@ -33,7 +33,7 @@ export default function EpisodeCard({
   const userEpisodeDeleteMutation = useUserEpisodeDelete();
 
   const remainingDays = getEpisodeReleaseDayDifference(episode.airDate);
-  const path = episode.stillPath ?? series.posterPath;
+  const path = episode.stillPath ?? series.backdropPath;
 
   function handleCheckedChange(checked: boolean) {
     const params = {
