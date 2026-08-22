@@ -72,7 +72,7 @@ export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
   Omit<UserSeriesRow, "isFavorite" | "watchCount" | "watchedEpisodeCount" | "addedAt"> &
     Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
       seriesName: string;
-      seriesPosterPath: string | null;
+      seriesBackdropPath: string | null;
       seriesTmdbId: number;
       remainingEpisodes: number;
     }
@@ -92,7 +92,7 @@ export type UserEpisodesUpcomingGetResponse = {
   > & {
     seriesId: number;
     seriesName: string;
-    seriesPosterPath: string | null;
+    seriesBackdropPath: string | null;
   })[];
 };
 
@@ -107,5 +107,5 @@ export type WatchSectionItem = Omit<
   "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"
 > & {
   seriesName: string;
-  seriesPosterPath: string | null;
+  seriesBackdropPath: string | null;
 };
