@@ -1,4 +1,5 @@
 import { World, setWorldConstructor } from "@cucumber/cucumber";
+import type { InjectOptions, LightMyRequestResponse } from "fastify";
 import { PatchScope } from "@/test/bdd/support/patch-scope.js";
 import { PrismaDouble } from "@/test/bdd/doubles/prisma.double.js";
 import { TmdbDouble } from "@/test/bdd/doubles/tmdb.double.js";
@@ -10,6 +11,7 @@ export class ApiWorld extends World {
   private selectedState?: string;
 
   app?: AppInstance;
+  response?: LightMyRequestResponse;
   scope?: PatchScope;
 
   useState(name: string) {
@@ -57,11 +59,32 @@ export class ApiWorld extends World {
     }
   }
 
+  async sendRequest(options: InjectOptions) {
+    if (!this.app) {
+      await this.prepareCase();
+    }
+
+    if (!this.app) {
+      throw new Error("HTTP application was not prepared");
+    }
+
+    this.response = await this.app.inject(options);
+  }
+
+  getResponse() {
+    if (!this.response) {
+      throw new Error("No HTTP response is available; send a request first");
+    }
+
+    return this.response;
+  }
+
   async disposeCase() {
     try {
       await this.app?.close();
     } finally {
       this.app = undefined;
+      this.response = undefined;
 
       this.scope?.restore();
       this.scope = undefined;
