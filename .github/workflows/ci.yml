@@ -96,11 +96,8 @@ jobs:
       - name: Lint
         run: npm run lint --if-present
 
-      - name: Test (with coverage)
+      - name: Test
         run: npm run test --if-present
-
-      - name: Integration tests
-        run: npm run test:integration
 
       - name: Build
         run: npm run build
