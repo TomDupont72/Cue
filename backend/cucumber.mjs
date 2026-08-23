@@ -1,5 +1,5 @@
 export default {
-  paths: ["src/modules/**/__tests__/*.feature", "src/shared/**/__tests__/*.feature"],
+  paths: ["src/modules/**/__tests__/*.test.feature", "src/shared/**/__tests__/*.test.feature"],
 
   import: [
     "./tsx-register.js",
