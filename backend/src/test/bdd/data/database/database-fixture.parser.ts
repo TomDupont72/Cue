@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { AstBuilder, GherkinClassicTokenMatcher, Parser } from "@cucumber/gherkin";
 import { IdGenerator, type Scenario } from "@cucumber/messages";
-import type { DatabaseState } from "@/test/bdd/doubles/prisma.double.js";
+import type { DatabaseState } from "@/test/bdd/support/test-database.js";
 import {
   type DatabaseFixtureCollection,
   type DatabaseFixtureRecordByCollection,
