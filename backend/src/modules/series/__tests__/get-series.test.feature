@@ -35,3 +35,19 @@ Feature: GET /api/series/:id
     And the response array at "userEpisodes" should exactly match:
       | userId | episodeId | watchedAt                |
       | user-1 | 1         | 2026-08-10T20:00:00.000Z |
+
+  Scenario: Reject an invalid series id
+    When I send a GET request to "/api/series/invalid"
+
+    Then the response status should be 400
+    And the response body should exactly match:
+      | code             | message         | details                                                                                                                                                                                                                  |
+      | VALIDATION_ERROR | Invalid request | json:[{"keyword":"invalid_type","instancePath":"/id","schemaPath":"#/id/invalid_type","message":"Invalid input: expected number, received NaN","params":{"expected":"number","received":"NaN"}}] |
+
+  Scenario: Return an error when the series does not exist
+    When I send a GET request to "/api/series/999"
+
+    Then the response status should be 404
+    And the response body should exactly match:
+      | code             | message          |
+      | SERIES_NOT_FOUND | Series not found |
