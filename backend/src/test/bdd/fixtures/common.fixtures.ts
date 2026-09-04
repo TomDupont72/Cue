@@ -1,37 +1,37 @@
 import { createDefaultDatabaseState, TEST_USER_IDS } from "@/test/bdd/data/database.data.js";
 import { loadDefaultTmdbData } from "@/test/bdd/data/tmdb.data.js";
-import { createEmptyDatabaseState } from "@/test/bdd/doubles/prisma.double.js";
+import { createEmptyDatabaseState } from "@/test/bdd/support/test-database.js";
 import { defineApiState } from "./registry.js";
 
-defineApiState("default.authenticated", ({ identity, prisma, tmdb }) => {
+defineApiState("default.authenticated", ({ identity, database, tmdb }) => {
   identity.userId = TEST_USER_IDS.primary;
 
-  prisma.load(createDefaultDatabaseState());
+  database.load(createDefaultDatabaseState());
   loadDefaultTmdbData(tmdb);
 });
 
-defineApiState("default.other-user", ({ identity, prisma, tmdb }) => {
+defineApiState("default.other-user", ({ identity, database, tmdb }) => {
   identity.userId = TEST_USER_IDS.other;
 
-  prisma.load(createDefaultDatabaseState());
+  database.load(createDefaultDatabaseState());
   loadDefaultTmdbData(tmdb);
 });
 
-defineApiState("default.anonymous", ({ prisma, tmdb }) => {
-  prisma.load(createDefaultDatabaseState());
+defineApiState("default.anonymous", ({ database, tmdb }) => {
+  database.load(createDefaultDatabaseState());
   loadDefaultTmdbData(tmdb);
 });
 
-defineApiState("default.worker", ({ identity, prisma, tmdb }) => {
+defineApiState("default.worker", ({ identity, database, tmdb }) => {
   identity.isWorker = true;
 
-  prisma.load(createDefaultDatabaseState());
+  database.load(createDefaultDatabaseState());
   loadDefaultTmdbData(tmdb);
 });
 
-defineApiState("empty.authenticated", ({ identity, prisma, tmdb }) => {
+defineApiState("empty.authenticated", ({ identity, database, tmdb }) => {
   identity.userId = TEST_USER_IDS.primary;
 
-  prisma.load(createEmptyDatabaseState());
+  database.load(createEmptyDatabaseState());
   loadDefaultTmdbData(tmdb);
 });

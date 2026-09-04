@@ -1,9 +1,9 @@
 import { World, setWorldConstructor } from "@cucumber/cucumber";
 import type { InjectOptions, LightMyRequestResponse } from "fastify";
 import { PatchScope } from "@/test/bdd/support/patch-scope.js";
-import { PrismaDouble } from "@/test/bdd/doubles/prisma.double.js";
 import { TmdbDouble } from "@/test/bdd/doubles/tmdb.double.js";
 import { createTestGuards, TestIdentity } from "@/test/bdd/support/test-guards.js";
+import { TestDatabase } from "@/test/bdd/support/test-database.js";
 import { resolveApiState } from "@/test/bdd/fixtures/registry.js";
 import { buildApp, type AppInstance } from "@/app.js";
 
@@ -28,7 +28,7 @@ export class ApiWorld extends World {
     }
 
     const scope = new PatchScope();
-    const prisma = new PrismaDouble();
+    const database = new TestDatabase();
     const tmdb = new TmdbDouble();
 
     const identity: TestIdentity = {
@@ -41,11 +41,11 @@ export class ApiWorld extends World {
     try {
       await resolveApiState(stateName)({
         identity,
-        prisma,
+        database,
         tmdb
       });
 
-      prisma.install(scope);
+      await database.resetAndSeed(identity.userId);
       tmdb.install(scope);
 
       this.app = await buildApp({

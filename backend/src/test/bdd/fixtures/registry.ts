@@ -1,10 +1,10 @@
-import type { PrismaDouble } from "@/test/bdd/doubles/prisma.double.js";
 import type { TmdbDouble } from "@/test/bdd/doubles/tmdb.double.js";
 import type { TestIdentity } from "@/test/bdd/support/test-guards.js";
+import type { TestDatabase } from "@/test/bdd/support/test-database.js";
 
 export type ApiCaseContext = {
   identity: TestIdentity;
-  prisma: PrismaDouble;
+  database: TestDatabase;
   tmdb: TmdbDouble;
 };
 
