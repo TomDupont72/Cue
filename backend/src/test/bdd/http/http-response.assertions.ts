@@ -6,6 +6,14 @@ type TableRows = readonly (readonly string[])[];
 const NUMBER_PATTERN = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
 
 function parseCell(value: string): unknown {
+  if (value.startsWith("json:")) {
+    try {
+      return JSON.parse(value.slice("json:".length)) as unknown;
+    } catch (cause) {
+      throw new Error(`Invalid JSON response cell: ${value}`, { cause });
+    }
+  }
+
   if (value === "null") {
     return null;
   }
