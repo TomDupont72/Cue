@@ -42,7 +42,7 @@ Feature: GET /api/user/dashboard/summary
             | totalWatchedMinutes | totalWatchedEpisodes | totalWatchedSeries |
             | 85                  | 3                    | 1                  |
 
-    Scenario: Get an empty user summary dashboard
+    Scenario: Get user summary dashboard - Missing Data
         When I send a GET request to "/api/user/dashboard/summary"
 
         Then the response status should be 200

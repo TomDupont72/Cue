@@ -3,7 +3,7 @@ Feature: GET /api/series/:id
     Background:
         Given I am authenticated as "user-1"
 
-    Scenario: Get a followed series
+    Scenario: Get series
         Given the database contains these series:
             | key       | id |
             | requested | 1  |
