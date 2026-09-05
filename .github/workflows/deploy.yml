@@ -92,5 +92,5 @@ jobs:
             docker compose -f compose.prod.yaml up -d \
               --remove-orphans
 
-            docker image prune -f
+            docker image prune -a -f --filter 'until=72h'
           "

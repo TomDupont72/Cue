@@ -1,4 +1,6 @@
 import datetime
+import httpx
+import time
 
 import dagster as dg
 from sqlalchemy import text
@@ -8,7 +10,7 @@ from orchestrator.resources.database import DatabaseResource
 
 
 class SyncSeriesConfig(dg.Config):
-    tmdb_id: int
+    full_sync: bool = False
 
 
 def select_tmdb_ids_to_sync(
@@ -71,18 +73,68 @@ def get_all_series(
 @dg.op
 def sync_series(
     context: dg.OpExecutionContext,
+    config: SyncSeriesConfig,
     cue_api: CueApiResource,
     changed_tmdb_ids: list[int],
     series_tmdb_ids: list[int],
 ) -> list[int]:
-    tmdb_ids_to_sync = select_tmdb_ids_to_sync(series_tmdb_ids, changed_tmdb_ids)
+    if config.full_sync:
+        tmdb_ids_to_sync = series_tmdb_ids
+        context.log.info(
+            f"FULL SYNC activée : synchronisation de toutes les "
+            f"{len(tmdb_ids_to_sync)} séries"
+        )
+    else:
+        tmdb_ids_to_sync = select_tmdb_ids_to_sync(
+            series_tmdb_ids,
+            changed_tmdb_ids,
+        )
 
-    context.log.info(f"Synchronisation de {len(tmdb_ids_to_sync)} séries")
+        context.log.info(
+            f"Synchronisation incrémentale de "
+            f"{len(tmdb_ids_to_sync)} séries"
+        )
 
     for tmdb_id_to_sync in tmdb_ids_to_sync:
-        cue_api.post_user_series_import(tmdb_id_to_sync)
+        max_attempts = 3
 
-        context.log.info(f"Série TMDB {tmdb_id_to_sync} synchronisée")
+        for attempt in range(1, max_attempts + 1):
+            try:
+                cue_api.post_user_series_import(tmdb_id_to_sync)
+                context.log.info(f"Série TMDB {tmdb_id_to_sync} synchronisée")
+
+                break
+
+            except httpx.HTTPStatusError as exc:
+                status = exc.response.status_code
+
+                retryable = status == 429 or status >= 500
+
+                if not retryable:
+                    context.log.error(
+                        f"Échec non retryable TMDB {tmdb_id_to_sync} "
+                        f"(HTTP {status})"
+                    )
+                    break
+
+                if attempt == max_attempts:
+                    context.log.error(
+                        f"Échec définitif TMDB {tmdb_id_to_sync} "
+                        f"après {max_attempts} tentatives "
+                        f"(HTTP {status})"
+                    )
+                    break
+
+                delay = 2 ** (attempt - 1)
+
+                context.log.warning(
+                    f"Échec TMDB {tmdb_id_to_sync} "
+                    f"(HTTP {status}), "
+                    f"tentative {attempt}/{max_attempts}. "
+                    f"Retry dans {delay}s"
+                )
+
+                time.sleep(delay)
 
     return tmdb_ids_to_sync
 
