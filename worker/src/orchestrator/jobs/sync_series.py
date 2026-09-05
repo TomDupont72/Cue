@@ -81,7 +81,7 @@ def sync_series(
     if config.full_sync:
         tmdb_ids_to_sync = series_tmdb_ids
         context.log.info(
-            f"FULL SYNC activée : synchronisation de toutes les "
+            f"FULL SYNC activée : synchronisation des "
             f"{len(tmdb_ids_to_sync)} séries"
         )
     else:
