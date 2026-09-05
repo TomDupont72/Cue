@@ -19,21 +19,3 @@ export class PatchScope {
     this.restorers = [];
   }
 }
-
-export function createSpy<TArgs extends unknown[], TResult>(
-  implementation: (...args: TArgs) => TResult
-) {
-  const calls: TArgs[] = [];
-
-  const fn = (...args: TArgs) => {
-    calls.push(args);
-    return implementation(...args);
-  };
-
-  return Object.assign(fn, {
-    calls,
-    reset() {
-      calls.length = 0;
-    }
-  });
-}

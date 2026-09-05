@@ -47,8 +47,6 @@
   },
   "devDependencies": {
     "@cucumber/cucumber": "^13.2.1",
-    "@cucumber/gherkin": "^42.0.1",
-    "@cucumber/messages": "^34.2.1",
     "@prisma/dev": "0.24.3",
     "@types/node": "^24.13.3",
     "@types/pg": "^8.20.0",

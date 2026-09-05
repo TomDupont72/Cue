@@ -96,6 +96,16 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function serializeFixture(value: unknown): unknown {
+  const serialized = JSON.stringify(value);
+
+  if (serialized === undefined) {
+    throw new Error("The database fixture cannot be represented as JSON");
+  }
+
+  return JSON.parse(serialized) as unknown;
+}
+
 function getValueAtPath(value: unknown, path: string): unknown {
   const segments = path.split(".");
 
@@ -157,10 +167,6 @@ export function assertResponseBodyExact(response: LightMyRequestResponse, rows: 
   assert.deepStrictEqual(parseResponseBody(response), parseObjectTable(rows));
 }
 
-export function assertResponseBodyPartial(response: LightMyRequestResponse, rows: TableRows) {
-  assert.partialDeepStrictEqual(parseResponseBody(response), parseObjectTable(rows));
-}
-
 export function assertResponseObjectAtPath(
   response: LightMyRequestResponse,
   path: string,
@@ -175,6 +181,34 @@ export function assertResponseArrayAtPath(
   rows: TableRows
 ) {
   assert.deepStrictEqual(getValueAtPath(parseResponseBody(response), path), parseTable(rows));
+}
+
+export function assertResponseObjectMatchesFixture(
+  response: LightMyRequestResponse,
+  path: string,
+  fixture: unknown
+) {
+  const value = getValueAtPath(parseResponseBody(response), path);
+
+  if (!isRecord(value)) {
+    throw new Error(`The response value at "${path}" is not an object`);
+  }
+
+  assert.deepStrictEqual(value, serializeFixture(fixture));
+}
+
+export function assertResponseArrayMatchesFixtures(
+  response: LightMyRequestResponse,
+  path: string,
+  fixtures: readonly unknown[]
+) {
+  const value = getValueAtPath(parseResponseBody(response), path);
+
+  if (!Array.isArray(value)) {
+    throw new Error(`The response value at "${path}" is not an array`);
+  }
+
+  assert.deepStrictEqual(value, fixtures.map(serializeFixture));
 }
 
 export function assertResponseNullAtPath(response: LightMyRequestResponse, path: string) {

@@ -4,28 +4,39 @@ import { PatchScope } from "@/test/bdd/support/patch-scope.js";
 import { TmdbDouble } from "@/test/bdd/doubles/tmdb.double.js";
 import { createTestGuards, TestIdentity } from "@/test/bdd/support/test-guards.js";
 import { TestDatabase } from "@/test/bdd/support/test-database.js";
-import { resolveApiState } from "@/test/bdd/fixtures/registry.js";
+import type { DatabaseFixtureCollection } from "@/test/bdd/data/database/database-fixture.schemas.js";
 import { buildApp, type AppInstance } from "@/app.js";
 
 export class ApiWorld extends World {
-  private selectedState?: string;
+  private authenticatedUserId?: string | null;
+  private pendingDatabaseFixtures: Array<{
+    collection: DatabaseFixtureCollection;
+    rows: Record<string, string>[];
+  }> = [];
+  private database?: TestDatabase;
 
   app?: AppInstance;
   response?: LightMyRequestResponse;
   scope?: PatchScope;
 
-  useState(name: string) {
-    this.selectedState = name;
+  authenticateAs(userId: string | null) {
+    this.authenticatedUserId = userId;
   }
 
-  async prepareCase(stateOverride?: string) {
-    await this.disposeCase();
+  addDatabaseFixtures(collection: DatabaseFixtureCollection, rows: Record<string, string>[]) {
+    this.pendingDatabaseFixtures.push({ collection, rows });
+  }
 
-    const stateName = stateOverride ?? this.selectedState;
-
-    if (!stateName) {
-      throw new Error("No API state selected");
+  getDatabaseFixture(reference: string) {
+    if (!this.database) {
+      throw new Error("The test database has not been prepared yet");
     }
+
+    return this.database.getFixture(reference);
+  }
+
+  async prepareCase() {
+    await this.disposeCase();
 
     const scope = new PatchScope();
     const database = new TestDatabase();
@@ -39,14 +50,18 @@ export class ApiWorld extends World {
     this.scope = scope;
 
     try {
-      await resolveApiState(stateName)({
-        identity,
-        database,
-        tmdb
-      });
+      if (this.authenticatedUserId !== undefined) {
+        identity.userId = this.authenticatedUserId;
+      }
+
+      for (const fixtures of this.pendingDatabaseFixtures) {
+        database.addFixtures(fixtures.collection, fixtures.rows);
+      }
 
       await database.resetAndSeed(identity.userId);
       tmdb.install(scope);
+
+      this.database = database;
 
       this.app = await buildApp({
         loggerEnabled: false,
@@ -88,6 +103,7 @@ export class ApiWorld extends World {
 
       this.scope?.restore();
       this.scope = undefined;
+      this.database = undefined;
     }
   }
 }

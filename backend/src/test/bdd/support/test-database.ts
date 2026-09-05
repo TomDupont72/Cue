@@ -1,32 +1,19 @@
-import type {
-  Episode,
-  Season,
-  Series,
-  UserEpisode,
-  UserSeries
-} from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
+import {
+  addDatabaseFixtureRows,
+  createEmptyDatabaseFixtures,
+  getDatabaseFixture,
+  type DatabaseFixtureState,
+  type LoadedDatabaseFixtures
+} from "@/test/bdd/data/database/database-fixture.parser.js";
+import type {
+  DatabaseFixtureCollection,
+  DatabaseFixtureRecord,
+  DatabaseFixtureRow
+} from "@/test/bdd/data/database/database-fixture.schemas.js";
 import { assertSafeTestDatabase } from "@/test/bdd/support/test-database-safety.js";
 
-export type DatabaseState = {
-  series: Series[];
-  seasons: Season[];
-  episodes: Episode[];
-  userSeries: UserSeries[];
-  userEpisodes: UserEpisode[];
-};
-
-export function createEmptyDatabaseState(): DatabaseState {
-  return {
-    series: [],
-    seasons: [],
-    episodes: [],
-    userSeries: [],
-    userEpisodes: []
-  };
-}
-
-function collectUserIds(state: DatabaseState, authenticatedUserId: string | null) {
+function collectUserIds(state: DatabaseFixtureState, authenticatedUserId: string | null) {
   const userIds = new Set<string>();
 
   if (authenticatedUserId !== null) {
@@ -68,16 +55,23 @@ const TRUNCATE_DATABASE_SQL = `
 `;
 
 export class TestDatabase {
-  private state = createEmptyDatabaseState();
+  private fixtures: LoadedDatabaseFixtures = createEmptyDatabaseFixtures();
 
-  load(state: DatabaseState) {
-    this.state = structuredClone(state);
+  addFixtures<Collection extends DatabaseFixtureCollection>(
+    collection: Collection,
+    rows: readonly DatabaseFixtureRow[]
+  ) {
+    return addDatabaseFixtureRows(this.fixtures, collection, rows);
+  }
+
+  getFixture(reference: string): DatabaseFixtureRecord {
+    return getDatabaseFixture(this.fixtures, reference);
   }
 
   async resetAndSeed(authenticatedUserId: string | null) {
     assertSafeTestDatabase(process.env);
 
-    const state = structuredClone(this.state);
+    const state = structuredClone(this.fixtures.state);
     const userIds = collectUserIds(state, authenticatedUserId);
     const now = new Date("2026-01-01T00:00:00.000Z");
 
