@@ -167,10 +167,6 @@ export function assertResponseBodyExact(response: LightMyRequestResponse, rows: 
   assert.deepStrictEqual(parseResponseBody(response), parseObjectTable(rows));
 }
 
-export function assertResponseBodyPartial(response: LightMyRequestResponse, rows: TableRows) {
-  assert.partialDeepStrictEqual(parseResponseBody(response), parseObjectTable(rows));
-}
-
 export function assertResponseObjectAtPath(
   response: LightMyRequestResponse,
   path: string,

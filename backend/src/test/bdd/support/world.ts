@@ -5,11 +5,9 @@ import { TmdbDouble } from "@/test/bdd/doubles/tmdb.double.js";
 import { createTestGuards, TestIdentity } from "@/test/bdd/support/test-guards.js";
 import { TestDatabase } from "@/test/bdd/support/test-database.js";
 import type { DatabaseFixtureCollection } from "@/test/bdd/data/database/database-fixture.schemas.js";
-import { resolveApiState } from "@/test/bdd/fixtures/registry.js";
 import { buildApp, type AppInstance } from "@/app.js";
 
 export class ApiWorld extends World {
-  private selectedState?: string;
   private authenticatedUserId?: string | null;
   private pendingDatabaseFixtures: Array<{
     collection: DatabaseFixtureCollection;
@@ -20,10 +18,6 @@ export class ApiWorld extends World {
   app?: AppInstance;
   response?: LightMyRequestResponse;
   scope?: PatchScope;
-
-  useState(name: string) {
-    this.selectedState = name;
-  }
 
   authenticateAs(userId: string | null) {
     this.authenticatedUserId = userId;
@@ -41,10 +35,8 @@ export class ApiWorld extends World {
     return this.database.getFixture(reference);
   }
 
-  async prepareCase(stateOverride?: string) {
+  async prepareCase() {
     await this.disposeCase();
-
-    const stateName = stateOverride ?? this.selectedState;
 
     const scope = new PatchScope();
     const database = new TestDatabase();
@@ -58,14 +50,6 @@ export class ApiWorld extends World {
     this.scope = scope;
 
     try {
-      if (stateName) {
-        await resolveApiState(stateName)({
-          identity,
-          database,
-          tmdb
-        });
-      }
-
       if (this.authenticatedUserId !== undefined) {
         identity.userId = this.authenticatedUserId;
       }

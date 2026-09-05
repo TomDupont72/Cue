@@ -1,16 +1,9 @@
-import type {
-  Episode,
-  Season,
-  Series,
-  UserEpisode,
-  UserSeries
-} from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import {
   addDatabaseFixtureRows,
-  createEmptyDatabaseFixtureReferences,
   createEmptyDatabaseFixtures,
   getDatabaseFixture,
+  type DatabaseFixtureState,
   type LoadedDatabaseFixtures
 } from "@/test/bdd/data/database/database-fixture.parser.js";
 import type {
@@ -20,25 +13,7 @@ import type {
 } from "@/test/bdd/data/database/database-fixture.schemas.js";
 import { assertSafeTestDatabase } from "@/test/bdd/support/test-database-safety.js";
 
-export type DatabaseState = {
-  series: Series[];
-  seasons: Season[];
-  episodes: Episode[];
-  userSeries: UserSeries[];
-  userEpisodes: UserEpisode[];
-};
-
-export function createEmptyDatabaseState(): DatabaseState {
-  return {
-    series: [],
-    seasons: [],
-    episodes: [],
-    userSeries: [],
-    userEpisodes: []
-  };
-}
-
-function collectUserIds(state: DatabaseState, authenticatedUserId: string | null) {
+function collectUserIds(state: DatabaseFixtureState, authenticatedUserId: string | null) {
   const userIds = new Set<string>();
 
   if (authenticatedUserId !== null) {
@@ -81,13 +56,6 @@ const TRUNCATE_DATABASE_SQL = `
 
 export class TestDatabase {
   private fixtures: LoadedDatabaseFixtures = createEmptyDatabaseFixtures();
-
-  load(state: DatabaseState) {
-    this.fixtures = {
-      state: structuredClone(state),
-      references: createEmptyDatabaseFixtureReferences()
-    };
-  }
 
   addFixtures<Collection extends DatabaseFixtureCollection>(
     collection: Collection,

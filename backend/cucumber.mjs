@@ -6,11 +6,7 @@ export default {
 
     "src/test/bdd/support/world.ts",
     "src/test/bdd/support/hooks.ts",
-    "src/test/bdd/steps/**/*.ts",
-    "src/test/bdd/fixtures/**/*.fixtures.ts",
-
-    "src/modules/**/__tests__/*.fixtures.ts",
-    "src/shared/**/__tests__/*.fixtures.ts"
+    "src/test/bdd/steps/**/*.ts"
   ],
 
   format: ["progress"],

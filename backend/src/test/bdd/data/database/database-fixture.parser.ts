@@ -1,7 +1,3 @@
-import { readFileSync } from "node:fs";
-import { AstBuilder, GherkinClassicTokenMatcher, Parser } from "@cucumber/gherkin";
-import { IdGenerator, type Scenario } from "@cucumber/messages";
-import type { DatabaseState } from "@/test/bdd/support/test-database.js";
 import {
   type DatabaseFixtureCollection,
   type DatabaseFixtureRecord,
@@ -12,20 +8,16 @@ import {
   parseDatabaseFixtureRow
 } from "./database-fixture.schemas.js";
 
-const FIXTURE_DEFINITIONS = [
-  ["series", "series.fixture.feature"],
-  ["seasons", "seasons.fixture.feature"],
-  ["episodes", "episodes.fixture.feature"],
-  ["userSeries", "userSeries.fixture.feature"],
-  ["userEpisodes", "userEpisodes.fixture.feature"]
-] as const satisfies readonly (readonly [DatabaseFixtureCollection, string])[];
+export type DatabaseFixtureState = {
+  [Collection in DatabaseFixtureCollection]: DatabaseFixtureRecordByCollection[Collection][];
+};
 
 export type LoadedDatabaseFixtures = {
-  state: DatabaseState;
+  state: DatabaseFixtureState;
   references: DatabaseFixtureReferences;
 };
 
-export function createEmptyDatabaseFixtureReferences(): DatabaseFixtureReferences {
+function createEmptyDatabaseFixtureReferences(): DatabaseFixtureReferences {
   return {
     series: new Map(),
     seasons: new Map(),
@@ -46,66 +38,6 @@ export function createEmptyDatabaseFixtures(): LoadedDatabaseFixtures {
     },
     references: createEmptyDatabaseFixtureReferences()
   };
-}
-
-function parseFeature(source: string) {
-  const parser = new Parser(
-    new AstBuilder(IdGenerator.incrementing()),
-    new GherkinClassicTokenMatcher()
-  );
-
-  return parser.parse(source);
-}
-
-function getScenarioRows(filename: string, fixtureName: string): Record<string, string>[] {
-  const source = readFileSync(new URL(filename, import.meta.url), "utf8");
-  const document = parseFeature(source);
-  const feature = document.feature;
-
-  if (!feature) {
-    throw new Error(`Database fixture ${filename} does not contain a Feature`);
-  }
-
-  const scenarios = feature.children.flatMap((child) => {
-    if (child.scenario) {
-      return [child.scenario];
-    }
-
-    return child.rule?.children.flatMap((ruleChild) => ruleChild.scenario ?? []) ?? [];
-  });
-  const matchingScenarios = scenarios.filter((scenario) => scenario.name === fixtureName);
-
-  if (matchingScenarios.length !== 1) {
-    throw new Error(
-      `Database fixture ${filename} must contain exactly one Scenario named "${fixtureName}"`
-    );
-  }
-
-  return getTableRows(filename, matchingScenarios[0]);
-}
-
-function getTableRows(filename: string, scenario: Scenario): Record<string, string>[] {
-  if (scenario.steps.length !== 1 || !scenario.steps[0].dataTable) {
-    throw new Error(
-      `Scenario "${scenario.name}" in ${filename} must contain exactly one step with a table`
-    );
-  }
-
-  const [headerRow, ...bodyRows] = scenario.steps[0].dataTable.rows;
-
-  if (!headerRow) {
-    throw new Error(`Scenario "${scenario.name}" in ${filename} has an empty table`);
-  }
-
-  const headers = headerRow.cells.map((cell) => cell.value);
-
-  if (new Set(headers).size !== headers.length) {
-    throw new Error(`Scenario "${scenario.name}" in ${filename} has duplicate columns`);
-  }
-
-  return bodyRows.map((row) =>
-    Object.fromEntries(row.cells.map((cell, index) => [headers[index], cell.value]))
-  );
 }
 
 function addFixtureRecord(
@@ -182,20 +114,4 @@ export function getDatabaseFixture(
   }
 
   return record;
-}
-
-export function loadDatabaseFixtures(fixtureName: string): LoadedDatabaseFixtures {
-  const loadedFixtures = createEmptyDatabaseFixtures();
-
-  for (const [collection, filename] of FIXTURE_DEFINITIONS) {
-    const rows = getScenarioRows(filename, fixtureName);
-
-    try {
-      addDatabaseFixtureRows(loadedFixtures, collection, rows);
-    } catch (error) {
-      throw new Error(`Invalid ${collection} fixture in ${filename}`, { cause: error });
-    }
-  }
-
-  return loadedFixtures;
 }

@@ -3,7 +3,6 @@ import {
   assertResponseArrayAtPath,
   assertResponseArrayMatchesFixtures,
   assertResponseBodyExact,
-  assertResponseBodyPartial,
   assertResponseEmptyArrayAtPath,
   assertResponseFields,
   assertResponseNullAtPath,
@@ -36,10 +35,6 @@ function parseHttpMethod(value: string): HttpMethod {
 
   return method as HttpMethod;
 }
-
-Given("the API state is {string}", function (this: ApiWorld, stateName: string) {
-  this.useState(stateName);
-});
 
 Given("I am authenticated as {string}", function (this: ApiWorld, userId: string) {
   this.authenticateAs(userId);
@@ -75,10 +70,6 @@ Then(
 
 Then("the response body should exactly match:", function (this: ApiWorld, table: DataTable) {
   assertResponseBodyExact(this.getResponse(), table.raw());
-});
-
-Then("the response body should partially match:", function (this: ApiWorld, table: DataTable) {
-  assertResponseBodyPartial(this.getResponse(), table.raw());
 });
 
 Then(

@@ -21,11 +21,7 @@ type IdentifiedDatabaseFixtureCollection = "series" | "seasons" | "episodes";
 
 export type DatabaseFixtureRow = Record<string, string>;
 
-export type DatabaseFixtureReference<
-  Collection extends DatabaseFixtureCollection = DatabaseFixtureCollection
-> = `@${Collection}.${string}`;
-
-export const DATABASE_FIXTURE_TIMESTAMP = "2026-01-01T00:00:00.000Z";
+const DATABASE_FIXTURE_TIMESTAMP = "2026-01-01T00:00:00.000Z";
 
 export type DatabaseFixtureRecordByCollection = {
   series: Series;
@@ -44,7 +40,7 @@ export type DatabaseFixtureReferences = {
   >;
 };
 
-export type ParsedDatabaseFixtureRow<
+type ParsedDatabaseFixtureRow<
   Collection extends DatabaseFixtureCollection = DatabaseFixtureCollection
 > = {
   key: string;
@@ -97,7 +93,7 @@ export function parseDatabaseFixtureReference(reference: string): {
   return { collection, key };
 }
 
-export function isDatabaseFixtureCollection(value: string): value is DatabaseFixtureCollection {
+function isDatabaseFixtureCollection(value: string): value is DatabaseFixtureCollection {
   return (
     value === "series" ||
     value === "seasons" ||
