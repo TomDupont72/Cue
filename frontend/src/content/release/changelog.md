@@ -6,6 +6,14 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ---
 
+## [1.0.2] · _5 septembre 2026_
+
+### Correction
+
+- Correction des timeout dans le job journalier.
+
+---
+
 ## [1.0.1] · _22 août 2026_
 
 ### Correction
