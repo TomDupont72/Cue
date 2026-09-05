@@ -4,8 +4,11 @@ import { IdGenerator, type Scenario } from "@cucumber/messages";
 import type { DatabaseState } from "@/test/bdd/support/test-database.js";
 import {
   type DatabaseFixtureCollection,
+  type DatabaseFixtureRecord,
   type DatabaseFixtureRecordByCollection,
+  type DatabaseFixtureRow,
   type DatabaseFixtureReferences,
+  parseDatabaseFixtureReference,
   parseDatabaseFixtureRow
 } from "./database-fixture.schemas.js";
 
@@ -17,18 +20,31 @@ const FIXTURE_DEFINITIONS = [
   ["userEpisodes", "userEpisodes.fixture.feature"]
 ] as const satisfies readonly (readonly [DatabaseFixtureCollection, string])[];
 
-type LoadedDatabaseFixtures = {
+export type LoadedDatabaseFixtures = {
   state: DatabaseState;
   references: DatabaseFixtureReferences;
 };
 
-function createEmptyReferences(): DatabaseFixtureReferences {
+export function createEmptyDatabaseFixtureReferences(): DatabaseFixtureReferences {
   return {
     series: new Map(),
     seasons: new Map(),
     episodes: new Map(),
     userSeries: new Map(),
     userEpisodes: new Map()
+  };
+}
+
+export function createEmptyDatabaseFixtures(): LoadedDatabaseFixtures {
+  return {
+    state: {
+      series: [],
+      seasons: [],
+      episodes: [],
+      userSeries: [],
+      userEpisodes: []
+    },
+    references: createEmptyDatabaseFixtureReferences()
   };
 }
 
@@ -129,31 +145,55 @@ function addFixtureRecord(
   }
 }
 
+export function addDatabaseFixtureRows<Collection extends DatabaseFixtureCollection>(
+  loadedFixtures: LoadedDatabaseFixtures,
+  collection: Collection,
+  rows: readonly DatabaseFixtureRow[]
+): DatabaseFixtureRecordByCollection[Collection][] {
+  const records: DatabaseFixtureRecordByCollection[Collection][] = [];
+
+  for (const [index, row] of rows.entries()) {
+    try {
+      const { key, record } = parseDatabaseFixtureRow(collection, row, loadedFixtures.references);
+
+      addFixtureRecord(collection, key, record, loadedFixtures);
+      records.push(record);
+    } catch (error) {
+      throw new Error(`Invalid ${collection} fixture, row ${index + 1}`, { cause: error });
+    }
+  }
+
+  return records;
+}
+
+export function getDatabaseFixture(
+  loadedFixtures: LoadedDatabaseFixtures,
+  reference: string
+): DatabaseFixtureRecord {
+  const { collection, key } = parseDatabaseFixtureReference(reference);
+  const collectionReferences = loadedFixtures.references[collection] as Map<
+    string,
+    DatabaseFixtureRecord
+  >;
+  const record = collectionReferences.get(key);
+
+  if (!record) {
+    throw new Error(`Unknown database fixture reference: ${reference}`);
+  }
+
+  return record;
+}
+
 export function loadDatabaseFixtures(fixtureName: string): LoadedDatabaseFixtures {
-  const loadedFixtures: LoadedDatabaseFixtures = {
-    state: {
-      series: [],
-      seasons: [],
-      episodes: [],
-      userSeries: [],
-      userEpisodes: []
-    },
-    references: createEmptyReferences()
-  };
+  const loadedFixtures = createEmptyDatabaseFixtures();
 
   for (const [collection, filename] of FIXTURE_DEFINITIONS) {
     const rows = getScenarioRows(filename, fixtureName);
 
-    for (const [index, row] of rows.entries()) {
-      try {
-        const { key, record } = parseDatabaseFixtureRow(collection, row, loadedFixtures.references);
-
-        addFixtureRecord(collection, key, record, loadedFixtures);
-      } catch (error) {
-        throw new Error(`Invalid ${collection} fixture in ${filename}, row ${index + 2}`, {
-          cause: error
-        });
-      }
+    try {
+      addDatabaseFixtureRows(loadedFixtures, collection, rows);
+    } catch (error) {
+      throw new Error(`Invalid ${collection} fixture in ${filename}`, { cause: error });
     }
   }
 
