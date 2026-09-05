@@ -51,7 +51,7 @@ export async function buildApp({
       openapi: {
         info: {
           title: "Cue API",
-          version: "0.9.7"
+          version: "1.0.2"
         },
         tags: [
           {
