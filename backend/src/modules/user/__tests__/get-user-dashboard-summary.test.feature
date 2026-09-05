@@ -18,7 +18,7 @@ Feature: GET /api/user/dashboard/summary
             | key       | id | seriesId          | seasonId            | episodeNumber | seasonNumber | runtime |
             | watched20 | 1  | @series.completed | @seasons.completedS | 1             | 1            | 20      |
             | watched25 | 2  | @series.completed | @seasons.completedS | 2             | 1            | 25      |
-            | watched40 | 3  | @series.watching  | @seasons.watchingS  | 1             | 1            | 35      |
+            | watched40 | 3  | @series.watching  | @seasons.watchingS  | 1             | 1            | 40      |
             | ignored   | 4  | @series.watching  | @seasons.watchingS  | 2             | 1            | 999     |
 
         And the database contains these user series:
