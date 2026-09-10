@@ -79,8 +79,7 @@ export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
 >;
 
 export type UserEpisodesUpcomingGetResponse = {
-  episodes: (
-    EpisodeRow & {
+  episodes: (EpisodeRow & {
     seriesName: string;
     seriesBackdropPath: string | null;
   })[];
