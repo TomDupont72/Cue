@@ -83,17 +83,22 @@ export const userEpisodeFeedGetResponseSchema = z.object({
 });
 
 export const userEpisodeUpcomingItemResponseSchema = z.object({
+  id: z.number().int(),
   seriesId: z.number().int(),
+  seasonId: z.number().int(),
+  airDate: z.date().nullable(),
+  episodeNumber: z.number().int(),
+  name: z.string(),
+  overview: z.string().nullable(),
+  tmdbId: z.number().int(),
+  stillPath: z.string().nullable(),
+  seasonNumber: z.number().int(),
+  voteAverage: z.number(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  runtime: z.number().int(),
   seriesName: z.string(),
   seriesBackdropPath: z.string().nullable(),
-  id: z.number().int(),
-  name: z.string(),
-  seasonNumber: z.number().int(),
-  episodeNumber: z.number().int(),
-  airDate: z.date().nullable(),
-  stillPath: z.string().nullable(),
-  runtime: z.number().int(),
-  overview: z.string().nullable()
 });
 
 export const userEpisodeUpcomingGetResponseSchema = z.object({
