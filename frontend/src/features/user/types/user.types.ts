@@ -79,18 +79,8 @@ export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
 >;
 
 export type UserEpisodesUpcomingGetResponse = {
-  episodes: (Pick<
-    EpisodeRow,
-    | "id"
-    | "name"
-    | "seasonNumber"
-    | "episodeNumber"
-    | "airDate"
-    | "stillPath"
-    | "runtime"
-    | "overview"
-  > & {
-    seriesId: number;
+  episodes: (
+    EpisodeRow & {
     seriesName: string;
     seriesBackdropPath: string | null;
   })[];
