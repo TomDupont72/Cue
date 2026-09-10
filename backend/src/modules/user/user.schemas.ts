@@ -1,5 +1,6 @@
 import z from "zod";
 import {
+  episodeResponseSchema,
   seriesResponseSchema,
   userEpisodeResponseSchema,
   userSeriesResponseSchema
@@ -82,18 +83,9 @@ export const userEpisodeFeedGetResponseSchema = z.object({
   DROPPED: z.array(userEpisodeFeedItemResponseSchema)
 });
 
-export const userEpisodeUpcomingItemResponseSchema = z.object({
-  seriesId: z.number().int(),
+export const userEpisodeUpcomingItemResponseSchema = episodeResponseSchema.extend({
   seriesName: z.string(),
-  seriesBackdropPath: z.string().nullable(),
-  id: z.number().int(),
-  name: z.string(),
-  seasonNumber: z.number().int(),
-  episodeNumber: z.number().int(),
-  airDate: z.date().nullable(),
-  stillPath: z.string().nullable(),
-  runtime: z.number().int(),
-  overview: z.string().nullable()
+  seriesBackdropPath: z.string().nullable()
 });
 
 export const userEpisodeUpcomingGetResponseSchema = z.object({

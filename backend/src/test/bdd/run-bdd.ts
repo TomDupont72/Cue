@@ -9,7 +9,10 @@ import { assertSafeTestDatabase } from "@/test/bdd/support/test-database-safety.
 
 const require = createRequire(import.meta.url);
 const prismaCli = require.resolve("prisma/build/index.js");
-const cucumberCli = join(dirname(require.resolve("@cucumber/cucumber/package.json")), "bin/cucumber.js");
+const cucumberCli = join(
+  dirname(require.resolve("@cucumber/cucumber/package.json")),
+  "bin/cucumber.js"
+);
 
 async function listenOnFreePort(server: NetServer): Promise<number> {
   await new Promise<void>((resolve, reject) => {
@@ -33,7 +36,7 @@ async function listenOnFreePort(server: NetServer): Promise<number> {
 
 async function closeNetServer(server: NetServer): Promise<void> {
   await new Promise<void>((resolve, reject) => {
-    server.close(error => (error ? reject(error) : resolve()));
+    server.close((error) => (error ? reject(error) : resolve()));
   });
 }
 
@@ -51,7 +54,7 @@ async function getFreePorts(count: number): Promise<number[]> {
 
     return ports;
   } finally {
-    await Promise.all(reservations.filter(server => server.listening).map(closeNetServer));
+    await Promise.all(reservations.filter((server) => server.listening).map(closeNetServer));
   }
 }
 
@@ -97,7 +100,7 @@ async function run(command: string, args: string[], env: NodeJS.ProcessEnv): Pro
     });
 
     child.once("error", reject);
-    child.once("exit", code => resolve(code ?? 1));
+    child.once("exit", (code) => resolve(code ?? 1));
   });
 }
 

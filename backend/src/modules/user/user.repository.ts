@@ -5,6 +5,7 @@ import {
   DashboardSummaryEpisodesRow,
   DashboardSummarySeriesRow,
   EpisodeFeedRow,
+  EpisodeUpcomingRow,
   UserSeriesProgressRow
 } from "./user.types.js";
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
@@ -332,33 +333,32 @@ export const userRepository = {
     return episode ?? null;
   },
 
-  async getEpisodesUpcoming(userId: string, db: PrismaTx = prisma) {
-    return db.$queryRaw<EpisodeFeedRow[]>(Prisma.sql`
+  async getEpisodesUpcoming(userId: string, now: Date, db: PrismaTx = prisma) {
+    const currentDate = now.toISOString().slice(0, 10);
+
+    return db.$queryRaw<EpisodeUpcomingRow[]>(Prisma.sql`
     SELECT
-      t."seriesId",
-      t."seriesName",
-      t."seriesBackdropPath",
       t.id,
-      t.name,
-      t."episodeNumber",
-      t."seasonNumber",
+      t."seriesId",
+      t."seasonId",
       t."airDate",
+      t."episodeNumber",
+      t.name,
+      t.overview,
+      t."tmdbId",
       t."stillPath",
+      t."seasonNumber",
+      t."voteAverage",
+      t."createdAt",
+      t."updatedAt",
       t.runtime,
-      t.overview
+      t."seriesName",
+      t."seriesBackdropPath"
     FROM (
       SELECT
-        s.id AS "seriesId",
         s.name AS "seriesName",
         s."backdropPath" AS "seriesBackdropPath",
-        e.id,
-        e.name,
-        e."episodeNumber",
-        e."seasonNumber",
-        e."airDate",
-        e."stillPath",
-        e.runtime,
-        e.overview,
+        e.*,
         ROW_NUMBER() OVER (
           PARTITION BY e."seriesId"
           ORDER BY
@@ -375,7 +375,7 @@ export const userRepository = {
       JOIN "UserSeries" us
         ON s.id = us."seriesId"
 
-      WHERE e."airDate" > CURRENT_DATE
+      WHERE e."airDate" > ${currentDate}::date
         AND us."userId" = ${userId}
     ) t
 

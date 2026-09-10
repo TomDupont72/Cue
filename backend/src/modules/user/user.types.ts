@@ -1,3 +1,4 @@
+import type { Episode } from "@/generated/prisma/client.js";
 import { UserSeriesStatus } from "@/generated/prisma/enums.js";
 
 export type DashboardSummaryEpisodesRow = {
@@ -35,4 +36,9 @@ export type EpisodeFeedRow = {
   runtime: number;
   overview: string | null;
   remainingEpisodes: number;
+};
+
+export type EpisodeUpcomingRow = Episode & {
+  seriesName: string;
+  seriesBackdropPath: string | null;
 };

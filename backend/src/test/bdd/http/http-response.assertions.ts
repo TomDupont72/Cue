@@ -59,6 +59,50 @@ function parseObjectTable(rows: TableRows): Record<string, unknown> {
   return values[0];
 }
 
+export function buildExpectedFixtures(
+  rows: TableRows,
+  resolveFixture: (reference: string) => unknown
+) {
+  const [headerRow, ...bodyRows] = rows;
+
+  if (!headerRow || headerRow[0] !== "fixture") {
+    throw new Error('The fixture table must start with a "fixture" column');
+  }
+
+  if (headerRow.some((header) => header === "")) {
+    throw new Error("The fixture table contains an empty column name");
+  }
+
+  if (new Set(headerRow).size !== headerRow.length) {
+    throw new Error("The fixture table contains duplicate columns");
+  }
+
+  const extraFields = headerRow.slice(1);
+
+  return bodyRows.map((row) => {
+    const reference = row[0];
+
+    if (!reference) {
+      throw new Error("The fixture table contains an empty reference");
+    }
+
+    const fixture = resolveFixture(reference);
+
+    if (!isRecord(fixture)) {
+      throw new Error(`Fixture ${reference} is not an object`);
+    }
+
+    const extras = Object.fromEntries(
+      extraFields.map((field, index) => [field, parseCell(row[index + 1] ?? "")])
+    );
+
+    return {
+      ...fixture,
+      ...extras
+    };
+  });
+}
+
 function getMediaType(response: LightMyRequestResponse): string | undefined {
   const header = response.headers["content-type"];
   const value = Array.isArray(header) ? header[0] : header;
