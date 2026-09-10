@@ -5,10 +5,12 @@ import { TmdbDouble } from "@/test/bdd/doubles/tmdb.double.js";
 import { createTestGuards, TestIdentity } from "@/test/bdd/support/test-guards.js";
 import { TestDatabase } from "@/test/bdd/support/test-database.js";
 import type { DatabaseFixtureCollection } from "@/test/bdd/data/database/database-fixture.schemas.js";
+import { userService } from "@/modules/user/user.service.js";
 import { buildApp, type AppInstance } from "@/app.js";
 
 export class ApiWorld extends World {
   private authenticatedUserId?: string | null;
+  private currentDate?: Date;
   private pendingDatabaseFixtures: Array<{
     collection: DatabaseFixtureCollection;
     rows: Record<string, string>[];
@@ -21,6 +23,10 @@ export class ApiWorld extends World {
 
   authenticateAs(userId: string | null) {
     this.authenticatedUserId = userId;
+  }
+
+  setCurrentDate(currentDate: Date) {
+    this.currentDate = currentDate;
   }
 
   addDatabaseFixtures(collection: DatabaseFixtureCollection, rows: Record<string, string>[]) {
@@ -50,6 +56,15 @@ export class ApiWorld extends World {
     this.scope = scope;
 
     try {
+      if (this.currentDate) {
+        const currentDate = new Date(this.currentDate);
+        const episodeUpcomingGet = userService.episodeUpcomingGet.bind(userService);
+        const getEpisodesAtCurrentDate: typeof userService.episodeUpcomingGet = (userId) =>
+          episodeUpcomingGet(userId, currentDate);
+
+        scope.replace(userService, "episodeUpcomingGet", getEpisodesAtCurrentDate);
+      }
+
       if (this.authenticatedUserId !== undefined) {
         identity.userId = this.authenticatedUserId;
       }

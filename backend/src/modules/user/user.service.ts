@@ -62,8 +62,8 @@ export const userService = {
     };
   },
 
-  async episodeUpcomingGet(userId: string) {
-    const episodes = await userRepository.getEpisodesUpcoming(userId);
+  async episodeUpcomingGet(userId: string, now = new Date()) {
+    const episodes = await userRepository.getEpisodesUpcoming(userId, now);
 
     return {
       episodes

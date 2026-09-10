@@ -332,7 +332,9 @@ export const userRepository = {
     return episode ?? null;
   },
 
-  async getEpisodesUpcoming(userId: string, db: PrismaTx = prisma) {
+  async getEpisodesUpcoming(userId: string, now: Date, db: PrismaTx = prisma) {
+    const currentDate = now.toISOString().slice(0, 10);
+
     return db.$queryRaw<EpisodeFeedRow[]>(Prisma.sql`
     SELECT
       t."seriesId",
@@ -375,7 +377,7 @@ export const userRepository = {
       JOIN "UserSeries" us
         ON s.id = us."seriesId"
 
-      WHERE e."airDate" > CURRENT_DATE
+      WHERE e."airDate" > ${currentDate}::date
         AND us."userId" = ${userId}
     ) t
 

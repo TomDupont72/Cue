@@ -12,6 +12,7 @@ import {
 } from "@/test/bdd/http/http-response.assertions.js";
 import type { ApiWorld } from "@/test/bdd/support/world.js";
 import type { DatabaseFixtureCollection } from "@/test/bdd/data/database/database-fixture.schemas.js";
+import { z } from "zod";
 
 const HTTP_METHODS = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"] as const;
 type HttpMethod = (typeof HTTP_METHODS)[number];
@@ -26,6 +27,8 @@ const DATABASE_COLLECTIONS = {
 
 type DatabaseCollectionLabel = keyof typeof DATABASE_COLLECTIONS;
 
+const currentDateSchema = z.iso.datetime().transform((value) => new Date(value));
+
 function parseHttpMethod(value: string): HttpMethod {
   const method = value.toUpperCase();
 
@@ -36,8 +39,28 @@ function parseHttpMethod(value: string): HttpMethod {
   return method as HttpMethod;
 }
 
+function parseFixtureReferences(table: DataTable) {
+  const [header, ...rows] = table.raw();
+
+  if (header?.length !== 1 || header[0] !== "fixture") {
+    throw new Error('The fixture table must contain a single "fixture" column');
+  }
+
+  const references = rows.map(([reference]) => reference ?? "");
+
+  if (references.some((reference) => reference === "")) {
+    throw new Error("The fixture table contains an empty reference");
+  }
+
+  return references;
+}
+
 Given("I am authenticated as {string}", function (this: ApiWorld, userId: string) {
   this.authenticateAs(userId);
+});
+
+Given("the current date is {string}", function (this: ApiWorld, value: string) {
+  this.setCurrentDate(currentDateSchema.parse(value));
 });
 
 Given(
@@ -100,22 +123,10 @@ Then(
 Then(
   "the response array at {string} should exactly match these fixtures:",
   function (this: ApiWorld, path: string, table: DataTable) {
-    const [header, ...rows] = table.raw();
-
-    if (header?.length !== 1 || header[0] !== "fixture") {
-      throw new Error('The fixture table must contain a single "fixture" column');
-    }
-
-    const references = rows.map(([reference]) => reference ?? "");
-
-    if (references.some((reference) => reference === "")) {
-      throw new Error("The fixture table contains an empty reference");
-    }
-
     assertResponseArrayMatchesFixtures(
       this.getResponse(),
       path,
-      references.map((reference) => this.getDatabaseFixture(reference))
+      parseFixtureReferences(table).map((reference) => this.getDatabaseFixture(reference))
     );
   }
 );
