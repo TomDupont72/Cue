@@ -108,8 +108,7 @@ function addAutomaticSeason(
 
   const seasonNumber = episodeRow.seasonNumber ?? "1";
   const existingSeason = [...loadedFixtures.references.seasons.entries()].find(
-    ([, season]) =>
-      season.seriesId === series.id && String(season.seasonNumber) === seasonNumber
+    ([, season]) => season.seriesId === series.id && String(season.seasonNumber) === seasonNumber
   );
 
   if (existingSeason) {
