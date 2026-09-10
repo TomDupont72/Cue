@@ -5,6 +5,7 @@ import {
   DashboardSummaryEpisodesRow,
   DashboardSummarySeriesRow,
   EpisodeFeedRow,
+  EpisodeUpcomingRow,
   UserSeriesProgressRow
 } from "./user.types.js";
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
@@ -335,7 +336,7 @@ export const userRepository = {
   async getEpisodesUpcoming(userId: string, now: Date, db: PrismaTx = prisma) {
     const currentDate = now.toISOString().slice(0, 10);
 
-    return db.$queryRaw<EpisodeFeedRow[]>(Prisma.sql`
+    return db.$queryRaw<EpisodeUpcomingRow[]>(Prisma.sql`
     SELECT
       t.id,
       t."seriesId",
