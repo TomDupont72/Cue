@@ -43,7 +43,7 @@ export type DatabaseFixtureReferences = {
 type ParsedDatabaseFixtureRow<
   Collection extends DatabaseFixtureCollection = DatabaseFixtureCollection
 > = {
-  key: string;
+  key: string | undefined;
   record: DatabaseFixtureRecordByCollection[Collection];
 };
 
@@ -51,6 +51,11 @@ const fixtureKeySchema = z
   .string()
   .min(1)
   .regex(/^[A-Za-z][A-Za-z0-9_-]*$/, "must be a valid fixture key");
+
+const optionalFixtureKeySchema = z.preprocess(
+  (value) => (value === "" ? undefined : value),
+  fixtureKeySchema.optional()
+);
 
 const integerCellSchema = z
   .string()
@@ -220,7 +225,7 @@ function withUserEpisodeDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
 function createSeriesRowSchema() {
   return z
     .object({
-      key: fixtureKeySchema,
+      key: optionalFixtureKeySchema,
       id: integerCellSchema,
       adult: booleanCellSchema,
       backdropPath: nullableStringCellSchema,
@@ -249,7 +254,7 @@ function createSeriesRowSchema() {
 function createSeasonRowSchema(references: DatabaseFixtureReferences) {
   return z
     .object({
-      key: fixtureKeySchema,
+      key: optionalFixtureKeySchema,
       id: integerCellSchema,
       seriesId: referenceCellSchema("series", references),
       airDate: nullableDateCellSchema,
@@ -272,7 +277,7 @@ function createSeasonRowSchema(references: DatabaseFixtureReferences) {
 function createEpisodeRowSchema(references: DatabaseFixtureReferences) {
   return z
     .object({
-      key: fixtureKeySchema,
+      key: optionalFixtureKeySchema,
       id: integerCellSchema,
       seriesId: referenceCellSchema("series", references),
       seasonId: referenceCellSchema("seasons", references),
@@ -298,7 +303,7 @@ function createEpisodeRowSchema(references: DatabaseFixtureReferences) {
 function createUserSeriesRowSchema(references: DatabaseFixtureReferences) {
   return z
     .object({
-      key: fixtureKeySchema,
+      key: optionalFixtureKeySchema,
       userId: z.string().min(1),
       seriesId: referenceCellSchema("series", references),
       status: userSeriesResponseSchema.shape.status,
@@ -318,7 +323,7 @@ function createUserSeriesRowSchema(references: DatabaseFixtureReferences) {
 function createUserEpisodeRowSchema(references: DatabaseFixtureReferences) {
   return z
     .object({
-      key: fixtureKeySchema,
+      key: optionalFixtureKeySchema,
       userId: z.string().min(1),
       episodeId: referenceCellSchema("episodes", references),
       watchedAt: dateCellSchema

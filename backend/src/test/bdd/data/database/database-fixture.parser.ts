@@ -42,17 +42,28 @@ export function createEmptyDatabaseFixtures(): LoadedDatabaseFixtures {
 
 function addFixtureRecord(
   collection: DatabaseFixtureCollection,
-  key: string,
+  key: string | undefined,
   record: DatabaseFixtureRecordByCollection[DatabaseFixtureCollection],
-  loadedFixtures: LoadedDatabaseFixtures
+  loadedFixtures: LoadedDatabaseFixtures,
+  reservedKeys: ReadonlySet<string> = new Set()
 ) {
   const collectionReferences = loadedFixtures.references[collection] as Map<string, typeof record>;
+  let resolvedKey = key;
 
-  if (collectionReferences.has(key)) {
-    throw new Error(`Duplicate database fixture reference @${collection}.${key}`);
+  if (resolvedKey === undefined) {
+    let suffix = loadedFixtures.state[collection].length + 1;
+
+    do {
+      resolvedKey = `anonymous-${suffix}`;
+      suffix += 1;
+    } while (collectionReferences.has(resolvedKey) || reservedKeys.has(resolvedKey));
   }
 
-  collectionReferences.set(key, record);
+  if (collectionReferences.has(resolvedKey)) {
+    throw new Error(`Duplicate database fixture reference @${collection}.${resolvedKey}`);
+  }
+
+  collectionReferences.set(resolvedKey, record);
 
   switch (collection) {
     case "series":
@@ -153,6 +164,9 @@ export function addDatabaseFixtureRows<Collection extends DatabaseFixtureCollect
   rows: readonly DatabaseFixtureRow[]
 ): DatabaseFixtureRecordByCollection[Collection][] {
   const records: DatabaseFixtureRecordByCollection[Collection][] = [];
+  const reservedKeys = new Set(
+    rows.map((row) => row.key).filter((key): key is string => key !== undefined && key !== "")
+  );
 
   for (const [index, row] of rows.entries()) {
     try {
@@ -164,7 +178,7 @@ export function addDatabaseFixtureRows<Collection extends DatabaseFixtureCollect
         loadedFixtures.references
       );
 
-      addFixtureRecord(collection, key, record, loadedFixtures);
+      addFixtureRecord(collection, key, record, loadedFixtures, reservedKeys);
       records.push(record);
     } catch (error) {
       throw new Error(`Invalid ${collection} fixture, row ${index + 1}`, { cause: error });

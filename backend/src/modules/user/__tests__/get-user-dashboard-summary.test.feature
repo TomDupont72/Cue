@@ -22,18 +22,18 @@ Feature: GET /api/user/dashboard/summary
             | ignored   | 4  | @series.watching  | @seasons.watchingS  | 2             | 1            | 999     |
 
         And the database with these user series:
-            | key            | userId | seriesId          | status    | watchCount | watchedEpisodeCount |
-            | user1Completed | user-1 | @series.completed | COMPLETED | 2          | 2                   |
-            | user1Watching  | user-1 | @series.watching  | WATCHING  | 1          | 1                   |
-            | user2Completed | user-2 | @series.watching  | COMPLETED | 2          | 2                   |
+            | userId | seriesId          | status    | watchCount | watchedEpisodeCount |
+            | user-1 | @series.completed | COMPLETED | 2          | 2                   |
+            | user-1 | @series.watching  | WATCHING  | 1          | 1                   |
+            | user-2 | @series.watching  | COMPLETED | 2          | 2                   |
 
         And the database with these user episodes:
-            | key       | userId | episodeId           |
-            | user1E20  | user-1 | @episodes.watched20 |
-            | user1E25  | user-1 | @episodes.watched25 |
-            | user1E40  | user-1 | @episodes.watched40 |
-            | user2E40  | user-2 | @episodes.watched40 |
-            | user2E999 | user-2 | @episodes.ignored   |
+            | userId | episodeId           |
+            | user-1 | @episodes.watched20 |
+            | user-1 | @episodes.watched25 |
+            | user-1 | @episodes.watched40 |
+            | user-2 | @episodes.watched40 |
+            | user-2 | @episodes.ignored   |
 
         When I send a GET request to "/api/user/dashboard/summary"
 
