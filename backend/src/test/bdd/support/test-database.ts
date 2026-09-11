@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { prisma } from "@/shared/db/prisma.js";
 import {
   addDatabaseFixtureRows,
@@ -11,6 +12,7 @@ import type {
   DatabaseFixtureRecord,
   DatabaseFixtureRow
 } from "@/test/bdd/data/database/database-fixture.schemas.js";
+import { parseDatabaseFixtureRow } from "@/test/bdd/data/database/database-fixture.schemas.js";
 import { assertSafeTestDatabase } from "@/test/bdd/support/test-database-safety.js";
 
 function collectUserIds(state: DatabaseFixtureState, authenticatedUserId: string | null) {
@@ -66,6 +68,73 @@ export class TestDatabase {
 
   getFixture(reference: string): DatabaseFixtureRecord {
     return getDatabaseFixture(this.fixtures, reference);
+  }
+
+  async assertExactlyUserSeries(rows: readonly DatabaseFixtureRow[]) {
+    const expectations = rows.map((row, index) => {
+      try {
+        const fixture = parseDatabaseFixtureRow(
+          "userSeries",
+          row,
+          this.fixtures.references
+        );
+
+        return {
+          ...fixture,
+          fields: Object.keys(row).filter((field) => field !== "key")
+        };
+      } catch (error) {
+        throw new Error(`Invalid expected userSeries row ${index + 1}`, { cause: error });
+      }
+    });
+
+    const actualRows = await prisma.userSeries.findMany();
+
+    assert.equal(
+      actualRows.length,
+      expectations.length,
+      `Expected ${expectations.length} userSeries rows, received ${actualRows.length}`
+    );
+
+    const expectedIdentities = new Set<string>();
+    const capturedFixtures: Array<{ key: string; record: (typeof actualRows)[number] }> = [];
+
+    for (const { key, record, fields } of expectations) {
+      const identity = `${record.userId}:${record.seriesId}`;
+
+      if (expectedIdentities.has(identity)) {
+        throw new Error(`Duplicate expected userSeries row: ${identity}`);
+      }
+
+      expectedIdentities.add(identity);
+
+      const actual = actualRows.find(
+        (row) => row.userId === record.userId && row.seriesId === record.seriesId
+      );
+
+      assert.ok(actual, `Missing userSeries row: ${identity}`);
+
+      const expectedFields = Object.fromEntries(
+        fields.map((field) => [field, record[field as keyof typeof record]])
+      );
+      const actualFields = Object.fromEntries(
+        fields.map((field) => [field, actual[field as keyof typeof actual]])
+      );
+
+      assert.deepStrictEqual(actualFields, expectedFields, `Unexpected userSeries row: ${identity}`);
+
+      if (key !== undefined) {
+        capturedFixtures.push({ key, record: actual });
+      }
+    }
+
+    for (const { key, record } of capturedFixtures) {
+      if (this.fixtures.references.userSeries.has(key)) {
+        throw new Error(`Duplicate database fixture reference @userSeries.${key}`);
+      }
+
+      this.fixtures.references.userSeries.set(key, record);
+    }
   }
 
   async resetAndSeed(authenticatedUserId: string | null) {

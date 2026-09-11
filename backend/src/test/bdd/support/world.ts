@@ -41,6 +41,14 @@ export class ApiWorld extends World {
     return this.database.getFixture(reference);
   }
 
+  async assertExactlyUserSeries(rows: Record<string, string>[]) {
+    if (!this.database) {
+      throw new Error("The test database has not been prepared yet");
+    }
+
+    await this.database.assertExactlyUserSeries(rows);
+  }
+
   async prepareCase() {
     await this.disposeCase();
 
