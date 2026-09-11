@@ -4,6 +4,7 @@ import type { LightMyRequestResponse } from "fastify";
 type TableRows = readonly (readonly string[])[];
 
 const NUMBER_PATTERN = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
+const FIXTURE_REFERENCE_PATTERN = /^@[A-Za-z][A-Za-z0-9_-]*\.[A-Za-z][A-Za-z0-9_-]*$/;
 
 function parseCell(value: string): unknown {
   if (value.startsWith("json:")) {
@@ -59,9 +60,9 @@ export function parseObjectTable(rows: TableRows): Record<string, unknown> {
   return values[0];
 }
 
-export function buildExpectedFixtures(
+export async function buildExpectedFixtures(
   rows: TableRows,
-  resolveFixture: (reference: string) => unknown
+  resolveFixture: (reference: string, field?: string) => unknown | Promise<unknown>
 ) {
   const [headerRow, ...bodyRows] = rows;
 
@@ -79,28 +80,41 @@ export function buildExpectedFixtures(
 
   const extraFields = headerRow.slice(1);
 
-  return bodyRows.map((row) => {
-    const reference = row[0];
+  return Promise.all(
+    bodyRows.map(async (row) => {
+      const reference = row[0];
 
-    if (!reference) {
-      throw new Error("The fixture table contains an empty reference");
-    }
+      if (!reference) {
+        throw new Error("The fixture table contains an empty reference");
+      }
 
-    const fixture = resolveFixture(reference);
+      const fixture = await resolveFixture(reference);
 
-    if (!isRecord(fixture)) {
-      throw new Error(`Fixture ${reference} is not an object`);
-    }
+      if (!isRecord(fixture)) {
+        throw new Error(`Fixture ${reference} is not an object`);
+      }
 
-    const extras = Object.fromEntries(
-      extraFields.map((field, index) => [field, parseCell(row[index + 1] ?? "")])
-    );
+      const extras = Object.fromEntries(
+        await Promise.all(
+          extraFields.map(async (field, index) => {
+            const value = row[index + 1] ?? "";
 
-    return {
-      ...fixture,
-      ...extras
-    };
-  });
+            return [
+              field,
+              FIXTURE_REFERENCE_PATTERN.test(value)
+                ? await resolveFixture(value, field)
+                : parseCell(value)
+            ];
+          })
+        )
+      );
+
+      return {
+        ...fixture,
+        ...extras
+      };
+    })
+  );
 }
 
 function getMediaType(response: LightMyRequestResponse): string | undefined {

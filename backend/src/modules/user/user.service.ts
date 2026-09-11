@@ -88,6 +88,7 @@ export const userService = {
 
   async episodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
     const { seriesId, episodeId } = params;
+    const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
       const episode = await episodeRepository.findOne(
@@ -95,7 +96,7 @@ export const userService = {
           id: episodeId,
           seriesId,
           airDate: {
-            lt: getEpisodeReleaseCutoff(now)
+            lt: releaseCutoff
           }
         },
         tx
@@ -165,7 +166,12 @@ export const userService = {
           );
         }
 
-        const nextEpisode = await userRepository.getEpisodeFeedItem(userId, seriesId, tx);
+        const nextEpisode = await userRepository.getEpisodeFeedItem(
+          userId,
+          seriesId,
+          tx,
+          releaseCutoff
+        );
 
         return {
           ...createdUserEpisode,
@@ -183,7 +189,12 @@ export const userService = {
         throw notFound("USER_EPISODE_NOT_FOUND", "Episode for this user not found");
       }
 
-      const nextEpisode = await userRepository.getEpisodeFeedItem(userId, seriesId, tx);
+      const nextEpisode = await userRepository.getEpisodeFeedItem(
+        userId,
+        seriesId,
+        tx,
+        releaseCutoff
+      );
 
       return {
         ...existingUserEpisode,

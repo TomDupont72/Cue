@@ -95,9 +95,9 @@ Then("the response body should exactly match:", function (this: ApiWorld, table:
 
 Then(
   "the response body should exactly match this fixture:",
-  function (this: ApiWorld, table: DataTable) {
-    const fixtures = buildExpectedFixtures(table.raw(), (reference) =>
-      this.getDatabaseFixture(reference)
+  async function (this: ApiWorld, table: DataTable) {
+    const fixtures = await buildExpectedFixtures(table.raw(), (reference, field) =>
+      this.resolveResponseFixture(reference, field)
     );
 
     if (fixtures.length !== 1) {
@@ -112,6 +112,13 @@ Then(
   "the database should contain exactly these user series:",
   async function (this: ApiWorld, table: DataTable) {
     await this.assertExactlyUserSeries(table.hashes());
+  }
+);
+
+Then(
+  "the database should contain exactly these user episodes:",
+  async function (this: ApiWorld, table: DataTable) {
+    await this.assertExactlyUserEpisodes(table.hashes());
   }
 );
 
@@ -142,11 +149,13 @@ Then(
 
 Then(
   "the response array at {string} should exactly match these fixtures:",
-  function (this: ApiWorld, path: string, table: DataTable) {
+  async function (this: ApiWorld, path: string, table: DataTable) {
     assertResponseArrayMatchesFixtures(
       this.getResponse(),
       path,
-      buildExpectedFixtures(table.raw(), (reference) => this.getDatabaseFixture(reference))
+      await buildExpectedFixtures(table.raw(), (reference, field) =>
+        this.resolveResponseFixture(reference, field)
+      )
     );
   }
 );
