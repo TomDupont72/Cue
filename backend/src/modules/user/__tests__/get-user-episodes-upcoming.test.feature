@@ -1,18 +1,18 @@
 Feature: GET /api/user/episodes/upcoming
 
     Background:
-        Given I am authenticated as "user-1"
+        Given authentication as "user-1"
 
     Scenario: Get user episodes upcoming
-        Given the current date is "2026-01-10T00:00:00.000Z"
+        Given the current date "2026-01-10T00:00:00.000Z"
         
-        And the database contains these series:
-            | key           | id | name           | backdropPath         |
-            | firstSeries   | 1  | First series   | /first-series.jpg    |
-            | lastSeries    | 2  | Last series    | null                 |
-            | ignoredSeries | 3  | Ignored series | /ignored-series.jpg  |
+        And the database with these series:
+            | key           | id | name           | backdropPath        |
+            | firstSeries   | 1  | First series   | /first-series.jpg   |
+            | lastSeries    | 2  | Last series    | null                |
+            | ignoredSeries | 3  | Ignored series | /ignored-series.jpg |
 
-        And the database contains these episodes:
+        And the database with these episodes:
             | key     | id | seriesId              | episodeNumber | airDate                  |
             | past    | 1  | @series.firstSeries   | 1             | 2026-01-01T00:00:00.000Z |
             | first1  | 2  | @series.firstSeries   | 2             | 2026-01-15T00:00:00.000Z |
@@ -21,8 +21,8 @@ Feature: GET /api/user/episodes/upcoming
             | noDate  | 5  | @series.firstSeries   | 4             | null                     |
             | ignored | 6  | @series.ignoredSeries | 1             | 2026-01-15T00:00:00.000Z |
 
-        And the database contains these user series:
-            | key         | userId | seriesId             |
+        And the database with these user series:
+            | key         | userId | seriesId              |
             | userFirst   | user-1 | @series.firstSeries   |
             | userLast    | user-1 | @series.lastSeries    |
             | otherSeries | user-2 | @series.ignoredSeries |
