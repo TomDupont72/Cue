@@ -7,9 +7,12 @@ import {
 } from "@/modules/series/series.schemas.js";
 import { UserSeriesStatus } from "@/generated/prisma/enums.js";
 
-export const userSeriesPostBodySchema = z.object({
-  isFavorite: z.boolean().optional()
-});
+export const userSeriesPostBodySchema = z.preprocess(
+  (value) => (value === null || value === undefined ? {} : value),
+  z.object({
+    isFavorite: z.boolean().optional()
+  })
+);
 
 export const userSeriesPostParamsSchema = z.object({
   seriesId: z.coerce.number().int().min(1)

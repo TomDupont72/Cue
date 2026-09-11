@@ -49,7 +49,7 @@ function parseTable(rows: TableRows): Record<string, unknown>[] {
   );
 }
 
-function parseObjectTable(rows: TableRows): Record<string, unknown> {
+export function parseObjectTable(rows: TableRows): Record<string, unknown> {
   const values = parseTable(rows);
 
   if (values.length !== 1) {
@@ -209,6 +209,19 @@ export function assertResponseFields(response: LightMyRequestResponse, rows: Tab
 
 export function assertResponseBodyExact(response: LightMyRequestResponse, rows: TableRows) {
   assert.deepStrictEqual(parseResponseBody(response), parseObjectTable(rows));
+}
+
+export function assertResponseBodyMatchesFixture(
+  response: LightMyRequestResponse,
+  fixture: unknown
+) {
+  const body = parseResponseBody(response);
+
+  if (!isRecord(body)) {
+    throw new Error("The response body is not an object");
+  }
+
+  assert.deepStrictEqual(body, serializeFixture(fixture));
 }
 
 export function assertResponseObjectAtPath(

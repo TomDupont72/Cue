@@ -3,13 +3,15 @@ import {
   assertResponseArrayAtPath,
   assertResponseArrayMatchesFixtures,
   assertResponseBodyExact,
+  assertResponseBodyMatchesFixture,
   assertResponseEmptyArrayAtPath,
   assertResponseFields,
   assertResponseNullAtPath,
   assertResponseObjectAtPath,
   assertResponseObjectMatchesFixture,
   assertResponseStatus,
-  buildExpectedFixtures
+  buildExpectedFixtures,
+  parseObjectTable
 } from "@/test/bdd/http/http-response.assertions.js";
 import type { ApiWorld } from "@/test/bdd/support/world.js";
 import type { DatabaseFixtureCollection } from "@/test/bdd/data/database/database-fixture.schemas.js";
@@ -65,6 +67,17 @@ When(
   }
 );
 
+When(
+  "I send a {word} request to {string} with body:",
+  async function (this: ApiWorld, method: string, url: string, table: DataTable) {
+    await this.sendRequest({
+      method: parseHttpMethod(method),
+      url,
+      payload: parseObjectTable(table.raw())
+    });
+  }
+);
+
 Then("the response status should be {int}", function (this: ApiWorld, status: number) {
   assertResponseStatus(this.getResponse(), status);
 });
@@ -79,6 +92,28 @@ Then(
 Then("the response body should exactly match:", function (this: ApiWorld, table: DataTable) {
   assertResponseBodyExact(this.getResponse(), table.raw());
 });
+
+Then(
+  "the response body should exactly match this fixture:",
+  function (this: ApiWorld, table: DataTable) {
+    const fixtures = buildExpectedFixtures(table.raw(), (reference) =>
+      this.getDatabaseFixture(reference)
+    );
+
+    if (fixtures.length !== 1) {
+      throw new Error("The response fixture table must contain exactly one data row");
+    }
+
+    assertResponseBodyMatchesFixture(this.getResponse(), fixtures[0]);
+  }
+);
+
+Then(
+  "the database should contain exactly these user series:",
+  async function (this: ApiWorld, table: DataTable) {
+    await this.assertExactlyUserSeries(table.hashes());
+  }
+);
 
 Then(
   "the response object at {string} should exactly match:",
