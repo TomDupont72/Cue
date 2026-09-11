@@ -9,8 +9,9 @@ import {
   UserSeriesProgressRow
 } from "./user.types.js";
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
+import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 
-function getEpisodesFeedQuery(userId: string, seriesId?: number) {
+function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: number) {
   const seriesFilter =
     seriesId === undefined ? Prisma.empty : Prisma.sql`AND us."seriesId" = ${seriesId}`;
 
@@ -62,11 +63,7 @@ function getEpisodesFeedQuery(userId: string, seriesId?: number) {
           AND remaining."seasonNumber" <> 0
 
           AND remaining."airDate" IS NOT NULL
-          AND remaining."airDate" <
-            date_trunc(
-              'day',
-              CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-            ) + INTERVAL '1 day'
+          AND remaining."airDate" < ${releaseCutoff}
 
           AND NOT EXISTS (
             SELECT 1
@@ -97,11 +94,7 @@ function getEpisodesFeedQuery(userId: string, seriesId?: number) {
         AND next_e."seasonNumber" <> 0
 
         AND next_e."airDate" IS NOT NULL
-        AND next_e."airDate" <
-          date_trunc(
-            'day',
-            CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-          ) + INTERVAL '1 day'
+        AND next_e."airDate" < ${releaseCutoff}
 
         AND (
           next_e."seasonNumber",
@@ -324,11 +317,20 @@ export const userRepository = {
   },
 
   async getEpisodesFeed(userId: string, db: PrismaTx = prisma) {
-    return db.$queryRaw<EpisodeFeedRow[]>(getEpisodesFeedQuery(userId));
+    return db.$queryRaw<EpisodeFeedRow[]>(
+      getEpisodesFeedQuery(userId, getEpisodeReleaseCutoff())
+    );
   },
 
-  async getEpisodeFeedItem(userId: string, seriesId: number, db: PrismaTx = prisma) {
-    const [episode] = await db.$queryRaw<EpisodeFeedRow[]>(getEpisodesFeedQuery(userId, seriesId));
+  async getEpisodeFeedItem(
+    userId: string,
+    seriesId: number,
+    db: PrismaTx = prisma,
+    releaseCutoff = getEpisodeReleaseCutoff()
+  ) {
+    const [episode] = await db.$queryRaw<EpisodeFeedRow[]>(
+      getEpisodesFeedQuery(userId, releaseCutoff, seriesId)
+    );
 
     return episode ?? null;
   },
