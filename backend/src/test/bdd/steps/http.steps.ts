@@ -40,16 +40,16 @@ function parseHttpMethod(value: string): HttpMethod {
   return method as HttpMethod;
 }
 
-Given("I am authenticated as {string}", function (this: ApiWorld, userId: string) {
+Given("authentication as {string}", function (this: ApiWorld, userId: string) {
   this.authenticateAs(userId);
 });
 
-Given("the current date is {string}", function (this: ApiWorld, value: string) {
+Given("the current date {string}", function (this: ApiWorld, value: string) {
   this.setCurrentDate(currentDateSchema.parse(value));
 });
 
 Given(
-  /^the database contains these (series|seasons|episodes|user series|user episodes):$/,
+  /^the database with these (series|seasons|episodes|user series|user episodes):$/,
   function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     this.addDatabaseFixtures(DATABASE_COLLECTIONS[label], table.hashes());
   }

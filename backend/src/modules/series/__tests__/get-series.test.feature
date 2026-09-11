@@ -1,30 +1,30 @@
 Feature: GET /api/series/:id
 
     Background:
-        Given I am authenticated as "user-1"
+        Given authentication as "user-1"
 
     Scenario: Get series
-        Given the database contains these series:
+        Given the database with these series:
             | key       | id |
             | requested | 1  |
             | other     | 2  |
 
-        And the database contains these seasons:
+        And the database with these seasons:
             | key             | id | seriesId          |
             | requestedSeason | 1  | @series.requested |
             | otherSeason     | 2  | @series.other     |
 
-        And the database contains these episodes:
+        And the database with these episodes:
             | key             | id | seriesId          | seasonId                 |
             | requestedFirst  | 1  | @series.requested | @seasons.requestedSeason |
             | requestedSecond | 2  | @series.requested | @seasons.requestedSeason |
             | otherEpisode    | 3  | @series.other     | @seasons.otherSeason     |
 
-        And the database contains these user series:
+        And the database with these user series:
             | key               | userId | seriesId          |
             | requestedProgress | user-1 | @series.requested |
 
-        And the database contains these user episodes:
+        And the database with these user episodes:
             | key                    | userId | episodeId                 |
             | requestedSeenByUser    | user-1 | @episodes.requestedFirst  |
             | requestedSeenByAnother | user-2 | @episodes.requestedSecond |
