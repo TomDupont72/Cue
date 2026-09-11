@@ -18,16 +18,16 @@ Feature: GET /api/series/:id
             | key             | id | seriesId          | seasonId                 |
             | requestedFirst  | 1  | @series.requested | @seasons.requestedSeason |
             | requestedSecond | 2  | @series.requested | @seasons.requestedSeason |
-            | otherEpisode    | 3  | @series.other     | @seasons.otherSeason     |
+            |                 | 3  | @series.other     | @seasons.otherSeason     |
 
         And the database with these user series:
             | key               | userId | seriesId          |
             | requestedProgress | user-1 | @series.requested |
 
         And the database with these user episodes:
-            | key                    | userId | episodeId                 |
-            | requestedSeenByUser    | user-1 | @episodes.requestedFirst  |
-            | requestedSeenByAnother | user-2 | @episodes.requestedSecond |
+            | key                 | userId | episodeId                 |
+            | requestedSeenByUser | user-1 | @episodes.requestedFirst  |
+            |                     | user-2 | @episodes.requestedSecond |
 
         When I send a GET request to "/api/series/1"
 
@@ -54,7 +54,7 @@ Feature: GET /api/series/:id
         And the response object at "userSeries" should exactly match the fixture "@userSeries.requestedProgress"
 
         And the response array at "userEpisodes" should exactly match these fixtures:
-            | fixture                            |
+            | fixture                           |
             | @userEpisodes.requestedSeenByUser |
 
     Scenario: Get series - Invalid query
