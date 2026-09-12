@@ -41,6 +41,36 @@ type ParsedDatabaseFixtureRow<
   record: DatabaseFixtureRecordByCollection[Collection];
 };
 
+export const DATABASE_FIXTURE_IDENTITY_FIELDS = {
+  series: ["id"],
+  seasons: ["id"],
+  episodes: ["id"],
+  userSeries: ["userId", "seriesId"],
+  userEpisodes: ["userId", "episodeId"]
+} as const satisfies {
+  [
+    Collection in DatabaseFixtureCollection
+  ]: readonly (keyof DatabaseFixtureRecordByCollection[Collection])[];
+};
+
+type DatabaseFixtureIdentityField<Collection extends DatabaseFixtureCollection> = Extract<
+  (typeof DATABASE_FIXTURE_IDENTITY_FIELDS)[Collection][number],
+  keyof DatabaseFixtureRecordByCollection[Collection]
+>;
+
+export type ParsedDatabaseFixtureFieldsUpdate<
+  Collection extends DatabaseFixtureCollection = DatabaseFixtureCollection
+> = {
+  key: string | undefined;
+  identity: Pick<
+    DatabaseFixtureRecordByCollection[Collection],
+    DatabaseFixtureIdentityField<Collection>
+  >;
+  fields: Partial<
+    Omit<DatabaseFixtureRecordByCollection[Collection], DatabaseFixtureIdentityField<Collection>>
+  >;
+};
+
 const fixtureKeySchema = z
   .string()
   .min(1)
@@ -67,9 +97,15 @@ const booleanCellSchema = z.enum(["true", "false"]).transform((value) => value =
 
 const dateCellSchema = z.iso.datetime().transform((value) => new Date(value));
 
-const nullableDateCellSchema = z.union([z.literal("null").transform(() => null), dateCellSchema]);
+const nullableDateCellSchema = z.preprocess(
+  (value) => (value === "" || value === "null" ? null : value),
+  dateCellSchema.nullable()
+);
 
-const nullableStringCellSchema = z.union([z.literal("null").transform(() => null), z.string()]);
+const nullableStringCellSchema = z.preprocess(
+  (value) => (value === "" || value === "null" ? null : value),
+  z.string().nullable()
+);
 
 const fixtureReferencePattern = /^@([A-Za-z][A-Za-z0-9_-]*)\.([A-Za-z][A-Za-z0-9_-]*)$/;
 
@@ -216,10 +252,19 @@ function withUserEpisodeDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
   };
 }
 
-function createSeriesRowSchema() {
-  return z
-    .object({
-      key: optionalFixtureKeySchema,
+type DatabaseFixtureFieldSchemas = {
+  [Collection in DatabaseFixtureCollection]: {
+    [Field in keyof DatabaseFixtureRecordByCollection[Collection]]: z.ZodType<
+      DatabaseFixtureRecordByCollection[Collection][Field]
+    >;
+  };
+};
+
+function createDatabaseFixtureFieldSchemas(
+  references: DatabaseFixtureReferences
+): DatabaseFixtureFieldSchemas {
+  return {
+    series: {
       id: integerCellSchema,
       adult: booleanCellSchema,
       backdropPath: nullableStringCellSchema,
@@ -237,18 +282,8 @@ function createSeriesRowSchema() {
       posterPath: nullableStringCellSchema,
       createdAt: dateCellSchema,
       updatedAt: dateCellSchema
-    })
-    .strict()
-    .transform(({ key, ...record }) => ({
-      key,
-      record
-    }));
-}
-
-function createSeasonRowSchema(references: DatabaseFixtureReferences) {
-  return z
-    .object({
-      key: optionalFixtureKeySchema,
+    },
+    seasons: {
       id: integerCellSchema,
       seriesId: referenceCellSchema("series", references),
       airDate: nullableDateCellSchema,
@@ -260,18 +295,8 @@ function createSeasonRowSchema(references: DatabaseFixtureReferences) {
       voteAverage: numberCellSchema,
       createdAt: dateCellSchema,
       updatedAt: dateCellSchema
-    })
-    .strict()
-    .transform(({ key, ...record }) => ({
-      key,
-      record
-    }));
-}
-
-function createEpisodeRowSchema(references: DatabaseFixtureReferences) {
-  return z
-    .object({
-      key: optionalFixtureKeySchema,
+    },
+    episodes: {
       id: integerCellSchema,
       seriesId: referenceCellSchema("series", references),
       seasonId: referenceCellSchema("seasons", references),
@@ -286,18 +311,8 @@ function createEpisodeRowSchema(references: DatabaseFixtureReferences) {
       voteAverage: numberCellSchema,
       createdAt: dateCellSchema,
       updatedAt: dateCellSchema
-    })
-    .strict()
-    .transform(({ key, ...record }) => ({
-      key,
-      record
-    }));
-}
-
-function createUserSeriesRowSchema(references: DatabaseFixtureReferences) {
-  return z
-    .object({
-      key: optionalFixtureKeySchema,
+    },
+    userSeries: {
       userId: z.string().min(1),
       seriesId: referenceCellSchema("series", references),
       status: z.enum(UserSeriesStatus),
@@ -306,27 +321,78 @@ function createUserSeriesRowSchema(references: DatabaseFixtureReferences) {
       watchedEpisodeCount: integerCellSchema,
       addedAt: dateCellSchema,
       lastWatchedAt: nullableDateCellSchema
-    })
-    .strict()
-    .transform(({ key, ...record }) => ({
-      key,
-      record
-    }));
-}
-
-function createUserEpisodeRowSchema(references: DatabaseFixtureReferences) {
-  return z
-    .object({
-      key: optionalFixtureKeySchema,
+    },
+    userEpisodes: {
       userId: z.string().min(1),
       episodeId: referenceCellSchema("episodes", references),
       watchedAt: dateCellSchema
+    }
+  };
+}
+
+function createDatabaseFixtureRowSchema<Shape extends z.ZodRawShape>(shape: Shape) {
+  return z
+    .object({
+      key: optionalFixtureKeySchema,
+      ...shape
     })
     .strict()
-    .transform(({ key, ...record }) => ({
-      key,
-      record
-    }));
+    .transform((value) => {
+      const { key, ...record } = value as Record<string, unknown> & {
+        key: string | undefined;
+      };
+
+      return { key, record };
+    });
+}
+
+function createDatabaseFixtureFieldsUpdateSchema<Collection extends DatabaseFixtureCollection>(
+  collection: Collection,
+  references: DatabaseFixtureReferences
+) {
+  const fieldSchemas = createDatabaseFixtureFieldSchemas(references)[collection] as Record<
+    string,
+    z.ZodType
+  >;
+  const identityFields = DATABASE_FIXTURE_IDENTITY_FIELDS[collection] as readonly string[];
+  const identityFieldSet = new Set(identityFields);
+  const updatedFields = Object.keys(fieldSchemas).filter((field) => !identityFieldSet.has(field));
+  const partialFieldSchemas = Object.fromEntries(
+    Object.entries(fieldSchemas).map(([field, schema]) => [
+      field,
+      identityFieldSet.has(field) ? schema : schema.optional()
+    ])
+  );
+
+  return z
+    .object({
+      key: optionalFixtureKeySchema,
+      ...partialFieldSchemas
+    })
+    .strict()
+    .superRefine((value, context) => {
+      if (!updatedFields.some((field) => Object.hasOwn(value, field))) {
+        context.addIssue({
+          code: "custom",
+          message: "must contain at least one field to update"
+        });
+      }
+    })
+    .transform((value) => {
+      const { key, ...values } = value as Record<string, unknown> & {
+        key: string | undefined;
+      };
+
+      return {
+        key,
+        identity: Object.fromEntries(identityFields.map((field) => [field, values[field]])),
+        fields: Object.fromEntries(
+          updatedFields
+            .filter((field) => Object.hasOwn(values, field))
+            .map((field) => [field, values[field]])
+        )
+      };
+    });
 }
 
 export function parseDatabaseFixtureRow<Collection extends DatabaseFixtureCollection>(
@@ -334,12 +400,13 @@ export function parseDatabaseFixtureRow<Collection extends DatabaseFixtureCollec
   row: DatabaseFixtureRow,
   references: DatabaseFixtureReferences
 ): ParsedDatabaseFixtureRow<Collection> {
+  const fieldSchemas = createDatabaseFixtureFieldSchemas(references);
   const schemaByCollection = {
-    series: createSeriesRowSchema(),
-    seasons: createSeasonRowSchema(references),
-    episodes: createEpisodeRowSchema(references),
-    userSeries: createUserSeriesRowSchema(references),
-    userEpisodes: createUserEpisodeRowSchema(references)
+    series: createDatabaseFixtureRowSchema(fieldSchemas.series),
+    seasons: createDatabaseFixtureRowSchema(fieldSchemas.seasons),
+    episodes: createDatabaseFixtureRowSchema(fieldSchemas.episodes),
+    userSeries: createDatabaseFixtureRowSchema(fieldSchemas.userSeries),
+    userEpisodes: createDatabaseFixtureRowSchema(fieldSchemas.userEpisodes)
   };
 
   const rowWithDefaultsByCollection = {
@@ -353,4 +420,14 @@ export function parseDatabaseFixtureRow<Collection extends DatabaseFixtureCollec
   return schemaByCollection[collection].parse(
     rowWithDefaultsByCollection[collection](row)
   ) as ParsedDatabaseFixtureRow<Collection>;
+}
+
+export function parseDatabaseFixtureFieldsUpdate<Collection extends DatabaseFixtureCollection>(
+  collection: Collection,
+  row: DatabaseFixtureRow,
+  references: DatabaseFixtureReferences
+): ParsedDatabaseFixtureFieldsUpdate<Collection> {
+  return createDatabaseFixtureFieldsUpdateSchema(collection, references).parse(
+    row
+  ) as ParsedDatabaseFixtureFieldsUpdate<Collection>;
 }

@@ -171,17 +171,8 @@ export const userService = {
           );
         }
 
-        const nextEpisode = await userRepository.getEpisodeFeedItem(
-          userId,
-          seriesId,
-          tx,
-          releaseCutoff
-        );
-
         return {
           ...createdUserEpisode,
-          seriesId,
-          nextEpisode
         };
       }
 

@@ -95,10 +95,7 @@ export const userEpisodeUpcomingGetResponseSchema = z.object({
   episodes: z.array(userEpisodeUpcomingItemResponseSchema)
 });
 
-export const userEpisodePostResponseSchema = userEpisodeResponseSchema.extend({
-  seriesId: z.number().int(),
-  nextEpisode: userEpisodeFeedItemResponseSchema.nullable()
-});
+export const userEpisodePostResponseSchema = userEpisodeResponseSchema;
 
 export const userEpisodeDeleteResponseSchema = userEpisodeResponseSchema;
 

@@ -49,6 +49,28 @@ export class ApiWorld extends World {
     await this.database.assertExactlyUserSeries(rows);
   }
 
+  async assertAddedDatabaseRows(
+    collection: DatabaseFixtureCollection,
+    rows: Record<string, string>[]
+  ) {
+    if (!this.database) {
+      throw new Error("The test database has not been prepared yet");
+    }
+
+    await this.database.assertAddedDatabaseRows(collection, rows);
+  }
+
+  async assertUpdatedDatabaseFields(
+    collection: DatabaseFixtureCollection,
+    rows: Record<string, string>[]
+  ) {
+    if (!this.database) {
+      throw new Error("The test database has not been prepared yet");
+    }
+
+    await this.database.assertUpdatedDatabaseFields(collection, rows);
+  }
+
   async assertExactlyUserEpisodes(rows: Record<string, string>[]) {
     if (!this.database) {
       throw new Error("The test database has not been prepared yet");
@@ -122,6 +144,7 @@ export class ApiWorld extends World {
       throw new Error("HTTP application was not prepared");
     }
 
+    await this.database?.snapshotBeforeRequest();
     this.response = await this.app.inject(options);
   }
 

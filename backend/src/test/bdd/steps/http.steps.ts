@@ -128,6 +128,20 @@ Then(
 );
 
 Then(
+  /^the database should have (?:exactly )?these (series|seasons|episodes|user series|user episodes) added:$/,
+  async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
+    await this.assertAddedDatabaseRows(DATABASE_COLLECTIONS[label], table.hashes());
+  }
+);
+
+Then(
+  /^the database should have these (series|seasons|episodes|user series|user episodes) fields updated:$/,
+  async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
+    await this.assertUpdatedDatabaseFields(DATABASE_COLLECTIONS[label], table.hashes());
+  }
+);
+
+Then(
   "the database should contain exactly these user episodes:",
   async function (this: ApiWorld, table: DataTable) {
     await this.assertExactlyUserEpisodes(table.hashes());
