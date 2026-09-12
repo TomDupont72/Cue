@@ -70,7 +70,12 @@ export const userService = {
     };
   },
 
-  async seriesPost(userId: string, params: UserSeriesPostParams, body: UserSeriesPostBody) {
+  async seriesPost(
+    userId: string,
+    params: UserSeriesPostParams,
+    body: UserSeriesPostBody,
+    now = new Date()
+  ) {
     const series = await seriesRepository.findOne({ id: params.seriesId });
 
     if (!series) {
@@ -79,7 +84,7 @@ export const userService = {
 
     const userSeries = await userRepository.upsertSeries(
       { userId_seriesId: { userId, ...params } },
-      { userId, ...params, ...body },
+      { userId, ...params, ...body, addedAt: now },
       { ...body }
     );
 
@@ -166,17 +171,8 @@ export const userService = {
           );
         }
 
-        const nextEpisode = await userRepository.getEpisodeFeedItem(
-          userId,
-          seriesId,
-          tx,
-          releaseCutoff
-        );
-
         return {
           ...createdUserEpisode,
-          seriesId,
-          nextEpisode
         };
       }
 

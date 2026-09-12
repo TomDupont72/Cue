@@ -31,11 +31,10 @@ Feature: POST /api/user/series/:seriesId/episode/:episodeId
         When I send a POST request to "/api/user/series/2/episode/2"
 
         Then the response status should be 200
-        And the database should contain exactly these user episodes:
-            | key     | userId | episodeId                 |
-            |         | user-1 | @episodes.addedEpisode    |
-            | created | user-1 | @episodes.notAddedEpisode |
+        And the database should have these user episodes added:
+            | key     | userId | episodeId                 | watchedAt                |
+            | created | user-1 | @episodes.notAddedEpisode | 2026-02-01T00:00:00.000Z |
 
         And the response body should exactly match this fixture:
-            | fixture               | seriesId | nextEpisode                   |
-            | @userEpisodes.created | 2        | @episodes.notAddedEpisodeNext |
+            | fixture               |
+            | @userEpisodes.created |

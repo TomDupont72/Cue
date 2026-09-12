@@ -27,18 +27,7 @@ export type UserSeriesRow = {
 // API RESPONSE TYPES
 // =============================================================================
 
-export type UserEpisodePostResponse = UserEpisodeRow & {
-  seriesId: number;
-  nextEpisode:
-    | (Omit<UserSeriesRow, "isFavorite" | "watchCount" | "watchedEpisodeCount" | "addedAt"> &
-        Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
-          seriesName: string;
-          seriesPosterPath: string | null;
-          seriesTmdbId: number;
-          remainingEpisodes: number;
-        })
-    | null;
-};
+export type UserEpisodePostResponse = UserEpisodeRow;
 
 export type UserEpisodeDeleteResponse = UserEpisodeRow;
 
