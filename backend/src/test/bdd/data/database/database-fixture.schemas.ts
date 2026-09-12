@@ -6,13 +6,7 @@ import type {
   UserEpisode,
   UserSeries
 } from "@/generated/prisma/client.js";
-import {
-  episodeResponseSchema,
-  seasonResponseSchema,
-  seriesResponseSchema,
-  userEpisodeResponseSchema,
-  userSeriesResponseSchema
-} from "@/modules/series/series.schemas.js";
+import { UserSeriesStatus } from "@/generated/prisma/enums.js";
 
 export type DatabaseFixtureCollection =
   "series" | "seasons" | "episodes" | "userSeries" | "userEpisodes";
@@ -247,7 +241,7 @@ function createSeriesRowSchema() {
     .strict()
     .transform(({ key, ...record }) => ({
       key,
-      record: seriesResponseSchema.parse(record)
+      record
     }));
 }
 
@@ -270,7 +264,7 @@ function createSeasonRowSchema(references: DatabaseFixtureReferences) {
     .strict()
     .transform(({ key, ...record }) => ({
       key,
-      record: seasonResponseSchema.parse(record)
+      record
     }));
 }
 
@@ -296,7 +290,7 @@ function createEpisodeRowSchema(references: DatabaseFixtureReferences) {
     .strict()
     .transform(({ key, ...record }) => ({
       key,
-      record: episodeResponseSchema.parse(record)
+      record
     }));
 }
 
@@ -306,7 +300,7 @@ function createUserSeriesRowSchema(references: DatabaseFixtureReferences) {
       key: optionalFixtureKeySchema,
       userId: z.string().min(1),
       seriesId: referenceCellSchema("series", references),
-      status: userSeriesResponseSchema.shape.status,
+      status: z.enum(UserSeriesStatus),
       isFavorite: booleanCellSchema,
       watchCount: integerCellSchema,
       watchedEpisodeCount: integerCellSchema,
@@ -316,7 +310,7 @@ function createUserSeriesRowSchema(references: DatabaseFixtureReferences) {
     .strict()
     .transform(({ key, ...record }) => ({
       key,
-      record: userSeriesResponseSchema.parse(record)
+      record
     }));
 }
 
@@ -331,7 +325,7 @@ function createUserEpisodeRowSchema(references: DatabaseFixtureReferences) {
     .strict()
     .transform(({ key, ...record }) => ({
       key,
-      record: userEpisodeResponseSchema.parse(record)
+      record
     }));
 }
 

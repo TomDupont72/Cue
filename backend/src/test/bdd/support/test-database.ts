@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
 import { prisma } from "@/shared/db/prisma.js";
-import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
-import type { EpisodeFeedRow } from "@/modules/user/user.types.js";
 import {
   addDatabaseFixtureRows,
   createEmptyDatabaseFixtures,
@@ -14,10 +12,7 @@ import type {
   DatabaseFixtureRecord,
   DatabaseFixtureRow
 } from "@/test/bdd/data/database/database-fixture.schemas.js";
-import {
-  parseDatabaseFixtureReference,
-  parseDatabaseFixtureRow
-} from "@/test/bdd/data/database/database-fixture.schemas.js";
+import { parseDatabaseFixtureRow } from "@/test/bdd/data/database/database-fixture.schemas.js";
 import { assertSafeTestDatabase } from "@/test/bdd/support/test-database-safety.js";
 
 function collectUserIds(state: DatabaseFixtureState, authenticatedUserId: string | null) {
@@ -78,11 +73,7 @@ export class TestDatabase {
   async assertExactlyUserSeries(rows: readonly DatabaseFixtureRow[]) {
     const expectations = rows.map((row, index) => {
       try {
-        const fixture = parseDatabaseFixtureRow(
-          "userSeries",
-          row,
-          this.fixtures.references
-        );
+        const fixture = parseDatabaseFixtureRow("userSeries", row, this.fixtures.references);
 
         return {
           ...fixture,
@@ -126,10 +117,22 @@ export class TestDatabase {
         fields.map((field) => [field, actual[field as keyof typeof actual]])
       );
 
-      assert.deepStrictEqual(actualFields, expectedFields, `Unexpected userSeries row: ${identity}`);
+      assert.deepStrictEqual(
+        actualFields,
+        expectedFields,
+        `Unexpected userSeries row: ${identity}`
+      );
 
       if (key !== undefined) {
-        capturedFixtures.push({ key, record: actual });
+        const missingFields = Object.keys(record).filter((field) => !fields.includes(field));
+
+        if (missingFields.length > 0) {
+          throw new Error(
+            `Cannot capture @userSeries.${key}: add these expected fields first: ${missingFields.join(", ")}`
+          );
+        }
+
+        capturedFixtures.push({ key, record });
       }
     }
 
@@ -145,11 +148,7 @@ export class TestDatabase {
   async assertExactlyUserEpisodes(rows: readonly DatabaseFixtureRow[]) {
     const expectations = rows.map((row, index) => {
       try {
-        const fixture = parseDatabaseFixtureRow(
-          "userEpisodes",
-          row,
-          this.fixtures.references
-        );
+        const fixture = parseDatabaseFixtureRow("userEpisodes", row, this.fixtures.references);
 
         return {
           ...fixture,
@@ -193,10 +192,22 @@ export class TestDatabase {
         fields.map((field) => [field, actual[field as keyof typeof actual]])
       );
 
-      assert.deepStrictEqual(actualFields, expectedFields, `Unexpected userEpisode row: ${identity}`);
+      assert.deepStrictEqual(
+        actualFields,
+        expectedFields,
+        `Unexpected userEpisode row: ${identity}`
+      );
 
       if (key !== undefined) {
-        capturedFixtures.push({ key, record: actual });
+        const missingFields = Object.keys(record).filter((field) => !fields.includes(field));
+
+        if (missingFields.length > 0) {
+          throw new Error(
+            `Cannot capture @userEpisodes.${key}: add these expected fields first: ${missingFields.join(", ")}`
+          );
+        }
+
+        capturedFixtures.push({ key, record });
       }
     }
 
@@ -207,67 +218,6 @@ export class TestDatabase {
 
       this.fixtures.references.userEpisodes.set(key, record);
     }
-  }
-
-  async getEpisodeFeedFixture(
-    reference: string,
-    userId: string,
-    now: Date
-  ): Promise<EpisodeFeedRow> {
-    const { collection, key } = parseDatabaseFixtureReference(reference);
-
-    if (collection !== "episodes") {
-      throw new Error(`Expected an episode fixture, received ${reference}`);
-    }
-
-    const episode = this.fixtures.references.episodes.get(key);
-
-    if (!episode) {
-      throw new Error(`Unknown database fixture reference: ${reference}`);
-    }
-
-    const releaseCutoff = getEpisodeReleaseCutoff(now);
-    const [series, userSeries, remainingEpisodes] = await Promise.all([
-      prisma.series.findUnique({ where: { id: episode.seriesId } }),
-      prisma.userSeries.findUnique({
-        where: { userId_seriesId: { userId, seriesId: episode.seriesId } }
-      }),
-      prisma.episode.count({
-        where: {
-          seriesId: episode.seriesId,
-          seasonNumber: { not: 0 },
-          airDate: { not: null, lt: releaseCutoff },
-          users: { none: { userId } }
-        }
-      })
-    ]);
-
-    if (!series) {
-      throw new Error(`Series ${episode.seriesId} does not exist`);
-    }
-
-    if (!userSeries) {
-      throw new Error(`UserSeries ${userId}:${episode.seriesId} does not exist`);
-    }
-
-    return {
-      userId,
-      seriesId: series.id,
-      status: userSeries.status,
-      lastWatchedAt: userSeries.lastWatchedAt,
-      seriesName: series.name,
-      seriesPosterPath: series.posterPath,
-      seriesTmdbId: series.tmdbId,
-      id: episode.id,
-      name: episode.name,
-      seasonNumber: episode.seasonNumber,
-      episodeNumber: episode.episodeNumber,
-      airDate: episode.airDate,
-      stillPath: episode.stillPath,
-      runtime: episode.runtime,
-      overview: episode.overview,
-      remainingEpisodes
-    };
   }
 
   async resetAndSeed(authenticatedUserId: string | null) {

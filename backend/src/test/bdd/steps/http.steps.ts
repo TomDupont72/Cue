@@ -11,6 +11,7 @@ import {
   assertResponseObjectMatchesFixture,
   assertResponseStatus,
   buildExpectedFixtures,
+  buildExpectedUserEpisodePostResponse,
   parseObjectTable
 } from "@/test/bdd/http/http-response.assertions.js";
 import type { ApiWorld } from "@/test/bdd/support/world.js";
@@ -95,9 +96,9 @@ Then("the response body should exactly match:", function (this: ApiWorld, table:
 
 Then(
   "the response body should exactly match this fixture:",
-  async function (this: ApiWorld, table: DataTable) {
-    const fixtures = await buildExpectedFixtures(table.raw(), (reference, field) =>
-      this.resolveResponseFixture(reference, field)
+  function (this: ApiWorld, table: DataTable) {
+    const fixtures = buildExpectedFixtures(table.raw(), (reference) =>
+      this.getDatabaseFixture(reference)
     );
 
     if (fixtures.length !== 1) {
@@ -105,6 +106,17 @@ Then(
     }
 
     assertResponseBodyMatchesFixture(this.getResponse(), fixtures[0]);
+  }
+);
+
+Then(
+  "the response body should exactly match this user episode response:",
+  function (this: ApiWorld, table: DataTable) {
+    const expected = buildExpectedUserEpisodePostResponse(table.raw(), (reference) =>
+      this.getDatabaseFixture(reference)
+    );
+
+    assertResponseBodyMatchesFixture(this.getResponse(), expected);
   }
 );
 
@@ -149,13 +161,11 @@ Then(
 
 Then(
   "the response array at {string} should exactly match these fixtures:",
-  async function (this: ApiWorld, path: string, table: DataTable) {
+  function (this: ApiWorld, path: string, table: DataTable) {
     assertResponseArrayMatchesFixtures(
       this.getResponse(),
       path,
-      await buildExpectedFixtures(table.raw(), (reference, field) =>
-        this.resolveResponseFixture(reference, field)
-      )
+      buildExpectedFixtures(table.raw(), (reference) => this.getDatabaseFixture(reference))
     );
   }
 );

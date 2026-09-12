@@ -57,26 +57,6 @@ export class ApiWorld extends World {
     await this.database.assertExactlyUserEpisodes(rows);
   }
 
-  async resolveResponseFixture(reference: string, field?: string) {
-    if (!this.database) {
-      throw new Error("The test database has not been prepared yet");
-    }
-
-    if (field !== "nextEpisode") {
-      return this.database.getFixture(reference);
-    }
-
-    if (typeof this.authenticatedUserId !== "string") {
-      throw new Error("An authenticated user is required to resolve a nextEpisode fixture");
-    }
-
-    return this.database.getEpisodeFeedFixture(
-      reference,
-      this.authenticatedUserId,
-      this.currentDate ?? new Date()
-    );
-  }
-
   async prepareCase() {
     await this.disposeCase();
 
@@ -96,13 +76,17 @@ export class ApiWorld extends World {
         const currentDate = new Date(this.currentDate);
         const episodeUpcomingGet = userService.episodeUpcomingGet.bind(userService);
         const episodePost = userService.episodePost.bind(userService);
+        const seriesPost = userService.seriesPost.bind(userService);
         const getEpisodesAtCurrentDate: typeof userService.episodeUpcomingGet = (userId) =>
           episodeUpcomingGet(userId, currentDate);
         const postEpisodeAtCurrentDate: typeof userService.episodePost = (userId, params) =>
           episodePost(userId, params, currentDate);
+        const postSeriesAtCurrentDate: typeof userService.seriesPost = (userId, params, body) =>
+          seriesPost(userId, params, body, currentDate);
 
         scope.replace(userService, "episodeUpcomingGet", getEpisodesAtCurrentDate);
         scope.replace(userService, "episodePost", postEpisodeAtCurrentDate);
+        scope.replace(userService, "seriesPost", postSeriesAtCurrentDate);
       }
 
       if (this.authenticatedUserId !== undefined) {

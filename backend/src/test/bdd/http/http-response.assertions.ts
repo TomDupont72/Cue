@@ -4,7 +4,6 @@ import type { LightMyRequestResponse } from "fastify";
 type TableRows = readonly (readonly string[])[];
 
 const NUMBER_PATTERN = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
-const FIXTURE_REFERENCE_PATTERN = /^@[A-Za-z][A-Za-z0-9_-]*\.[A-Za-z][A-Za-z0-9_-]*$/;
 
 function parseCell(value: string): unknown {
   if (value.startsWith("json:")) {
@@ -60,9 +59,9 @@ export function parseObjectTable(rows: TableRows): Record<string, unknown> {
   return values[0];
 }
 
-export async function buildExpectedFixtures(
+export function buildExpectedFixtures(
   rows: TableRows,
-  resolveFixture: (reference: string, field?: string) => unknown | Promise<unknown>
+  resolveFixture: (reference: string) => unknown
 ) {
   const [headerRow, ...bodyRows] = rows;
 
@@ -80,41 +79,166 @@ export async function buildExpectedFixtures(
 
   const extraFields = headerRow.slice(1);
 
-  return Promise.all(
-    bodyRows.map(async (row) => {
-      const reference = row[0];
+  return bodyRows.map((row) => {
+    const reference = row[0];
 
-      if (!reference) {
-        throw new Error("The fixture table contains an empty reference");
-      }
+    if (!reference) {
+      throw new Error("The fixture table contains an empty reference");
+    }
 
-      const fixture = await resolveFixture(reference);
+    const fixture = resolveFixture(reference);
 
-      if (!isRecord(fixture)) {
-        throw new Error(`Fixture ${reference} is not an object`);
-      }
+    if (!isRecord(fixture)) {
+      throw new Error(`Fixture ${reference} is not an object`);
+    }
 
-      const extras = Object.fromEntries(
-        await Promise.all(
-          extraFields.map(async (field, index) => {
-            const value = row[index + 1] ?? "";
+    const extras = Object.fromEntries(
+      extraFields.map((field, index) => [field, parseCell(row[index + 1] ?? "")])
+    );
 
-            return [
-              field,
-              FIXTURE_REFERENCE_PATTERN.test(value)
-                ? await resolveFixture(value, field)
-                : parseCell(value)
-            ];
-          })
-        )
-      );
+    return {
+      ...fixture,
+      ...extras
+    };
+  });
+}
 
-      return {
-        ...fixture,
-        ...extras
-      };
-    })
+function getExpectedField<T>(
+  row: Record<string, unknown>,
+  field: string,
+  isExpectedType: (value: unknown) => value is T,
+  expectedType: string
+): T {
+  const value = row[field];
+
+  if (!isExpectedType(value)) {
+    throw new Error(`Expected "${field}" to be ${expectedType}`);
+  }
+
+  return value;
+}
+
+function getFixtureRecord(
+  row: Record<string, unknown>,
+  field: string,
+  resolveFixture: (reference: string) => unknown
+) {
+  const reference = getExpectedField(
+    row,
+    field,
+    (value): value is string => typeof value === "string",
+    "a fixture reference"
   );
+  const fixture = resolveFixture(reference);
+
+  if (!isRecord(fixture)) {
+    throw new Error(`Fixture ${reference} is not an object`);
+  }
+
+  return fixture;
+}
+
+function assertExactFields(row: Record<string, unknown>, expectedFields: readonly string[]) {
+  assert.deepStrictEqual(
+    Object.keys(row).sort(),
+    [...expectedFields].sort(),
+    "The expected response table does not contain exactly the required columns"
+  );
+}
+
+export function buildExpectedUserEpisodePostResponse(
+  rows: TableRows,
+  resolveFixture: (reference: string) => unknown
+) {
+  const row = parseObjectTable(rows);
+  const commonFields = ["userEpisode", "seriesId"];
+
+  if (row.nextEpisode === null) {
+    assertExactFields(row, [...commonFields, "nextEpisode"]);
+
+    return {
+      ...getFixtureRecord(row, "userEpisode", resolveFixture),
+      seriesId: getExpectedField(
+        row,
+        "seriesId",
+        (value): value is number => typeof value === "number",
+        "a number"
+      ),
+      nextEpisode: null
+    };
+  }
+
+  assertExactFields(row, [
+    ...commonFields,
+    "nextEpisode.episode",
+    "nextEpisode.userId",
+    "nextEpisode.series",
+    "nextEpisode.status",
+    "nextEpisode.lastWatchedAt",
+    "nextEpisode.remainingEpisodes"
+  ]);
+
+  const userEpisode = getFixtureRecord(row, "userEpisode", resolveFixture);
+  const nextEpisode = getFixtureRecord(row, "nextEpisode.episode", resolveFixture);
+  const nextEpisodeSeries = getFixtureRecord(row, "nextEpisode.series", resolveFixture);
+  const seriesId = getExpectedField(
+    row,
+    "seriesId",
+    (value): value is number => typeof value === "number",
+    "a number"
+  );
+  const nextEpisodeUserId = getExpectedField(
+    row,
+    "nextEpisode.userId",
+    (value): value is string => typeof value === "string",
+    "a string"
+  );
+  const nextEpisodeStatus = getExpectedField(
+    row,
+    "nextEpisode.status",
+    (value): value is string => typeof value === "string",
+    "a string"
+  );
+  const nextEpisodeLastWatchedAt = row["nextEpisode.lastWatchedAt"];
+  const remainingEpisodes = getExpectedField(
+    row,
+    "nextEpisode.remainingEpisodes",
+    (value): value is number => typeof value === "number",
+    "a number"
+  );
+
+  if (nextEpisodeLastWatchedAt !== null && typeof nextEpisodeLastWatchedAt !== "string") {
+    throw new Error('Expected "nextEpisode.lastWatchedAt" to be a date string or null');
+  }
+
+  if (nextEpisode.seriesId !== nextEpisodeSeries.id) {
+    throw new Error(
+      'The fixtures referenced by "nextEpisode.episode" and "nextEpisode.series" belong to different series'
+    );
+  }
+
+  return {
+    ...userEpisode,
+    seriesId,
+    nextEpisode: {
+      userId: nextEpisodeUserId,
+      seriesId: nextEpisodeSeries.id,
+      status: nextEpisodeStatus,
+      lastWatchedAt: nextEpisodeLastWatchedAt,
+      seriesName: nextEpisodeSeries.name,
+      seriesPosterPath: nextEpisodeSeries.posterPath,
+      seriesTmdbId: nextEpisodeSeries.tmdbId,
+      id: nextEpisode.id,
+      name: nextEpisode.name,
+      seasonNumber: nextEpisode.seasonNumber,
+      episodeNumber: nextEpisode.episodeNumber,
+      airDate: nextEpisode.airDate,
+      stillPath: nextEpisode.stillPath,
+      runtime: nextEpisode.runtime,
+      overview: nextEpisode.overview,
+      remainingEpisodes
+    }
+  };
 }
 
 function getMediaType(response: LightMyRequestResponse): string | undefined {
