@@ -100,3 +100,8 @@ Feature: POST /api/user/series/:seriesId/episode/:episodeId
         And the response body should exactly match:
             | code              | message           |
             | EPISODE_NOT_FOUND | Episode not found |
+
+    Scenario: Post episode - Invalid query
+        When I send a POST request to "/api/user/series/invalid/episode/invalid"
+
+        Then the response status should be 400

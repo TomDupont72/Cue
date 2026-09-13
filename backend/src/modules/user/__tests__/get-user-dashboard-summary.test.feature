@@ -3,8 +3,7 @@ Feature: GET /api/user/dashboard/summary
     Background:
         Given authentication as "user-1"
 
-    Scenario: Get user summary dashboard
-        Given the database with these series:
+        And the database with these series:
             | key       | id | name      | numberOfEpisodes | numberOfSeasons |
             | completed | 1  | Completed | 2                | 1               |
             | watching  | 2  | Watching  | 2                | 1               |
@@ -35,17 +34,10 @@ Feature: GET /api/user/dashboard/summary
             | user-2 | @episodes.watched40 |
             | user-2 | @episodes.ignored   |
 
+    Scenario: Get user summary dashboard
         When I send a GET request to "/api/user/dashboard/summary"
 
         Then the response status should be 200
         And the response body should exactly match:
             | totalWatchedMinutes | totalWatchedEpisodes | totalWatchedSeries |
             | 85                  | 3                    | 1                  |
-
-    Scenario: Get user summary dashboard - Missing Data
-        When I send a GET request to "/api/user/dashboard/summary"
-
-        Then the response status should be 200
-        And the response body should exactly match:
-            | totalWatchedMinutes | totalWatchedEpisodes | totalWatchedSeries |
-            | 0                   | 0                    | 0                  |

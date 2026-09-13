@@ -3,8 +3,7 @@ Feature: GET /api/series/:id
     Background:
         Given authentication as "user-1"
 
-    Scenario: Get series
-        Given the database with these series:
+        And the database with these series:
             | key       | id |
             | requested | 1  |
             | other     | 2  |
@@ -29,6 +28,7 @@ Feature: GET /api/series/:id
             | requestedSeenByUser | user-1 | @episodes.requestedFirst  |
             |                     | user-2 | @episodes.requestedSecond |
 
+    Scenario: Get series
         When I send a GET request to "/api/series/1"
 
         Then the response status should be 200
