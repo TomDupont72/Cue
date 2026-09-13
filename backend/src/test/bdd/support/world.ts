@@ -10,6 +10,7 @@ import { buildApp, type AppInstance } from "@/app.js";
 
 export class ApiWorld extends World {
   private authenticatedUserId?: string | null;
+  private calledByWorker = false;
   private currentDate?: Date;
   private pendingDatabaseFixtures: Array<{
     collection: DatabaseFixtureCollection;
@@ -23,6 +24,10 @@ export class ApiWorld extends World {
 
   authenticateAs(userId: string | null) {
     this.authenticatedUserId = userId;
+  }
+
+  authenticateAsWorker() {
+    this.calledByWorker = true;
   }
 
   setCurrentDate(currentDate: Date) {
@@ -99,7 +104,7 @@ export class ApiWorld extends World {
 
     const identity: TestIdentity = {
       userId: null,
-      isWorker: false
+      isWorker: this.calledByWorker
     };
 
     this.scope = scope;
@@ -110,16 +115,20 @@ export class ApiWorld extends World {
         const episodeUpcomingGet = userService.episodeUpcomingGet.bind(userService);
         const episodePost = userService.episodePost.bind(userService);
         const seriesPost = userService.seriesPost.bind(userService);
+        const seriesReconcilePost = userService.seriesReconcilePost.bind(userService);
         const getEpisodesAtCurrentDate: typeof userService.episodeUpcomingGet = (userId) =>
           episodeUpcomingGet(userId, currentDate);
         const postEpisodeAtCurrentDate: typeof userService.episodePost = (userId, params) =>
           episodePost(userId, params, currentDate);
         const postSeriesAtCurrentDate: typeof userService.seriesPost = (userId, params, body) =>
           seriesPost(userId, params, body, currentDate);
+        const reconcileSeriesAtCurrentDate: typeof userService.seriesReconcilePost = (params) =>
+          seriesReconcilePost(params, currentDate);
 
         scope.replace(userService, "episodeUpcomingGet", getEpisodesAtCurrentDate);
         scope.replace(userService, "episodePost", postEpisodeAtCurrentDate);
         scope.replace(userService, "seriesPost", postSeriesAtCurrentDate);
+        scope.replace(userService, "seriesReconcilePost", reconcileSeriesAtCurrentDate);
       }
 
       if (this.authenticatedUserId !== undefined) {

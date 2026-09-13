@@ -1,0 +1,49 @@
+Feature: POST /api/user/:userId/series/reconcile
+
+    Background:
+        Given authentication as "user-1"
+
+        And called by worker
+
+        And the current date "2026-02-01T00:00:00.000Z"
+
+        And the database with these series:
+            | key              | id |
+            | watchingSeries   | 1  |
+            | pausedSeries     | 2  |
+            | droppedSeries    | 3  |
+            | unwatchingSeries | 4  |
+
+        And the database with these episodes:
+            | key               | id | seriesId                 |
+            | watchingEpisode   | 1  | @series.watchingSeries   |
+            | pausedEpisode     | 2  | @series.pausedSeries     |
+            | droppedEpisode    | 3  | @series.droppedSeries    |
+            | unwatchingEpisode | 4  | @series.unwatchingSeries |
+
+        And the database with these user series:
+            | userId | seriesId                 | status   | watchCount | watchedEpisodeCount | lastWatchedAt            |
+            | user-1 | @series.watchingSeries   | WATCHING | 1          | 1                   | 2026-01-01T00:00:00.000Z |
+            | user-1 | @series.pausedSeries     | PAUSED   | 1          | 1                   | 2026-01-01T00:00:00.000Z |
+            | user-1 | @series.droppedSeries    | DROPPED  | 1          | 1                   | 2026-01-01T00:00:00.000Z |
+            | user-1 | @series.unwatchingSeries | WATCHING | 1          | 1                   | 2025-06-01T00:00:00.000Z |
+
+        And the database with these user episodes:
+            | userId | episodeId                   | watchedAt                |
+            | user-1 | @episodes.watchingEpisode   | 2026-01-01T00:00:00.000Z |
+            | user-1 | @episodes.pausedEpisode     | 2026-01-01T00:00:00.000Z |
+            | user-1 | @episodes.droppedEpisode    | 2026-01-01T00:00:00.000Z |
+            | user-1 | @episodes.unwatchingEpisode | 2025-06-01T00:00:00.000Z |
+
+    Scenario: Post user series reconcile
+        When I send a POST request to "/api/user/user-1/series/reconcile"
+
+        Then the response status should be 200
+        And the database should have these user series fields updated:
+            | userId | seriesId                 | status   |
+            | user-1 | @series.pausedSeries     | WATCHING |
+            | user-1 | @series.unwatchingSeries | DROPPED  |
+
+        And the response body should exactly match:
+            | updatedCount |
+            | 2            |
