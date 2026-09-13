@@ -527,22 +527,38 @@ export class TestDatabase {
       );
 
       assert.ok(actual, `Missing userEpisode row: ${identity}`);
+      const rowBeforeRequest = this.databaseBeforeRequest?.userEpisodes.find(
+        (row) => row.userId === record.userId && row.episodeId === record.episodeId
+      );
+      const isIdentityOnly = fields.every(
+        (field) => field === "userId" || field === "episodeId"
+      );
+      let expectedRecord = record;
 
-      const expectedFields = Object.fromEntries(
-        fields.map((field) => [field, record[field as keyof typeof record]])
-      );
-      const actualFields = Object.fromEntries(
-        fields.map((field) => [field, actual[field as keyof typeof actual]])
-      );
+      if (rowBeforeRequest && isIdentityOnly) {
+        expectedRecord = rowBeforeRequest;
 
-      assert.deepStrictEqual(
-        actualFields,
-        expectedFields,
-        `Unexpected userEpisode row: ${identity}`
-      );
+        assert.deepStrictEqual(actual, expectedRecord, `Unexpected userEpisode row: ${identity}`);
+      } else {
+        const expectedFields = Object.fromEntries(
+          fields.map((field) => [field, record[field as keyof typeof record]])
+        );
+        const actualFields = Object.fromEntries(
+          fields.map((field) => [field, actual[field as keyof typeof actual]])
+        );
+
+        assert.deepStrictEqual(
+          actualFields,
+          expectedFields,
+          `Unexpected userEpisode row: ${identity}`
+        );
+      }
 
       if (key !== undefined) {
-        const missingFields = Object.keys(record).filter((field) => !fields.includes(field));
+        const missingFields =
+          rowBeforeRequest && isIdentityOnly
+            ? []
+            : Object.keys(record).filter((field) => !fields.includes(field));
 
         if (missingFields.length > 0) {
           throw new Error(
@@ -550,7 +566,7 @@ export class TestDatabase {
           );
         }
 
-        capturedFixtures.push({ key, record });
+        capturedFixtures.push({ key, record: expectedRecord });
       }
     }
 
