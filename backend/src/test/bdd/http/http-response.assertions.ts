@@ -289,6 +289,10 @@ function serializeFixture(value: unknown): unknown {
 }
 
 function getValueAtPath(value: unknown, path: string): unknown {
+  if (path === "$") {
+    return value;
+  }
+
   const segments = path.split(".");
 
   if (segments.some((segment) => segment === "")) {
