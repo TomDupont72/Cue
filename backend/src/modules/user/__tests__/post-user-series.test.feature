@@ -19,7 +19,7 @@ Feature: POST /api/user/series/:seriesId
 
         Then the response status should be 200
         And the database should have these user series added:
-            | key     | userId | seriesId               | status  | isFavorite | watchCount | watchedEpisodeCount | addedAt                 | lastWatchedAt |
+            | key     | userId | seriesId               | status  | isFavorite | watchCount | watchedEpisodeCount | addedAt                  | lastWatchedAt |
             | created | user-1 | @series.notAddedSeries | PLANNED | false      | 0          | 0                   | 2026-01-01T00:00:00.000Z |               |
 
         And the response body should exactly match this fixture:

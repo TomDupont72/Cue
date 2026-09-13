@@ -3,8 +3,7 @@ Feature: GET /api/user/episodes/upcoming
     Background:
         Given authentication as "user-1"
 
-    Scenario: Get user episodes upcoming
-        Given the current date "2026-01-10T00:00:00.000Z"
+        And the current date "2026-01-10T00:00:00.000Z"
 
         And the database with these series:
             | key           | id | name           | backdropPath        |
@@ -27,6 +26,7 @@ Feature: GET /api/user/episodes/upcoming
             | user-1 | @series.lastSeries    |
             | user-2 | @series.ignoredSeries |
 
+    Scenario: Get user episodes upcoming
         When I send a GET request to "/api/user/episodes/upcoming"
 
         Then the response status should be 200
