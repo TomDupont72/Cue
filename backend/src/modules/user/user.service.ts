@@ -12,7 +12,7 @@ import {
 } from "@/modules/user/user.schemas.js";
 import { episodeRepository } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import { seriesRepository } from "@/modules/series/series.repository.js";
+import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 
@@ -96,11 +96,13 @@ export const userService = {
     const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
-      const series = await seriesRepository.findOne({ id: seriesId }, tx);
+      /*const series = await seriesRepository.findOne({ id: seriesId }, tx);
 
       if (!series) {
         throw notFound("SERIES_NOT_FOUND", "Series not found");
-      }
+      }*/
+
+      const series = await seriesSelectQuery(tx).selectAll().where({id: seriesId}).oneOrThrow("SERIES_NOT_FOUND")
 
       const episode = await episodeRepository.findOne(
         {
