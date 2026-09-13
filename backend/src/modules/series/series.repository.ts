@@ -1,7 +1,13 @@
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { Prisma } from "@/generated/prisma/client.js";
+import { Prisma, type Series } from "@/generated/prisma/client.js";
 import type { SeriesReconcileUpdatedCountRow } from "./series.types.js";
+import { SelectQuery } from "@/shared/db/selectQuery.js";
+
+export const seriesSelectQuery = (db: PrismaTx = prisma) =>
+  new SelectQuery<typeof db.series, Prisma.SeriesSelect, Prisma.SeriesWhereInput, Series>(
+    db.series
+  );
 
 export const seriesRepository = {
   findOne(where: Prisma.SeriesWhereUniqueInput, db: PrismaTx = prisma) {
