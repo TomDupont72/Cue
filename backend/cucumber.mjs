@@ -9,7 +9,7 @@ export default {
     "src/test/bdd/steps/**/*.ts"
   ],
 
-  format: ["progress"],
+  format: ["./src/test/bdd/reporters/file-progress.formatter.mjs"],
   strict: true,
   parallel: 0
 };
