@@ -25,9 +25,15 @@ export class SelectQuery<TModel extends FindManyModel<TWhere, TSelect>, TSelect,
         super(model)
     }
 
-    select(...fields: SelectArg<TSelect>[]) {
+    select(): SelectQuery<TModel, TSelect, TWhere, TRow, TRow>;
+    select(
+        first: SelectArg<TSelect>,
+        ...rest: SelectArg<TSelect>[]
+    ): SelectQuery<TModel, TSelect, TWhere, TRow, Record<string, unknown>>;
+    select(...fields: SelectArg<TSelect>[]): SelectQuery<TModel, TSelect, TWhere, TRow, unknown> {
         if (fields.length === 0) {
             this.selection = undefined;
+            this.aliases = {};
             return this;
         }
 
@@ -48,9 +54,10 @@ export class SelectQuery<TModel extends FindManyModel<TWhere, TSelect>, TSelect,
         return this;
     }
 
-    selectAll() {
+    selectAll(): SelectQuery<TModel, TSelect, TWhere, TRow, TRow> {
         this.selection = undefined
-        return this
+        this.aliases = {};
+        return this as unknown as SelectQuery<TModel, TSelect, TWhere, TRow, TRow>
     }
 
     async all(): Promise<TResult[]> {
