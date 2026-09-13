@@ -47,6 +47,10 @@ Given("authentication as {string}", function (this: ApiWorld, userId: string) {
   this.authenticateAs(userId);
 });
 
+Given("called by worker", function (this: ApiWorld) {
+  this.authenticateAsWorker();
+});
+
 Given("the current date {string}", function (this: ApiWorld, value: string) {
   this.setCurrentDate(currentDateSchema.parse(value));
 });
