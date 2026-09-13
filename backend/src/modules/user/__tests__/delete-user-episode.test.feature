@@ -10,12 +10,12 @@ Feature: DELETE /api/user/series/:seriesId/episode/:episodeId
             | untrackedSeries | 3  | 1                | false        |
 
         And the database with these episodes:
-            | key                  | id | seriesId                | seasonNumber | episodeNumber |
-            | firstWatchedEpisode  | 1  | @series.watchedSeries   | 1            | 1             |
-            | lastWatchedEpisode   | 2  | @series.watchedSeries   | 1            | 2             |
-            | notWatchedEpisode    | 3  | @series.watchedSeries   | 1            | 3             |
-            | watchedSpecial       | 4  | @series.specialSeries   | 0            | 1             |
-            | untrackedEpisode     | 5  | @series.untrackedSeries | 1            | 1             |
+            | key                 | id | seriesId                | seasonNumber | episodeNumber |
+            | firstWatchedEpisode | 1  | @series.watchedSeries   | 1            | 1             |
+            | lastWatchedEpisode  | 2  | @series.watchedSeries   | 1            | 2             |
+            | notWatchedEpisode   | 3  | @series.watchedSeries   | 1            | 3             |
+            | watchedSpecial      | 4  | @series.specialSeries   | 0            | 1             |
+            | untrackedEpisode    | 5  | @series.untrackedSeries | 1            | 1             |
 
         And the database with these user series:
             | userId | seriesId              | status    | watchCount | watchedEpisodeCount | lastWatchedAt            |
