@@ -4,34 +4,34 @@ Feature: DELETE /api/user/series/:seriesId/season/:seasonId
         Given authentication as "user-1"
 
         And the database with these series:
-            | key               | id | numberOfEpisodes | inProduction |
-            | watchedSeries     | 1  | 3                | false        |
-            | specialSeries     | 2  | 0                | false        |
-            | notWatchedSeries  | 3  | 1                | false        |
-            | untrackedSeries   | 4  | 1                | false        |
+            | key              | id | numberOfEpisodes | inProduction |
+            | watchedSeries    | 1  | 3                | false        |
+            | specialSeries    | 2  | 0                | false        |
+            | notWatchedSeries | 3  | 1                | false        |
+            | untrackedSeries  | 4  | 1                | false        |
 
         And the database with these seasons:
-            | key                 | id | seriesId                   | seasonNumber |
-            | watchedSeason       | 1  | @series.watchedSeries      | 1            |
-            | remainingSeason     | 2  | @series.watchedSeries      | 2            |
-            | specialSeason       | 3  | @series.specialSeries      | 0            |
-            | notWatchedSeason    | 4  | @series.notWatchedSeries   | 1            |
-            | untrackedSeason     | 5  | @series.untrackedSeries    | 1            |
+            | key              | id | seriesId                 | seasonNumber |
+            | watchedSeason    | 1  | @series.watchedSeries    | 1            |
+            | remainingSeason  | 2  | @series.watchedSeries    | 2            |
+            | specialSeason    | 3  | @series.specialSeries    | 0            |
+            | notWatchedSeason | 4  | @series.notWatchedSeries | 1            |
+            | untrackedSeason  | 5  | @series.untrackedSeries  | 1            |
 
         And the database with these episodes:
-            | key                  | id | seriesId                   | seasonId                    | seasonNumber | episodeNumber |
-            | deletedFirst         | 1  | @series.watchedSeries      | @seasons.watchedSeason      | 1            | 1             |
-            | deletedSecond        | 2  | @series.watchedSeries      | @seasons.watchedSeason      | 1            | 2             |
-            | remainingEpisode     | 3  | @series.watchedSeries      | @seasons.remainingSeason    | 2            | 1             |
-            | specialEpisode       | 4  | @series.specialSeries      | @seasons.specialSeason      | 0            | 1             |
-            | notWatchedEpisode    | 5  | @series.notWatchedSeries   | @seasons.notWatchedSeason   | 1            | 1             |
-            | untrackedEpisode     | 6  | @series.untrackedSeries    | @seasons.untrackedSeason    | 1            | 1             |
+            | key               | id | seriesId                 | seasonId                  | seasonNumber | episodeNumber |
+            | deletedFirst      | 1  | @series.watchedSeries    | @seasons.watchedSeason    | 1            | 1             |
+            | deletedSecond     | 2  | @series.watchedSeries    | @seasons.watchedSeason    | 1            | 2             |
+            | remainingEpisode  | 3  | @series.watchedSeries    | @seasons.remainingSeason  | 2            | 1             |
+            | specialEpisode    | 4  | @series.specialSeries    | @seasons.specialSeason    | 0            | 1             |
+            | notWatchedEpisode | 5  | @series.notWatchedSeries | @seasons.notWatchedSeason | 1            | 1             |
+            | untrackedEpisode  | 6  | @series.untrackedSeries  | @seasons.untrackedSeason  | 1            | 1             |
 
         And the database with these user series:
-            | userId | seriesId                  | status    | watchCount | watchedEpisodeCount | lastWatchedAt            |
-            | user-1 | @series.watchedSeries     | COMPLETED | 3          | 3                   | 2026-01-25T00:00:00.000Z |
-            | user-1 | @series.specialSeries     | WATCHING  | 0          | 1                   | 2026-01-20T00:00:00.000Z |
-            | user-1 | @series.notWatchedSeries  | PLANNED   | 0          | 0                   |                          |
+            | userId | seriesId                 | status    | watchCount | watchedEpisodeCount | lastWatchedAt            |
+            | user-1 | @series.watchedSeries    | COMPLETED | 3          | 3                   | 2026-01-25T00:00:00.000Z |
+            | user-1 | @series.specialSeries    | WATCHING  | 0          | 1                   | 2026-01-20T00:00:00.000Z |
+            | user-1 | @series.notWatchedSeries | PLANNED   | 0          | 0                   |                          |
 
         And the database with these user episodes:
             | userId | episodeId                  | watchedAt                |
@@ -54,9 +54,9 @@ Feature: DELETE /api/user/series/:seriesId/season/:seasonId
             | user-1 | @series.watchedSeries | WATCHING | 1          | 1                   | 2026-01-10T00:00:00.000Z |
 
         And the response array at "$" should exactly match these fixtures:
-            | fixture                         |
-            | @userEpisodes.deletedFirst      |
-            | @userEpisodes.deletedSecond     |
+            | fixture                     |
+            | @userEpisodes.deletedFirst  |
+            | @userEpisodes.deletedSecond |
 
     Scenario: Delete a watched special season
         When I send a DELETE request to "/api/user/series/2/season/3"
@@ -67,7 +67,7 @@ Feature: DELETE /api/user/series/:seriesId/season/:seasonId
             | deleted | user-1 | @episodes.specialEpisode |
 
         And the database should have these user series fields updated:
-            | userId | seriesId             | status  | watchedEpisodeCount | lastWatchedAt |
+            | userId | seriesId              | status  | watchedEpisodeCount | lastWatchedAt |
             | user-1 | @series.specialSeries | PLANNED | 0                   |               |
 
         And the response array at "$" should exactly match these fixtures:

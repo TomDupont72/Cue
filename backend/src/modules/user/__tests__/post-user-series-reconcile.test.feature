@@ -26,13 +26,13 @@ Feature: POST /api/user/:userId/series/reconcile
             | completedEpisode  | 6  | @series.completedSeries  | 1             | 2026-01-01T00:00:00.000Z |
 
         And the database with these user series:
-            | userId | seriesId                 | status   | watchCount | watchedEpisodeCount | lastWatchedAt            |
-            | user-1 | @series.watchingSeries   | WATCHING | 1          | 1                   | 2026-01-01T00:00:00.000Z |
-            | user-1 | @series.pausedSeries     | PAUSED   | 1          | 1                   | 2026-01-01T00:00:00.000Z |
-            | user-1 | @series.droppedSeries    | DROPPED  | 1          | 1                   | 2026-01-01T00:00:00.000Z |
-            | user-1 | @series.unwatchingSeries | WATCHING | 1          | 1                   | 2025-06-01T00:00:00.000Z |
-            | user-1 | @series.plannedSeries    | PLANNED  | 0          | 0                   |                          |
-            | user-1 | @series.completedSeries  | COMPLETED | 1         | 1                   | 2026-01-01T00:00:00.000Z |
+            | userId | seriesId                 | status    | watchCount | watchedEpisodeCount | lastWatchedAt            |
+            | user-1 | @series.watchingSeries   | WATCHING  | 1          | 1                   | 2026-01-01T00:00:00.000Z |
+            | user-1 | @series.pausedSeries     | PAUSED    | 1          | 1                   | 2026-01-01T00:00:00.000Z |
+            | user-1 | @series.droppedSeries    | DROPPED   | 1          | 1                   | 2026-01-01T00:00:00.000Z |
+            | user-1 | @series.unwatchingSeries | WATCHING  | 1          | 1                   | 2025-06-01T00:00:00.000Z |
+            | user-1 | @series.plannedSeries    | PLANNED   | 0          | 0                   |                          |
+            | user-1 | @series.completedSeries  | COMPLETED | 1          | 1                   | 2026-01-01T00:00:00.000Z |
 
         And the database with these user episodes:
             | userId | episodeId                   | watchedAt                |
