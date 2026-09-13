@@ -96,11 +96,11 @@ export const userService = {
     const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
-        const series = await seriesRepository.findOne({ id: seriesId }, tx);
-  
-        if (!series) {
-          throw notFound("SERIES_NOT_FOUND", "Series not found");
-        }
+      const series = await seriesRepository.findOne({ id: seriesId }, tx);
+
+      if (!series) {
+        throw notFound("SERIES_NOT_FOUND", "Series not found");
+      }
 
       const episode = await episodeRepository.findOne(
         {
@@ -172,7 +172,7 @@ export const userService = {
         }
 
         return {
-          ...createdUserEpisode,
+          ...createdUserEpisode
         };
       }
 

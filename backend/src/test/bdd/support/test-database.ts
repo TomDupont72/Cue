@@ -530,9 +530,7 @@ export class TestDatabase {
       const rowBeforeRequest = this.databaseBeforeRequest?.userEpisodes.find(
         (row) => row.userId === record.userId && row.episodeId === record.episodeId
       );
-      const isIdentityOnly = fields.every(
-        (field) => field === "userId" || field === "episodeId"
-      );
+      const isIdentityOnly = fields.every((field) => field === "userId" || field === "episodeId");
       let expectedRecord = record;
 
       if (rowBeforeRequest && isIdentityOnly) {

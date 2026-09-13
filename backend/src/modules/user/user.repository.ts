@@ -317,9 +317,7 @@ export const userRepository = {
   },
 
   async getEpisodesFeed(userId: string, db: PrismaTx = prisma) {
-    return db.$queryRaw<EpisodeFeedRow[]>(
-      getEpisodesFeedQuery(userId, getEpisodeReleaseCutoff())
-    );
+    return db.$queryRaw<EpisodeFeedRow[]>(getEpisodesFeedQuery(userId, getEpisodeReleaseCutoff()));
   },
 
   async getEpisodeFeedItem(
