@@ -102,7 +102,10 @@ export const userService = {
         throw notFound("SERIES_NOT_FOUND", "Series not found");
       }*/
 
-      const series = await seriesSelectQuery(tx).selectAll().where({id: seriesId}).oneOrThrow("SERIES_NOT_FOUND")
+      const series = await seriesSelectQuery(tx)
+        .selectAll()
+        .where({ id: seriesId })
+        .oneOrThrow("SERIES_NOT_FOUND");
 
       const episode = await episodeRepository.findOne(
         {
