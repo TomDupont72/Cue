@@ -346,9 +346,10 @@ function createDatabaseFixtureRowSchema<Shape extends z.ZodRawShape>(shape: Shap
     });
 }
 
-function createDatabaseFixtureFieldsUpdateSchema<Collection extends DatabaseFixtureCollection>(
+function createDatabaseFixturePartialRowSchema<Collection extends DatabaseFixtureCollection>(
   collection: Collection,
-  references: DatabaseFixtureReferences
+  references: DatabaseFixtureReferences,
+  requireUpdatedField: boolean
 ) {
   const fieldSchemas = createDatabaseFixtureFieldSchemas(references)[collection] as Record<
     string,
@@ -371,7 +372,7 @@ function createDatabaseFixtureFieldsUpdateSchema<Collection extends DatabaseFixt
     })
     .strict()
     .superRefine((value, context) => {
-      if (!updatedFields.some((field) => Object.hasOwn(value, field))) {
+      if (requireUpdatedField && !updatedFields.some((field) => Object.hasOwn(value, field))) {
         context.addIssue({
           code: "custom",
           message: "must contain at least one field to update"
@@ -427,7 +428,17 @@ export function parseDatabaseFixtureFieldsUpdate<Collection extends DatabaseFixt
   row: DatabaseFixtureRow,
   references: DatabaseFixtureReferences
 ): ParsedDatabaseFixtureFieldsUpdate<Collection> {
-  return createDatabaseFixtureFieldsUpdateSchema(collection, references).parse(
+  return createDatabaseFixturePartialRowSchema(collection, references, true).parse(
+    row
+  ) as ParsedDatabaseFixtureFieldsUpdate<Collection>;
+}
+
+export function parseDatabaseFixtureRowSelection<Collection extends DatabaseFixtureCollection>(
+  collection: Collection,
+  row: DatabaseFixtureRow,
+  references: DatabaseFixtureReferences
+): ParsedDatabaseFixtureFieldsUpdate<Collection> {
+  return createDatabaseFixturePartialRowSchema(collection, references, false).parse(
     row
   ) as ParsedDatabaseFixtureFieldsUpdate<Collection>;
 }

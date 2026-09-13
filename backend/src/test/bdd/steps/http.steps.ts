@@ -135,6 +135,13 @@ Then(
 );
 
 Then(
+  /^the database should have these (series|seasons|episodes|user series|user episodes) deleted:$/,
+  async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
+    await this.assertDeletedDatabaseRows(DATABASE_COLLECTIONS[label], table.hashes());
+  }
+);
+
+Then(
   /^the database should have these (series|seasons|episodes|user series|user episodes) fields updated:$/,
   async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     await this.assertUpdatedDatabaseFields(DATABASE_COLLECTIONS[label], table.hashes());

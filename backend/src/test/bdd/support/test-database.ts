@@ -18,7 +18,8 @@ import type {
 import {
   DATABASE_FIXTURE_IDENTITY_FIELDS,
   parseDatabaseFixtureFieldsUpdate,
-  parseDatabaseFixtureRow
+  parseDatabaseFixtureRow,
+  parseDatabaseFixtureRowSelection
 } from "@/test/bdd/data/database/database-fixture.schemas.js";
 import { assertSafeTestDatabase } from "@/test/bdd/support/test-database-safety.js";
 
@@ -384,6 +385,91 @@ export class TestDatabase {
     );
 
     this.assertDatabaseRows(collection, rows, addedRows, `added ${collection}`);
+  }
+
+  async assertDeletedDatabaseRows<Collection extends DatabaseFixtureCollection>(
+    collection: Collection,
+    rows: readonly DatabaseFixtureRow[]
+  ) {
+    const rowsBeforeRequest = this.getDatabaseRowsBeforeRequest(collection);
+    const actualRows = await this.findDatabaseRows(collection);
+    const beforeByIdentity = new Map(
+      rowsBeforeRequest.map((row) => [getDatabaseRecordIdentity(collection, row), row])
+    );
+    const afterByIdentity = new Map(
+      actualRows.map((row) => [getDatabaseRecordIdentity(collection, row), row])
+    );
+    const expectations = rows.map((row, index) => {
+      try {
+        return parseDatabaseFixtureRowSelection(collection, row, this.fixtures.references);
+      } catch (error) {
+        throw new Error(`Invalid expected ${collection} deletion, row ${index + 1}`, {
+          cause: error
+        });
+      }
+    });
+    const expectedIdentities = expectations.map(({ identity }) =>
+      getDatabaseRecordIdentity(collection, identity as unknown as DatabaseFixtureRecord)
+    );
+
+    if (new Set(expectedIdentities).size !== expectedIdentities.length) {
+      throw new Error(`The expected ${collection} deletions contain duplicate rows`);
+    }
+
+    const deletedIdentities = rowsBeforeRequest
+      .filter((row) => !afterByIdentity.has(getDatabaseRecordIdentity(collection, row)))
+      .map((row) => getDatabaseRecordIdentity(collection, row));
+
+    assert.deepStrictEqual(
+      deletedIdentities.sort(),
+      [...expectedIdentities].sort(),
+      `The deleted ${collection} rows do not match the expected rows`
+    );
+
+    for (const rowAfterRequest of actualRows) {
+      const identity = getDatabaseRecordIdentity(collection, rowAfterRequest);
+      const readableIdentity = formatDatabaseRecordIdentity(collection, rowAfterRequest);
+      const rowBeforeRequest = beforeByIdentity.get(identity);
+
+      assert.ok(rowBeforeRequest, `${collection} row was unexpectedly added: ${readableIdentity}`);
+      assert.deepStrictEqual(
+        rowAfterRequest,
+        rowBeforeRequest,
+        `${collection} row was unexpectedly changed: ${readableIdentity}`
+      );
+    }
+
+    const capturedFixtures: Array<{
+      key: string;
+      record: DatabaseFixtureRecordByCollection[Collection];
+    }> = [];
+
+    for (const [index, { key, identity, fields }] of expectations.entries()) {
+      const rowBeforeRequest = beforeByIdentity.get(expectedIdentities[index]);
+      const readableIdentity = formatDatabaseRecordIdentity(
+        collection,
+        identity as unknown as DatabaseFixtureRecord
+      );
+
+      assert.ok(
+        rowBeforeRequest,
+        `${collection} row did not exist before the request: ${readableIdentity}`
+      );
+
+      for (const [field, expectedValue] of Object.entries(fields)) {
+        assert.deepStrictEqual(
+          rowBeforeRequest[field as keyof typeof rowBeforeRequest],
+          expectedValue,
+          `Unexpected deleted ${collection} row: ${readableIdentity}.${field}`
+        );
+      }
+
+      if (key !== undefined) {
+        capturedFixtures.push({ key, record: rowBeforeRequest });
+      }
+    }
+
+    this.captureDatabaseFixtures(collection, capturedFixtures);
   }
 
   async assertUpdatedDatabaseFields<Collection extends DatabaseFixtureCollection>(

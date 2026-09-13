@@ -60,6 +60,17 @@ export class ApiWorld extends World {
     await this.database.assertAddedDatabaseRows(collection, rows);
   }
 
+  async assertDeletedDatabaseRows(
+    collection: DatabaseFixtureCollection,
+    rows: Record<string, string>[]
+  ) {
+    if (!this.database) {
+      throw new Error("The test database has not been prepared yet");
+    }
+
+    await this.database.assertDeletedDatabaseRows(collection, rows);
+  }
+
   async assertUpdatedDatabaseFields(
     collection: DatabaseFixtureCollection,
     rows: Record<string, string>[]
