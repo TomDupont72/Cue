@@ -113,7 +113,7 @@ Feature: POST /api/user/series/:seriesId/season/:seasonId
         Then the response status should be 404
         And the response body should exactly match:
             | code               | message            |
-            | EPISODES_NOT_FOUND | Episodes not found |
+            | EPISODE_NOT_FOUND | Episode not found |
 
     Scenario: Post user season - Invalid query
         When I send a POST request to "/api/user/series/invalid/season/invalid"

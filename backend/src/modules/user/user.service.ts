@@ -259,28 +259,20 @@ export const userService = {
 
   async seasonPost(userId: string, params: UserSeasonPostParams, now = new Date()) {
     const { seriesId, seasonId } = params;
+    const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
-      const episodes = await episodeRepository.findMany(
-        {
-          seriesId,
-          seasonId,
-          airDate: {
-            lt: getEpisodeReleaseCutoff(now)
-          }
-        },
-        tx
-      );
+      const episodes = await episodeSelectQuery(tx)
+        .selectAll()
+        .where({ seriesId, seasonId, airDate: { lt: releaseCutoff } })
+        .emptyThrow()
+        .all();
 
-      if (episodes.length === 0) {
-        throw notFound("EPISODES_NOT_FOUND", "Episodes not found");
-      }
-
-      const series = await seriesRepository.findOne({ id: seriesId }, tx);
-
-      if (!series) {
-        throw notFound("SERIES_NOT_FOUND", "Series not found");
-      }
+      const series = await seriesSelectQuery(tx)
+        .selectAll()
+        .where({ id: seriesId })
+        .emptyThrow()
+        .first();
 
       const createdUserEpisodes = await userRepository.createManyEpisodes(
         episodes.map((episode) => ({ userId, episodeId: episode.id, watchedAt: now })),
@@ -288,10 +280,10 @@ export const userService = {
       );
 
       if (createdUserEpisodes.length === 0) {
-        return userRepository.findManyEpisodes(
-          { userId, episodeId: { in: episodes.map((episode) => episode.id) } },
-          tx
-        );
+        return userEpisodeSelectQuery(tx)
+          .selectAll()
+          .where({ userId, episodeId: { in: episodes.map((episode) => episode.id) } })
+          .all();
       }
 
       const regularEpisodeIds = new Set(
@@ -347,10 +339,10 @@ export const userService = {
         );
       }
 
-      return userRepository.findManyEpisodes(
-        { userId, episodeId: { in: episodes.map((episode) => episode.id) } },
-        tx
-      );
+      return userEpisodeSelectQuery(tx)
+        .selectAll()
+        .where({ userId, episodeId: { in: episodes.map((episode) => episode.id) } })
+        .all();
     });
   },
 
