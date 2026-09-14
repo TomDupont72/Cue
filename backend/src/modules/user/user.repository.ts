@@ -13,7 +13,7 @@ import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
 
 export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
-  new SelectQuery<typeof db.userEpisode>(db.userEpisode);
+  new SelectQuery<typeof db.userEpisode>(db.userEpisode, "USER_EPISODE_NOT_FOUND");
 
 function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: number) {
   const seriesFilter =

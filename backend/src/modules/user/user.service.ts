@@ -99,13 +99,13 @@ export const userService = {
       const series = await seriesSelectQuery(tx)
         .selectAll()
         .where({ id: seriesId })
-        .emptyThrow("SERIES_NOT_FOUND")
+        .emptyThrow()
         .first();
 
       const episode = await episodeSelectQuery(tx)
         .selectAll()
         .where({ id: episodeId, seriesId, airDate: { lt: releaseCutoff } })
-        .emptyThrow("EPISODE_NOT_FOUND")
+        .emptyThrow()
         .first();
 
       const [createdUserEpisode] = await userRepository.createManyEpisodes(
@@ -170,7 +170,7 @@ export const userService = {
       return userEpisodeSelectQuery(tx)
         .selectAll()
         .where({ userId, episodeId })
-        .emptyThrow("USER_EPISODE_NOT_FOUND")
+        .emptyThrow()
         .first();
     });
   },

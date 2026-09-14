@@ -5,7 +5,7 @@ import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
 export const episodeSelectQuery = (db: PrismaTx = prisma) =>
-  new SelectQuery<typeof db.episode>(db.episode);
+  new SelectQuery<typeof db.episode>(db.episode, "EPISODE_NOT_FOUND");
 
 export const episodeRepository = {
   findOne(where: Prisma.EpisodeWhereUniqueInput, db: PrismaTx = prisma) {

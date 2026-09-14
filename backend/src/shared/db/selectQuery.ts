@@ -7,10 +7,12 @@ import { ERROR_MESSAGE } from "@/shared/db/constants/errorMessage.js";
 export class SelectQuery<TModel extends PrismaModel, TResult = never> extends Query<TModel> {
   private selection?: Record<string, true>;
   private aliases: Record<string, string> = {};
-  private error?: keyof typeof ERROR_MESSAGE;
+  private emptyThrowError: keyof typeof ERROR_MESSAGE;
+  private emptyThrowEnable?: boolean;
 
-  constructor(model: TModel) {
+  constructor(model: TModel, emptyThrowError: keyof typeof ERROR_MESSAGE) {
     super(model);
+    this.emptyThrowError = emptyThrowError;
   }
 
   private asResult<T>(): SelectQuery<TModel, T> {
@@ -59,8 +61,8 @@ export class SelectQuery<TModel extends PrismaModel, TResult = never> extends Qu
     return this.asResult<never>();
   }
 
-  emptyThrow(error: keyof typeof ERROR_MESSAGE) {
-    this.error = error;
+  emptyThrow() {
+    this.emptyThrowEnable = true;
     return this;
   }
 
@@ -72,8 +74,8 @@ export class SelectQuery<TModel extends PrismaModel, TResult = never> extends Qu
       select: this.selection
     });
 
-    if (this.error !== undefined && rows.length === 0) {
-      throw notFound(this.error, ERROR_MESSAGE[this.error]);
+    if (this.emptyThrowEnable && rows.length === 0) {
+      throw notFound(this.emptyThrowError, ERROR_MESSAGE[this.emptyThrowError]);
     }
 
     return rows.map((row: Record<string, unknown>) =>
@@ -91,8 +93,8 @@ export class SelectQuery<TModel extends PrismaModel, TResult = never> extends Qu
       select: this.selection
     });
 
-    if (this.error !== undefined && row === null) {
-      throw notFound(this.error, ERROR_MESSAGE[this.error]);
+    if (this.emptyThrowEnable !== undefined && row === null) {
+      throw notFound(this.emptyThrowError, ERROR_MESSAGE[this.emptyThrowError]);
     }
 
     return Object.fromEntries(
