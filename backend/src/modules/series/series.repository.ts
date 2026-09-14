@@ -5,7 +5,7 @@ import type { SeriesReconcileUpdatedCountRow } from "./series.types.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
 
 export const seriesSelectQuery = (db: PrismaTx = prisma) =>
-  new SelectQuery<typeof db.series, Prisma.SeriesSelect, Prisma.SeriesWhereInput, Series>(
+  new SelectQuery<typeof db.series>(
     db.series
   );
 

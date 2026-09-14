@@ -1,9 +1,11 @@
-export class Query<TModel, TWhere> {
-  protected conditions: TWhere[] = [];
+import { Where } from "@/shared/db/types/query.types.js";
+
+export class Query<TModel> {
+  protected conditions: Where<TModel>[] = [];
 
   constructor(protected readonly model: TModel) {}
 
-  where(condition: TWhere): this {
+  where(condition: Where<TModel>): this {
     this.conditions.push(condition);
     return this;
   }

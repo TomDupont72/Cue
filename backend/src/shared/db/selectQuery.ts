@@ -1,89 +1,100 @@
 import { Query } from "@/shared/db/query.js";
 import { notFound } from "../errors/errors.helpers.js";
+import { Add, Rename, Result } from "@/shared/db/types/selectQuery.types.js";
+import { Field, Row, Where } from "@/shared/db/types/query.types.js";
+import { ERROR_MESSAGE } from "@/shared/db/constants/errorMessage.js";
 
-const ERROR_MESSAGE = {
-  SERIES_NOT_FOUND: "Series not found"
-};
 
-type FindManyModel<TWhere, TSelect> = {
-  findMany(args: { where: { AND: TWhere[] }; select: TSelect | undefined }): Promise<unknown[]>;
-};
 
-type Field<TSelect> = keyof TSelect & string;
-type SelectArg<TSelect> = Field<TSelect> | Partial<Record<Field<TSelect>, string>>;
-
-export class SelectQuery<
-  TModel extends FindManyModel<TWhere, TSelect>,
-  TSelect,
-  TWhere,
-  TRow,
-  TResult = TRow
-> extends Query<TModel, TWhere> {
-  selection: TSelect | undefined;
+export class SelectQuery<TModel, TResult = never> extends Query<TModel> {
+  private selection?: Record<string, true>;
   private aliases: Record<string, string> = {};
+  private error?: keyof typeof ERROR_MESSAGE;
 
   constructor(model: TModel) {
     super(model);
   }
 
-  select(): SelectQuery<TModel, TSelect, TWhere, TRow, TRow>;
-  select(
-    first: SelectArg<TSelect>,
-    ...rest: SelectArg<TSelect>[]
-  ): SelectQuery<TModel, TSelect, TWhere, TRow, Record<string, unknown>>;
-  select(...fields: SelectArg<TSelect>[]): SelectQuery<TModel, TSelect, TWhere, TRow, unknown> {
-    if (fields.length === 0) {
-      this.selection = undefined;
-      this.aliases = {};
-      return this;
-    }
+  select<K extends Field<TModel>>(
+    ...fields: K[]
+  ): SelectQuery<TModel, Add<TResult, Pick<Row<TModel>, K>>> {
+    const currentSelection = Object.fromEntries(fields.map((field) => [field, true] as const));
 
-    const selection = { ...this.selection } as Record<string, true>;
+    this.selection = {
+      ...this.selection,
+      ...currentSelection
+    };
 
-    for (const field of fields) {
-      if (typeof field === "string") {
-        selection[field] = true;
-      } else {
-        for (const [name, alias] of Object.entries(field)) {
-          selection[name] = true;
-          if (typeof alias === "string") this.aliases[name] = alias;
-        }
+    return this as any;
+  }
+
+  selectAs<const TMap extends Partial<Record<Field<TModel>, string>>>(
+    aliases: TMap
+  ): SelectQuery<TModel, Add<TResult, Rename<Row<TModel>, TMap>>> {
+    const currentSelection: Record<string, true> = {};
+
+    for (const [field, alias] of Object.entries(aliases)) {
+      if (typeof alias !== "string") {
+        continue;
       }
+
+      currentSelection[field] = true;
+      this.aliases[field] = alias;
     }
 
-    this.selection = selection as TSelect;
+    this.selection = {
+      ...this.selection,
+      ...currentSelection
+    };
+
+    return this as any;
+  }
+
+  selectAll(): SelectQuery<TModel> {
+    this.selection = undefined;
+    this.aliases = {};
+
+    return this as any;
+  }
+
+  emptyThrow(error: keyof typeof ERROR_MESSAGE) {
+    this.error = error;
     return this;
   }
 
-  selectAll(): SelectQuery<TModel, TSelect, TWhere, TRow, TRow> {
-    this.selection = undefined;
-    this.aliases = {};
-    return this as unknown as SelectQuery<TModel, TSelect, TWhere, TRow, TRow>;
-  }
-
-  async all(): Promise<TResult[]> {
-    const rows = await this.model.findMany({
-      where: { AND: this.conditions },
+  async all(): Promise<Result<TModel, TResult>[]> {
+    const rows = await (this.model as any).findMany({
+      where: {
+        AND: this.conditions
+      },
       select: this.selection
     });
 
-    return rows.map((row) =>
-      Object.fromEntries(
-        Object.entries(row as Record<string, unknown>).map(([key, value]) => [
-          this.aliases[key] ?? key,
-          value
-        ])
-      )
-    ) as unknown as TResult[];
-  }
-
-  async oneOrThrow(error: keyof typeof ERROR_MESSAGE): Promise<TResult> {
-    const rows = await this.all();
-
-    if (rows.length === 0) {
-      throw notFound(error, ERROR_MESSAGE[error]);
+    if (this.error !== undefined && rows.length === 0) {
+      throw notFound(this.error, ERROR_MESSAGE[this.error]);
     }
 
-    return rows[0]!;
+    return rows.map((row: Record<string, unknown>) =>
+      Object.fromEntries(
+        Object.entries(row).map(([key, value]) => [this.aliases[key] ?? key, value])
+      )
+    ) as Result<TModel, TResult>[];
+  }
+
+  async first(): Promise<Result<TModel, TResult>> {
+    const row = await (this.model as any).findFirst({
+      where: {
+        AND: this.conditions
+      },
+      select: this.selection
+    });
+
+    if (this.error !== undefined && row === null) {
+      throw notFound(this.error, ERROR_MESSAGE[this.error]);
+    }
+
+    return Object.fromEntries(
+      Object.entries(row).map(([key, value]) => [this.aliases[key] ?? key, value])
+    ) as Result<TModel, TResult>;
   }
 }
