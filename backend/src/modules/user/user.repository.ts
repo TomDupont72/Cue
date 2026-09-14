@@ -10,6 +10,10 @@ import {
 } from "./user.types.js";
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
+import { SelectQuery } from "@/shared/db/selectQuery.js";
+
+export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
+  new SelectQuery<typeof db.userEpisode>(db.userEpisode);
 
 function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: number) {
   const seriesFilter =

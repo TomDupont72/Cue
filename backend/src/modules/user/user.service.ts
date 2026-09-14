@@ -1,5 +1,5 @@
 import { prisma } from "@/shared/db/prisma.js";
-import { userRepository } from "@/modules/user/user.repository.js";
+import { userEpisodeSelectQuery, userRepository } from "@/modules/user/user.repository.js";
 import {
   UserEpisodePostParams,
   UserSeriesPostBody,
@@ -10,7 +10,7 @@ import {
   UserSeasonDeleteParams,
   UserSeriesReconcilePostParams
 } from "@/modules/user/user.schemas.js";
-import { episodeRepository } from "@/modules/episode/episode.repository.js";
+import { episodeRepository, episodeSelectQuery } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
 import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
@@ -96,32 +96,17 @@ export const userService = {
     const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
-      /*const series = await seriesRepository.findOne({ id: seriesId }, tx);
-
-      if (!series) {
-        throw notFound("SERIES_NOT_FOUND", "Series not found");
-      }*/
-
       const series = await seriesSelectQuery(tx)
         .selectAll()
         .where({ id: seriesId })
         .emptyThrow("SERIES_NOT_FOUND")
         .first();
 
-      const episode = await episodeRepository.findOne(
-        {
-          id: episodeId,
-          seriesId,
-          airDate: {
-            lt: releaseCutoff
-          }
-        },
-        tx
-      );
-
-      if (!episode) {
-        throw notFound("EPISODE_NOT_FOUND", "Episode not found");
-      }
+      const episode = await episodeSelectQuery(tx)
+        .selectAll()
+        .where({ id: episodeId, seriesId, airDate: { lt: releaseCutoff } })
+        .emptyThrow("EPISODE_NOT_FOUND")
+        .first();
 
       const [createdUserEpisode] = await userRepository.createManyEpisodes(
         [{ userId, episodeId, watchedAt: now }],
@@ -182,27 +167,7 @@ export const userService = {
         };
       }
 
-      const existingUserEpisode = await userRepository.findOneEpisode(
-        { userId_episodeId: { userId, episodeId } },
-        tx
-      );
-
-      if (!existingUserEpisode) {
-        throw notFound("USER_EPISODE_NOT_FOUND", "Episode for this user not found");
-      }
-
-      const nextEpisode = await userRepository.getEpisodeFeedItem(
-        userId,
-        seriesId,
-        tx,
-        releaseCutoff
-      );
-
-      return {
-        ...existingUserEpisode,
-        seriesId,
-        nextEpisode
-      };
+      return userEpisodeSelectQuery(tx).selectAll().emptyThrow("USER_EPISODE_NOT_FOUND").first();
     });
   },
 
