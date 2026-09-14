@@ -105,7 +105,8 @@ export const userService = {
       const series = await seriesSelectQuery(tx)
         .selectAll()
         .where({ id: seriesId })
-        .oneOrThrow("SERIES_NOT_FOUND");
+        .emptyThrow("SERIES_NOT_FOUND")
+        .first();
 
       const episode = await episodeRepository.findOne(
         {
