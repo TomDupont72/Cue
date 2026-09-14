@@ -1,18 +1,20 @@
 import { Query } from "@/shared/db/query.js";
 import { notFound } from "../errors/errors.helpers.js";
 import { Add, Rename, Result } from "@/shared/db/types/selectQuery.types.js";
-import { Field, Row, Where } from "@/shared/db/types/query.types.js";
+import { Field, PrismaModel, Row } from "@/shared/db/types/query.types.js";
 import { ERROR_MESSAGE } from "@/shared/db/constants/errorMessage.js";
 
-
-
-export class SelectQuery<TModel, TResult = never> extends Query<TModel> {
+export class SelectQuery<TModel extends PrismaModel, TResult = never> extends Query<TModel> {
   private selection?: Record<string, true>;
   private aliases: Record<string, string> = {};
   private error?: keyof typeof ERROR_MESSAGE;
 
   constructor(model: TModel) {
     super(model);
+  }
+
+  private asResult<T>(): SelectQuery<TModel, T> {
+    return this as unknown as SelectQuery<TModel, T>;
   }
 
   select<K extends Field<TModel>>(
@@ -25,7 +27,7 @@ export class SelectQuery<TModel, TResult = never> extends Query<TModel> {
       ...currentSelection
     };
 
-    return this as any;
+    return this.asResult< Add<TResult, Pick<Row<TModel>, K>>>();
   }
 
   selectAs<const TMap extends Partial<Record<Field<TModel>, string>>>(
@@ -47,14 +49,14 @@ export class SelectQuery<TModel, TResult = never> extends Query<TModel> {
       ...currentSelection
     };
 
-    return this as any;
+    return this.asResult<Add<TResult, Rename<Row<TModel>, TMap>>>();
   }
 
   selectAll(): SelectQuery<TModel> {
     this.selection = undefined;
     this.aliases = {};
 
-    return this as any;
+    return this.asResult<never>();
   }
 
   emptyThrow(error: keyof typeof ERROR_MESSAGE) {
@@ -63,7 +65,7 @@ export class SelectQuery<TModel, TResult = never> extends Query<TModel> {
   }
 
   async all(): Promise<Result<TModel, TResult>[]> {
-    const rows = await (this.model as any).findMany({
+    const rows = await this.model.findMany({
       where: {
         AND: this.conditions
       },
@@ -82,7 +84,7 @@ export class SelectQuery<TModel, TResult = never> extends Query<TModel> {
   }
 
   async first(): Promise<Result<TModel, TResult>> {
-    const row = await (this.model as any).findFirst({
+    const row = await this.model.findFirst({
       where: {
         AND: this.conditions
       },

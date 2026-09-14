@@ -1,6 +1,6 @@
-import { Where } from "@/shared/db/types/query.types.js";
+import { PrismaModel, Where } from "@/shared/db/types/query.types.js";
 
-export class Query<TModel> {
+export class Query<TModel extends PrismaModel> {
   protected conditions: Where<TModel>[] = [];
 
   constructor(protected readonly model: TModel) {}
