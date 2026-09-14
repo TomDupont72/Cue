@@ -167,7 +167,11 @@ export const userService = {
         };
       }
 
-      return userEpisodeSelectQuery(tx).selectAll().emptyThrow("USER_EPISODE_NOT_FOUND").first();
+      return userEpisodeSelectQuery(tx)
+        .selectAll()
+        .where({ userId, episodeId })
+        .emptyThrow("USER_EPISODE_NOT_FOUND")
+        .first();
     });
   },
 
