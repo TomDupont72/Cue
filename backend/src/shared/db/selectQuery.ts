@@ -27,7 +27,7 @@ export class SelectQuery<TModel extends PrismaModel, TResult = never> extends Qu
       ...currentSelection
     };
 
-    return this.asResult< Add<TResult, Pick<Row<TModel>, K>>>();
+    return this.asResult<Add<TResult, Pick<Row<TModel>, K>>>();
   }
 
   selectAs<const TMap extends Partial<Record<Field<TModel>, string>>>(
