@@ -326,11 +326,14 @@ export const userService = {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
-      const episodes = await episodeSelectQuery(tx).where({ seriesId, seasonId }).emptyThrow().all()
+      const episodes = await episodeSelectQuery(tx)
+        .where({ seriesId, seasonId })
+        .emptyThrow()
+        .all();
 
-      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first()
+      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first();
 
-      await userSeriesSelectQuery(tx).where({userId, seriesId}).emptyThrow().first()
+      await userSeriesSelectQuery(tx).where({ userId, seriesId }).emptyThrow().first();
 
       const deletedUserEpisodes = await userRepository.deleteEpisodes(
         userId,
