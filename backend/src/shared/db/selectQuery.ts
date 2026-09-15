@@ -54,11 +54,19 @@ export class SelectQuery<TModel extends PrismaModel, TResult = never> extends Qu
     return this.asResult<Add<TResult, Rename<Row<TModel>, TMap>>>();
   }
 
-  selectAll(): SelectQuery<TModel> {
+  selectAllAs<const TMap extends Partial<Record<Field<TModel>, string>>>(
+    aliases: TMap
+  ): SelectQuery<TModel, Omit<Row<TModel>, keyof TMap> & Rename<Row<TModel>, TMap>> {
     this.selection = undefined;
     this.aliases = {};
 
-    return this.asResult<never>();
+    for (const [field, alias] of Object.entries(aliases)) {
+      if (typeof alias === "string") {
+        this.aliases[field] = alias;
+      }
+    }
+
+    return this.asResult<Omit<Row<TModel>, keyof TMap> & Rename<Row<TModel>, TMap>>();
   }
 
   emptyThrow() {

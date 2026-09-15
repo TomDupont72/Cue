@@ -96,14 +96,9 @@ export const userService = {
     const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
-      const series = await seriesSelectQuery(tx)
-        .selectAll()
-        .where({ id: seriesId })
-        .emptyThrow()
-        .first();
+      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first();
 
       const episode = await episodeSelectQuery(tx)
-        .selectAll()
         .where({ id: episodeId, seriesId, airDate: { lt: releaseCutoff } })
         .emptyThrow()
         .first();
@@ -167,11 +162,7 @@ export const userService = {
         };
       }
 
-      return userEpisodeSelectQuery(tx)
-        .selectAll()
-        .where({ userId, episodeId })
-        .emptyThrow()
-        .first();
+      return userEpisodeSelectQuery(tx).where({ userId, episodeId }).emptyThrow().first();
     });
   },
 
@@ -263,16 +254,11 @@ export const userService = {
 
     return prisma.$transaction(async (tx) => {
       const episodes = await episodeSelectQuery(tx)
-        .selectAll()
         .where({ seriesId, seasonId, airDate: { lt: releaseCutoff } })
         .emptyThrow()
         .all();
 
-      const series = await seriesSelectQuery(tx)
-        .selectAll()
-        .where({ id: seriesId })
-        .emptyThrow()
-        .first();
+      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first();
 
       const createdUserEpisodes = await userRepository.createManyEpisodes(
         episodes.map((episode) => ({ userId, episodeId: episode.id, watchedAt: now })),
@@ -281,7 +267,6 @@ export const userService = {
 
       if (createdUserEpisodes.length === 0) {
         return userEpisodeSelectQuery(tx)
-          .selectAll()
           .where({ userId, episodeId: { in: episodes.map((episode) => episode.id) } })
           .all();
       }
@@ -340,7 +325,6 @@ export const userService = {
       }
 
       return userEpisodeSelectQuery(tx)
-        .selectAll()
         .where({ userId, episodeId: { in: episodes.map((episode) => episode.id) } })
         .all();
     });
