@@ -14,7 +14,7 @@ import {
   UserSeasonDeleteParams,
   UserSeriesReconcilePostParams
 } from "@/modules/user/user.schemas.js";
-import { episodeRepository, episodeSelectQuery } from "@/modules/episode/episode.repository.js";
+import { episodeSelectQuery } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
 import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
