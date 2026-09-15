@@ -326,26 +326,11 @@ export const userService = {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
-      const episodes = await episodeRepository.findMany({ seriesId, seasonId }, tx);
+      const episodes = await episodeSelectQuery(tx).where({ seriesId, seasonId }).emptyThrow().all()
 
-      if (episodes.length === 0) {
-        throw notFound("EPISODES_NOT_FOUND", "Episodes not found");
-      }
+      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first()
 
-      const series = await seriesRepository.findOne({ id: seriesId }, tx);
-
-      if (!series) {
-        throw notFound("SERIES_NOT_FOUND", "Series not found");
-      }
-
-      const userSeries = await userRepository.findOneSeries(
-        { userId_seriesId: { userId: userId, seriesId: seriesId } },
-        tx
-      );
-
-      if (!userSeries) {
-        throw notFound("USER_SERIES_NOT_FOUND", "Series for this user not found");
-      }
+      await userSeriesSelectQuery(tx).where({userId, seriesId}).emptyThrow().first()
 
       const deletedUserEpisodes = await userRepository.deleteEpisodes(
         userId,
