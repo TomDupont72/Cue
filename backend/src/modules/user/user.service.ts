@@ -1,5 +1,9 @@
 import { prisma } from "@/shared/db/prisma.js";
-import { userEpisodeSelectQuery, userRepository } from "@/modules/user/user.repository.js";
+import {
+  userEpisodeSelectQuery,
+  userRepository,
+  userSeriesSelectQuery
+} from "@/modules/user/user.repository.js";
 import {
   UserEpisodePostParams,
   UserSeriesPostBody,
@@ -170,26 +174,14 @@ export const userService = {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
-      const episode = await episodeRepository.findOne({ id: episodeId, seriesId }, tx);
+      const episode = await episodeSelectQuery(tx)
+        .where({ id: episodeId, seriesId })
+        .emptyThrow()
+        .first();
 
-      if (!episode) {
-        throw notFound("EPISODE_NOT_FOUND", "Episode not found");
-      }
+      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first();
 
-      const series = await seriesRepository.findOne({ id: seriesId }, tx);
-
-      if (!series) {
-        throw notFound("SERIES_NOT_FOUND", "Series not found");
-      }
-
-      const userSeries = await userRepository.findOneSeries(
-        { userId_seriesId: { userId: userId, seriesId: seriesId } },
-        tx
-      );
-
-      if (!userSeries) {
-        throw notFound("USER_SERIES_NOT_FOUND", "Series for this user not found");
-      }
+      await userSeriesSelectQuery(tx).where({ userId, seriesId }).emptyThrow().first();
 
       const [deletedUserEpisode] = await userRepository.deleteEpisodes(userId, [episodeId], tx);
 
