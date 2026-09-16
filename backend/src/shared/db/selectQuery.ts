@@ -80,9 +80,7 @@ export class SelectQuery<
 
   async all(): Promise<Result<TModel, TResult>[]> {
     const rows = await this.model.findMany({
-      where: {
-        AND: this.conditions
-      },
+      where: this.prismaWhere(),
       select: this.selection
     });
 
@@ -101,9 +99,7 @@ export class SelectQuery<
     TThrow extends true ? Result<TModel, TResult> : Result<TModel, TResult> | null
   > {
     const row = await this.model.findFirst({
-      where: {
-        AND: this.conditions
-      },
+      where: this.prismaWhere(),
       select: this.selection
     });
 

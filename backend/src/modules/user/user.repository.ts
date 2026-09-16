@@ -1,22 +1,29 @@
 import { Prisma, type UserEpisode, type UserSeries } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
-import {
-  DashboardSummaryEpisodesRow,
-  DashboardSummarySeriesRow,
-  EpisodeFeedRow,
-  EpisodeUpcomingRow,
-  UserSeriesProgressRow
-} from "./user.types.js";
+import { EpisodeFeedRow, EpisodeUpcomingRow, UserSeriesProgressRow } from "./user.types.js";
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
+import { AggregateQuery } from "@/shared/db/aggregateQuery.js";
+import { coalesce, count, sum } from "@/shared/db/aggregateExpressions.js";
+import {
+  episodeTable,
+  userEpisodeTable,
+  userSeriesTable
+} from "@/shared/db/constants/aggregateTables.js";
 
 export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery<typeof db.userEpisode>(db.userEpisode, "USER_EPISODE_NOT_FOUND");
 
+export const userEpisodeAggregateQuery = (db: PrismaTx = prisma) =>
+  new AggregateQuery(db.userEpisode, db, userEpisodeTable);
+
 export const userSeriesSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery<typeof db.userSeries>(db.userSeries, "USER_SERIES_NOT_FOUND");
+
+export const userSeriesAggregateQuery = (db: PrismaTx = prisma) =>
+  new AggregateQuery(db.userSeries, db, userSeriesTable);
 
 function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: number) {
   const seriesFilter =
@@ -300,27 +307,6 @@ export const userRepository = {
         AND "episodeId" IN (${Prisma.join(episodeIds)})
       RETURNING "userId", "episodeId", "watchedAt"
     `);
-  },
-
-  async getDashboardSummary(userId: string, db: PrismaTx = prisma) {
-    const [summaryEpisodes] = await db.$queryRaw<DashboardSummaryEpisodesRow[]>`
-        SELECT COALESCE(SUM(e.runtime), 0)::bigint AS "totalWatchedMinutes", COUNT(e.id) AS "totalWatchedEpisodes" FROM "Episode" e
-        INNER JOIN "UserEpisode" ue         
-        ON ue."episodeId" = e.id
-        WHERE ue."userId" = ${userId};
-    `;
-
-    const [summarySeries] = await db.$queryRaw<DashboardSummarySeriesRow[]>`
-        SELECT COUNT(us."seriesId") AS "totalWatchedSeries" FROM "UserSeries" us
-        WHERE us."userId"= ${userId}
-        AND us.status = 'COMPLETED';
-    `;
-
-    return {
-      totalWatchedMinutes: Number(summaryEpisodes.totalWatchedMinutes),
-      totalWatchedEpisodes: Number(summaryEpisodes.totalWatchedEpisodes),
-      totalWatchedSeries: Number(summarySeries.totalWatchedSeries)
-    };
   },
 
   async getEpisodesFeed(userId: string, db: PrismaTx = prisma) {

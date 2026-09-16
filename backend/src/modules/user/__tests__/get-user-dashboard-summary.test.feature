@@ -41,3 +41,13 @@ Feature: GET /api/user/dashboard/summary
         And the response body should exactly match:
             | totalWatchedMinutes | totalWatchedEpisodes | totalWatchedSeries |
             | 85                  | 3                    | 1                  |
+
+    Scenario: Get user summary dashboard - No watched episodes
+        Given authentication as "user-3"
+
+        When I send a GET request to "/api/user/dashboard/summary"
+
+        Then the response status should be 200
+        And the response body should exactly match:
+            | totalWatchedMinutes | totalWatchedEpisodes | totalWatchedSeries |
+            | 0                   | 0                    | 0                  |
