@@ -26,8 +26,8 @@ Feature: GET /api/series/:id
             | otherUserProgress | user-2 | @series.requested |
 
         And the database with these user episodes:
-            | key                     | userId | episodeId                 |
-            | requestedSeenByUser     | user-1 | @episodes.requestedFirst  |
+            | key                      | userId | episodeId                 |
+            | requestedSeenByUser      | user-1 | @episodes.requestedFirst  |
             | requestedSeenByOtherUser | user-2 | @episodes.requestedSecond |
 
     Scenario: Get series - Added
