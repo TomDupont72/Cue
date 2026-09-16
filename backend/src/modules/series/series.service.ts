@@ -1,12 +1,11 @@
-import { episodeRepository, episodeSelectQuery } from "@/modules/episode/episode.repository.js";
-import { seasonRepository, seasonsSelectQuery } from "@/modules/season/season.repository.js";
+import { episodeSelectQuery } from "@/modules/episode/episode.repository.js";
+import { seasonsSelectQuery } from "@/modules/season/season.repository.js";
 import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
 import type {
   SeriesGetParams,
   SeriesImportPostBody,
   SeriesReconcilePostBody
 } from "@/modules/series/series.schemas.js";
-import { notFound } from "@/shared/errors/errors.helpers.js";
 import {
   userEpisodeSelectQuery,
   userRepository,
