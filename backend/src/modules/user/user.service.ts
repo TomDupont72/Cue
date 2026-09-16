@@ -80,11 +80,7 @@ export const userService = {
     body: UserSeriesPostBody,
     now = new Date()
   ) {
-    const series = await seriesRepository.findOne({ id: params.seriesId });
-
-    if (!series) {
-      throw notFound("SERIES_NOT_FOUND", "Series not found");
-    }
+    await seriesSelectQuery().where({ id: params.seriesId }).emptyThrow().first();
 
     const userSeries = await userRepository.upsertSeries(
       { userId_seriesId: { userId, ...params } },
