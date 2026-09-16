@@ -6,10 +6,7 @@ import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { AggregateQuery } from "@/shared/db/aggregateQuery.js";
-import {
-  userEpisodeTable,
-  userSeriesTable
-} from "@/shared/db/constants/aggregateTables.js";
+import { userEpisodeTable, userSeriesTable } from "@/shared/db/constants/aggregateTables.js";
 
 export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery<typeof db.userEpisode>(db.userEpisode, "USER_EPISODE_NOT_FOUND");
@@ -192,20 +189,6 @@ export const userRepository = {
   findManyEpisodes(where: Prisma.UserEpisodeWhereInput, db: PrismaTx = prisma) {
     return db.userEpisode.findMany({
       where
-    });
-  },
-
-  findLatestWatchedEpisode(userId: string, seriesId: number, db: PrismaTx = prisma) {
-    return db.userEpisode.findFirst({
-      where: {
-        userId,
-        episode: {
-          seriesId
-        }
-      },
-      orderBy: {
-        watchedAt: "desc"
-      }
     });
   },
 

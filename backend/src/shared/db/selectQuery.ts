@@ -1,6 +1,6 @@
 import { Query } from "@/shared/db/query.js";
 import { notFound } from "../errors/errors.helpers.js";
-import { Add, Rename, Result } from "@/shared/db/types/selectQuery.types.js";
+import { Add, OrderBy, Rename, Result } from "@/shared/db/types/selectQuery.types.js";
 import { Field, PrismaModel, Row } from "@/shared/db/types/query.types.js";
 import { ERROR_MESSAGE } from "@/shared/db/constants/errorMessage.js";
 
@@ -10,6 +10,7 @@ export class SelectQuery<
   TThrow extends boolean = false
 > extends Query<TModel> {
   private selection?: Record<string, true>;
+  private ordering?: OrderBy<TModel>;
   private aliases: Record<string, string> = {};
   private emptyThrowError: keyof typeof ERROR_MESSAGE;
   private emptyThrowEnable = false;
@@ -21,6 +22,11 @@ export class SelectQuery<
 
   private asResult<T>(): SelectQuery<TModel, T, TThrow> {
     return this as unknown as SelectQuery<TModel, T, TThrow>;
+  }
+
+  orderBy(ordering: OrderBy<TModel>): this {
+    this.ordering = ordering;
+    return this;
   }
 
   select<K extends Field<TModel>>(
@@ -81,7 +87,8 @@ export class SelectQuery<
   async all(): Promise<Result<TModel, TResult>[]> {
     const rows = await this.model.findMany({
       where: this.prismaWhere(),
-      select: this.selection
+      select: this.selection,
+      orderBy: this.ordering
     });
 
     if (this.emptyThrowEnable && rows.length === 0) {
@@ -100,7 +107,8 @@ export class SelectQuery<
   > {
     const row = await this.model.findFirst({
       where: this.prismaWhere(),
-      select: this.selection
+      select: this.selection,
+      orderBy: this.ordering
     });
 
     if (row === null) {

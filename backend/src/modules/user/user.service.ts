@@ -213,11 +213,10 @@ export const userService = {
           series.inProduction
         );
 
-        const latestWatchedEpisode = await userRepository.findLatestWatchedEpisode(
-          userId,
-          seriesId,
-          tx
-        );
+        const latestWatchedEpisode = await userEpisodeSelectQuery(tx)
+          .where({ userId, episode: { seriesId } })
+          .orderBy({ watchedAt: "desc" })
+          .first();
 
         await userRepository.updateSeries(
           {
@@ -377,11 +376,10 @@ export const userService = {
         series.inProduction
       );
 
-      const latestWatchedEpisode = await userRepository.findLatestWatchedEpisode(
-        userId,
-        seriesId,
-        tx
-      );
+      const latestWatchedEpisode = await userEpisodeSelectQuery(tx)
+        .where({ userId, episode: { seriesId } })
+        .orderBy({ watchedAt: "desc" })
+        .first();
 
       await userRepository.updateSeries(
         {
