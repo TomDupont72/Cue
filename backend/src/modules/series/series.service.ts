@@ -1,41 +1,29 @@
-import { episodeRepository } from "@/modules/episode/episode.repository.js";
-import { seasonRepository } from "@/modules/season/season.repository.js";
-import { seriesRepository } from "@/modules/series/series.repository.js";
+import { episodeRepository, episodeSelectQuery } from "@/modules/episode/episode.repository.js";
+import { seasonRepository, seasonsSelectQuery } from "@/modules/season/season.repository.js";
+import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
 import type {
   SeriesGetParams,
   SeriesImportPostBody,
   SeriesReconcilePostBody
 } from "@/modules/series/series.schemas.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import { userRepository } from "@/modules/user/user.repository.js";
+import {
+  userEpisodeSelectQuery,
+  userRepository,
+  userSeriesSelectQuery
+} from "@/modules/user/user.repository.js";
 import { syncTmdb } from "@/modules/series/series.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 
 export const seriesService = {
   async get(userId: string, params: SeriesGetParams) {
-    const series = await seriesRepository.findOne(params);
-
-    if (!series) {
-      throw notFound("SERIES_NOT_FOUND", "Series not found");
-    }
-
-    const [seasons, episodes, userSeries, userEpisodes] = await Promise.all([
-      seasonRepository.findMany({
-        seriesId: series.id
-      }),
-      episodeRepository.findMany({
-        seriesId: series.id
-      }),
-      userRepository.findOneSeries({
-        userId_seriesId: { userId, seriesId: series.id }
-      }),
-      userRepository.findManyEpisodes({
-        userId,
-        episode: {
-          seriesId: series.id
-        }
-      })
-    ]);
+    const series = await seriesSelectQuery().where(params).emptyThrow().first();
+    const seasons = await seasonsSelectQuery().where({ seriesId: series.id }).all();
+    const episodes = await episodeSelectQuery().where({ seriesId: series.id }).all();
+    const userSeries = await userSeriesSelectQuery().where({ userId, seriesId: series.id }).first();
+    const userEpisodes = await userEpisodeSelectQuery()
+      .where({ userId, episode: { seriesId: series.id } })
+      .all();
 
     return { series, seasons, episodes, userSeries, userEpisodes };
   },
