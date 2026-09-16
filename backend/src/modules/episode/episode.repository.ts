@@ -1,7 +1,11 @@
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
+import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
+
+export const episodeSelectQuery = (db: PrismaTx = prisma) =>
+  new SelectQuery<typeof db.episode>(db.episode, "EPISODE_NOT_FOUND");
 
 export const episodeRepository = {
   findOne(where: Prisma.EpisodeWhereUniqueInput, db: PrismaTx = prisma) {
