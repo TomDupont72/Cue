@@ -6,9 +6,7 @@ import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { AggregateQuery } from "@/shared/db/aggregateQuery.js";
-import { coalesce, count, sum } from "@/shared/db/aggregateExpressions.js";
 import {
-  episodeTable,
   userEpisodeTable,
   userSeriesTable
 } from "@/shared/db/constants/aggregateTables.js";
