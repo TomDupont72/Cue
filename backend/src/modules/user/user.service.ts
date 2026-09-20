@@ -25,7 +25,7 @@ import {
   episodeSelectQuery
 } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
+import { seriesSelectQuery } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { episodeTable, seriesTable, userSeriesTable } from "@/shared/db/constants/queryTables.js";
@@ -34,23 +34,17 @@ import { asc, dateOnly, eq, gt } from "@/shared/db/queryExpressions.js";
 
 export const userService = {
   async seriesGet(userId: string, params: UserSeriesGet) {
-    const { seriesId, status, limit, cursor } = params;
-    const cursorField = status === undefined || status === "PLANNED" ? "addedAt" : "lastWatchedAt";
+    const { seriesId } = params;
 
-    const userSeries = await userRepository.findManySeries(
-      { userId, seriesId, status },
-      limit,
-      cursor,
-      cursorField
-    );
+    const userSeries = await userSeriesSelectQuery().where({ userId, seriesId }).all();
 
-    const seriesDetails = await seriesRepository.findMany({
-      id: { in: userSeries.items.map((series) => series.seriesId) }
-    });
+    const seriesDetails = await seriesSelectQuery()
+      .where({ id: { in: userSeries.map((series) => series.seriesId) } })
+      .all();
 
     const seriesById = new Map(seriesDetails.map((series) => [series.id, series]));
 
-    const items = userSeries.items
+    const series = userSeries
       .map((series) => {
         const seriesDetails = seriesById.get(series.seriesId);
 
@@ -62,9 +56,7 @@ export const userService = {
       .filter((item) => item !== null);
 
     return {
-      items: items,
-      hasNextPage: userSeries.hasNextPage,
-      nextCursor: userSeries.nextCursor
+      series
     };
   },
 

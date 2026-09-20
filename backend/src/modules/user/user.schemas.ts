@@ -27,13 +27,7 @@ export const userEpisodePostParamsSchema = z.object({
 });
 
 export const userSeriesGetSchema = z.object({
-  seriesId: z.coerce.number().int().min(1).optional(),
-  status: z.enum(UserSeriesStatus).optional(),
-  limit: z.coerce.number().int().min(1).max(50).default(20),
-  cursor: z.iso
-    .datetime()
-    .transform((cursor) => new Date(cursor))
-    .optional()
+  seriesId: z.coerce.number().int().min(1).optional()
 });
 
 export const userSeasonPostParamsSchema = z.object({
@@ -50,13 +44,11 @@ export const userEpisodeDeleteParamsSchema = userEpisodePostParamsSchema;
 export const userSeasonDeleteParamsSchema = userSeasonPostParamsSchema;
 
 export const userSeriesGetResponseSchema = z.object({
-  items: z.array(
+  series: z.array(
     userSeriesResponseSchema.extend({
       seriesDetails: seriesResponseSchema
     })
-  ),
-  hasNextPage: z.boolean(),
-  nextCursor: z.date().nullable()
+  )
 });
 
 export const userSeriesPostResponseSchema = userSeriesResponseSchema;
