@@ -215,10 +215,10 @@ export const userService = {
 
       const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first();
 
-      const createdUserEpisodes = await userRepository.createManyEpisodes(
-        episodes.map((episode) => ({ userId, episodeId: episode.id, watchedAt: now })),
-        tx
-      );
+      const createdUserEpisodes = await userEpisodeInsertQuery(tx)
+        .values(episodes.map((episode) => ({ userId, episodeId: episode.id, watchedAt: now })))
+        .skipDuplicates()
+        .all();
 
       if (createdUserEpisodes.length === 0) {
         return userEpisodeSelectQuery(tx)
@@ -233,31 +233,21 @@ export const userService = {
         regularEpisodeIds.has(episode.episodeId)
       ).length;
 
-      const userSeries = await userRepository.upsertSeries(
-        {
-          userId_seriesId: {
-            userId,
-            seriesId
-          }
-        },
-        {
+      const userSeries = await userSeriesUpsertQuery(tx)
+        .where({ userId_seriesId: { userId, seriesId } })
+        .create({
           userId,
           seriesId,
           watchCount: watchCountIncrement,
           watchedEpisodeCount: createdUserEpisodes.length,
           lastWatchedAt: now
-        },
-        {
-          watchCount: {
-            increment: watchCountIncrement
-          },
-          watchedEpisodeCount: {
-            increment: createdUserEpisodes.length
-          },
+        })
+        .update({
+          watchCount: { increment: watchCountIncrement },
+          watchedEpisodeCount: { increment: createdUserEpisodes.length },
           lastWatchedAt: now
-        },
-        tx
-      );
+        })
+        .first();
 
       const status = getUserSeriesStatus(
         userSeries.watchedEpisodeCount,
@@ -267,16 +257,7 @@ export const userService = {
       );
 
       if (status !== userSeries.status) {
-        await userRepository.updateSeries(
-          {
-            userId_seriesId: {
-              userId,
-              seriesId
-            }
-          },
-          { status },
-          tx
-        );
+        await userSeriesUpdateQuery(tx).where({ userId, seriesId }).set({ status }).first();
       }
 
       return userEpisodeSelectQuery(tx)
