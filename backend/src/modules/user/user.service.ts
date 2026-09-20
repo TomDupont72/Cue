@@ -20,13 +20,17 @@ import {
   UserSeasonDeleteParams,
   UserSeriesReconcilePostParams
 } from "@/modules/user/user.schemas.js";
-import { episodeSelectQuery } from "@/modules/episode/episode.repository.js";
+import {
+  episodeRelationalSelectQuery,
+  episodeSelectQuery
+} from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
 import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
-import { episodeTable } from "@/shared/db/constants/queryTables.js";
+import { episodeTable, seriesTable, userSeriesTable } from "@/shared/db/constants/queryTables.js";
 import { coalesce, count, sum } from "@/shared/db/aggregateExpressions.js";
+import { asc, dateOnly, eq, gt } from "@/shared/db/queryExpressions.js";
 
 export const userService = {
   async seriesGet(userId: string, params: UserSeriesGet) {
@@ -75,7 +79,23 @@ export const userService = {
   },
 
   async episodeUpcomingGet(userId: string, now = new Date()) {
-    const episodes = await userRepository.getEpisodesUpcoming(userId, now);
+    const episodes = await episodeRelationalSelectQuery()
+      .join(seriesTable)
+      .join(userSeriesTable)
+      .selectAll()
+      .select({
+        seriesName: seriesTable.name,
+        seriesBackdropPath: seriesTable.backdropPath
+      })
+      .where(gt(episodeTable.airDate, dateOnly(now)))
+      .where(eq(userSeriesTable.userId, userId))
+      .firstPer(episodeTable.seriesId, [
+        asc(episodeTable.airDate),
+        asc(episodeTable.seasonNumber),
+        asc(episodeTable.episodeNumber)
+      ])
+      .orderBy({ airDate: "asc", seriesName: "asc" })
+      .all();
 
     return {
       episodes

@@ -1,23 +1,16 @@
 import { Prisma, type UserEpisode, type UserSeries } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
-import { EpisodeFeedRow, EpisodeUpcomingRow, UserSeriesProgressRow } from "./user.types.js";
+import { EpisodeFeedRow, UserSeriesProgressRow } from "./user.types.js";
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { RelationalSelectQuery } from "@/shared/db/relationalSelectQuery.js";
-import {
-  episodeTable,
-  seriesTable,
-  userEpisodeTable,
-  userSeriesTable
-} from "@/shared/db/constants/queryTables.js";
+import { userEpisodeTable, userSeriesTable } from "@/shared/db/constants/queryTables.js";
 import { InsertQuery } from "@/shared/db/insertQuery.js";
 import { UpdateQuery } from "@/shared/db/updateQuery.js";
 import { UpsertQuery } from "@/shared/db/upsertQuery.js";
 import { DeleteQuery } from "@/shared/db/deleteQuery.js";
-import { asc, dateOnly, eq, gt } from "@/shared/db/queryExpressions.js";
-import { episodeRelationalSelectQuery } from "@/modules/episode/episode.repository.js";
 
 export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery(db.userEpisode, "USER_EPISODE_NOT_FOUND");
@@ -314,29 +307,5 @@ export const userRepository = {
     );
 
     return episode ?? null;
-  },
-
-  async getEpisodesUpcoming(
-    userId: string,
-    now: Date,
-    db: PrismaTx = prisma
-  ): Promise<EpisodeUpcomingRow[]> {
-    return episodeRelationalSelectQuery(db)
-      .join(seriesTable)
-      .join(userSeriesTable)
-      .selectAll()
-      .select({
-        seriesName: seriesTable.name,
-        seriesBackdropPath: seriesTable.backdropPath
-      })
-      .where(gt(episodeTable.airDate, dateOnly(now)))
-      .where(eq(userSeriesTable.userId, userId))
-      .firstPer(episodeTable.seriesId, [
-        asc(episodeTable.airDate),
-        asc(episodeTable.seasonNumber),
-        asc(episodeTable.episodeNumber)
-      ])
-      .orderBy({ airDate: "asc", seriesName: "asc" })
-      .all();
   }
 };
