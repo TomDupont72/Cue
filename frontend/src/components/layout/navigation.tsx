@@ -106,11 +106,9 @@ export function NavigationFooter() {
   return (
     <PageContainer className="flex-row flex-wrap justify-center gap-4">
       {Object.values(NAVIGATION_FOOTER_LINK).map((navigation) => (
-        <>
-          <Link to={navigation.link} className="hover:underline">
-            {t(`common:navigation.${navigation.label}`)}
-          </Link>
-        </>
+        <Link key={navigation.link} to={navigation.link} className="hover:underline">
+          {t(`common:navigation.${navigation.label}`)}
+        </Link>
       ))}
     </PageContainer>
   );
