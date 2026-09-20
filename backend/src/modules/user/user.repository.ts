@@ -10,7 +10,6 @@ import { userEpisodeTable, userSeriesTable } from "@/shared/db/constants/aggrega
 import { InsertQuery } from "@/shared/db/insertQuery.js";
 import { UpdateQuery } from "@/shared/db/updateQuery.js";
 import { UpsertQuery } from "@/shared/db/upsertQuery.js";
-import { DbNull } from "@prisma/client/runtime/client";
 import { DeleteQuery } from "@/shared/db/deleteQuery.js";
 
 export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
