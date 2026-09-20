@@ -1,5 +1,5 @@
 import { Prisma } from "@/generated/prisma/client.js";
-import type { Column, Expression } from "@/shared/db/types/aggregate.types.js";
+import type { Column, Expression } from "@/shared/db/types/relationalQuery.types.js";
 
 export function sum(column: Column<number>): Expression<number | null> {
   return {

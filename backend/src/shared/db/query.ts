@@ -1,6 +1,6 @@
 import { Prisma } from "@/generated/prisma/client.js";
-import { getColumn } from "@/shared/db/aggregateTables.js";
-import type { Table } from "@/shared/db/types/aggregate.types.js";
+import { getColumn } from "@/shared/db/queryTables.js";
+import type { Table } from "@/shared/db/types/relationalQuery.types.js";
 import { PrismaModel, Where } from "@/shared/db/types/query.types.js";
 
 function isInFilter(value: unknown): value is { in: unknown[] } {
@@ -25,7 +25,7 @@ export class Query<TModel extends PrismaModel, TWhere extends object = Where<TMo
     return { AND: this.conditions } as unknown as Where<TModel>;
   }
 
-  protected sqlWhere<TRow extends object>(table: Table<TRow>): Prisma.Sql {
+  protected sqlPredicates<TRow extends object>(table: Table<TRow>): Prisma.Sql[] {
     const predicates: Prisma.Sql[] = [];
 
     for (const condition of this.conditions) {
@@ -49,6 +49,12 @@ export class Query<TModel extends PrismaModel, TWhere extends object = Where<TMo
         }
       }
     }
+
+    return predicates;
+  }
+
+  protected sqlWhere<TRow extends object>(table: Table<TRow>): Prisma.Sql {
+    const predicates = this.sqlPredicates(table);
 
     return predicates.length ? Prisma.sql`WHERE ${Prisma.join(predicates, " AND ")}` : Prisma.empty;
   }

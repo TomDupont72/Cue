@@ -1,11 +1,11 @@
 import { prisma } from "@/shared/db/prisma.js";
 import {
-  userEpisodeAggregateQuery,
   userEpisodeDeleteQuery,
   userEpisodeInsertQuery,
+  userEpisodeRelationalSelectQuery,
   userEpisodeSelectQuery,
   userRepository,
-  userSeriesAggregateQuery,
+  userSeriesRelationalSelectQuery,
   userSeriesSelectQuery,
   userSeriesUpdateQuery,
   userSeriesUpsertQuery
@@ -25,7 +25,7 @@ import { notFound } from "@/shared/errors/errors.helpers.js";
 import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
-import { episodeTable } from "@/shared/db/constants/aggregateTables.js";
+import { episodeTable } from "@/shared/db/constants/queryTables.js";
 import { coalesce, count, sum } from "@/shared/db/aggregateExpressions.js";
 
 export const userService = {
@@ -324,7 +324,7 @@ export const userService = {
   },
 
   async dashboardSummaryGet(userId: string) {
-    const summaryEpisodes = await userEpisodeAggregateQuery()
+    const summaryEpisodes = await userEpisodeRelationalSelectQuery()
       .join(episodeTable)
       .select({
         totalWatchedMinutes: coalesce(sum(episodeTable.runtime), 0),
@@ -333,7 +333,7 @@ export const userService = {
       .where({ userId })
       .first();
 
-    const summarySeries = await userSeriesAggregateQuery()
+    const summarySeries = await userSeriesRelationalSelectQuery()
       .select({ totalWatchedSeries: count() })
       .where({ userId, status: "COMPLETED" })
       .first();

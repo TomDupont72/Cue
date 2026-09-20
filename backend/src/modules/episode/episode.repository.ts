@@ -5,12 +5,17 @@ import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 import { DeleteQuery } from "@/shared/db/deleteQuery.js";
 import {
+  episodeTable,
   episodeCharacterTable,
   episodePeopleTable
-} from "@/shared/db/constants/aggregateTables.js";
+} from "@/shared/db/constants/queryTables.js";
+import { RelationalSelectQuery } from "@/shared/db/relationalSelectQuery.js";
 
 export const episodeSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery<typeof db.episode>(db.episode, "EPISODE_NOT_FOUND");
+
+export const episodeRelationalSelectQuery = (db: PrismaTx = prisma) =>
+  new RelationalSelectQuery(db.episode, db, episodeTable);
 
 const episodePeopleDeleteQuery = (db: PrismaTx = prisma) =>
   new DeleteQuery(db.episodePeople, db, episodePeopleTable);

@@ -5,18 +5,25 @@ import { EpisodeFeedRow, EpisodeUpcomingRow, UserSeriesProgressRow } from "./use
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
-import { AggregateQuery } from "@/shared/db/aggregateQuery.js";
-import { userEpisodeTable, userSeriesTable } from "@/shared/db/constants/aggregateTables.js";
+import { RelationalSelectQuery } from "@/shared/db/relationalSelectQuery.js";
+import {
+  episodeTable,
+  seriesTable,
+  userEpisodeTable,
+  userSeriesTable
+} from "@/shared/db/constants/queryTables.js";
 import { InsertQuery } from "@/shared/db/insertQuery.js";
 import { UpdateQuery } from "@/shared/db/updateQuery.js";
 import { UpsertQuery } from "@/shared/db/upsertQuery.js";
 import { DeleteQuery } from "@/shared/db/deleteQuery.js";
+import { asc, dateOnly, eq, gt } from "@/shared/db/queryExpressions.js";
+import { episodeRelationalSelectQuery } from "@/modules/episode/episode.repository.js";
 
 export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery(db.userEpisode, "USER_EPISODE_NOT_FOUND");
 
-export const userEpisodeAggregateQuery = (db: PrismaTx = prisma) =>
-  new AggregateQuery(db.userEpisode, db, userEpisodeTable);
+export const userEpisodeRelationalSelectQuery = (db: PrismaTx = prisma) =>
+  new RelationalSelectQuery(db.userEpisode, db, userEpisodeTable);
 
 export const userEpisodeInsertQuery = (db: PrismaTx = prisma) => new InsertQuery(db.userEpisode);
 
@@ -26,8 +33,8 @@ export const userEpisodeDeleteQuery = (db: PrismaTx = prisma) =>
 export const userSeriesSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery(db.userSeries, "USER_SERIES_NOT_FOUND");
 
-export const userSeriesAggregateQuery = (db: PrismaTx = prisma) =>
-  new AggregateQuery(db.userSeries, db, userSeriesTable);
+export const userSeriesRelationalSelectQuery = (db: PrismaTx = prisma) =>
+  new RelationalSelectQuery(db.userSeries, db, userSeriesTable);
 
 export const userSeriesUpdateQuery = (db: PrismaTx = prisma) => new UpdateQuery(db.userSeries);
 
@@ -309,56 +316,27 @@ export const userRepository = {
     return episode ?? null;
   },
 
-  async getEpisodesUpcoming(userId: string, now: Date, db: PrismaTx = prisma) {
-    const currentDate = now.toISOString().slice(0, 10);
-
-    return db.$queryRaw<EpisodeUpcomingRow[]>(Prisma.sql`
-    SELECT
-      t.id,
-      t."seriesId",
-      t."seasonId",
-      t."airDate",
-      t."episodeNumber",
-      t.name,
-      t.overview,
-      t."tmdbId",
-      t."stillPath",
-      t."seasonNumber",
-      t."voteAverage",
-      t."createdAt",
-      t."updatedAt",
-      t.runtime,
-      t."seriesName",
-      t."seriesBackdropPath"
-    FROM (
-      SELECT
-        s.name AS "seriesName",
-        s."backdropPath" AS "seriesBackdropPath",
-        e.*,
-        ROW_NUMBER() OVER (
-          PARTITION BY e."seriesId"
-          ORDER BY
-            e."airDate",
-            e."seasonNumber",
-            e."episodeNumber"
-        ) AS rn
-
-      FROM "Episode" e
-
-      JOIN "Series" s
-        ON e."seriesId" = s.id
-
-      JOIN "UserSeries" us
-        ON s.id = us."seriesId"
-
-      WHERE e."airDate" > ${currentDate}::date
-        AND us."userId" = ${userId}
-    ) t
-
-    WHERE t.rn = 1
-    ORDER BY
-        t."airDate" ASC,
-        t."seriesName" ASC;
-  `);
+  async getEpisodesUpcoming(
+    userId: string,
+    now: Date,
+    db: PrismaTx = prisma
+  ): Promise<EpisodeUpcomingRow[]> {
+    return episodeRelationalSelectQuery(db)
+      .join(seriesTable)
+      .join(userSeriesTable)
+      .selectAll()
+      .select({
+        seriesName: seriesTable.name,
+        seriesBackdropPath: seriesTable.backdropPath
+      })
+      .where(gt(episodeTable.airDate, dateOnly(now)))
+      .where(eq(userSeriesTable.userId, userId))
+      .firstPer(episodeTable.seriesId, [
+        asc(episodeTable.airDate),
+        asc(episodeTable.seasonNumber),
+        asc(episodeTable.episodeNumber)
+      ])
+      .orderBy({ airDate: "asc", seriesName: "asc" })
+      .all();
   }
 };

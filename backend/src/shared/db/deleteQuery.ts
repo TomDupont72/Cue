@@ -1,7 +1,7 @@
 import { Prisma } from "@/generated/prisma/client.js";
 import { Query } from "@/shared/db/query.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import type { Table } from "@/shared/db/types/aggregate.types.js";
+import type { Table } from "@/shared/db/types/relationalQuery.types.js";
 import type { DeleteWhere, MutationModel } from "@/shared/db/types/mutationQuery.types.js";
 import type { Row } from "@/shared/db/types/query.types.js";
 

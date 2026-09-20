@@ -3,18 +3,25 @@ import {
   type Episode,
   type EpisodeCharacter,
   type EpisodePeople,
+  type Series,
   type SeriesGenre,
   type SeriesNetwork,
   type SeriesPeople,
   type UserEpisode,
   type UserSeries
 } from "@/generated/prisma/client.js";
-import { defineTable } from "@/shared/db/aggregateTables.js";
+import { defineTable } from "@/shared/db/queryTables.js";
 
 export const episodeTable = defineTable<Episode>(
   "Episode",
   "e",
   Object.values(Prisma.EpisodeScalarFieldEnum)
+);
+
+export const seriesTable = defineTable<Series>(
+  "Series",
+  "s",
+  Object.values(Prisma.SeriesScalarFieldEnum)
 );
 
 export const userEpisodeTable = defineTable<UserEpisode>(
@@ -59,11 +66,23 @@ export const seriesPeopleTable = defineTable<SeriesPeople>(
   Object.values(Prisma.SeriesPeopleScalarFieldEnum)
 );
 
-export const aggregateRelations = [
+export const queryRelations = [
   {
     from: userEpisodeTable.$name,
     to: episodeTable.$name,
     left: userEpisodeTable.episodeId,
     right: episodeTable.id
+  },
+  {
+    from: episodeTable.$name,
+    to: seriesTable.$name,
+    left: episodeTable.seriesId,
+    right: seriesTable.id
+  },
+  {
+    from: seriesTable.$name,
+    to: userSeriesTable.$name,
+    left: seriesTable.id,
+    right: userSeriesTable.seriesId
   }
 ];

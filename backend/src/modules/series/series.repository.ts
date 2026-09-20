@@ -10,7 +10,7 @@ import {
   seriesGenreTable,
   seriesNetworkTable,
   seriesPeopleTable
-} from "@/shared/db/constants/aggregateTables.js";
+} from "@/shared/db/constants/queryTables.js";
 
 export const seriesSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery<typeof db.series>(db.series, "SERIES_NOT_FOUND");

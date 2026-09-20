@@ -1,5 +1,5 @@
 import { Prisma } from "@/generated/prisma/client.js";
-import type { Column, Table } from "@/shared/db/types/aggregate.types.js";
+import type { Column, Table } from "@/shared/db/types/relationalQuery.types.js";
 
 export function identifier(name: string): Prisma.Sql {
   return Prisma.raw(`"${name.replaceAll('"', '""')}"`);
@@ -14,7 +14,8 @@ export function defineTable<TRow extends object>(
     fields.map((field) => [
       field,
       {
-        sql: Prisma.sql`${identifier(alias)}.${identifier(field)}`
+        sql: Prisma.sql`${identifier(alias)}.${identifier(field)}`,
+        decode: (value: unknown) => value
       }
     ])
   );
@@ -22,7 +23,8 @@ export function defineTable<TRow extends object>(
   return {
     ...columns,
     $name: name,
-    $from: Prisma.sql`${identifier(name)} AS ${identifier(alias)}`
+    $from: Prisma.sql`${identifier(name)} AS ${identifier(alias)}`,
+    $columns: fields
   } as Table<TRow>;
 }
 
