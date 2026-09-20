@@ -30,29 +30,29 @@ Feature: POST /api/user/series/:seriesId/season/:seasonId
             | emptySeason        | 11 | @series.releaseSeries      | 4            |
 
         And the database with these episodes:
-            | key                  | id | seriesId                   | seasonId                    | seasonNumber | episodeNumber | airDate                  |
-            | addedSeasonFirst     | 1  | @series.addedSeries        | @seasons.addedSeason        | 1            | 1             | 2026-01-01T00:00:00.000Z |
-            | addedSeasonSecond    | 2  | @series.addedSeries        | @seasons.addedSeason        | 1            | 2             | 2026-01-10T00:00:00.000Z |
-            | addedSeasonUpcoming  | 3  | @series.addedSeries        | @seasons.addedSeason        | 1            | 3             | 2026-02-03T00:00:00.000Z |
-            | notAddedSeasonFirst  | 4  | @series.notAddedSeries     | @seasons.notAddedSeason     | 1            | 1             | 2026-01-15T00:00:00.000Z |
-            | notAddedSeasonSecond | 5  | @series.notAddedSeries     | @seasons.notAddedSeason     | 1            | 2             | 2026-01-20T00:00:00.000Z |
-            | specialEpisode       | 6  | @series.specialSeries      | @seasons.specialSeason      | 0            | 1             | 2026-01-20T00:00:00.000Z |
-            | alreadyAddedFirst    | 7  | @series.alreadyAddedSeries | @seasons.alreadyAddedSeason | 1            | 1             | 2026-01-01T00:00:00.000Z |
-            | alreadyAddedSecond   | 8  | @series.alreadyAddedSeries | @seasons.alreadyAddedSeason | 1            | 2             | 2026-01-10T00:00:00.000Z |
-            | addedSpecialEpisode  | 9  | @series.addedSeries        | @seasons.addedSpecialSeason | 0            | 1             | 2026-01-25T00:00:00.000Z |
-            | pausedFinalEpisode   | 10 | @series.pausedSeries       | @seasons.pausedSeason       | 1            | 1             | 2026-01-25T00:00:00.000Z |
-            | watchedWatching      | 11 | @series.watchingSeries     | @seasons.watchingSeason     | 1            | 1             | 2026-01-20T00:00:00.000Z |
-            | newWatching          | 12 | @series.watchingSeries     | @seasons.watchingSeason     | 1            | 2             | 2026-01-25T00:00:00.000Z |
-            | futureWatching       | 13 | @series.watchingSeries     | @seasons.watchingSeason     | 1            | 3             | 2026-02-03T00:00:00.000Z |
-            | todaysEpisode        | 14 | @series.releaseSeries      | @seasons.todaySeason        | 1            | 1             | 2026-02-01T23:59:59.999Z |
-            | tomorrowEpisode      | 15 | @series.releaseSeries      | @seasons.futureSeason       | 2            | 1             | 2026-02-02T00:00:00.000Z |
-            | undatedEpisode       | 16 | @series.releaseSeries      | @seasons.undatedSeason      | 3            | 1             |                          |
+            | key                  | id | seriesId                   | seasonId                    | seasonNumber | airDate                  |
+            | addedSeasonFirst     | 1  | @series.addedSeries        | @seasons.addedSeason        | 1            | 2026-01-01T00:00:00.000Z |
+            | addedSeasonSecond    | 2  | @series.addedSeries        | @seasons.addedSeason        | 1            | 2026-01-10T00:00:00.000Z |
+            | addedSeasonUpcoming  | 3  | @series.addedSeries        | @seasons.addedSeason        | 1            | 2026-02-03T00:00:00.000Z |
+            | notAddedSeasonFirst  | 4  | @series.notAddedSeries     | @seasons.notAddedSeason     | 1            | 2026-01-15T00:00:00.000Z |
+            | notAddedSeasonSecond | 5  | @series.notAddedSeries     | @seasons.notAddedSeason     | 1            | 2026-01-20T00:00:00.000Z |
+            | specialEpisode       | 6  | @series.specialSeries      | @seasons.specialSeason      | 0            | 2026-01-20T00:00:00.000Z |
+            | alreadyAddedFirst    | 7  | @series.alreadyAddedSeries | @seasons.alreadyAddedSeason | 1            | 2026-01-01T00:00:00.000Z |
+            | alreadyAddedSecond   | 8  | @series.alreadyAddedSeries | @seasons.alreadyAddedSeason | 1            | 2026-01-10T00:00:00.000Z |
+            | addedSpecialEpisode  | 9  | @series.addedSeries        | @seasons.addedSpecialSeason | 0            | 2026-01-25T00:00:00.000Z |
+            | pausedFinalEpisode   | 10 | @series.pausedSeries       | @seasons.pausedSeason       | 1            | 2026-01-25T00:00:00.000Z |
+            | watchedWatching      | 11 | @series.watchingSeries     | @seasons.watchingSeason     | 1            | 2026-01-20T00:00:00.000Z |
+            | newWatching          | 12 | @series.watchingSeries     | @seasons.watchingSeason     | 1            | 2026-01-25T00:00:00.000Z |
+            | futureWatching       | 13 | @series.watchingSeries     | @seasons.watchingSeason     | 1            | 2026-02-03T00:00:00.000Z |
+            | todaysEpisode        | 14 | @series.releaseSeries      | @seasons.todaySeason        | 1            | 2026-02-01T23:59:59.999Z |
+            | tomorrowEpisode      | 15 | @series.releaseSeries      | @seasons.futureSeason       | 2            | 2026-02-02T00:00:00.000Z |
+            | undatedEpisode       | 16 | @series.releaseSeries      | @seasons.undatedSeason      | 3            |                          |
 
         And the database with these user series:
-            | userId | seriesId                   | lastWatchedAt            | status    | watchCount | watchedEpisodeCount |
-            | user-1 | @series.addedSeries        | 2026-01-05T00:00:00.000Z | DROPPED   | 1          | 1                   |
-            | user-1 | @series.alreadyAddedSeries | 2026-01-10T00:00:00.000Z | COMPLETED | 2          | 2                   |
-            | user-1 | @series.watchingSeries     | 2026-01-20T00:00:00.000Z | WATCHING  | 1          | 1                   |
+            | userId | seriesId                   | status    | watchCount | watchedEpisodeCount |
+            | user-1 | @series.addedSeries        | DROPPED   | 1          | 1                   |
+            | user-1 | @series.alreadyAddedSeries | COMPLETED | 2          | 2                   |
+            | user-1 | @series.watchingSeries     | WATCHING  | 1          | 1                   |
 
         And the database with these user episodes:
             | key           | userId | episodeId                    | watchedAt                |

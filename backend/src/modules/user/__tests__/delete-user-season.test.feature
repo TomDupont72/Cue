@@ -35,29 +35,29 @@ Feature: DELETE /api/user/series/:seriesId/season/:seasonId
             | emptySeason        | 15 | @series.notWatchedSeries    | 2            |
 
         And the database with these episodes:
-            | key                    | id | seriesId                    | seasonId                     | seasonNumber | episodeNumber |
-            | completedDeletedFirst  | 1  | @series.completedSeries     | @seasons.completedDeleted    | 1            | 1             |
-            | completedDeletedSecond | 2  | @series.completedSeries     | @seasons.completedDeleted    | 1            | 2             |
-            | completedRemaining     | 3  | @series.completedSeries     | @seasons.completedRemaining  | 2            | 1             |
-            | specialEpisode         | 4  | @series.specialSeries       | @seasons.specialSeason       | 0            | 1             |
-            | notWatchedEpisode      | 5  | @series.notWatchedSeries    | @seasons.notWatchedSeason    | 1            | 1             |
-            | untrackedEpisode       | 6  | @series.untrackedSeries     | @seasons.untrackedSeason     | 1            | 1             |
-            | singleFirst            | 7  | @series.singleSeasonSeries  | @seasons.singleSeason        | 1            | 1             |
-            | singleSecond           | 8  | @series.singleSeasonSeries  | @seasons.singleSeason        | 1            | 2             |
-            | pausedDeletedFirst     | 9  | @series.pausedSeries        | @seasons.pausedDeleted       | 1            | 1             |
-            | pausedDeletedSecond    | 10 | @series.pausedSeries        | @seasons.pausedDeleted       | 1            | 2             |
-            | pausedRemaining        | 11 | @series.pausedSeries        | @seasons.pausedRemaining     | 2            | 1             |
-            | watchingOlderFirst     | 12 | @series.watchingSeries      | @seasons.watchingOlder       | 1            | 1             |
-            | watchingOlderSecond    | 13 | @series.watchingSeries      | @seasons.watchingOlder       | 1            | 2             |
-            | watchingLatest         | 14 | @series.watchingSeries      | @seasons.watchingLatest      | 2            | 1             |
-            | watchingNotWatched     | 15 | @series.watchingSeries      | @seasons.watchingLatest      | 2            | 2             |
-            | partialFirst           | 16 | @series.partialSeries       | @seasons.partialSeason       | 1            | 1             |
-            | partialSecond          | 17 | @series.partialSeries       | @seasons.partialSeason       | 1            | 2             |
-            | partialNotWatched      | 18 | @series.partialSeries       | @seasons.partialSeason       | 1            | 3             |
-            | mixedRegular           | 19 | @series.mixedSeries         | @seasons.mixedRegular        | 1            | 1             |
-            | mixedSpecialFirst      | 20 | @series.mixedSeries         | @seasons.mixedSpecial        | 0            | 1             |
-            | mixedSpecialSecond     | 21 | @series.mixedSeries         | @seasons.mixedSpecial        | 0            | 2             |
-            | watchedByOtherUser     | 22 | @series.sharedSeries        | @seasons.sharedSeason        | 1            | 1             |
+            | key                    | id | seriesId                    | seasonId                     | seasonNumber |
+            | completedDeletedFirst  | 1  | @series.completedSeries     | @seasons.completedDeleted    | 1            |
+            | completedDeletedSecond | 2  | @series.completedSeries     | @seasons.completedDeleted    | 1            |
+            | completedRemaining     | 3  | @series.completedSeries     | @seasons.completedRemaining  | 2            |
+            | specialEpisode         | 4  | @series.specialSeries       | @seasons.specialSeason       | 0            |
+            | notWatchedEpisode      | 5  | @series.notWatchedSeries    | @seasons.notWatchedSeason    | 1            |
+            | untrackedEpisode       | 6  | @series.untrackedSeries     | @seasons.untrackedSeason     | 1            |
+            | singleFirst            | 7  | @series.singleSeasonSeries  | @seasons.singleSeason        | 1            |
+            | singleSecond           | 8  | @series.singleSeasonSeries  | @seasons.singleSeason        | 1            |
+            | pausedDeletedFirst     | 9  | @series.pausedSeries        | @seasons.pausedDeleted       | 1            |
+            | pausedDeletedSecond    | 10 | @series.pausedSeries        | @seasons.pausedDeleted       | 1            |
+            | pausedRemaining        | 11 | @series.pausedSeries        | @seasons.pausedRemaining     | 2            |
+            | watchingOlderFirst     | 12 | @series.watchingSeries      | @seasons.watchingOlder       | 1            |
+            | watchingOlderSecond    | 13 | @series.watchingSeries      | @seasons.watchingOlder       | 1            |
+            | watchingLatest         | 14 | @series.watchingSeries      | @seasons.watchingLatest      | 2            |
+            | watchingNotWatched     | 15 | @series.watchingSeries      | @seasons.watchingLatest      | 2            |
+            | partialFirst           | 16 | @series.partialSeries       | @seasons.partialSeason       | 1            |
+            | partialSecond          | 17 | @series.partialSeries       | @seasons.partialSeason       | 1            |
+            | partialNotWatched      | 18 | @series.partialSeries       | @seasons.partialSeason       | 1            |
+            | mixedRegular           | 19 | @series.mixedSeries         | @seasons.mixedRegular        | 1            |
+            | mixedSpecialFirst      | 20 | @series.mixedSeries         | @seasons.mixedSpecial        | 0            |
+            | mixedSpecialSecond     | 21 | @series.mixedSeries         | @seasons.mixedSpecial        | 0            |
+            | watchedByOtherUser     | 22 | @series.sharedSeries        | @seasons.sharedSeason        | 1            |
 
         And the database with these user series:
             | userId | seriesId                    | status    | watchCount | watchedEpisodeCount | lastWatchedAt            |

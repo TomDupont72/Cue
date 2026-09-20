@@ -15,20 +15,20 @@ Feature: DELETE /api/user/series/:seriesId/episode/:episodeId
             | sharedSeries        | 8  | 1                | false        |
 
         And the database with these episodes:
-            | key                | id | seriesId                    | seasonNumber | episodeNumber |
-            | completedFirst     | 1  | @series.completedSeries     | 1            | 1             |
-            | completedLatest    | 2  | @series.completedSeries     | 1            | 2             |
-            | watchedSpecial     | 3  | @series.specialSeries       | 0            | 1             |
-            | untrackedEpisode   | 4  | @series.untrackedSeries     | 1            | 1             |
-            | onlyWatchedEpisode | 5  | @series.singleEpisodeSeries | 1            | 1             |
-            | pausedFirst        | 6  | @series.pausedSeries        | 1            | 1             |
-            | pausedLatest       | 7  | @series.pausedSeries        | 1            | 2             |
-            | watchingFirst      | 8  | @series.watchingSeries      | 1            | 1             |
-            | watchingLatest     | 9  | @series.watchingSeries      | 1            | 2             |
-            | notWatchedEpisode  | 10 | @series.watchingSeries      | 1            | 3             |
-            | mixedRegular       | 11 | @series.mixedSeries         | 1            | 1             |
-            | mixedSpecial       | 12 | @series.mixedSeries         | 0            | 1             |
-            | watchedByOtherUser | 13 | @series.sharedSeries        | 1            | 1             |
+            | key                | id | seriesId                    | seasonNumber |
+            | completedFirst     | 1  | @series.completedSeries     | 1            |
+            | completedLatest    | 2  | @series.completedSeries     | 1            |
+            | watchedSpecial     | 3  | @series.specialSeries       | 0            |
+            | untrackedEpisode   | 4  | @series.untrackedSeries     | 1            |
+            | onlyWatchedEpisode | 5  | @series.singleEpisodeSeries | 1            |
+            | pausedFirst        | 6  | @series.pausedSeries        | 1            |
+            | pausedLatest       | 7  | @series.pausedSeries        | 1            |
+            | watchingFirst      | 8  | @series.watchingSeries      | 1            |
+            | watchingLatest     | 9  | @series.watchingSeries      | 1            |
+            | notWatchedEpisode  | 10 | @series.watchingSeries      | 1            |
+            | mixedRegular       | 11 | @series.mixedSeries         | 1            |
+            | mixedSpecial       | 12 | @series.mixedSeries         | 0            |
+            | watchedByOtherUser | 13 | @series.sharedSeries        | 1            |
 
         And the database with these user series:
             | userId | seriesId                    | status    | watchCount | watchedEpisodeCount | lastWatchedAt            |
@@ -42,18 +42,18 @@ Feature: DELETE /api/user/series/:seriesId/episode/:episodeId
             | user-2 | @series.sharedSeries        | COMPLETED | 1          | 1                   | 2026-01-30T00:00:00.000Z |
 
         And the database with these user episodes:
-            | key                | userId | episodeId                    | watchedAt                |
-            | completedFirst     | user-1 | @episodes.completedFirst     | 2026-01-10T00:00:00.000Z |
-            | completedLatest    | user-1 | @episodes.completedLatest    | 2026-01-20T00:00:00.000Z |
-            | watchedSpecial     | user-1 | @episodes.watchedSpecial     | 2026-01-25T00:00:00.000Z |
-            | onlyWatchedEpisode | user-1 | @episodes.onlyWatchedEpisode | 2026-01-15T00:00:00.000Z |
-            | pausedFirst        | user-1 | @episodes.pausedFirst        | 2026-01-10T00:00:00.000Z |
-            | pausedLatest       | user-1 | @episodes.pausedLatest       | 2026-01-20T00:00:00.000Z |
-            | watchingFirst      | user-1 | @episodes.watchingFirst      | 2026-01-10T00:00:00.000Z |
-            | watchingLatest     | user-1 | @episodes.watchingLatest     | 2026-01-25T00:00:00.000Z |
-            | mixedRegular       | user-1 | @episodes.mixedRegular       | 2026-01-10T00:00:00.000Z |
-            | mixedSpecial       | user-1 | @episodes.mixedSpecial       | 2026-01-25T00:00:00.000Z |
-            | watchedByOtherUser | user-2 | @episodes.watchedByOtherUser | 2026-01-30T00:00:00.000Z |
+            | userId | episodeId                    | watchedAt                |
+            | user-1 | @episodes.completedFirst     | 2026-01-10T00:00:00.000Z |
+            | user-1 | @episodes.completedLatest    | 2026-01-20T00:00:00.000Z |
+            | user-1 | @episodes.watchedSpecial     | 2026-01-25T00:00:00.000Z |
+            | user-1 | @episodes.onlyWatchedEpisode | 2026-01-15T00:00:00.000Z |
+            | user-1 | @episodes.pausedFirst        | 2026-01-10T00:00:00.000Z |
+            | user-1 | @episodes.pausedLatest       | 2026-01-20T00:00:00.000Z |
+            | user-1 | @episodes.watchingFirst      | 2026-01-10T00:00:00.000Z |
+            | user-1 | @episodes.watchingLatest     | 2026-01-25T00:00:00.000Z |
+            | user-1 | @episodes.mixedRegular       | 2026-01-10T00:00:00.000Z |
+            | user-1 | @episodes.mixedSpecial       | 2026-01-25T00:00:00.000Z |
+            | user-2 | @episodes.watchedByOtherUser | 2026-01-30T00:00:00.000Z |
 
     Scenario: Delete user episode - Latest from completed
         When I send a DELETE request to "/api/user/series/1/episode/2"

@@ -15,33 +15,33 @@ Feature: POST /api/user/series/:seriesId/episode/:episodeId
             | alreadyWatched  | 6  | 1                | false        |
 
         And the database with these episodes:
-            | key                   | id | seriesId                | seasonNumber | episodeNumber | airDate                  |
-            | addedEpisode          | 1  | @series.addedSeries     | 1            | 1             | 2026-01-01T00:00:00.000Z |
-            | notAddedEpisode       | 2  | @series.addedSeries     | 1            | 2             | 2026-01-10T00:00:00.000Z |
-            | notAddedSeries        | 3  | @series.notAddedSeries  | 1            | 1             | 2026-01-15T00:00:00.000Z |
-            | specialEpisode        | 4  | @series.notAddedSeries  | 0            | 1             | 2026-01-20T00:00:00.000Z |
-            | newSpecialEpisode     | 5  | @series.addedSeries     | 0            | 1             | 2026-01-25T00:00:00.000Z |
-            | completedFinalEpisode | 6  | @series.completedSeries | 1            | 1             | 2026-01-25T00:00:00.000Z |
-            | pausedFinalEpisode    | 7  | @series.pausedSeries    | 1            | 1             | 2026-01-25T00:00:00.000Z |
-            | watchedEpisode        | 8  | @series.watchingSeries  | 1            | 1             | 2026-01-20T00:00:00.000Z |
-            | newEpisode            | 9  | @series.watchingSeries  | 1            | 2             | 2026-01-25T00:00:00.000Z |
-            | futureWatchingEpisode | 10 | @series.watchingSeries  | 1            | 3             | 2026-02-03T00:00:00.000Z |
-            | alreadyWatchedEpisode | 11 | @series.alreadyWatched  | 1            | 1             | 2026-01-25T00:00:00.000Z |
-            | todaysEpisode         | 12 | @series.notAddedSeries  | 1            | 2             | 2026-02-01T23:59:59.999Z |
-            | futureEpisode         | 13 | @series.notAddedSeries  | 1            | 3             | 2026-02-02T00:00:00.000Z |
-            | undatedEpisode        | 14 | @series.notAddedSeries  | 1            | 4             |                          |
+            | key                   | id | seriesId                | seasonNumber | airDate                  |
+            | addedEpisode          | 1  | @series.addedSeries     | 1            | 2026-01-01T00:00:00.000Z |
+            | notAddedEpisode       | 2  | @series.addedSeries     | 1            | 2026-01-10T00:00:00.000Z |
+            | notAddedSeries        | 3  | @series.notAddedSeries  | 1            | 2026-01-15T00:00:00.000Z |
+            | specialEpisode        | 4  | @series.notAddedSeries  | 0            | 2026-01-20T00:00:00.000Z |
+            | newSpecialEpisode     | 5  | @series.addedSeries     | 0            | 2026-01-25T00:00:00.000Z |
+            | completedFinalEpisode | 6  | @series.completedSeries | 1            | 2026-01-25T00:00:00.000Z |
+            | pausedFinalEpisode    | 7  | @series.pausedSeries    | 1            | 2026-01-25T00:00:00.000Z |
+            | watchedEpisode        | 8  | @series.watchingSeries  | 1            | 2026-01-20T00:00:00.000Z |
+            | newEpisode            | 9  | @series.watchingSeries  | 1            | 2026-01-25T00:00:00.000Z |
+            | futureWatchingEpisode | 10 | @series.watchingSeries  | 1            | 2026-02-03T00:00:00.000Z |
+            | alreadyWatchedEpisode | 11 | @series.alreadyWatched  | 1            | 2026-01-25T00:00:00.000Z |
+            | todaysEpisode         | 12 | @series.notAddedSeries  | 1            | 2026-02-01T23:59:59.999Z |
+            | futureEpisode         | 13 | @series.notAddedSeries  | 1            | 2026-02-02T00:00:00.000Z |
+            | undatedEpisode        | 14 | @series.notAddedSeries  | 1            |                          |
 
         And the database with these user series:
-            | userId | seriesId               | lastWatchedAt            | status    | watchCount | watchedEpisodeCount |
-            | user-1 | @series.addedSeries    | 2026-01-05T00:00:00.000Z | DROPPED   | 1          | 1                   |
-            | user-1 | @series.watchingSeries | 2026-01-20T00:00:00.000Z | WATCHING  | 1          | 1                   |
-            | user-1 | @series.alreadyWatched | 2026-01-25T00:00:00.000Z | COMPLETED | 1          | 1                   |
+            | userId | seriesId               | status    | watchCount | watchedEpisodeCount |
+            | user-1 | @series.addedSeries    | DROPPED   | 1          | 1                   |
+            | user-1 | @series.watchingSeries | WATCHING  | 1          | 1                   |
+            | user-1 | @series.alreadyWatched | COMPLETED | 1          | 1                   |
 
         And the database with these user episodes:
-            | key     | userId | episodeId                       | watchedAt                |
-            | existed | user-1 | @episodes.addedEpisode          | 2026-02-01T00:00:00.000Z |
-            |         | user-1 | @episodes.watchedEpisode        | 2026-01-20T00:00:00.000Z |
-            | watched | user-1 | @episodes.alreadyWatchedEpisode | 2026-01-25T00:00:00.000Z |
+            | key     | userId | episodeId                       |
+            | existed | user-1 | @episodes.addedEpisode          |
+            |         | user-1 | @episodes.watchedEpisode        |
+            | watched | user-1 | @episodes.alreadyWatchedEpisode |
 
     Scenario: Post user episode
         When I send a POST request to "/api/user/series/1/episode/2"

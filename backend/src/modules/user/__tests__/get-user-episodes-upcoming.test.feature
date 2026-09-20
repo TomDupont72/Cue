@@ -12,13 +12,13 @@ Feature: GET /api/user/episodes/upcoming
             | ignoredSeries | 3  | Ignored series | /ignored-series.jpg |
 
         And the database with these episodes:
-            | key   | id | seriesId              | episodeNumber | airDate                  |
-            |       | 1  | @series.firstSeries   | 1             | 2026-01-01T00:00:00.000Z |
-            | first | 2  | @series.firstSeries   | 2             | 2026-01-15T00:00:00.000Z |
-            |       | 3  | @series.firstSeries   | 3             | 2026-01-25T00:00:00.000Z |
-            | last  | 4  | @series.lastSeries    | 1             | 2026-01-20T00:00:00.000Z |
-            |       | 5  | @series.firstSeries   | 4             | null                     |
-            |       | 6  | @series.ignoredSeries | 1             | 2026-01-15T00:00:00.000Z |
+            | key   | id | seriesId              | airDate                  |
+            |       | 1  | @series.firstSeries   | 2026-01-01T00:00:00.000Z |
+            | first | 2  | @series.firstSeries   | 2026-01-15T00:00:00.000Z |
+            |       | 3  | @series.firstSeries   | 2026-01-25T00:00:00.000Z |
+            | last  | 4  | @series.lastSeries    | 2026-01-20T00:00:00.000Z |
+            |       | 5  | @series.firstSeries   | null                     |
+            |       | 6  | @series.ignoredSeries | 2026-01-15T00:00:00.000Z |
 
         And the database with these user series:
             | userId | seriesId              |

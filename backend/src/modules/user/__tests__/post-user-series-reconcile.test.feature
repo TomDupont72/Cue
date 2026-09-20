@@ -17,13 +17,13 @@ Feature: POST /api/user/:userId/series/reconcile
             | completedSeries  | 6  | 1                | false        |
 
         And the database with these episodes:
-            | key               | id | seriesId                 | episodeNumber | airDate                  |
-            | watchingEpisode   | 1  | @series.watchingSeries   | 1             | 2026-01-01T00:00:00.000Z |
-            | pausedEpisode     | 2  | @series.pausedSeries     | 1             | 2026-01-01T00:00:00.000Z |
-            | releasedEpisode   | 3  | @series.pausedSeries     | 2             | 2026-02-01T00:00:00.000Z |
-            | droppedEpisode    | 4  | @series.droppedSeries    | 1             | 2026-01-01T00:00:00.000Z |
-            | unwatchingEpisode | 5  | @series.unwatchingSeries | 1             | 2025-06-01T00:00:00.000Z |
-            | completedEpisode  | 6  | @series.completedSeries  | 1             | 2026-01-01T00:00:00.000Z |
+            | key               | id | seriesId                 |
+            | watchingEpisode   | 1  | @series.watchingSeries   |
+            | pausedEpisode     | 2  | @series.pausedSeries     |
+            | releasedEpisode   | 3  | @series.pausedSeries     |
+            | droppedEpisode    | 4  | @series.droppedSeries    |
+            | unwatchingEpisode | 5  | @series.unwatchingSeries |
+            | completedEpisode  | 6  | @series.completedSeries  |
 
         And the database with these user series:
             | userId | seriesId                 | status    | watchCount | watchedEpisodeCount | lastWatchedAt            |
