@@ -21,11 +21,7 @@ import {
 } from "@/modules/user/user.schemas.js";
 import { episodeSelectQuery } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import {
-  seriesRepository,
-  seriesSelectQuery,
-  seriesUpsertQuery
-} from "@/modules/series/series.repository.js";
+import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { episodeTable } from "@/shared/db/constants/aggregateTables.js";
