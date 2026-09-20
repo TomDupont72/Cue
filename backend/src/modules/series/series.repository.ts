@@ -3,9 +3,33 @@ import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { Prisma } from "@/generated/prisma/client.js";
 import type { SeriesReconcileUpdatedCountRow } from "./series.types.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
+import { InsertQuery } from "@/shared/db/insertQuery.js";
+import { DeleteQuery } from "@/shared/db/deleteQuery.js";
+import { UpsertQuery } from "@/shared/db/upsertQuery.js";
 
 export const seriesSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery<typeof db.series>(db.series, "SERIES_NOT_FOUND");
+
+export const seriesUpsertQuery = (db: PrismaTx = prisma) =>
+  new UpsertQuery<typeof db.series>(db.series);
+
+const seriesGenreInsertQuery = (db: PrismaTx = prisma) =>
+  new InsertQuery<typeof db.seriesGenre>(db.seriesGenre);
+
+const seriesGenreDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery<typeof db.seriesGenre>(db.seriesGenre);
+
+const seriesNetworkInsertQuery = (db: PrismaTx = prisma) =>
+  new InsertQuery<typeof db.seriesNetwork>(db.seriesNetwork);
+
+const seriesNetworkDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery<typeof db.seriesNetwork>(db.seriesNetwork);
+
+const seriesPeopleInsertQuery = (db: PrismaTx = prisma) =>
+  new InsertQuery<typeof db.seriesPeople>(db.seriesPeople);
+
+const seriesPeopleDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery<typeof db.seriesPeople>(db.seriesPeople);
 
 export const seriesRepository = {
   findOne(where: Prisma.SeriesWhereUniqueInput, db: PrismaTx = prisma) {
@@ -25,11 +49,7 @@ export const seriesRepository = {
     data: Prisma.SeriesCreateInput,
     db: PrismaTx = prisma
   ) {
-    return db.series.upsert({
-      where,
-      create: data,
-      update: data
-    });
+    return seriesUpsertQuery(db).where(where).create(data).update(data).first();
   },
 
   async reconcileEpisodeCounts(tmdbIds: number[], releaseCutoff: Date, db: PrismaTx = prisma) {
@@ -69,44 +89,38 @@ export const seriesRepository = {
   },
 
   async addGenres(seriesId: number, genreIds: number[], db: PrismaTx = prisma) {
-    await db.seriesGenre.createMany({
-      data: genreIds.map((genreId) => ({
-        seriesId,
-        genreId
-      })),
-      skipDuplicates: true
-    });
+    await seriesGenreInsertQuery(db)
+      .values(genreIds.map((genreId) => ({ seriesId, genreId })))
+      .skipDuplicates()
+      .execute();
   },
 
   async addNetworks(seriesId: number, networkIds: number[], db: PrismaTx = prisma) {
-    await db.seriesNetwork.createMany({
-      data: networkIds.map((networkId) => ({
-        seriesId,
-        networkId
-      })),
-      skipDuplicates: true
-    });
+    await seriesNetworkInsertQuery(db)
+      .values(networkIds.map((networkId) => ({ seriesId, networkId })))
+      .skipDuplicates()
+      .execute();
   },
 
   async addPeople(seriesId: number, peopleIds: number[], db: PrismaTx = prisma) {
-    await db.seriesPeople.createMany({
-      data: peopleIds.map((peopleId) => ({ seriesId, peopleId })),
-      skipDuplicates: true
-    });
+    await seriesPeopleInsertQuery(db)
+      .values(peopleIds.map((peopleId) => ({ seriesId, peopleId })))
+      .skipDuplicates()
+      .execute();
   },
 
   async replaceGenres(seriesId: number, genreIds: number[], db: PrismaTx = prisma) {
-    await db.seriesGenre.deleteMany({ where: { seriesId } });
+    await seriesGenreDeleteQuery(db).where({ seriesId }).execute();
     return this.addGenres(seriesId, genreIds, db);
   },
 
   async replaceNetworks(seriesId: number, networkIds: number[], db: PrismaTx = prisma) {
-    await db.seriesNetwork.deleteMany({ where: { seriesId } });
+    await seriesNetworkDeleteQuery(db).where({ seriesId }).execute();
     return this.addNetworks(seriesId, networkIds, db);
   },
 
   async replacePeople(seriesId: number, peopleIds: number[], db: PrismaTx = prisma) {
-    await db.seriesPeople.deleteMany({ where: { seriesId } });
+    await seriesPeopleDeleteQuery(db).where({ seriesId }).execute();
     return this.addPeople(seriesId, peopleIds, db);
   }
 };

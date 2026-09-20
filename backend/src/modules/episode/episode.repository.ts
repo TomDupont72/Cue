@@ -3,9 +3,16 @@ import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
+import { DeleteQuery } from "@/shared/db/deleteQuery.js";
 
 export const episodeSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery<typeof db.episode>(db.episode, "EPISODE_NOT_FOUND");
+
+const episodePeopleDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery<typeof db.episodePeople>(db.episodePeople);
+
+const episodeCharacterDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery<typeof db.episodeCharacter>(db.episodeCharacter);
 
 export const episodeRepository = {
   findOne(where: Prisma.EpisodeWhereUniqueInput, db: PrismaTx = prisma) {
@@ -48,7 +55,9 @@ export const episodeRepository = {
     data: Prisma.EpisodePeopleCreateManyInput[],
     db: PrismaTx = prisma
   ) {
-    await db.episodePeople.deleteMany({ where: { episodeId: { in: episodeIds } } });
+    await episodePeopleDeleteQuery(db)
+      .where({ episodeId: { in: episodeIds } })
+      .execute();
     return this.addPeople(data, db);
   },
 
@@ -57,7 +66,9 @@ export const episodeRepository = {
     data: Prisma.EpisodeCharacterCreateManyInput[],
     db: PrismaTx = prisma
   ) {
-    await db.episodeCharacter.deleteMany({ where: { episodeId: { in: episodeIds } } });
+    await episodeCharacterDeleteQuery(db)
+      .where({ episodeId: { in: episodeIds } })
+      .execute();
     return this.addCharacters(data, db);
   }
 };
