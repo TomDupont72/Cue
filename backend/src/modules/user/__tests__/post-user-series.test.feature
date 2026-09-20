@@ -85,7 +85,7 @@ Feature: POST /api/user/series/:seriesId
             | fixture             |
             | @userSeries.updated |
 
-    Scenario: Post user series - Another user
+    Scenario: Post user series - Already added by another user
         Given authentication as "user-2"
 
         When I send a POST request to "/api/user/series/1"

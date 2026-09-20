@@ -3,14 +3,18 @@ import { getColumn } from "@/shared/db/aggregateTables.js";
 import type { Table } from "@/shared/db/types/aggregate.types.js";
 import { PrismaModel, Where } from "@/shared/db/types/query.types.js";
 
-export class Query<TModel extends PrismaModel> {
-  protected conditions: Where<TModel>[] = [];
+export class Query<TModel extends PrismaModel, TWhere extends object = Where<TModel>> {
+  protected conditions: TWhere[] = [];
 
   constructor(protected readonly model: TModel) {}
 
-  where(condition: Where<TModel>): this {
+  where(condition: TWhere): this {
     this.conditions.push(condition);
     return this;
+  }
+
+  protected firstCondition(): TWhere {
+    return this.conditions[0]!;
   }
 
   protected prismaWhere(): Where<TModel> {

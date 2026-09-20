@@ -4,7 +4,8 @@ import {
   userEpisodeSelectQuery,
   userRepository,
   userSeriesAggregateQuery,
-  userSeriesSelectQuery
+  userSeriesSelectQuery,
+  userSeriesUpsertQuery
 } from "@/modules/user/user.repository.js";
 import {
   UserEpisodePostParams,
@@ -86,13 +87,11 @@ export const userService = {
   ) {
     await seriesSelectQuery().where({ id: params.seriesId }).emptyThrow().first();
 
-    const userSeries = await userRepository.upsertSeries(
-      { userId_seriesId: { userId, ...params } },
-      { userId, ...params, ...body, addedAt: now },
-      { ...body }
-    );
-
-    return userSeries;
+    return userSeriesUpsertQuery()
+      .where({ userId_seriesId: { userId, ...params } })
+      .create({ userId, ...params, ...body, addedAt: now })
+      .update(body)
+      .first();
   },
 
   async episodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
