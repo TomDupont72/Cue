@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/feedback/emptyState";
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
 import { Heading } from "@/components/layout/heading";
@@ -7,8 +8,7 @@ import UserDashboardSummaryWidget from "@/features/user/components/userDashboard
 import { UserSeriesSection } from "@/features/user/components/userSeriesSection";
 import { USER_SERIES_STATUS } from "@/features/user/constants/userSeriesStatus";
 import { useUserDashboardSummary } from "@/features/user/hooks/useUserDashboardSummary";
-import { queryKeys } from "@/lib/queryKeys";
-import { useIsFetching } from "@tanstack/react-query";
+import { useUserSeries } from "@/features/user/hooks/useUserSeries";
 import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
@@ -16,12 +16,10 @@ export default function Dashboard() {
 
   const dashboardSummaryQuery = useUserDashboardSummary();
 
-  const initialFetchingCount = useIsFetching({
-    queryKey: queryKeys.userSeries.all,
-    predicate: (query) => query.state.data === undefined
-  });
+  const userSeriesQuery = useUserSeries();
+  const series = userSeriesQuery.data?.series ?? [];
 
-  const isPending = initialFetchingCount > 0 || dashboardSummaryQuery.isPending;
+  const isPending = userSeriesQuery.isPending || dashboardSummaryQuery.isPending;
 
   if (isPending) {
     return <LoadingState />;
@@ -32,6 +30,19 @@ export default function Dashboard() {
       <ErrorState
         error={dashboardSummaryQuery.error}
         onRetry={() => dashboardSummaryQuery.refetch()}
+      />
+    );
+  }
+
+  if (userSeriesQuery.isError) {
+    return <ErrorState error={userSeriesQuery.error} onRetry={() => userSeriesQuery.refetch()} />;
+  }
+
+  if (series.length === 0) {
+    return (
+      <EmptyState
+        title={t("series:dashboard.emptySeriesTitle")}
+        description={t("series:dashboard.emptySeriesDescription")}
       />
     );
   }
@@ -53,9 +64,12 @@ export default function Dashboard() {
         <Heading level={1} className="uppercase">
           {t("user:series.mySeries")}
         </Heading>
-        <div className={isPending ? "hidden" : "flex flex-col gap-4"}>
+        <div className="flex flex-col gap-4">
           {Object.values(USER_SERIES_STATUS).map((status) => (
-            <UserSeriesSection key={status} status={status} />
+            <UserSeriesSection
+              key={status}
+              series={series.filter((serie) => serie.status === status)}
+            />
           ))}
         </div>
       </PageSection>

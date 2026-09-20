@@ -36,11 +36,9 @@ export type UserSeasonPostResponse = UserEpisodeRow[];
 export type UserSeasonDeleteResponse = UserEpisodeRow[];
 
 export type UserSeriesGetResponse = {
-  items: (UserSeriesRow & {
+  series: (UserSeriesRow & {
     seriesDetails: SeriesRow;
   })[];
-  hasNextPage: boolean;
-  nextCursor: string | null;
 };
 
 export type UserSeriesPostResponse = UserSeriesRow;
@@ -87,3 +85,5 @@ export type WatchSectionItem = Omit<
   seriesName: string;
   seriesBackdropPath: string | null;
 };
+
+export type SeriesSectionItem = UserSeriesRow & { seriesDetails: SeriesRow };

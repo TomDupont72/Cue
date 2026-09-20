@@ -5,7 +5,7 @@ import { getWatchProgress } from "@/features/user/utils/watchProgress";
 
 type SeriesDisplayProps = {
   series: SeriesDisplaySeries[];
-  userSeries?: UserSeriesGetResponse["items"];
+  userSeries?: UserSeriesGetResponse["series"];
 };
 
 export default function SeriesDisplay({ series, userSeries = [] }: SeriesDisplayProps) {

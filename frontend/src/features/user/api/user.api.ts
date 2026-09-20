@@ -19,21 +19,10 @@ import type {
   UserSeriesGetResponse,
   UserSeriesPostResponse
 } from "@/features/user/types/user.types";
-import { type UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
 
-export function userSeriesGet(
-  limit: number,
-  seriesId?: number,
-  status?: UserSeriesStatus,
-  cursor?: string
-): Promise<UserSeriesGetResponse> {
+export function userSeriesGet(seriesId?: number): Promise<UserSeriesGetResponse> {
   return ApiClient("/user/series", {
-    query: {
-      ...(seriesId && { seriesId }),
-      ...(status && { status }),
-      limit,
-      ...(cursor && { cursor })
-    },
+    query: { seriesId },
     querySchema: userSeriesGetQuerySchema
   });
 }
