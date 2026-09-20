@@ -6,6 +6,11 @@ import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { InsertQuery } from "@/shared/db/insertQuery.js";
 import { DeleteQuery } from "@/shared/db/deleteQuery.js";
 import { UpsertQuery } from "@/shared/db/upsertQuery.js";
+import {
+  seriesGenreTable,
+  seriesNetworkTable,
+  seriesPeopleTable
+} from "@/shared/db/constants/aggregateTables.js";
 
 export const seriesSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery<typeof db.series>(db.series, "SERIES_NOT_FOUND");
@@ -17,19 +22,19 @@ const seriesGenreInsertQuery = (db: PrismaTx = prisma) =>
   new InsertQuery<typeof db.seriesGenre>(db.seriesGenre);
 
 const seriesGenreDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery<typeof db.seriesGenre>(db.seriesGenre);
+  new DeleteQuery(db.seriesGenre, db, seriesGenreTable);
 
 const seriesNetworkInsertQuery = (db: PrismaTx = prisma) =>
   new InsertQuery<typeof db.seriesNetwork>(db.seriesNetwork);
 
 const seriesNetworkDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery<typeof db.seriesNetwork>(db.seriesNetwork);
+  new DeleteQuery(db.seriesNetwork, db, seriesNetworkTable);
 
 const seriesPeopleInsertQuery = (db: PrismaTx = prisma) =>
   new InsertQuery<typeof db.seriesPeople>(db.seriesPeople);
 
 const seriesPeopleDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery<typeof db.seriesPeople>(db.seriesPeople);
+  new DeleteQuery(db.seriesPeople, db, seriesPeopleTable);
 
 export const seriesRepository = {
   findOne(where: Prisma.SeriesWhereUniqueInput, db: PrismaTx = prisma) {

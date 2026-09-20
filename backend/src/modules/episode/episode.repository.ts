@@ -4,15 +4,19 @@ import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 import { DeleteQuery } from "@/shared/db/deleteQuery.js";
+import {
+  episodeCharacterTable,
+  episodePeopleTable
+} from "@/shared/db/constants/aggregateTables.js";
 
 export const episodeSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery<typeof db.episode>(db.episode, "EPISODE_NOT_FOUND");
 
 const episodePeopleDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery<typeof db.episodePeople>(db.episodePeople);
+  new DeleteQuery(db.episodePeople, db, episodePeopleTable);
 
 const episodeCharacterDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery<typeof db.episodeCharacter>(db.episodeCharacter);
+  new DeleteQuery(db.episodeCharacter, db, episodeCharacterTable);
 
 export const episodeRepository = {
   findOne(where: Prisma.EpisodeWhereUniqueInput, db: PrismaTx = prisma) {

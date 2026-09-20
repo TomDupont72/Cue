@@ -1,5 +1,5 @@
 import type { Prisma } from "@/generated/prisma/client.js";
-import type { PrismaModel } from "@/shared/db/types/query.types.js";
+import type { PrismaModel, Row } from "@/shared/db/types/query.types.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -20,6 +20,10 @@ export type UpdateData<T> = NonNullable<Prisma.Args<T, "updateManyAndReturn">["d
 export type InsertData<T> = NonNullable<Prisma.Args<T, "create">["data"]>;
 
 export type InsertManyData<T> = NonNullable<Prisma.Args<T, "createMany">["data"]>;
+
+export type DeleteWhere<T extends MutationModel> = Partial<{
+  [K in keyof Row<T>]: Row<T>[K] | { in: Row<T>[K][] };
+}>;
 
 export type UpsertWhere<T> = NonNullable<Prisma.Args<T, "upsert">["where"]>;
 

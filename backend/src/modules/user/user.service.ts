@@ -1,6 +1,7 @@
 import { prisma } from "@/shared/db/prisma.js";
 import {
   userEpisodeAggregateQuery,
+  userEpisodeDeleteQuery,
   userEpisodeInsertQuery,
   userEpisodeSelectQuery,
   userRepository,
@@ -140,7 +141,7 @@ export const userService = {
         );
 
         if (status !== userSeries.status) {
-          await userSeriesUpdateQuery(tx).where({ userId, seriesId }).set({ status }).all();
+          await userSeriesUpdateQuery(tx).where({ userId, seriesId }).set({ status }).first();
         }
 
         return createdUserEpisode;
@@ -163,28 +164,20 @@ export const userService = {
 
       await userSeriesSelectQuery(tx).where({ userId, seriesId }).emptyThrow().first();
 
-      const [deletedUserEpisode] = await userRepository.deleteEpisodes(userId, [episodeId], tx);
+      const deletedUserEpisode = await userEpisodeDeleteQuery(tx)
+        .where({ userId, episodeId })
+        .first();
 
       if (deletedUserEpisode) {
         const watchCountDecrement = episode.seasonNumber === 0 ? 0 : 1;
 
-        const updatedUserSeries = await userRepository.updateSeries(
-          {
-            userId_seriesId: {
-              userId,
-              seriesId
-            }
-          },
-          {
-            watchCount: {
-              decrement: watchCountDecrement
-            },
-            watchedEpisodeCount: {
-              decrement: 1
-            }
-          },
-          tx
-        );
+        const updatedUserSeries = await userSeriesUpdateQuery(tx)
+          .where({ userId, seriesId })
+          .set({
+            watchCount: { decrement: watchCountDecrement },
+            watchedEpisodeCount: { decrement: 1 }
+          })
+          .first();
 
         const status = getUserSeriesStatus(
           updatedUserSeries.watchedEpisodeCount,
@@ -198,19 +191,10 @@ export const userService = {
           .orderBy({ watchedAt: "desc" })
           .first();
 
-        await userRepository.updateSeries(
-          {
-            userId_seriesId: {
-              userId,
-              seriesId
-            }
-          },
-          {
-            status,
-            lastWatchedAt: latestWatchedEpisode?.watchedAt ?? null
-          },
-          tx
-        );
+        await userSeriesUpdateQuery(tx)
+          .where({ userId, seriesId })
+          .set({ status, lastWatchedAt: latestWatchedEpisode?.watchedAt ?? null })
+          .first();
 
         return deletedUserEpisode;
       }

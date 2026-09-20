@@ -10,6 +10,8 @@ import { userEpisodeTable, userSeriesTable } from "@/shared/db/constants/aggrega
 import { InsertQuery } from "@/shared/db/insertQuery.js";
 import { UpdateQuery } from "@/shared/db/updateQuery.js";
 import { UpsertQuery } from "@/shared/db/upsertQuery.js";
+import { DbNull } from "@prisma/client/runtime/client";
+import { DeleteQuery } from "@/shared/db/deleteQuery.js";
 
 export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery(db.userEpisode, "USER_EPISODE_NOT_FOUND");
@@ -18,6 +20,9 @@ export const userEpisodeAggregateQuery = (db: PrismaTx = prisma) =>
   new AggregateQuery(db.userEpisode, db, userEpisodeTable);
 
 export const userEpisodeInsertQuery = (db: PrismaTx = prisma) => new InsertQuery(db.userEpisode);
+
+export const userEpisodeDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery(db.userEpisode, db, userEpisodeTable);
 
 export const userSeriesSelectQuery = (db: PrismaTx = prisma) =>
   new SelectQuery(db.userSeries, "USER_SERIES_NOT_FOUND");
@@ -283,12 +288,9 @@ export const userRepository = {
       return Promise.resolve<UserEpisode[]>([]);
     }
 
-    return db.$queryRaw<UserEpisode[]>(Prisma.sql`
-      DELETE FROM "UserEpisode"
-      WHERE "userId" = ${userId}
-        AND "episodeId" IN (${Prisma.join(episodeIds)})
-      RETURNING "userId", "episodeId", "watchedAt"
-    `);
+    return userEpisodeDeleteQuery(db)
+      .where({ userId, episodeId: { in: episodeIds } })
+      .all();
   },
 
   async getEpisodesFeed(userId: string, db: PrismaTx = prisma) {

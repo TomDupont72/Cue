@@ -10,6 +10,16 @@ export class UpdateQuery<TModel extends MutationModel> extends Query<TModel> {
     return this;
   }
 
+  async first(): Promise<Row<TModel>> {
+    const [row] = (await this.model.updateManyAndReturn({
+      where: this.prismaWhere(),
+      data: this.data,
+      limit: 1
+    })) as Row<TModel>[];
+
+    return row!;
+  }
+
   all(): Promise<Row<TModel>[]> {
     return this.model.updateManyAndReturn({
       where: this.prismaWhere(),

@@ -3,6 +3,10 @@ import { getColumn } from "@/shared/db/aggregateTables.js";
 import type { Table } from "@/shared/db/types/aggregate.types.js";
 import { PrismaModel, Where } from "@/shared/db/types/query.types.js";
 
+function isInFilter(value: unknown): value is { in: unknown[] } {
+  return typeof value === "object" && value !== null && "in" in value && Array.isArray(value.in);
+}
+
 export class Query<TModel extends PrismaModel, TWhere extends object = Where<TModel>> {
   protected conditions: TWhere[] = [];
 
@@ -28,8 +32,18 @@ export class Query<TModel extends PrismaModel, TWhere extends object = Where<TMo
       for (const [field, value] of Object.entries(condition)) {
         const column = getColumn(table, field);
 
+        if (value === undefined) {
+          continue;
+        }
+
         if (value === null) {
           predicates.push(Prisma.sql`${column.sql} IS NULL`);
+        } else if (isInFilter(value)) {
+          predicates.push(
+            value.in.length === 0
+              ? Prisma.sql`FALSE`
+              : Prisma.sql`${column.sql} IN (${Prisma.join(value.in)})`
+          );
         } else {
           predicates.push(Prisma.sql`${column.sql} = ${value}`);
         }
