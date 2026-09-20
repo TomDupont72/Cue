@@ -12,25 +12,22 @@ import { UpdateQuery } from "@/shared/db/updateQuery.js";
 import { UpsertQuery } from "@/shared/db/upsertQuery.js";
 
 export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
-  new SelectQuery<typeof db.userEpisode>(db.userEpisode, "USER_EPISODE_NOT_FOUND");
+  new SelectQuery(db.userEpisode, "USER_EPISODE_NOT_FOUND");
 
 export const userEpisodeAggregateQuery = (db: PrismaTx = prisma) =>
   new AggregateQuery(db.userEpisode, db, userEpisodeTable);
 
+export const userEpisodeInsertQuery = (db: PrismaTx = prisma) => new InsertQuery(db.userEpisode);
+
 export const userSeriesSelectQuery = (db: PrismaTx = prisma) =>
-  new SelectQuery<typeof db.userSeries>(db.userSeries, "USER_SERIES_NOT_FOUND");
+  new SelectQuery(db.userSeries, "USER_SERIES_NOT_FOUND");
 
 export const userSeriesAggregateQuery = (db: PrismaTx = prisma) =>
   new AggregateQuery(db.userSeries, db, userSeriesTable);
 
-export const userEpisodeInsertQuery = (db: PrismaTx = prisma) =>
-  new InsertQuery<typeof db.userEpisode>(db.userEpisode);
+export const userSeriesUpdateQuery = (db: PrismaTx = prisma) => new UpdateQuery(db.userSeries);
 
-export const userSeriesUpdateQuery = (db: PrismaTx = prisma) =>
-  new UpdateQuery<typeof db.userSeries>(db.userSeries);
-
-export const userSeriesUpsertQuery = (db: PrismaTx = prisma) =>
-  new UpsertQuery<typeof db.userSeries>(db.userSeries);
+export const userSeriesUpsertQuery = (db: PrismaTx = prisma) => new UpsertQuery(db.userSeries);
 
 function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: number) {
   const seriesFilter =

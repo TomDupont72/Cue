@@ -1,10 +1,12 @@
 import { prisma } from "@/shared/db/prisma.js";
 import {
   userEpisodeAggregateQuery,
+  userEpisodeInsertQuery,
   userEpisodeSelectQuery,
   userRepository,
   userSeriesAggregateQuery,
   userSeriesSelectQuery,
+  userSeriesUpdateQuery,
   userSeriesUpsertQuery
 } from "@/modules/user/user.repository.js";
 import {
@@ -19,7 +21,11 @@ import {
 } from "@/modules/user/user.schemas.js";
 import { episodeSelectQuery } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import { seriesRepository, seriesSelectQuery } from "@/modules/series/series.repository.js";
+import {
+  seriesRepository,
+  seriesSelectQuery,
+  seriesUpsertQuery
+} from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { episodeTable } from "@/shared/db/constants/aggregateTables.js";
@@ -106,39 +112,29 @@ export const userService = {
         .emptyThrow()
         .first();
 
-      const [createdUserEpisode] = await userRepository.createManyEpisodes(
-        [{ userId, episodeId, watchedAt: now }],
-        tx
-      );
+      const createdUserEpisode = await userEpisodeInsertQuery(tx)
+        .value({ userId, episodeId, watchedAt: now })
+        .skipDuplicates()
+        .first();
 
       if (createdUserEpisode) {
         const watchCountIncrement = episode.seasonNumber === 0 ? 0 : 1;
 
-        const userSeries = await userRepository.upsertSeries(
-          {
-            userId_seriesId: {
-              userId,
-              seriesId
-            }
-          },
-          {
+        const userSeries = await userSeriesUpsertQuery(tx)
+          .where({ userId_seriesId: { userId, seriesId } })
+          .create({
             userId,
             seriesId,
             watchCount: watchCountIncrement,
             watchedEpisodeCount: 1,
             lastWatchedAt: now
-          },
-          {
-            watchCount: {
-              increment: watchCountIncrement
-            },
-            watchedEpisodeCount: {
-              increment: 1
-            },
+          })
+          .update({
+            watchCount: { increment: watchCountIncrement },
+            watchedEpisodeCount: { increment: 1 },
             lastWatchedAt: now
-          },
-          tx
-        );
+          })
+          .first();
 
         const status = getUserSeriesStatus(
           userSeries.watchedEpisodeCount,
@@ -148,21 +144,10 @@ export const userService = {
         );
 
         if (status !== userSeries.status) {
-          await userRepository.updateSeries(
-            {
-              userId_seriesId: {
-                userId,
-                seriesId
-              }
-            },
-            { status },
-            tx
-          );
+          await userSeriesUpdateQuery(tx).where({ userId, seriesId }).set({ status }).all();
         }
 
-        return {
-          ...createdUserEpisode
-        };
+        return createdUserEpisode;
       }
 
       return userEpisodeSelectQuery(tx).where({ userId, episodeId }).emptyThrow().first();

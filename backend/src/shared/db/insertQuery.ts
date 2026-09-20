@@ -5,7 +5,7 @@ import type {
   MutationModel
 } from "@/shared/db/types/mutationQuery.types.js";
 
-export class InsertQuery<TModel extends MutationModel> {
+export class InsertQuery<TModel extends MutationModel, TSkipDuplicates extends boolean = false> {
   private data!: InsertData<TModel>;
   private manyData!: InsertManyData<TModel>;
   private skipDuplicatesEnabled = false;
@@ -22,13 +22,26 @@ export class InsertQuery<TModel extends MutationModel> {
     return this;
   }
 
-  skipDuplicates(enabled = true): this {
+  skipDuplicates<TEnabled extends boolean = true>(
+    enabled: TEnabled = true as TEnabled
+  ): InsertQuery<TModel, TEnabled> {
     this.skipDuplicatesEnabled = enabled;
-    return this;
+    return this as unknown as InsertQuery<TModel, TEnabled>;
   }
 
-  first(): Promise<Row<TModel>> {
-    return this.model.create({ data: this.data }) as Promise<Row<TModel>>;
+  async first(): Promise<true extends TSkipDuplicates ? Row<TModel> | undefined : Row<TModel>> {
+    type Result = true extends TSkipDuplicates ? Row<TModel> | undefined : Row<TModel>;
+
+    if (this.skipDuplicatesEnabled) {
+      const [row] = (await this.model.createManyAndReturn({
+        data: this.data,
+        skipDuplicates: true
+      })) as Row<TModel>[];
+
+      return row as Result;
+    }
+
+    return (await this.model.create({ data: this.data })) as Result;
   }
 
   all(): Promise<Row<TModel>[]> {
