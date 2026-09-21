@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { seriesRowSchema } from "./seriesRows.schemas.js";
-import { userEpisodeRowSchema, userSeriesRowSchema } from "../user/userRows.schemas.js";
-import { seasonRowSchema } from "../season/seasonRows.schemas.js";
-import { episodeRowSchema } from "../episode/episodeRows.schemas.js";
+import { seriesRowSchema } from "./series.db.schemas.js";
+import { userEpisodeRowSchema, userSeriesRowSchema } from "../user/user.db.schemas.js";
+import { seasonRowSchema } from "../season/season.db.schemas.js";
+import { episodeRowSchema } from "../episode/episode.db.schemas.js";
 
 // =============================================================================
 // API RESPONSE SCHEMAS
