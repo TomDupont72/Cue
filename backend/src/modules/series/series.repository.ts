@@ -1,11 +1,11 @@
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { Prisma } from "@/generated/prisma/client.js";
-import type { SeriesReconcileUpdatedCountRow } from "./series.types.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { InsertQuery } from "@/shared/db/insertQuery.js";
 import { DeleteQuery } from "@/shared/db/deleteQuery.js";
 import { UpsertQuery } from "@/shared/db/upsertQuery.js";
+import { UpdateQuery } from "@/shared/db/updateQuery.js";
 import {
   seriesGenreTable,
   seriesNetworkTable,
@@ -17,6 +17,9 @@ export const seriesSelectQuery = (db: PrismaTx = prisma) =>
 
 export const seriesUpsertQuery = (db: PrismaTx = prisma) =>
   new UpsertQuery<typeof db.series>(db.series);
+
+export const seriesUpdateQuery = (db: PrismaTx = prisma) =>
+  new UpdateQuery<typeof db.series>(db.series);
 
 const seriesGenreInsertQuery = (db: PrismaTx = prisma) =>
   new InsertQuery<typeof db.seriesGenre>(db.seriesGenre);
@@ -55,42 +58,6 @@ export const seriesRepository = {
     db: PrismaTx = prisma
   ) {
     return seriesUpsertQuery(db).where(where).create(data).update(data).first();
-  },
-
-  async reconcileEpisodeCounts(tmdbIds: number[], releaseCutoff: Date, db: PrismaTx = prisma) {
-    if (tmdbIds.length === 0) {
-      return 0;
-    }
-
-    const [result] = await db.$queryRaw<SeriesReconcileUpdatedCountRow[]>(Prisma.sql`
-      WITH episode_counts AS (
-        SELECT
-          s.id,
-          COUNT(e.id)::int AS "numberOfEpisodes"
-        FROM "Series" s
-        LEFT JOIN "Episode" e
-          ON e."seriesId" = s.id
-          AND e."seasonNumber" <> 0
-          AND e."airDate" IS NOT NULL
-          AND e."airDate" < ${releaseCutoff}
-        WHERE s."tmdbId" IN (${Prisma.join(tmdbIds)})
-        GROUP BY s.id
-      ),
-      updated_series AS (
-        UPDATE "Series" s
-        SET
-          "numberOfEpisodes" = episode_counts."numberOfEpisodes",
-          "updatedAt" = CURRENT_TIMESTAMP
-        FROM episode_counts
-        WHERE s.id = episode_counts.id
-          AND s."numberOfEpisodes" IS DISTINCT FROM episode_counts."numberOfEpisodes"
-        RETURNING s.id
-      )
-      SELECT COUNT(*)::int AS "updatedCount"
-      FROM updated_series
-    `);
-
-    return result?.updatedCount ?? 0;
   },
 
   async addGenres(seriesId: number, genreIds: number[], db: PrismaTx = prisma) {

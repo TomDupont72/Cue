@@ -88,6 +88,17 @@ function formatDatabaseRecordIdentity(
     .join(", ");
 }
 
+function withoutAutoUpdatedAt(collection: DatabaseFixtureCollection, row: DatabaseFixtureRecord) {
+  if (collection !== "series" && collection !== "seasons" && collection !== "episodes") {
+    return row;
+  }
+
+  const record = { ...(row as unknown as Record<string, unknown>) };
+  delete record.updatedAt;
+
+  return record;
+}
+
 export class TestDatabase {
   private fixtures: LoadedDatabaseFixtures = createEmptyDatabaseFixtures();
   private databaseBeforeRequest?: DatabaseFixtureState;
@@ -561,8 +572,8 @@ export class TestDatabase {
       };
 
       assert.deepStrictEqual(
-        actual,
-        expected,
+        withoutAutoUpdatedAt(collection, actual),
+        withoutAutoUpdatedAt(collection, expected),
         `Unexpected ${collection} update: ${readableIdentity}`
       );
 

@@ -48,6 +48,16 @@ export function gt<T>(
   };
 }
 
+export function lt<T>(
+  column: Column<T>,
+  value: NonNullable<T> | Operand<NonNullable<T>>
+): Predicate {
+  return {
+    kind: "predicate",
+    sql: Prisma.sql`${column.sql} < ${operandSql(value)}`
+  };
+}
+
 export function asc(column: Column<unknown>): Ordering {
   return {
     sql: Prisma.sql`${column.sql} ASC`

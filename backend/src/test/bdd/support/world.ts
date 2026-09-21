@@ -5,6 +5,7 @@ import { TmdbDouble } from "@/test/bdd/doubles/tmdb.double.js";
 import { createTestGuards, TestIdentity } from "@/test/bdd/support/test-guards.js";
 import { TestDatabase } from "@/test/bdd/support/test-database.js";
 import type { DatabaseFixtureCollection } from "@/test/bdd/data/database/database-fixture.schemas.js";
+import { seriesService } from "@/modules/series/series.service.js";
 import { userService } from "@/modules/user/user.service.js";
 import { buildApp, type AppInstance } from "@/app.js";
 
@@ -117,6 +118,7 @@ export class ApiWorld extends World {
         const seasonPost = userService.seasonPost.bind(userService);
         const seriesPost = userService.seriesPost.bind(userService);
         const seriesReconcilePost = userService.seriesReconcilePost.bind(userService);
+        const reconcileEpisodesAtCurrentDate = seriesService.reconcilePost.bind(seriesService);
         const getEpisodesAtCurrentDate: typeof userService.episodeUpcomingGet = (userId) =>
           episodeUpcomingGet(userId, currentDate);
         const postEpisodeAtCurrentDate: typeof userService.episodePost = (userId, params) =>
@@ -127,12 +129,15 @@ export class ApiWorld extends World {
           seriesPost(userId, params, body, currentDate);
         const reconcileSeriesAtCurrentDate: typeof userService.seriesReconcilePost = (params) =>
           seriesReconcilePost(params, currentDate);
+        const reconcileEpisodesAtFixedDate: typeof seriesService.reconcilePost = (body) =>
+          reconcileEpisodesAtCurrentDate(body, currentDate);
 
         scope.replace(userService, "episodeUpcomingGet", getEpisodesAtCurrentDate);
         scope.replace(userService, "episodePost", postEpisodeAtCurrentDate);
         scope.replace(userService, "seasonPost", postSeasonAtCurrentDate);
         scope.replace(userService, "seriesPost", postSeriesAtCurrentDate);
         scope.replace(userService, "seriesReconcilePost", reconcileSeriesAtCurrentDate);
+        scope.replace(seriesService, "reconcilePost", reconcileEpisodesAtFixedDate);
       }
 
       if (this.authenticatedUserId !== undefined) {
