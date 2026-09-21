@@ -1,6 +1,7 @@
 import { Given, Then, When, type DataTable } from "@cucumber/cucumber";
 import {
   assertResponseArrayAtPath,
+  assertResponseArrayContainsFixtures,
   assertResponseArrayMatchesFixtures,
   assertResponseBodyExact,
   assertResponseBodyMatchesFixture,
@@ -188,6 +189,17 @@ Then(
   "the response array at {string} should exactly match these fixtures:",
   function (this: ApiWorld, path: string, table: DataTable) {
     assertResponseArrayMatchesFixtures(
+      this.getResponse(),
+      path,
+      buildExpectedFixtures(table.raw(), (reference) => this.getDatabaseFixture(reference))
+    );
+  }
+);
+
+Then(
+  "the response array at {string} should contain exactly these fixtures:",
+  function (this: ApiWorld, path: string, table: DataTable) {
+    assertResponseArrayContainsFixtures(
       this.getResponse(),
       path,
       buildExpectedFixtures(table.raw(), (reference) => this.getDatabaseFixture(reference))
