@@ -1,17 +1,46 @@
 import { z } from "zod";
 import type {
+  Character,
+  EpisodeCharacter,
+  EpisodePeople,
   Episode,
+  Genre,
+  Network,
+  People,
   Season,
   Series,
+  SeriesGenre,
+  SeriesNetwork,
+  SeriesPeople,
   UserEpisode,
   UserSeries
 } from "@/generated/prisma/client.js";
 import { UserSeriesStatus } from "@/generated/prisma/enums.js";
 
 export type DatabaseFixtureCollection =
-  "series" | "seasons" | "episodes" | "userSeries" | "userEpisodes";
+  | "series"
+  | "seasons"
+  | "episodes"
+  | "genres"
+  | "networks"
+  | "people"
+  | "characters"
+  | "seriesGenres"
+  | "seriesNetworks"
+  | "seriesPeople"
+  | "episodePeople"
+  | "episodeCharacters"
+  | "userSeries"
+  | "userEpisodes";
 
-type IdentifiedDatabaseFixtureCollection = "series" | "seasons" | "episodes";
+type IdentifiedDatabaseFixtureCollection =
+  | "series"
+  | "seasons"
+  | "episodes"
+  | "genres"
+  | "networks"
+  | "people"
+  | "characters";
 
 export type DatabaseFixtureRow = Record<string, string>;
 
@@ -21,6 +50,15 @@ export type DatabaseFixtureRecordByCollection = {
   series: Series;
   seasons: Season;
   episodes: Episode;
+  genres: Genre;
+  networks: Network;
+  people: People;
+  characters: Character;
+  seriesGenres: SeriesGenre;
+  seriesNetworks: SeriesNetwork;
+  seriesPeople: SeriesPeople;
+  episodePeople: EpisodePeople;
+  episodeCharacters: EpisodeCharacter;
   userSeries: UserSeries;
   userEpisodes: UserEpisode;
 };
@@ -45,6 +83,15 @@ export const DATABASE_FIXTURE_IDENTITY_FIELDS = {
   series: ["id"],
   seasons: ["id"],
   episodes: ["id"],
+  genres: ["id"],
+  networks: ["id"],
+  people: ["id"],
+  characters: ["id"],
+  seriesGenres: ["seriesId", "genreId"],
+  seriesNetworks: ["seriesId", "networkId"],
+  seriesPeople: ["seriesId", "peopleId"],
+  episodePeople: ["episodeId", "peopleId"],
+  episodeCharacters: ["episodeId", "characterId"],
   userSeries: ["userId", "seriesId"],
   userEpisodes: ["userId", "episodeId"]
 } as const satisfies {
@@ -107,6 +154,16 @@ const nullableStringCellSchema = z.preprocess(
   z.string().nullable()
 );
 
+const nullableBooleanCellSchema = z.preprocess(
+  (value) => (value === "" || value === "null" ? null : value),
+  booleanCellSchema.nullable()
+);
+
+const nullableNumberCellSchema = z.preprocess(
+  (value) => (value === "" || value === "null" ? null : value),
+  numberCellSchema.nullable()
+);
+
 const fixtureReferencePattern = /^@([A-Za-z][A-Za-z0-9_-]*)\.([A-Za-z][A-Za-z0-9_-]*)$/;
 
 export function parseDatabaseFixtureReference(reference: string): {
@@ -133,6 +190,15 @@ function isDatabaseFixtureCollection(value: string): value is DatabaseFixtureCol
     value === "series" ||
     value === "seasons" ||
     value === "episodes" ||
+    value === "genres" ||
+    value === "networks" ||
+    value === "people" ||
+    value === "characters" ||
+    value === "seriesGenres" ||
+    value === "seriesNetworks" ||
+    value === "seriesPeople" ||
+    value === "episodePeople" ||
+    value === "episodeCharacters" ||
     value === "userSeries" ||
     value === "userEpisodes"
   );
@@ -143,6 +209,12 @@ function referenceCellSchema<Collection extends IdentifiedDatabaseFixtureCollect
   references: DatabaseFixtureReferences
 ) {
   return z.string().transform((value, context) => {
+    const numericId = integerCellSchema.safeParse(value);
+
+    if (numericId.success) {
+      return numericId.data;
+    }
+
     const match = fixtureReferencePattern.exec(value);
 
     if (!match) {
@@ -233,6 +305,55 @@ function withEpisodeDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
   };
 }
 
+function withGenreDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
+  return {
+    tmdbId: row.id,
+    name: `Genre ${row.id}`,
+    createdAt: DATABASE_FIXTURE_TIMESTAMP,
+    updatedAt: DATABASE_FIXTURE_TIMESTAMP,
+    ...row
+  };
+}
+
+function withNetworkDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
+  return {
+    tmdbId: row.id,
+    logoPath: "null",
+    name: `Network ${row.id}`,
+    createdAt: DATABASE_FIXTURE_TIMESTAMP,
+    updatedAt: DATABASE_FIXTURE_TIMESTAMP,
+    ...row
+  };
+}
+
+function withPeopleDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
+  return {
+    adult: "null",
+    gender: "0",
+    tmdbId: row.id,
+    knownForDepartment: "null",
+    name: `People ${row.id}`,
+    popularity: "null",
+    profilePath: "null",
+    createdAt: DATABASE_FIXTURE_TIMESTAMP,
+    updatedAt: DATABASE_FIXTURE_TIMESTAMP,
+    ...row
+  };
+}
+
+function withCharacterDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
+  return {
+    name: `Character ${row.id}`,
+    createdAt: DATABASE_FIXTURE_TIMESTAMP,
+    updatedAt: DATABASE_FIXTURE_TIMESTAMP,
+    ...row
+  };
+}
+
+function withoutDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
+  return row;
+}
+
 function withUserSeriesDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
   return {
     status: "PLANNED",
@@ -311,6 +432,60 @@ function createDatabaseFixtureFieldSchemas(
       voteAverage: numberCellSchema,
       createdAt: dateCellSchema,
       updatedAt: dateCellSchema
+    },
+    genres: {
+      id: integerCellSchema,
+      tmdbId: integerCellSchema,
+      name: z.string().min(1),
+      createdAt: dateCellSchema,
+      updatedAt: dateCellSchema
+    },
+    networks: {
+      id: integerCellSchema,
+      tmdbId: integerCellSchema,
+      logoPath: nullableStringCellSchema,
+      name: z.string().min(1),
+      createdAt: dateCellSchema,
+      updatedAt: dateCellSchema
+    },
+    people: {
+      id: integerCellSchema,
+      adult: nullableBooleanCellSchema,
+      gender: integerCellSchema,
+      tmdbId: integerCellSchema,
+      knownForDepartment: nullableStringCellSchema,
+      name: z.string().min(1),
+      popularity: nullableNumberCellSchema,
+      profilePath: nullableStringCellSchema,
+      createdAt: dateCellSchema,
+      updatedAt: dateCellSchema
+    },
+    characters: {
+      id: integerCellSchema,
+      peopleId: referenceCellSchema("people", references),
+      name: z.string().min(1),
+      createdAt: dateCellSchema,
+      updatedAt: dateCellSchema
+    },
+    seriesGenres: {
+      seriesId: referenceCellSchema("series", references),
+      genreId: referenceCellSchema("genres", references)
+    },
+    seriesNetworks: {
+      seriesId: referenceCellSchema("series", references),
+      networkId: referenceCellSchema("networks", references)
+    },
+    seriesPeople: {
+      seriesId: referenceCellSchema("series", references),
+      peopleId: referenceCellSchema("people", references)
+    },
+    episodePeople: {
+      episodeId: referenceCellSchema("episodes", references),
+      peopleId: referenceCellSchema("people", references)
+    },
+    episodeCharacters: {
+      episodeId: referenceCellSchema("episodes", references),
+      characterId: referenceCellSchema("characters", references)
     },
     userSeries: {
       userId: z.string().min(1),
@@ -406,6 +581,15 @@ export function parseDatabaseFixtureRow<Collection extends DatabaseFixtureCollec
     series: createDatabaseFixtureRowSchema(fieldSchemas.series),
     seasons: createDatabaseFixtureRowSchema(fieldSchemas.seasons),
     episodes: createDatabaseFixtureRowSchema(fieldSchemas.episodes),
+    genres: createDatabaseFixtureRowSchema(fieldSchemas.genres),
+    networks: createDatabaseFixtureRowSchema(fieldSchemas.networks),
+    people: createDatabaseFixtureRowSchema(fieldSchemas.people),
+    characters: createDatabaseFixtureRowSchema(fieldSchemas.characters),
+    seriesGenres: createDatabaseFixtureRowSchema(fieldSchemas.seriesGenres),
+    seriesNetworks: createDatabaseFixtureRowSchema(fieldSchemas.seriesNetworks),
+    seriesPeople: createDatabaseFixtureRowSchema(fieldSchemas.seriesPeople),
+    episodePeople: createDatabaseFixtureRowSchema(fieldSchemas.episodePeople),
+    episodeCharacters: createDatabaseFixtureRowSchema(fieldSchemas.episodeCharacters),
     userSeries: createDatabaseFixtureRowSchema(fieldSchemas.userSeries),
     userEpisodes: createDatabaseFixtureRowSchema(fieldSchemas.userEpisodes)
   };
@@ -414,6 +598,15 @@ export function parseDatabaseFixtureRow<Collection extends DatabaseFixtureCollec
     series: withSeriesDefaults,
     seasons: withSeasonDefaults,
     episodes: withEpisodeDefaults,
+    genres: withGenreDefaults,
+    networks: withNetworkDefaults,
+    people: withPeopleDefaults,
+    characters: withCharacterDefaults,
+    seriesGenres: withoutDefaults,
+    seriesNetworks: withoutDefaults,
+    seriesPeople: withoutDefaults,
+    episodePeople: withoutDefaults,
+    episodeCharacters: withoutDefaults,
     userSeries: withUserSeriesDefaults,
     userEpisodes: withUserEpisodeDefaults
   } satisfies Record<DatabaseFixtureCollection, (value: DatabaseFixtureRow) => DatabaseFixtureRow>;

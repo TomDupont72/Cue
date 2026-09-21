@@ -17,6 +17,10 @@ export class ApiWorld extends World {
     collection: DatabaseFixtureCollection;
     rows: Record<string, string>[];
   }> = [];
+  private pendingTmdbResponses: Array<{
+    pathname: string;
+    response: unknown;
+  }> = [];
   private database?: TestDatabase;
 
   app?: AppInstance;
@@ -37,6 +41,10 @@ export class ApiWorld extends World {
 
   addDatabaseFixtures(collection: DatabaseFixtureCollection, rows: Record<string, string>[]) {
     this.pendingDatabaseFixtures.push({ collection, rows });
+  }
+
+  addTmdbResponse(pathname: string, response: unknown) {
+    this.pendingTmdbResponses.push({ pathname, response });
   }
 
   getDatabaseFixture(reference: string) {
@@ -149,6 +157,11 @@ export class ApiWorld extends World {
       }
 
       await database.resetAndSeed(identity.userId);
+
+      for (const response of this.pendingTmdbResponses) {
+        tmdb.respond(response.pathname, response.response);
+      }
+
       tmdb.install(scope);
 
       this.database = database;

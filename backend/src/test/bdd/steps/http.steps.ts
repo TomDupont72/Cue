@@ -26,6 +26,15 @@ const DATABASE_COLLECTIONS = {
   series: "series",
   seasons: "seasons",
   episodes: "episodes",
+  genres: "genres",
+  networks: "networks",
+  people: "people",
+  characters: "characters",
+  "series genres": "seriesGenres",
+  "series networks": "seriesNetworks",
+  "series people": "seriesPeople",
+  "episode people": "episodePeople",
+  "episode characters": "episodeCharacters",
   "user series": "userSeries",
   "user episodes": "userEpisodes"
 } as const satisfies Record<string, DatabaseFixtureCollection>;
@@ -57,7 +66,18 @@ Given("the current date {string}", function (this: ApiWorld, value: string) {
 });
 
 Given(
-  /^the database with these (series|seasons|episodes|user series|user episodes):$/,
+  "TMDB responds to {string} with:",
+  function (this: ApiWorld, pathname: string, response: string) {
+    try {
+      this.addTmdbResponse(pathname, JSON.parse(response));
+    } catch (error) {
+      throw new Error(`Invalid TMDB response for ${pathname}`, { cause: error });
+    }
+  }
+);
+
+Given(
+  /^the database with these (series|seasons|episodes|genres|networks|people|characters|series genres|series networks|series people|episode people|episode characters|user series|user episodes):$/,
   function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     this.addDatabaseFixtures(DATABASE_COLLECTIONS[label], table.hashes());
   }
@@ -133,21 +153,21 @@ Then(
 );
 
 Then(
-  /^the database should have (?:exactly )?these (series|seasons|episodes|user series|user episodes) added:$/,
+  /^the database should have (?:exactly )?these (series|seasons|episodes|genres|networks|people|characters|series genres|series networks|series people|episode people|episode characters|user series|user episodes) added:$/,
   async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     await this.assertAddedDatabaseRows(DATABASE_COLLECTIONS[label], table.hashes());
   }
 );
 
 Then(
-  /^the database should have these (series|seasons|episodes|user series|user episodes) deleted:$/,
+  /^the database should have these (series|seasons|episodes|genres|networks|people|characters|series genres|series networks|series people|episode people|episode characters|user series|user episodes) deleted:$/,
   async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     await this.assertDeletedDatabaseRows(DATABASE_COLLECTIONS[label], table.hashes());
   }
 );
 
 Then(
-  /^the database should have these (series|seasons|episodes|user series|user episodes) fields updated:$/,
+  /^the database should have these (series|seasons|episodes|genres|networks|people|characters|series genres|series networks|series people|episode people|episode characters|user series|user episodes) fields updated:$/,
   async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     await this.assertUpdatedDatabaseFields(DATABASE_COLLECTIONS[label], table.hashes());
   }

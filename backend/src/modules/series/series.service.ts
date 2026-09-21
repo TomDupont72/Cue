@@ -3,21 +3,13 @@ import {
   episodeSelectQuery
 } from "@/modules/episode/episode.repository.js";
 import { seasonsSelectQuery } from "@/modules/season/season.repository.js";
-import {
-  seriesRepository,
-  seriesSelectQuery,
-  seriesUpdateQuery
-} from "@/modules/series/series.repository.js";
+import { seriesSelectQuery, seriesUpdateQuery } from "@/modules/series/series.repository.js";
 import type {
   SeriesGetParams,
   SeriesImportPostBody,
   SeriesReconcilePostBody
 } from "@/modules/series/series.schemas.js";
-import {
-  userEpisodeSelectQuery,
-  userRepository,
-  userSeriesSelectQuery
-} from "@/modules/user/user.repository.js";
+import { userEpisodeSelectQuery, userSeriesSelectQuery } from "@/modules/user/user.repository.js";
 import { syncTmdb } from "@/modules/series/series.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { prisma } from "@/shared/db/prisma.js";
@@ -39,12 +31,10 @@ export const seriesService = {
   },
 
   async importPost(userId: string | null, body: SeriesImportPostBody, forceSync = false) {
-    const existingSeries = await seriesRepository.findOne(body);
+    const existingSeries = await seriesSelectQuery().where(body).first();
     const series = existingSeries && !forceSync ? existingSeries : await syncTmdb(body.tmdbId);
     const userSeries = userId
-      ? await userRepository.findOneSeries({
-          userId_seriesId: { userId, seriesId: series.id }
-        })
+      ? await userSeriesSelectQuery().where({ userId, seriesId: series.id }).first()
       : null;
 
     return { series, userSeries };
