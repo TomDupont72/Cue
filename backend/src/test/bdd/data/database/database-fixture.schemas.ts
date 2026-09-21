@@ -34,13 +34,7 @@ export type DatabaseFixtureCollection =
   | "userEpisodes";
 
 type IdentifiedDatabaseFixtureCollection =
-  | "series"
-  | "seasons"
-  | "episodes"
-  | "genres"
-  | "networks"
-  | "people"
-  | "characters";
+  "series" | "seasons" | "episodes" | "genres" | "networks" | "people" | "characters";
 
 export type DatabaseFixtureRow = Record<string, string>;
 

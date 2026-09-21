@@ -15,7 +15,7 @@ import {
   UserSeriesPostBody,
   UserSeriesPostParams,
   UserEpisodeDeleteParams,
-  UserSeriesGet,
+  UserSeriesGetParams,
   UserSeasonPostParams,
   UserSeasonDeleteParams,
   UserSeriesReconcilePostParams
@@ -38,7 +38,7 @@ import { coalesce, count, countWhere, max, sum } from "@/shared/db/aggregateExpr
 import { asc, dateOnly, eq, gt, ne } from "@/shared/db/queryExpressions.js";
 
 export const userService = {
-  async seriesGet(userId: string, params: UserSeriesGet) {
+  async seriesGet(userId: string, params: UserSeriesGetParams) {
     const { seriesId } = params;
 
     const series = await userSeriesRelationalSelectQuery()

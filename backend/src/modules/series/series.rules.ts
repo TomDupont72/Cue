@@ -7,12 +7,12 @@ import {
   episodeCharacterInsertQuery,
   episodePeopleDeleteQuery,
   episodePeopleInsertQuery,
-  episodeUpsertManyQuery
+  episodeUpsertQuery
 } from "@/modules/episode/episode.repository.js";
-import { genreUpsertManyQuery } from "@/modules/genre/genre.repository.js";
-import { networkUpsertManyQuery } from "@/modules/network/network.repository.js";
-import { peopleUpsertManyQuery } from "@/modules/people/people.repository.js";
-import { seasonUpsertManyQuery } from "@/modules/season/season.repository.js";
+import { genreUpsertQuery } from "@/modules/genre/genre.repository.js";
+import { networkUpsertQuery } from "@/modules/network/network.repository.js";
+import { peopleUpsertQuery } from "@/modules/people/people.repository.js";
+import { seasonUpsertQuery } from "@/modules/season/season.repository.js";
 import {
   seriesGenreDeleteQuery,
   seriesGenreInsertQuery,
@@ -53,21 +53,21 @@ export async function syncTmdb(tmdbId: number) {
         .update(seriesData)
         .first();
 
-      const genres = await genreUpsertManyQuery(tx).values(tmdbSeries.genres).all();
+      const genres = await genreUpsertQuery(tx).values(tmdbSeries.genres).all();
       await seriesGenreDeleteQuery(tx).where({ seriesId: series.id }).execute();
       await seriesGenreInsertQuery(tx)
         .values(genres.map((genre) => ({ seriesId: series.id, genreId: genre.id })))
         .skipDuplicates()
         .execute();
 
-      const networks = await networkUpsertManyQuery(tx).values(tmdbSeries.networks).all();
+      const networks = await networkUpsertQuery(tx).values(tmdbSeries.networks).all();
       await seriesNetworkDeleteQuery(tx).where({ seriesId: series.id }).execute();
       await seriesNetworkInsertQuery(tx)
         .values(networks.map((network) => ({ seriesId: series.id, networkId: network.id })))
         .skipDuplicates()
         .execute();
 
-      const people = await peopleUpsertManyQuery(tx)
+      const people = await peopleUpsertQuery(tx)
         .values(
           getMany<Prisma.PeopleCreateManyInput>(
             { data: tmdbSeries, fields: ["createdBy"] },
@@ -103,7 +103,7 @@ export async function syncTmdb(tmdbId: number) {
         )
         .all();
 
-      const seasons = await seasonUpsertManyQuery(tx)
+      const seasons = await seasonUpsertQuery(tx)
         .values(
           tmdbSeasons.map((season) => ({
             ...dropKeys(season, ["episodes"] as const),
@@ -112,7 +112,7 @@ export async function syncTmdb(tmdbId: number) {
         )
         .all();
 
-      const episodes = await episodeUpsertManyQuery(tx)
+      const episodes = await episodeUpsertQuery(tx)
         .values(
           joinBy(
             { data: tmdbEpisodes, key: "seasonNumber" },

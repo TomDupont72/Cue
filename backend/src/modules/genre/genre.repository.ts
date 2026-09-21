@@ -1,11 +1,10 @@
-import { Prisma, type Genre } from "@/generated/prisma/client.js";
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { UpsertManyQuery } from "@/shared/db/upsertManyQuery.js";
+import { UpsertQuery } from "@/shared/db/upsertQuery.js";
 
-export const genreUpsertManyQuery = (db: PrismaTx = prisma) =>
-  new UpsertManyQuery<Prisma.GenreCreateManyInput, "tmdbId", Genre>({
+export const genreUpsertQuery = (db: PrismaTx = prisma) =>
+  new UpsertQuery<typeof db.genre, Prisma.GenreCreateManyInput, "tmdbId">(db.genre, {
     scalarFields: Prisma.GenreScalarFieldEnum,
-    uniqueBy: "tmdbId",
-    delegate: db.genre
+    uniqueBy: "tmdbId"
   });

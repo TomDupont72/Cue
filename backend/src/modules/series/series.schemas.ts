@@ -1,92 +1,43 @@
 import { z } from "zod";
-import { UserSeriesStatus } from "@/generated/prisma/enums.js";
+import { seriesRowSchema } from "./seriesRows.schemas.js";
+import { userEpisodeRowSchema, userSeriesRowSchema } from "../user/userRows.schemas.js";
+import { seasonRowSchema } from "../season/seasonRows.schemas.js";
+import { episodeRowSchema } from "../episode/episodeRows.schemas.js";
 
-const timestampsResponseShape = {
-  createdAt: z.date(),
-  updatedAt: z.date()
-};
+// =============================================================================
+// API RESPONSE SCHEMAS
+// =============================================================================
 
-export const seriesResponseSchema = z.object({
-  id: z.number().int(),
-  adult: z.boolean(),
-  backdropPath: z.string().nullable(),
-  firstAirDate: z.date().nullable(),
-  tmdbId: z.number().int(),
-  inProduction: z.boolean(),
-  lastAirDate: z.date().nullable(),
-  name: z.string(),
-  numberOfEpisodes: z.number().int(),
-  numberOfSeasons: z.number().int(),
-  originalLanguage: z.string(),
-  originalName: z.string(),
-  overview: z.string().nullable(),
-  popularity: z.number(),
-  posterPath: z.string().nullable(),
-  ...timestampsResponseShape
-});
-
-export const seasonResponseSchema = z.object({
-  id: z.number().int(),
-  seriesId: z.number().int(),
-  airDate: z.date().nullable(),
-  name: z.string(),
-  overview: z.string().nullable(),
-  tmdbId: z.number().int(),
-  posterPath: z.string().nullable(),
-  seasonNumber: z.number().int(),
-  voteAverage: z.number(),
-  ...timestampsResponseShape
-});
-
-export const episodeResponseSchema = z.object({
-  id: z.number().int(),
-  seriesId: z.number().int(),
-  seasonId: z.number().int(),
-  airDate: z.date().nullable(),
-  episodeNumber: z.number().int(),
-  name: z.string(),
-  overview: z.string().nullable(),
-  tmdbId: z.number().int(),
-  stillPath: z.string().nullable(),
-  runtime: z.number().int(),
-  seasonNumber: z.number().int(),
-  voteAverage: z.number(),
-  ...timestampsResponseShape
-});
-
-export const userSeriesResponseSchema = z.object({
-  userId: z.string(),
-  seriesId: z.number().int(),
-  status: z.enum(UserSeriesStatus),
-  isFavorite: z.boolean(),
-  watchCount: z.number().int().nonnegative(),
-  watchedEpisodeCount: z.number().int().nonnegative(),
-  addedAt: z.date(),
-  lastWatchedAt: z.date().nullable()
-});
-
-export const userEpisodeResponseSchema = z.object({
-  userId: z.string(),
-  episodeId: z.number().int(),
-  watchedAt: z.date()
+export const seriesImportPostResponseSchema = z.object({
+  series: seriesRowSchema,
+  userSeries: userSeriesRowSchema.nullable()
 });
 
 export const seriesGetResponseSchema = z.object({
-  series: seriesResponseSchema,
-  seasons: z.array(seasonResponseSchema),
-  episodes: z.array(episodeResponseSchema),
-  userSeries: userSeriesResponseSchema.nullable(),
-  userEpisodes: z.array(userEpisodeResponseSchema)
-});
-
-export const seriesImportPostResponseSchema = z.object({
-  series: seriesResponseSchema,
-  userSeries: userSeriesResponseSchema.nullable()
+  series: seriesRowSchema,
+  seasons: z.array(seasonRowSchema),
+  episodes: z.array(episodeRowSchema),
+  userSeries: userSeriesRowSchema.nullable(),
+  userEpisodes: z.array(userEpisodeRowSchema)
 });
 
 export const seriesImportPostBodySchema = z.object({
   tmdbId: z.number().int().min(1)
 });
+
+export const seriesReconcilePostResponseSchema = z.object({
+  updatedCount: z.number().int().nonnegative()
+});
+
+// =============================================================================
+// API PARAMS SCHEMAS
+// =============================================================================
+
+export type SeriesGetParams = z.infer<typeof seriesGetParamsSchema>;
+
+// =============================================================================
+// API BODY SCHEMAS
+// =============================================================================
 
 export type SeriesImportPostBody = z.infer<typeof seriesImportPostBodySchema>;
 
@@ -94,14 +45,8 @@ export const seriesReconcilePostBodySchema = z.object({
   tmdbIds: z.array(z.number().int().min(1))
 });
 
-export const seriesReconcilePostResponseSchema = z.object({
-  updatedCount: z.number().int().nonnegative()
-});
-
 export type SeriesReconcilePostBody = z.infer<typeof seriesReconcilePostBodySchema>;
 
 export const seriesGetParamsSchema = z.object({
   id: z.coerce.number().int().min(1)
 });
-
-export type SeriesGetParams = z.infer<typeof seriesGetParamsSchema>;

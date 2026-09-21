@@ -1,10 +1,10 @@
-import { Prisma, type Episode } from "@/generated/prisma/client.js";
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
 import { DeleteQuery } from "@/shared/db/deleteQuery.js";
 import { InsertQuery } from "@/shared/db/insertQuery.js";
-import { UpsertManyQuery } from "@/shared/db/upsertManyQuery.js";
+import { UpsertQuery } from "@/shared/db/upsertQuery.js";
 import {
   episodeTable,
   episodeCharacterTable,
@@ -18,11 +18,10 @@ export const episodeSelectQuery = (db: PrismaTx = prisma) =>
 export const episodeRelationalSelectQuery = (db: PrismaTx = prisma) =>
   new RelationalSelectQuery(db.episode, db, episodeTable);
 
-export const episodeUpsertManyQuery = (db: PrismaTx = prisma) =>
-  new UpsertManyQuery<Prisma.EpisodeUncheckedCreateInput, "tmdbId", Episode>({
+export const episodeUpsertQuery = (db: PrismaTx = prisma) =>
+  new UpsertQuery<typeof db.episode, Prisma.EpisodeUncheckedCreateInput, "tmdbId">(db.episode, {
     scalarFields: Prisma.EpisodeScalarFieldEnum,
-    uniqueBy: "tmdbId",
-    delegate: db.episode
+    uniqueBy: "tmdbId"
   });
 
 export const episodePeopleInsertQuery = (db: PrismaTx = prisma) =>

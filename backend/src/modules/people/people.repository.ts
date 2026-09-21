@@ -1,11 +1,10 @@
-import { Prisma, type People } from "@/generated/prisma/client.js";
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { UpsertManyQuery } from "@/shared/db/upsertManyQuery.js";
+import { UpsertQuery } from "@/shared/db/upsertQuery.js";
 
-export const peopleUpsertManyQuery = (db: PrismaTx = prisma) =>
-  new UpsertManyQuery<Prisma.PeopleCreateManyInput, "tmdbId", People>({
+export const peopleUpsertQuery = (db: PrismaTx = prisma) =>
+  new UpsertQuery<typeof db.people, Prisma.PeopleCreateManyInput, "tmdbId">(db.people, {
     scalarFields: Prisma.PeopleScalarFieldEnum,
-    uniqueBy: "tmdbId",
-    delegate: db.people
+    uniqueBy: "tmdbId"
   });
