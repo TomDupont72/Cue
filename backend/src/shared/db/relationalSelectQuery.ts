@@ -50,6 +50,7 @@ export class RelationalSelectQuery<
   private readonly joins: Prisma.Sql[] = [];
   private readonly joinedTables: Set<string>;
   private readonly predicates: Predicate[] = [];
+  private readonly grouping: Column<unknown>[] = [];
   private projection: Projection = {};
   private firstPerSelection?: FirstPer;
   private resultOrdering: Partial<Record<string, SortDirection>> = {};
@@ -113,6 +114,11 @@ export class RelationalSelectQuery<
     return super.where(condition);
   }
 
+  groupBy(...columns: Column<unknown>[]): this {
+    this.grouping.push(...columns);
+    return this;
+  }
+
   firstPer<TValue>(column: Column<TValue>, ordering: readonly Ordering[]): this {
     this.firstPerSelection = {
       partition: column.sql,
@@ -154,6 +160,12 @@ export class RelationalSelectQuery<
     const where = predicates.length
       ? Prisma.sql`WHERE ${Prisma.join(predicates, " AND ")}`
       : Prisma.empty;
+    const groupBy = this.grouping.length
+      ? Prisma.sql`GROUP BY ${Prisma.join(
+          this.grouping.map((column) => column.sql),
+          ", "
+        )}`
+      : Prisma.empty;
     const rowNumber = this.firstPerSelection
       ? Prisma.sql`, ROW_NUMBER() OVER (
           PARTITION BY ${this.firstPerSelection.partition}
@@ -169,6 +181,7 @@ export class RelationalSelectQuery<
       FROM ${this.table.$from}
       ${joins}
       ${where}
+      ${groupBy}
     `;
     const orderBy = this.orderBySql();
     const limitSql = limit === undefined ? Prisma.empty : Prisma.sql`LIMIT ${limit}`;

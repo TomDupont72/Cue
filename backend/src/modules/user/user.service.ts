@@ -28,9 +28,14 @@ import { notFound } from "@/shared/errors/errors.helpers.js";
 import { seriesSelectQuery } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
-import { episodeTable, seriesTable, userSeriesTable } from "@/shared/db/constants/queryTables.js";
-import { coalesce, count, sum } from "@/shared/db/aggregateExpressions.js";
-import { asc, dateOnly, eq, gt } from "@/shared/db/queryExpressions.js";
+import {
+  episodeTable,
+  seriesTable,
+  userEpisodeTable,
+  userSeriesTable
+} from "@/shared/db/constants/queryTables.js";
+import { coalesce, count, countWhere, max, sum } from "@/shared/db/aggregateExpressions.js";
+import { asc, dateOnly, eq, gt, ne } from "@/shared/db/queryExpressions.js";
 
 export const userService = {
   async seriesGet(userId: string, params: UserSeriesGet) {
@@ -346,24 +351,27 @@ export const userService = {
     inactiveSince.setUTCDate(inactiveSince.getUTCDate() - 60);
 
     return prisma.$transaction(async (tx) => {
-      const seriesProgress = await userRepository.getSeriesProgress(params.userId, tx);
+      const seriesProgress = await userEpisodeRelationalSelectQuery(tx)
+        .join(episodeTable)
+        .select({
+          seriesId: episodeTable.seriesId,
+          watchedEpisodeCount: count(),
+          watchCount: countWhere(ne(episodeTable.seasonNumber, 0)),
+          lastWatchedAt: max(userEpisodeTable.watchedAt)
+        })
+        .where({ userId: params.userId })
+        .groupBy(episodeTable.seriesId)
+        .all();
       const progressBySeriesId = new Map(
         seriesProgress.map((progress) => [progress.seriesId, progress])
       );
 
-      const userSeries = await tx.userSeries.findMany({
-        where: {
-          userId: params.userId
-        },
-        include: {
-          series: {
-            select: {
-              numberOfEpisodes: true,
-              inProduction: true
-            }
-          }
-        }
-      });
+      const userSeries = await userSeriesRelationalSelectQuery(tx)
+        .join(seriesTable)
+        .selectAll()
+        .select({ series: seriesTable })
+        .where({ userId: params.userId })
+        .all();
 
       const updates = userSeries.flatMap((item) => {
         const progress = progressBySeriesId.get(item.seriesId);
@@ -395,21 +403,10 @@ export const userService = {
         return !hasChanged
           ? []
           : [
-              userRepository.updateSeries(
-                {
-                  userId_seriesId: {
-                    userId: item.userId,
-                    seriesId: item.seriesId
-                  }
-                },
-                {
-                  watchedEpisodeCount,
-                  watchCount,
-                  lastWatchedAt,
-                  status
-                },
-                tx
-              )
+              userSeriesUpdateQuery(tx)
+                .where({ userId: item.userId, seriesId: item.seriesId })
+                .set({ watchedEpisodeCount, watchCount, lastWatchedAt, status })
+                .execute()
             ];
       });
 

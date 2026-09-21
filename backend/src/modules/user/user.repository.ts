@@ -1,7 +1,7 @@
 import { Prisma, type UserEpisode, type UserSeries } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
-import { EpisodeFeedRow, UserSeriesProgressRow } from "./user.types.js";
+import { EpisodeFeedRow } from "./user.types.js";
 import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { SelectQuery } from "@/shared/db/selectQuery.js";
@@ -205,20 +205,6 @@ export const userRepository = {
     });
   },
 
-  getSeriesProgress(userId: string, db: PrismaTx = prisma) {
-    return db.$queryRaw<UserSeriesProgressRow[]>(Prisma.sql`
-      SELECT
-        e."seriesId",
-        COUNT(*)::int AS "watchedEpisodeCount",
-        (COUNT(*) FILTER (WHERE e."seasonNumber" <> 0))::int AS "watchCount",
-        MAX(ue."watchedAt") AS "lastWatchedAt"
-      FROM "UserEpisode" ue
-      JOIN "Episode" e ON e.id = ue."episodeId"
-      WHERE ue."userId" = ${userId}
-      GROUP BY e."seriesId"
-    `);
-  },
-
   upsertSeries(
     where: Prisma.UserSeriesWhereUniqueInput,
     create: Prisma.UserSeriesUncheckedCreateInput,
@@ -226,17 +212,6 @@ export const userRepository = {
     db: PrismaTx = prisma
   ) {
     return userSeriesUpsertQuery(db).where(where).create(create).update(update).first();
-  },
-
-  updateSeries(
-    where: Prisma.UserSeriesWhereUniqueInput,
-    data: Prisma.UserSeriesUncheckedUpdateInput,
-    db: PrismaTx = prisma
-  ) {
-    return db.userSeries.update({
-      where,
-      data
-    });
   },
 
   async incrementSeriesProgress(

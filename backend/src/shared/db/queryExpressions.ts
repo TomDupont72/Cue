@@ -31,6 +31,13 @@ export function eq<T>(column: Column<T>, value: T | Operand<T>): Predicate {
   };
 }
 
+export function ne<T>(column: Column<T>, value: T | Operand<T>): Predicate {
+  return {
+    kind: "predicate",
+    sql: Prisma.sql`${column.sql} <> ${operandSql(value)}`
+  };
+}
+
 export function gt<T>(
   column: Column<T>,
   value: NonNullable<T> | Operand<NonNullable<T>>
