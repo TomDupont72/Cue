@@ -2,16 +2,19 @@ import { Prisma } from "@/generated/prisma/client.js";
 import { queryRelations } from "@/shared/db/constants/queryTables.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { Query } from "@/shared/db/query.js";
-import { identifier } from "@/shared/db/queryTables.js";
+import { getColumn, identifier } from "@/shared/db/queryTables.js";
 import type {
   Column,
+  Expression,
   Ordering,
   Predicate,
   Projected,
   Projection,
+  ProjectionValue,
   ResultOrder,
   SortDirection,
-  Table
+  Table,
+  TableReference
 } from "@/shared/db/types/relationalQuery.types.js";
 import type { PrismaModel, Where } from "@/shared/db/types/query.types.js";
 
@@ -24,8 +27,19 @@ type FirstPer = {
   ordering: readonly Ordering[];
 };
 
+type CompiledProjection = {
+  outputKey: string;
+  field?: string;
+  sqlAlias: string;
+  expression: Expression<unknown>;
+};
+
 function isPredicate(condition: object): condition is Predicate {
   return "kind" in condition && condition.kind === "predicate";
+}
+
+function isTableReference(value: ProjectionValue): value is TableReference {
+  return "$kind" in value && value.$kind === "table";
 }
 
 export class RelationalSelectQuery<
@@ -128,9 +142,9 @@ export class RelationalSelectQuery<
   }
 
   private toSql(limit?: number): Prisma.Sql {
-    const entries = Object.entries(this.projection);
-    const selectedColumns = entries.map(
-      ([alias, expression]) => Prisma.sql`${expression.sql} AS ${identifier(alias)}`
+    const projection = this.compileProjection();
+    const selectedColumns = projection.map(
+      ({ sqlAlias, expression }) => Prisma.sql`${expression.sql} AS ${identifier(sqlAlias)}`
     );
     const joins = this.joins.length ? Prisma.join(this.joins, " ") : Prisma.empty;
     const predicates = [
@@ -163,7 +177,7 @@ export class RelationalSelectQuery<
       return Prisma.sql`${innerQuery} ${orderBy} ${limitSql}`;
     }
 
-    const outerColumns = entries.map(([alias]) => identifier(alias));
+    const outerColumns = projection.map(({ sqlAlias }) => identifier(sqlAlias));
 
     return Prisma.sql`
       SELECT ${Prisma.join(outerColumns, ", ")}
@@ -189,11 +203,55 @@ export class RelationalSelectQuery<
   }
 
   private decode(row: Record<string, unknown>): QueryResult<TRow, TResult> {
-    return Object.fromEntries(
-      Object.entries(this.projection).map(([alias, expression]) => [
-        alias,
-        expression.decode(row[alias])
-      ])
-    ) as QueryResult<TRow, TResult>;
+    const result: Record<string, unknown> = {};
+
+    for (const { outputKey, field, sqlAlias, expression } of this.compileProjection()) {
+      const value = expression.decode(row[sqlAlias]);
+
+      if (field === undefined) {
+        result[outputKey] = value;
+        continue;
+      }
+
+      const nested = (result[outputKey] ??= {}) as Record<string, unknown>;
+      nested[field] = value;
+    }
+
+    return result as QueryResult<TRow, TResult>;
+  }
+
+  private compileProjection(): CompiledProjection[] {
+    const entries = Object.entries(this.projection);
+    const reservedAliases = new Set([...entries.map(([outputKey]) => outputKey), "__rowNumber"]);
+    const projection: CompiledProjection[] = [];
+
+    for (const [projectionIndex, [outputKey, value]] of entries.entries()) {
+      if (!isTableReference(value)) {
+        projection.push({
+          outputKey,
+          sqlAlias: outputKey,
+          expression: value
+        });
+        continue;
+      }
+
+      for (const [fieldIndex, field] of value.$columns.entries()) {
+        let sqlAlias = `__nested_${projectionIndex}_${fieldIndex}`;
+
+        while (reservedAliases.has(sqlAlias)) {
+          sqlAlias = `_${sqlAlias}`;
+        }
+
+        reservedAliases.add(sqlAlias);
+        projection.push({
+          outputKey,
+          field,
+          sqlAlias,
+          expression: getColumn(value, field)
+        });
+      }
+    }
+
+    return projection;
   }
 }

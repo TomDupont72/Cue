@@ -22,6 +22,7 @@ export function defineTable<TRow extends object>(
 
   return {
     ...columns,
+    $kind: "table",
     $name: name,
     $from: Prisma.sql`${identifier(name)} AS ${identifier(alias)}`,
     $columns: fields

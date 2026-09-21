@@ -36,24 +36,12 @@ export const userService = {
   async seriesGet(userId: string, params: UserSeriesGet) {
     const { seriesId } = params;
 
-    const userSeries = await userSeriesSelectQuery().where({ userId, seriesId }).all();
-
-    const seriesDetails = await seriesSelectQuery()
-      .where({ id: { in: userSeries.map((series) => series.seriesId) } })
+    const series = await userSeriesRelationalSelectQuery()
+      .join(seriesTable)
+      .selectAll()
+      .select({ seriesDetails: seriesTable })
+      .where({ userId, seriesId })
       .all();
-
-    const seriesById = new Map(seriesDetails.map((series) => [series.id, series]));
-
-    const series = userSeries
-      .map((series) => {
-        const seriesDetails = seriesById.get(series.seriesId);
-
-        return {
-          ...series,
-          seriesDetails
-        };
-      })
-      .filter((item) => item !== null);
 
     return {
       series
