@@ -44,7 +44,7 @@ function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: nu
     us."lastWatchedAt",
 
     s.name AS "seriesName",
-    s."posterPath" AS "seriesPosterPath",
+    s."backdropPath" AS "seriesBackdropPath",
     s."tmdbId" AS "seriesTmdbId",
 
     next_episode.id,
