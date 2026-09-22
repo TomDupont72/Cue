@@ -76,6 +76,29 @@ Feature: POST /api/series/import
             }
             """
 
+        And TMDB responds to "/tv/100/watch/providers" with:
+            """
+            {
+              "id": 100,
+              "results": {
+                "FR": {
+                  "buy": [{
+                    "logo_path": "/buy-provider.png",
+                    "provider_id": 40,
+                    "provider_name": "Buy provider",
+                    "display_priority": 2
+                  }],
+                  "flatrate": [{
+                    "logo_path": null,
+                    "provider_id": 41,
+                    "provider_name": "Subscription provider",
+                    "display_priority": 3
+                  }]
+                }
+              }
+            }
+            """
+
         And TMDB responds to "/tv/200" with:
             """
             {
@@ -97,6 +120,14 @@ Feature: POST /api/series/import
               "overview": "Imported overview",
               "popularity": 2,
               "poster_path": null
+            }
+            """
+
+        And TMDB responds to "/tv/200/watch/providers" with:
+            """
+            {
+              "id": 200,
+              "results": {}
             }
             """
 
@@ -147,6 +178,11 @@ Feature: POST /api/series/import
             | key     | id | tmdbId | name    |
             | network | 1  | 20     | Network |
 
+        And the database should have these providers added:
+            | key                  | id | tmdbId | name                  | logoPath          | displayPriority |
+            | buyProvider          | 1  | 40     | Buy provider          | /buy-provider.png | 2               |
+            | subscriptionProvider | 2  | 41     | Subscription provider |                   | 3               |
+
         And the database should have these people added:
             | key       | id | tmdbId | name        |
             | creator   | 1  | 30     | Creator     |
@@ -164,6 +200,11 @@ Feature: POST /api/series/import
         And the database should have these series networks added:
             | seriesId             | networkId         |
             | @series.cachedSeries | @networks.network |
+
+        And the database should have these series providers added:
+            | seriesId             | providerId                      |
+            | @series.cachedSeries | @providers.buyProvider          |
+            | @series.cachedSeries | @providers.subscriptionProvider |
 
         And the database should have these series people added:
             | seriesId             | peopleId        |

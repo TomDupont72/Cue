@@ -28,10 +28,12 @@ const DATABASE_COLLECTIONS = {
   episodes: "episodes",
   genres: "genres",
   networks: "networks",
+  providers: "providers",
   people: "people",
   characters: "characters",
   "series genres": "seriesGenres",
   "series networks": "seriesNetworks",
+  "series providers": "seriesProviders",
   "series people": "seriesPeople",
   "episode people": "episodePeople",
   "episode characters": "episodeCharacters",
@@ -77,7 +79,7 @@ Given(
 );
 
 Given(
-  /^the database with these (series|seasons|episodes|genres|networks|people|characters|series genres|series networks|series people|episode people|episode characters|user series|user episodes):$/,
+  /^the database with these (series|seasons|episodes|genres|networks|providers|people|characters|series genres|series networks|series providers|series people|episode people|episode characters|user series|user episodes):$/,
   function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     this.addDatabaseFixtures(DATABASE_COLLECTIONS[label], table.hashes());
   }
@@ -153,21 +155,21 @@ Then(
 );
 
 Then(
-  /^the database should have (?:exactly )?these (series|seasons|episodes|genres|networks|people|characters|series genres|series networks|series people|episode people|episode characters|user series|user episodes) added:$/,
+  /^the database should have (?:exactly )?these (series|seasons|episodes|genres|networks|providers|people|characters|series genres|series networks|series providers|series people|episode people|episode characters|user series|user episodes) added:$/,
   async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     await this.assertAddedDatabaseRows(DATABASE_COLLECTIONS[label], table.hashes());
   }
 );
 
 Then(
-  /^the database should have these (series|seasons|episodes|genres|networks|people|characters|series genres|series networks|series people|episode people|episode characters|user series|user episodes) deleted:$/,
+  /^the database should have these (series|seasons|episodes|genres|networks|providers|people|characters|series genres|series networks|series providers|series people|episode people|episode characters|user series|user episodes) deleted:$/,
   async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     await this.assertDeletedDatabaseRows(DATABASE_COLLECTIONS[label], table.hashes());
   }
 );
 
 Then(
-  /^the database should have these (series|seasons|episodes|genres|networks|people|characters|series genres|series networks|series people|episode people|episode characters|user series|user episodes) fields updated:$/,
+  /^the database should have these (series|seasons|episodes|genres|networks|providers|people|characters|series genres|series networks|series providers|series people|episode people|episode characters|user series|user episodes) fields updated:$/,
   async function (this: ApiWorld, label: DatabaseCollectionLabel, table: DataTable) {
     await this.assertUpdatedDatabaseFields(DATABASE_COLLECTIONS[label], table.hashes());
   }

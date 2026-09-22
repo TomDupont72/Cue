@@ -48,6 +48,8 @@ const TRUNCATE_DATABASE_SQL = `
     "EpisodeCharacter",
     "EpisodePeople",
     "Character",
+    "SeriesProvider",
+    "Provider",
     "SeriesNetwork",
     "Network",
     "SeriesPeople",
@@ -95,6 +97,7 @@ function withoutAutoUpdatedAt(collection: DatabaseFixtureCollection, row: Databa
     collection !== "episodes" &&
     collection !== "genres" &&
     collection !== "networks" &&
+    collection !== "providers" &&
     collection !== "people" &&
     collection !== "characters"
   ) {
@@ -129,10 +132,12 @@ export class TestDatabase {
       episodes,
       genres,
       networks,
+      providers,
       people,
       characters,
       seriesGenres,
       seriesNetworks,
+      seriesProviders,
       seriesPeople,
       episodePeople,
       episodeCharacters,
@@ -144,10 +149,12 @@ export class TestDatabase {
       prisma.episode.findMany(),
       prisma.genre.findMany(),
       prisma.network.findMany(),
+      prisma.provider.findMany(),
       prisma.people.findMany(),
       prisma.character.findMany(),
       prisma.seriesGenre.findMany(),
       prisma.seriesNetwork.findMany(),
+      prisma.seriesProvider.findMany(),
       prisma.seriesPeople.findMany(),
       prisma.episodePeople.findMany(),
       prisma.episodeCharacter.findMany(),
@@ -161,10 +168,12 @@ export class TestDatabase {
       episodes,
       genres,
       networks,
+      providers,
       people,
       characters,
       seriesGenres,
       seriesNetworks,
+      seriesProviders,
       seriesPeople,
       episodePeople,
       episodeCharacters,
@@ -194,6 +203,9 @@ export class TestDatabase {
       case "networks":
         rows = await prisma.network.findMany();
         break;
+      case "providers":
+        rows = await prisma.provider.findMany();
+        break;
       case "people":
         rows = await prisma.people.findMany();
         break;
@@ -205,6 +217,9 @@ export class TestDatabase {
         break;
       case "seriesNetworks":
         rows = await prisma.seriesNetwork.findMany();
+        break;
+      case "seriesProviders":
+        rows = await prisma.seriesProvider.findMany();
         break;
       case "seriesPeople":
         rows = await prisma.seriesPeople.findMany();
@@ -778,6 +793,10 @@ export class TestDatabase {
         await tx.network.createMany({ data: state.networks });
       }
 
+      if (state.providers.length > 0) {
+        await tx.provider.createMany({ data: state.providers });
+      }
+
       if (state.people.length > 0) {
         await tx.people.createMany({ data: state.people });
       }
@@ -792,6 +811,10 @@ export class TestDatabase {
 
       if (state.seriesNetworks.length > 0) {
         await tx.seriesNetwork.createMany({ data: state.seriesNetworks });
+      }
+
+      if (state.seriesProviders.length > 0) {
+        await tx.seriesProvider.createMany({ data: state.seriesProviders });
       }
 
       if (state.seriesPeople.length > 0) {
@@ -853,6 +876,14 @@ export class TestDatabase {
           MAX(id) IS NOT NULL
         )
         FROM "Network"
+      `;
+      await tx.$queryRaw`
+        SELECT setval(
+          pg_get_serial_sequence('"Provider"', 'id'),
+          COALESCE(MAX(id), 1),
+          MAX(id) IS NOT NULL
+        )
+        FROM "Provider"
       `;
       await tx.$queryRaw`
         SELECT setval(

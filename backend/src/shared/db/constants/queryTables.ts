@@ -1,5 +1,6 @@
 import {
   Prisma,
+  SeriesProvider,
   type Episode,
   type EpisodeCharacter,
   type EpisodePeople,
@@ -64,6 +65,12 @@ export const seriesPeopleTable = defineTable<SeriesPeople>(
   "SeriesPeople",
   "sp",
   Object.values(Prisma.SeriesPeopleScalarFieldEnum)
+);
+
+export const seriesProviderTable = defineTable<SeriesProvider>(
+  "SeriesProvider",
+  "sp",
+  Object.values(Prisma.SeriesProviderScalarFieldEnum)
 );
 
 export const queryRelations = [

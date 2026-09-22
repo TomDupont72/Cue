@@ -96,12 +96,13 @@ model Series {
   popularity       Float
   posterPath       String?
 
-  seasons  Season[]
-  episodes Episode[]
-  genres   SeriesGenre[]
-  peoples  SeriesPeople[]
-  networks SeriesNetwork[]
-  users    UserSeries[]
+  seasons   Season[]
+  episodes  Episode[]
+  genres    SeriesGenre[]
+  peoples   SeriesPeople[]
+  networks  SeriesNetwork[]
+  users     UserSeries[]
+  providers SeriesProvider[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -241,6 +242,29 @@ model Character {
   people People @relation(fields: [peopleId], references: [id], onDelete: Cascade)
 
   @@unique([peopleId, name])
+}
+
+model Provider {
+  id              Int     @id @default(autoincrement())
+  tmdbId          Int     @unique
+  name            String
+  logoPath        String?
+  displayPriority Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  series SeriesProvider[]
+}
+
+model SeriesProvider {
+  seriesId   Int
+  providerId Int
+
+  series   Series   @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@id([seriesId, providerId])
 }
 
 model EpisodePeople {

@@ -20,6 +20,8 @@ import {
   seriesNetworkInsertQuery,
   seriesPeopleDeleteQuery,
   seriesPeopleInsertQuery,
+  seriesProviderDeleteQuery,
+  seriesProviderInsertQuery,
   seriesUpsertQuery
 } from "@/modules/series/series.repository.js";
 import { dropKeys, getMany, joinBy } from "@/shared/utils/object/object.js";
@@ -28,6 +30,8 @@ import type {
   TmdbEpisodeDetailsGuestStar,
   TmdbEpisodeDetailsResponse
 } from "@/external/tmdb/tmdb.types.js";
+import { tvWatchProviders } from "@/external/tmdb/tmdb.tv-watch-providers.js";
+import { providerUpsertQuery } from "@/modules/provider/provider.repository.js";
 
 export async function syncTmdb(tmdbId: number) {
   const tmdbSeries = await tvDetails(tmdbId);
@@ -38,6 +42,11 @@ export async function syncTmdb(tmdbId: number) {
     data: tmdbSeasons,
     fields: ["episodes"]
   });
+  const providersResult = await tvWatchProviders(tmdbId);
+  const providersFR = [
+    ...(providersResult.results.FR?.buy ?? []),
+    ...(providersResult.results.FR?.flatrate ?? [])
+  ];
 
   return prisma.$transaction(
     async (tx) => {
@@ -64,6 +73,13 @@ export async function syncTmdb(tmdbId: number) {
       await seriesNetworkDeleteQuery(tx).where({ seriesId: series.id }).execute();
       await seriesNetworkInsertQuery(tx)
         .values(networks.map((network) => ({ seriesId: series.id, networkId: network.id })))
+        .skipDuplicates()
+        .execute();
+
+      const providers = await providerUpsertQuery(tx).values(providersFR).all();
+      await seriesProviderDeleteQuery(tx).where({ seriesId: series.id }).execute();
+      await seriesProviderInsertQuery(tx)
+        .values(providers.map((provider) => ({ seriesId: series.id, providerId: provider.id })))
         .skipDuplicates()
         .execute();
 
