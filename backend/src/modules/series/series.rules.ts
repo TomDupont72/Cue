@@ -1,7 +1,7 @@
 import { seasonDetails } from "@/external/tmdb/tmdb.season-details.js";
 import { tvDetails } from "@/external/tmdb/tmdb.tv-details.js";
 import { prisma } from "@/shared/db/prisma.js";
-import { characterCreateManyAndFetchQuery } from "@/modules/character/character.repository.js";
+import { characterInsertQuery } from "@/modules/character/character.repository.js";
 import {
   episodeCharacterDeleteQuery,
   episodeCharacterInsertQuery,
@@ -86,7 +86,7 @@ export async function syncTmdb(tmdbId: number) {
         .skipDuplicates()
         .execute();
 
-      const characters = await characterCreateManyAndFetchQuery(tx)
+      const characters = await characterInsertQuery(tx)
         .values(
           joinBy(
             {
@@ -101,6 +101,7 @@ export async function syncTmdb(tmdbId: number) {
             { data: people, key: "tmdbId", value: "id", as: "peopleId" }
           )
         )
+        .skipDuplicates()
         .all();
 
       const seasons = await seasonUpsertQuery(tx)

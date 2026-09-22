@@ -1,16 +1,16 @@
-import { Prisma, type Character } from "@/generated/prisma/client.js";
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { CreateManyAndFetchQuery } from "@/shared/db/createManyAndFetchQuery.js";
+import { InsertQuery } from "@/shared/db/insertQuery.js";
 
-export const characterCreateManyAndFetchQuery = (db: PrismaTx = prisma) =>
-  new CreateManyAndFetchQuery<
+export const characterInsertQuery = (db: PrismaTx = prisma) =>
+  new InsertQuery<
+    typeof db.character,
+    false,
     Prisma.CharacterCreateManyInput,
     Prisma.CharacterCreateManyInput,
-    readonly ["peopleId", "name"],
-    Character
-  >({
+    readonly ["peopleId", "name"]
+  >(db.character, {
     scalarFields: Prisma.CharacterScalarFieldEnum,
-    uniqueBy: ["peopleId", "name"],
-    delegate: db.character
+    uniqueBy: ["peopleId", "name"]
   });

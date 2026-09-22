@@ -7,7 +7,7 @@ export type EpisodeFeedRow = {
   lastWatchedAt: Date | null;
 
   seriesName: string;
-  seriesPosterPath: string | null;
+  seriesBackdropPath: string | null;
   seriesTmdbId: number;
 
   id: number;
