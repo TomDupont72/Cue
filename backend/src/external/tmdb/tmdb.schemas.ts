@@ -156,3 +156,23 @@ export const tmdbTvChangesSchema = z
       total_results: "totalResults"
     })
   );
+
+const tmdbTvWatchProvidersItemSchema = z
+  .object({
+    logo_path: z.string().nullable(),
+    provider_id: z.number(),
+    provider_name: z.string(),
+    display_priority: z.number()
+  })
+  .transform((changes) =>
+    camelCaseKeys(changes, {
+      logo_path: "logoPath",
+      provider_id: "tmdbId",
+      provider_name: "name",
+      display_priority: "displayPriority"
+    })
+  );
+
+export const tmdbTvWatchProvidersSchema = z.object({
+  FR: z.object({ flatrate: z.array(tmdbTvWatchProvidersItemSchema) })
+});
