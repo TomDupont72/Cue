@@ -46,6 +46,7 @@ export const userService = {
       .selectAll()
       .select({ seriesDetails: seriesTable })
       .where({ userId, seriesId })
+      .orderBy({ lastWatchedAt: "desc" })
       .all();
 
     return {

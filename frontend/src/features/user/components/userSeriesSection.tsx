@@ -10,6 +10,10 @@ type UserSeriesSectionProps = {
 export function UserSeriesSection({ series }: UserSeriesSectionProps) {
   const { t } = useTranslation();
 
+  if (series.length === 0) {
+    return null;
+  }
+
   return (
     <section className="flex flex-col gap-4">
       <Heading level={3} className="uppercase">
