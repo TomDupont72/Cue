@@ -24,10 +24,12 @@ function createEmptyDatabaseFixtureReferences(): DatabaseFixtureReferences {
     episodes: new Map(),
     genres: new Map(),
     networks: new Map(),
+    providers: new Map(),
     people: new Map(),
     characters: new Map(),
     seriesGenres: new Map(),
     seriesNetworks: new Map(),
+    seriesProviders: new Map(),
     seriesPeople: new Map(),
     episodePeople: new Map(),
     episodeCharacters: new Map(),
@@ -44,10 +46,12 @@ export function createEmptyDatabaseFixtures(): LoadedDatabaseFixtures {
       episodes: [],
       genres: [],
       networks: [],
+      providers: [],
       people: [],
       characters: [],
       seriesGenres: [],
       seriesNetworks: [],
+      seriesProviders: [],
       seriesPeople: [],
       episodePeople: [],
       episodeCharacters: [],
@@ -99,6 +103,9 @@ function addFixtureRecord(
     case "networks":
       loadedFixtures.state.networks.push(record as DatabaseFixtureRecordByCollection["networks"]);
       break;
+    case "providers":
+      loadedFixtures.state.providers.push(record as DatabaseFixtureRecordByCollection["providers"]);
+      break;
     case "people":
       loadedFixtures.state.people.push(record as DatabaseFixtureRecordByCollection["people"]);
       break;
@@ -115,6 +122,11 @@ function addFixtureRecord(
     case "seriesNetworks":
       loadedFixtures.state.seriesNetworks.push(
         record as DatabaseFixtureRecordByCollection["seriesNetworks"]
+      );
+      break;
+    case "seriesProviders":
+      loadedFixtures.state.seriesProviders.push(
+        record as DatabaseFixtureRecordByCollection["seriesProviders"]
       );
       break;
     case "seriesPeople":

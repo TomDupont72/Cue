@@ -8,7 +8,8 @@ import { UpdateQuery } from "@/shared/db/updateQuery.js";
 import {
   seriesGenreTable,
   seriesNetworkTable,
-  seriesPeopleTable
+  seriesPeopleTable,
+  seriesProviderTable
 } from "@/shared/db/constants/queryTables.js";
 
 export const seriesSelectQuery = (db: PrismaTx = prisma) =>
@@ -37,3 +38,9 @@ export const seriesPeopleInsertQuery = (db: PrismaTx = prisma) =>
 
 export const seriesPeopleDeleteQuery = (db: PrismaTx = prisma) =>
   new DeleteQuery(db.seriesPeople, db, seriesPeopleTable);
+
+export const seriesProviderInsertQuery = (db: PrismaTx = prisma) =>
+  new InsertQuery<typeof db.seriesProvider>(db.seriesProvider);
+
+export const seriesProviderDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery(db.seriesProvider, db, seriesProviderTable);

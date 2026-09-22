@@ -164,15 +164,20 @@ const tmdbTvWatchProvidersItemSchema = z
     provider_name: z.string(),
     display_priority: z.number()
   })
-  .transform((changes) =>
-    camelCaseKeys(changes, {
-      logo_path: "logoPath",
+  .transform((provider) =>
+    camelCaseKeys(provider, {
       provider_id: "tmdbId",
-      provider_name: "name",
-      display_priority: "displayPriority"
-    })
+      provider_name: "name"
+    } as const)
   );
 
 export const tmdbTvWatchProvidersSchema = z.object({
-  FR: z.object({ flatrate: z.array(tmdbTvWatchProvidersItemSchema) })
+  results: z.object({
+    FR: z
+      .object({
+        buy: z.array(tmdbTvWatchProvidersItemSchema).optional(),
+        flatrate: z.array(tmdbTvWatchProvidersItemSchema).optional()
+      })
+      .optional()
+  })
 });

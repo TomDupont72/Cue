@@ -7,11 +7,13 @@ import type {
   Genre,
   Network,
   People,
+  Provider,
   Season,
   Series,
   SeriesGenre,
   SeriesNetwork,
   SeriesPeople,
+  SeriesProvider,
   UserEpisode,
   UserSeries
 } from "@/generated/prisma/client.js";
@@ -23,10 +25,12 @@ export type DatabaseFixtureCollection =
   | "episodes"
   | "genres"
   | "networks"
+  | "providers"
   | "people"
   | "characters"
   | "seriesGenres"
   | "seriesNetworks"
+  | "seriesProviders"
   | "seriesPeople"
   | "episodePeople"
   | "episodeCharacters"
@@ -34,7 +38,7 @@ export type DatabaseFixtureCollection =
   | "userEpisodes";
 
 type IdentifiedDatabaseFixtureCollection =
-  "series" | "seasons" | "episodes" | "genres" | "networks" | "people" | "characters";
+  "series" | "seasons" | "episodes" | "genres" | "networks" | "providers" | "people" | "characters";
 
 export type DatabaseFixtureRow = Record<string, string>;
 
@@ -46,10 +50,12 @@ export type DatabaseFixtureRecordByCollection = {
   episodes: Episode;
   genres: Genre;
   networks: Network;
+  providers: Provider;
   people: People;
   characters: Character;
   seriesGenres: SeriesGenre;
   seriesNetworks: SeriesNetwork;
+  seriesProviders: SeriesProvider;
   seriesPeople: SeriesPeople;
   episodePeople: EpisodePeople;
   episodeCharacters: EpisodeCharacter;
@@ -79,10 +85,12 @@ export const DATABASE_FIXTURE_IDENTITY_FIELDS = {
   episodes: ["id"],
   genres: ["id"],
   networks: ["id"],
+  providers: ["id"],
   people: ["id"],
   characters: ["id"],
   seriesGenres: ["seriesId", "genreId"],
   seriesNetworks: ["seriesId", "networkId"],
+  seriesProviders: ["seriesId", "providerId"],
   seriesPeople: ["seriesId", "peopleId"],
   episodePeople: ["episodeId", "peopleId"],
   episodeCharacters: ["episodeId", "characterId"],
@@ -186,10 +194,12 @@ function isDatabaseFixtureCollection(value: string): value is DatabaseFixtureCol
     value === "episodes" ||
     value === "genres" ||
     value === "networks" ||
+    value === "providers" ||
     value === "people" ||
     value === "characters" ||
     value === "seriesGenres" ||
     value === "seriesNetworks" ||
+    value === "seriesProviders" ||
     value === "seriesPeople" ||
     value === "episodePeople" ||
     value === "episodeCharacters" ||
@@ -320,6 +330,18 @@ function withNetworkDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
   };
 }
 
+function withProviderDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
+  return {
+    tmdbId: row.id,
+    name: `Provider ${row.id}`,
+    logoPath: "null",
+    displayPriority: "0",
+    createdAt: DATABASE_FIXTURE_TIMESTAMP,
+    updatedAt: DATABASE_FIXTURE_TIMESTAMP,
+    ...row
+  };
+}
+
 function withPeopleDefaults(row: DatabaseFixtureRow): DatabaseFixtureRow {
   return {
     adult: "null",
@@ -442,6 +464,15 @@ function createDatabaseFixtureFieldSchemas(
       createdAt: dateCellSchema,
       updatedAt: dateCellSchema
     },
+    providers: {
+      id: integerCellSchema,
+      tmdbId: integerCellSchema,
+      name: z.string().min(1),
+      logoPath: nullableStringCellSchema,
+      displayPriority: integerCellSchema,
+      createdAt: dateCellSchema,
+      updatedAt: dateCellSchema
+    },
     people: {
       id: integerCellSchema,
       adult: nullableBooleanCellSchema,
@@ -468,6 +499,10 @@ function createDatabaseFixtureFieldSchemas(
     seriesNetworks: {
       seriesId: referenceCellSchema("series", references),
       networkId: referenceCellSchema("networks", references)
+    },
+    seriesProviders: {
+      seriesId: referenceCellSchema("series", references),
+      providerId: referenceCellSchema("providers", references)
     },
     seriesPeople: {
       seriesId: referenceCellSchema("series", references),
@@ -577,10 +612,12 @@ export function parseDatabaseFixtureRow<Collection extends DatabaseFixtureCollec
     episodes: createDatabaseFixtureRowSchema(fieldSchemas.episodes),
     genres: createDatabaseFixtureRowSchema(fieldSchemas.genres),
     networks: createDatabaseFixtureRowSchema(fieldSchemas.networks),
+    providers: createDatabaseFixtureRowSchema(fieldSchemas.providers),
     people: createDatabaseFixtureRowSchema(fieldSchemas.people),
     characters: createDatabaseFixtureRowSchema(fieldSchemas.characters),
     seriesGenres: createDatabaseFixtureRowSchema(fieldSchemas.seriesGenres),
     seriesNetworks: createDatabaseFixtureRowSchema(fieldSchemas.seriesNetworks),
+    seriesProviders: createDatabaseFixtureRowSchema(fieldSchemas.seriesProviders),
     seriesPeople: createDatabaseFixtureRowSchema(fieldSchemas.seriesPeople),
     episodePeople: createDatabaseFixtureRowSchema(fieldSchemas.episodePeople),
     episodeCharacters: createDatabaseFixtureRowSchema(fieldSchemas.episodeCharacters),
@@ -594,10 +631,12 @@ export function parseDatabaseFixtureRow<Collection extends DatabaseFixtureCollec
     episodes: withEpisodeDefaults,
     genres: withGenreDefaults,
     networks: withNetworkDefaults,
+    providers: withProviderDefaults,
     people: withPeopleDefaults,
     characters: withCharacterDefaults,
     seriesGenres: withoutDefaults,
     seriesNetworks: withoutDefaults,
+    seriesProviders: withoutDefaults,
     seriesPeople: withoutDefaults,
     episodePeople: withoutDefaults,
     episodeCharacters: withoutDefaults,
