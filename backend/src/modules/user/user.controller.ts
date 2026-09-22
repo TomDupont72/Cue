@@ -4,7 +4,7 @@ import {
   UserEpisodePostParams,
   UserSeasonDeleteParams,
   UserSeasonPostParams,
-  UserSeriesGet,
+  UserSeriesGetParams,
   UserSeriesPostBody,
   UserSeriesPostParams,
   UserSeriesReconcilePostParams
@@ -12,7 +12,7 @@ import {
 import { userService } from "@/modules/user/user.service.js";
 
 export const userSeriesController = {
-  async get(request: FastifyRequest<{ Querystring: UserSeriesGet }>, reply: FastifyReply) {
+  async get(request: FastifyRequest<{ Querystring: UserSeriesGetParams }>, reply: FastifyReply) {
     const result = await userService.seriesGet(request.user.id, request.query);
 
     return reply.send(result);

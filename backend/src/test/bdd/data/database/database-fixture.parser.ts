@@ -22,6 +22,15 @@ function createEmptyDatabaseFixtureReferences(): DatabaseFixtureReferences {
     series: new Map(),
     seasons: new Map(),
     episodes: new Map(),
+    genres: new Map(),
+    networks: new Map(),
+    people: new Map(),
+    characters: new Map(),
+    seriesGenres: new Map(),
+    seriesNetworks: new Map(),
+    seriesPeople: new Map(),
+    episodePeople: new Map(),
+    episodeCharacters: new Map(),
     userSeries: new Map(),
     userEpisodes: new Map()
   };
@@ -33,6 +42,15 @@ export function createEmptyDatabaseFixtures(): LoadedDatabaseFixtures {
       series: [],
       seasons: [],
       episodes: [],
+      genres: [],
+      networks: [],
+      people: [],
+      characters: [],
+      seriesGenres: [],
+      seriesNetworks: [],
+      seriesPeople: [],
+      episodePeople: [],
+      episodeCharacters: [],
       userSeries: [],
       userEpisodes: []
     },
@@ -74,6 +92,45 @@ function addFixtureRecord(
       break;
     case "episodes":
       loadedFixtures.state.episodes.push(record as DatabaseFixtureRecordByCollection["episodes"]);
+      break;
+    case "genres":
+      loadedFixtures.state.genres.push(record as DatabaseFixtureRecordByCollection["genres"]);
+      break;
+    case "networks":
+      loadedFixtures.state.networks.push(record as DatabaseFixtureRecordByCollection["networks"]);
+      break;
+    case "people":
+      loadedFixtures.state.people.push(record as DatabaseFixtureRecordByCollection["people"]);
+      break;
+    case "characters":
+      loadedFixtures.state.characters.push(
+        record as DatabaseFixtureRecordByCollection["characters"]
+      );
+      break;
+    case "seriesGenres":
+      loadedFixtures.state.seriesGenres.push(
+        record as DatabaseFixtureRecordByCollection["seriesGenres"]
+      );
+      break;
+    case "seriesNetworks":
+      loadedFixtures.state.seriesNetworks.push(
+        record as DatabaseFixtureRecordByCollection["seriesNetworks"]
+      );
+      break;
+    case "seriesPeople":
+      loadedFixtures.state.seriesPeople.push(
+        record as DatabaseFixtureRecordByCollection["seriesPeople"]
+      );
+      break;
+    case "episodePeople":
+      loadedFixtures.state.episodePeople.push(
+        record as DatabaseFixtureRecordByCollection["episodePeople"]
+      );
+      break;
+    case "episodeCharacters":
+      loadedFixtures.state.episodeCharacters.push(
+        record as DatabaseFixtureRecordByCollection["episodeCharacters"]
+      );
       break;
     case "userSeries":
       loadedFixtures.state.userSeries.push(

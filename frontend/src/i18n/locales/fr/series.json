@@ -25,6 +25,10 @@
     "previous": "Précédent",
     "next": "Suivant"
   },
+  "dashboard": {
+    "emptySeriesTitle": "Aucune série",
+    "emptySeriesDescription": "Ajoute une série pour commencer."
+  },
   "season_one": "{{count}} saison",
   "season_other": "{{count}} saisons",
   "seasonNumber": "saison {{number}}",

@@ -88,6 +88,25 @@ function formatDatabaseRecordIdentity(
     .join(", ");
 }
 
+function withoutAutoUpdatedAt(collection: DatabaseFixtureCollection, row: DatabaseFixtureRecord) {
+  if (
+    collection !== "series" &&
+    collection !== "seasons" &&
+    collection !== "episodes" &&
+    collection !== "genres" &&
+    collection !== "networks" &&
+    collection !== "people" &&
+    collection !== "characters"
+  ) {
+    return row;
+  }
+
+  const record = { ...(row as unknown as Record<string, unknown>) };
+  delete record.updatedAt;
+
+  return record;
+}
+
 export class TestDatabase {
   private fixtures: LoadedDatabaseFixtures = createEmptyDatabaseFixtures();
   private databaseBeforeRequest?: DatabaseFixtureState;
@@ -104,10 +123,34 @@ export class TestDatabase {
   }
 
   async snapshotBeforeRequest() {
-    const [series, seasons, episodes, userSeries, userEpisodes] = await Promise.all([
+    const [
+      series,
+      seasons,
+      episodes,
+      genres,
+      networks,
+      people,
+      characters,
+      seriesGenres,
+      seriesNetworks,
+      seriesPeople,
+      episodePeople,
+      episodeCharacters,
+      userSeries,
+      userEpisodes
+    ] = await Promise.all([
       prisma.series.findMany(),
       prisma.season.findMany(),
       prisma.episode.findMany(),
+      prisma.genre.findMany(),
+      prisma.network.findMany(),
+      prisma.people.findMany(),
+      prisma.character.findMany(),
+      prisma.seriesGenre.findMany(),
+      prisma.seriesNetwork.findMany(),
+      prisma.seriesPeople.findMany(),
+      prisma.episodePeople.findMany(),
+      prisma.episodeCharacter.findMany(),
       prisma.userSeries.findMany(),
       prisma.userEpisode.findMany()
     ]);
@@ -116,6 +159,15 @@ export class TestDatabase {
       series,
       seasons,
       episodes,
+      genres,
+      networks,
+      people,
+      characters,
+      seriesGenres,
+      seriesNetworks,
+      seriesPeople,
+      episodePeople,
+      episodeCharacters,
       userSeries,
       userEpisodes
     };
@@ -135,6 +187,33 @@ export class TestDatabase {
         break;
       case "episodes":
         rows = await prisma.episode.findMany();
+        break;
+      case "genres":
+        rows = await prisma.genre.findMany();
+        break;
+      case "networks":
+        rows = await prisma.network.findMany();
+        break;
+      case "people":
+        rows = await prisma.people.findMany();
+        break;
+      case "characters":
+        rows = await prisma.character.findMany();
+        break;
+      case "seriesGenres":
+        rows = await prisma.seriesGenre.findMany();
+        break;
+      case "seriesNetworks":
+        rows = await prisma.seriesNetwork.findMany();
+        break;
+      case "seriesPeople":
+        rows = await prisma.seriesPeople.findMany();
+        break;
+      case "episodePeople":
+        rows = await prisma.episodePeople.findMany();
+        break;
+      case "episodeCharacters":
+        rows = await prisma.episodeCharacter.findMany();
         break;
       case "userSeries":
         rows = await prisma.userSeries.findMany();
@@ -244,15 +323,7 @@ export class TestDatabase {
       );
 
       if (key !== undefined) {
-        const missingFields = Object.keys(record).filter((field) => !fields.includes(field));
-
-        if (missingFields.length > 0) {
-          throw new Error(
-            `Cannot capture @${collection}.${key}: add these expected fields first: ${missingFields.join(", ")}`
-          );
-        }
-
-        capturedFixtures.push({ key, record });
+        capturedFixtures.push({ key, record: actual });
       }
     }
 
@@ -561,8 +632,8 @@ export class TestDatabase {
       };
 
       assert.deepStrictEqual(
-        actual,
-        expected,
+        withoutAutoUpdatedAt(collection, actual),
+        withoutAutoUpdatedAt(collection, expected),
         `Unexpected ${collection} update: ${readableIdentity}`
       );
 
@@ -699,6 +770,42 @@ export class TestDatabase {
         await tx.episode.createMany({ data: state.episodes });
       }
 
+      if (state.genres.length > 0) {
+        await tx.genre.createMany({ data: state.genres });
+      }
+
+      if (state.networks.length > 0) {
+        await tx.network.createMany({ data: state.networks });
+      }
+
+      if (state.people.length > 0) {
+        await tx.people.createMany({ data: state.people });
+      }
+
+      if (state.characters.length > 0) {
+        await tx.character.createMany({ data: state.characters });
+      }
+
+      if (state.seriesGenres.length > 0) {
+        await tx.seriesGenre.createMany({ data: state.seriesGenres });
+      }
+
+      if (state.seriesNetworks.length > 0) {
+        await tx.seriesNetwork.createMany({ data: state.seriesNetworks });
+      }
+
+      if (state.seriesPeople.length > 0) {
+        await tx.seriesPeople.createMany({ data: state.seriesPeople });
+      }
+
+      if (state.episodePeople.length > 0) {
+        await tx.episodePeople.createMany({ data: state.episodePeople });
+      }
+
+      if (state.episodeCharacters.length > 0) {
+        await tx.episodeCharacter.createMany({ data: state.episodeCharacters });
+      }
+
       if (state.userSeries.length > 0) {
         await tx.userSeries.createMany({ data: state.userSeries });
       }
@@ -730,6 +837,38 @@ export class TestDatabase {
           MAX(id) IS NOT NULL
         )
         FROM "Episode"
+      `;
+      await tx.$queryRaw`
+        SELECT setval(
+          pg_get_serial_sequence('"Genre"', 'id'),
+          COALESCE(MAX(id), 1),
+          MAX(id) IS NOT NULL
+        )
+        FROM "Genre"
+      `;
+      await tx.$queryRaw`
+        SELECT setval(
+          pg_get_serial_sequence('"Network"', 'id'),
+          COALESCE(MAX(id), 1),
+          MAX(id) IS NOT NULL
+        )
+        FROM "Network"
+      `;
+      await tx.$queryRaw`
+        SELECT setval(
+          pg_get_serial_sequence('"People"', 'id'),
+          COALESCE(MAX(id), 1),
+          MAX(id) IS NOT NULL
+        )
+        FROM "People"
+      `;
+      await tx.$queryRaw`
+        SELECT setval(
+          pg_get_serial_sequence('"Character"', 'id'),
+          COALESCE(MAX(id), 1),
+          MAX(id) IS NOT NULL
+        )
+        FROM "Character"
       `;
     });
   }

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { isDeepStrictEqual } from "node:util";
 import type { LightMyRequestResponse } from "fastify";
 
 type TableRows = readonly (readonly string[])[];
@@ -93,7 +94,11 @@ export function buildExpectedFixtures(
     }
 
     const extras = Object.fromEntries(
-      extraFields.map((field, index) => [field, parseCell(row[index + 1] ?? "")])
+      extraFields.map((field, index) => {
+        const value = row[index + 1] ?? "";
+
+        return [field, value.startsWith("@") ? resolveFixture(value) : parseCell(value)];
+      })
     );
 
     return {
@@ -408,6 +413,39 @@ export function assertResponseArrayMatchesFixtures(
   }
 
   assert.deepStrictEqual(value, fixtures.map(serializeFixture));
+}
+
+export function assertResponseArrayContainsFixtures(
+  response: LightMyRequestResponse,
+  path: string,
+  fixtures: readonly unknown[]
+) {
+  const value = getValueAtPath(parseResponseBody(response), path);
+
+  if (!Array.isArray(value)) {
+    throw new Error(`The response value at "${path}" is not an array`);
+  }
+
+  const remainingValues = [...value];
+  const expectedFixtures = fixtures.map(serializeFixture);
+
+  assert.equal(
+    remainingValues.length,
+    expectedFixtures.length,
+    `The response array at "${path}" does not contain the expected number of items`
+  );
+
+  for (const fixture of expectedFixtures) {
+    const index = remainingValues.findIndex((value) => isDeepStrictEqual(value, fixture));
+
+    assert.notEqual(
+      index,
+      -1,
+      `The response array at "${path}" is missing fixture ${JSON.stringify(fixture)}`
+    );
+
+    remainingValues.splice(index, 1);
+  }
 }
 
 export function assertResponseNullAtPath(response: LightMyRequestResponse, path: string) {

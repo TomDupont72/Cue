@@ -1,21 +1,4 @@
-import type { Episode } from "@/generated/prisma/client.js";
 import { UserSeriesStatus } from "@/generated/prisma/enums.js";
-
-export type DashboardSummaryEpisodesRow = {
-  totalWatchedMinutes: bigint;
-  totalWatchedEpisodes: bigint;
-};
-
-export type DashboardSummarySeriesRow = {
-  totalWatchedSeries: bigint;
-};
-
-export type UserSeriesProgressRow = {
-  seriesId: number;
-  watchCount: number;
-  watchedEpisodeCount: number;
-  lastWatchedAt: Date;
-};
 
 export type EpisodeFeedRow = {
   userId: string;
@@ -24,7 +7,7 @@ export type EpisodeFeedRow = {
   lastWatchedAt: Date | null;
 
   seriesName: string;
-  seriesPosterPath: string | null;
+  seriesBackdropPath: string | null;
   seriesTmdbId: number;
 
   id: number;
@@ -36,9 +19,4 @@ export type EpisodeFeedRow = {
   runtime: number;
   overview: string | null;
   remainingEpisodes: number;
-};
-
-export type EpisodeUpcomingRow = Episode & {
-  seriesName: string;
-  seriesBackdropPath: string | null;
 };

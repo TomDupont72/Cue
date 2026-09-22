@@ -1,15 +1,36 @@
-import { Prisma, type UserEpisode, type UserSeries } from "@/generated/prisma/client.js";
+import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
-import {
-  DashboardSummaryEpisodesRow,
-  DashboardSummarySeriesRow,
-  EpisodeFeedRow,
-  EpisodeUpcomingRow,
-  UserSeriesProgressRow
-} from "./user.types.js";
-import { findManyPaginated } from "@/shared/utils/prisma/prisma.js";
+import { EpisodeFeedRow } from "./user.types.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
+import { SelectQuery } from "@/shared/db/selectQuery.js";
+import { RelationalSelectQuery } from "@/shared/db/relationalSelectQuery.js";
+import { userEpisodeTable, userSeriesTable } from "@/shared/db/constants/queryTables.js";
+import { InsertQuery } from "@/shared/db/insertQuery.js";
+import { UpdateQuery } from "@/shared/db/updateQuery.js";
+import { UpsertQuery } from "@/shared/db/upsertQuery.js";
+import { DeleteQuery } from "@/shared/db/deleteQuery.js";
+
+export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
+  new SelectQuery(db.userEpisode, "USER_EPISODE_NOT_FOUND");
+
+export const userEpisodeRelationalSelectQuery = (db: PrismaTx = prisma) =>
+  new RelationalSelectQuery(db.userEpisode, db, userEpisodeTable);
+
+export const userEpisodeInsertQuery = (db: PrismaTx = prisma) => new InsertQuery(db.userEpisode);
+
+export const userEpisodeDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery(db.userEpisode, db, userEpisodeTable);
+
+export const userSeriesSelectQuery = (db: PrismaTx = prisma) =>
+  new SelectQuery(db.userSeries, "USER_SERIES_NOT_FOUND");
+
+export const userSeriesRelationalSelectQuery = (db: PrismaTx = prisma) =>
+  new RelationalSelectQuery(db.userSeries, db, userSeriesTable);
+
+export const userSeriesUpdateQuery = (db: PrismaTx = prisma) => new UpdateQuery(db.userSeries);
+
+export const userSeriesUpsertQuery = (db: PrismaTx = prisma) => new UpsertQuery(db.userSeries);
 
 function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: number) {
   const seriesFilter =
@@ -23,7 +44,7 @@ function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: nu
     us."lastWatchedAt",
 
     s.name AS "seriesName",
-    s."posterPath" AS "seriesPosterPath",
+    s."backdropPath" AS "seriesBackdropPath",
     s."tmdbId" AS "seriesTmdbId",
 
     next_episode.id,
@@ -148,174 +169,6 @@ function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: nu
 }
 
 export const userRepository = {
-  findOneSeries(where: Prisma.UserSeriesWhereUniqueInput, db: PrismaTx = prisma) {
-    return db.userSeries.findUnique({
-      where
-    });
-  },
-
-  findOneEpisode(where: Prisma.UserEpisodeWhereUniqueInput, db: PrismaTx = prisma) {
-    return db.userEpisode.findUnique({
-      where
-    });
-  },
-
-  findManySeries(
-    where: Prisma.UserSeriesWhereInput,
-    limit: number,
-    cursor: Date | undefined,
-    cursorField: "addedAt" | "lastWatchedAt",
-    db: PrismaTx = prisma
-  ) {
-    return findManyPaginated({
-      where,
-      limit,
-      cursor,
-      cursorField,
-      order: "desc",
-      delegate: db.userSeries
-    });
-  },
-
-  findManyEpisodes(where: Prisma.UserEpisodeWhereInput, db: PrismaTx = prisma) {
-    return db.userEpisode.findMany({
-      where
-    });
-  },
-
-  findLatestWatchedEpisode(userId: string, seriesId: number, db: PrismaTx = prisma) {
-    return db.userEpisode.findFirst({
-      where: {
-        userId,
-        episode: {
-          seriesId
-        }
-      },
-      orderBy: {
-        watchedAt: "desc"
-      }
-    });
-  },
-
-  getSeriesProgress(userId: string, db: PrismaTx = prisma) {
-    return db.$queryRaw<UserSeriesProgressRow[]>(Prisma.sql`
-      SELECT
-        e."seriesId",
-        COUNT(*)::int AS "watchedEpisodeCount",
-        (COUNT(*) FILTER (WHERE e."seasonNumber" <> 0))::int AS "watchCount",
-        MAX(ue."watchedAt") AS "lastWatchedAt"
-      FROM "UserEpisode" ue
-      JOIN "Episode" e ON e.id = ue."episodeId"
-      WHERE ue."userId" = ${userId}
-      GROUP BY e."seriesId"
-    `);
-  },
-
-  upsertSeries(
-    where: Prisma.UserSeriesWhereUniqueInput,
-    create: Prisma.UserSeriesUncheckedCreateInput,
-    update: Prisma.UserSeriesUncheckedUpdateInput,
-    db: PrismaTx = prisma
-  ) {
-    return db.userSeries.upsert({
-      where,
-      create: create,
-      update: update
-    });
-  },
-
-  updateSeries(
-    where: Prisma.UserSeriesWhereUniqueInput,
-    data: Prisma.UserSeriesUncheckedUpdateInput,
-    db: PrismaTx = prisma
-  ) {
-    return db.userSeries.update({
-      where,
-      data
-    });
-  },
-
-  async incrementSeriesProgress(
-    userId: string,
-    seriesId: number,
-    delta: number,
-    watchedAt: Date,
-    db: PrismaTx = prisma
-  ) {
-    const [userSeries] = await db.$queryRaw<UserSeries[]>(Prisma.sql`
-      UPDATE "UserSeries"
-      SET "watchCount" = "watchCount" + ${delta},
-          "lastWatchedAt" = GREATEST(
-            COALESCE("lastWatchedAt", ${watchedAt}),
-            ${watchedAt}
-          )
-      WHERE "userId" = ${userId}
-        AND "seriesId" = ${seriesId}
-      RETURNING
-        "userId",
-        "seriesId",
-        "status",
-        "isFavorite",
-        "watchCount",
-        "addedAt",
-        "lastWatchedAt"
-    `);
-
-    return userSeries ?? null;
-  },
-
-  updateManySeries(
-    where: Prisma.UserSeriesWhereInput,
-    data: Prisma.UserSeriesUpdateManyMutationInput,
-    db: PrismaTx = prisma
-  ) {
-    return db.userSeries.updateMany({
-      where,
-      data
-    });
-  },
-
-  createManyEpisodes(data: Prisma.UserEpisodeCreateManyInput[], db: PrismaTx = prisma) {
-    return db.userEpisode.createManyAndReturn({
-      data,
-      skipDuplicates: true
-    });
-  },
-
-  deleteEpisodes(userId: string, episodeIds: number[], db: PrismaTx = prisma) {
-    if (episodeIds.length === 0) {
-      return Promise.resolve<UserEpisode[]>([]);
-    }
-
-    return db.$queryRaw<UserEpisode[]>(Prisma.sql`
-      DELETE FROM "UserEpisode"
-      WHERE "userId" = ${userId}
-        AND "episodeId" IN (${Prisma.join(episodeIds)})
-      RETURNING "userId", "episodeId", "watchedAt"
-    `);
-  },
-
-  async getDashboardSummary(userId: string, db: PrismaTx = prisma) {
-    const [summaryEpisodes] = await db.$queryRaw<DashboardSummaryEpisodesRow[]>`
-        SELECT COALESCE(SUM(e.runtime), 0)::bigint AS "totalWatchedMinutes", COUNT(e.id) AS "totalWatchedEpisodes" FROM "Episode" e
-        INNER JOIN "UserEpisode" ue         
-        ON ue."episodeId" = e.id
-        WHERE ue."userId" = ${userId};
-    `;
-
-    const [summarySeries] = await db.$queryRaw<DashboardSummarySeriesRow[]>`
-        SELECT COUNT(us."seriesId") AS "totalWatchedSeries" FROM "UserSeries" us
-        WHERE us."userId"= ${userId}
-        AND us.status = 'COMPLETED';
-    `;
-
-    return {
-      totalWatchedMinutes: Number(summaryEpisodes.totalWatchedMinutes),
-      totalWatchedEpisodes: Number(summaryEpisodes.totalWatchedEpisodes),
-      totalWatchedSeries: Number(summarySeries.totalWatchedSeries)
-    };
-  },
-
   async getEpisodesFeed(userId: string, db: PrismaTx = prisma) {
     return db.$queryRaw<EpisodeFeedRow[]>(getEpisodesFeedQuery(userId, getEpisodeReleaseCutoff()));
   },
@@ -331,58 +184,5 @@ export const userRepository = {
     );
 
     return episode ?? null;
-  },
-
-  async getEpisodesUpcoming(userId: string, now: Date, db: PrismaTx = prisma) {
-    const currentDate = now.toISOString().slice(0, 10);
-
-    return db.$queryRaw<EpisodeUpcomingRow[]>(Prisma.sql`
-    SELECT
-      t.id,
-      t."seriesId",
-      t."seasonId",
-      t."airDate",
-      t."episodeNumber",
-      t.name,
-      t.overview,
-      t."tmdbId",
-      t."stillPath",
-      t."seasonNumber",
-      t."voteAverage",
-      t."createdAt",
-      t."updatedAt",
-      t.runtime,
-      t."seriesName",
-      t."seriesBackdropPath"
-    FROM (
-      SELECT
-        s.name AS "seriesName",
-        s."backdropPath" AS "seriesBackdropPath",
-        e.*,
-        ROW_NUMBER() OVER (
-          PARTITION BY e."seriesId"
-          ORDER BY
-            e."airDate",
-            e."seasonNumber",
-            e."episodeNumber"
-        ) AS rn
-
-      FROM "Episode" e
-
-      JOIN "Series" s
-        ON e."seriesId" = s.id
-
-      JOIN "UserSeries" us
-        ON s.id = us."seriesId"
-
-      WHERE e."airDate" > ${currentDate}::date
-        AND us."userId" = ${userId}
-    ) t
-
-    WHERE t.rn = 1
-    ORDER BY
-        t."airDate" ASC,
-        t."seriesName" ASC;
-  `);
   }
 };

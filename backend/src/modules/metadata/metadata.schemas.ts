@@ -31,7 +31,7 @@ export const metadataSeriesChangesGetResponseSchema = z.object({
 });
 
 export const metadataSeriesSearchGetSchema = z.object({
-  query: z.string().trim().min(2),
+  query: z.string().trim().min(2).max(100),
   page: z.coerce.number().int().min(1).default(1)
 });
 

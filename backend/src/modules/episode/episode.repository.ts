@@ -1,59 +1,37 @@
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
+import { SelectQuery } from "@/shared/db/selectQuery.js";
+import { DeleteQuery } from "@/shared/db/deleteQuery.js";
+import { InsertQuery } from "@/shared/db/insertQuery.js";
+import { UpsertQuery } from "@/shared/db/upsertQuery.js";
+import {
+  episodeTable,
+  episodeCharacterTable,
+  episodePeopleTable
+} from "@/shared/db/constants/queryTables.js";
+import { RelationalSelectQuery } from "@/shared/db/relationalSelectQuery.js";
 
-export const episodeRepository = {
-  findOne(where: Prisma.EpisodeWhereUniqueInput, db: PrismaTx = prisma) {
-    return db.episode.findUnique({
-      where
-    });
-  },
+export const episodeSelectQuery = (db: PrismaTx = prisma) =>
+  new SelectQuery<typeof db.episode>(db.episode, "EPISODE_NOT_FOUND");
 
-  findMany(where: Prisma.EpisodeWhereInput, db: PrismaTx = prisma) {
-    return db.episode.findMany({
-      where
-    });
-  },
+export const episodeRelationalSelectQuery = (db: PrismaTx = prisma) =>
+  new RelationalSelectQuery(db.episode, db, episodeTable);
 
-  async upsertMany(episodes: Prisma.EpisodeUncheckedCreateInput[], db: PrismaTx = prisma) {
-    return upsertManyAndFetch({
-      data: episodes,
-      scalarFields: Prisma.EpisodeScalarFieldEnum,
-      uniqueBy: "tmdbId",
-      delegate: db.episode
-    });
-  },
+export const episodeUpsertQuery = (db: PrismaTx = prisma) =>
+  new UpsertQuery<typeof db.episode, Prisma.EpisodeUncheckedCreateInput, "tmdbId">(db.episode, {
+    scalarFields: Prisma.EpisodeScalarFieldEnum,
+    uniqueBy: "tmdbId"
+  });
 
-  addPeople(data: Prisma.EpisodePeopleCreateManyInput[], db: PrismaTx = prisma) {
-    return db.episodePeople.createMany({
-      data,
-      skipDuplicates: true
-    });
-  },
+export const episodePeopleInsertQuery = (db: PrismaTx = prisma) =>
+  new InsertQuery<typeof db.episodePeople>(db.episodePeople);
 
-  addCharacters(data: Prisma.EpisodeCharacterCreateManyInput[], db: PrismaTx = prisma) {
-    return db.episodeCharacter.createMany({
-      data,
-      skipDuplicates: true
-    });
-  },
+export const episodePeopleDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery(db.episodePeople, db, episodePeopleTable);
 
-  async replacePeople(
-    episodeIds: number[],
-    data: Prisma.EpisodePeopleCreateManyInput[],
-    db: PrismaTx = prisma
-  ) {
-    await db.episodePeople.deleteMany({ where: { episodeId: { in: episodeIds } } });
-    return this.addPeople(data, db);
-  },
+export const episodeCharacterInsertQuery = (db: PrismaTx = prisma) =>
+  new InsertQuery<typeof db.episodeCharacter>(db.episodeCharacter);
 
-  async replaceCharacters(
-    episodeIds: number[],
-    data: Prisma.EpisodeCharacterCreateManyInput[],
-    db: PrismaTx = prisma
-  ) {
-    await db.episodeCharacter.deleteMany({ where: { episodeId: { in: episodeIds } } });
-    return this.addCharacters(data, db);
-  }
-};
+export const episodeCharacterDeleteQuery = (db: PrismaTx = prisma) =>
+  new DeleteQuery(db.episodeCharacter, db, episodeCharacterTable);

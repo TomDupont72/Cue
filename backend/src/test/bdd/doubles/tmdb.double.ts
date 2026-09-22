@@ -17,14 +17,15 @@ export class TmdbDouble {
         const request = input instanceof Request ? input : new Request(input, init);
 
         const url = new URL(request.url);
+        const pathname = url.pathname.replace(/^\/3(?=\/)/, "");
 
         this.calls.push(url);
 
-        if (!this.responses.has(url.pathname)) {
+        if (!this.responses.has(pathname)) {
           throw new Error(`Unexpected TMDB request: ${url}`);
         }
 
-        return Response.json(this.responses.get(url.pathname), { status: 200 });
+        return Response.json(this.responses.get(pathname), { status: 200 });
       }
     );
   }

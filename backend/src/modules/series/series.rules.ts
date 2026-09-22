@@ -1,13 +1,27 @@
 import { seasonDetails } from "@/external/tmdb/tmdb.season-details.js";
 import { tvDetails } from "@/external/tmdb/tmdb.tv-details.js";
 import { prisma } from "@/shared/db/prisma.js";
-import { characterRepository } from "@/modules/character/character.repository.js";
-import { episodeRepository } from "@/modules/episode/episode.repository.js";
-import { genreRepository } from "@/modules/genre/genre.repository.js";
-import { networkRepository } from "@/modules/network/network.repository.js";
-import { peopleRepository } from "@/modules/people/people.repository.js";
-import { seasonRepository } from "@/modules/season/season.repository.js";
-import { seriesRepository } from "@/modules/series/series.repository.js";
+import { characterInsertQuery } from "@/modules/character/character.repository.js";
+import {
+  episodeCharacterDeleteQuery,
+  episodeCharacterInsertQuery,
+  episodePeopleDeleteQuery,
+  episodePeopleInsertQuery,
+  episodeUpsertQuery
+} from "@/modules/episode/episode.repository.js";
+import { genreUpsertQuery } from "@/modules/genre/genre.repository.js";
+import { networkUpsertQuery } from "@/modules/network/network.repository.js";
+import { peopleUpsertQuery } from "@/modules/people/people.repository.js";
+import { seasonUpsertQuery } from "@/modules/season/season.repository.js";
+import {
+  seriesGenreDeleteQuery,
+  seriesGenreInsertQuery,
+  seriesNetworkDeleteQuery,
+  seriesNetworkInsertQuery,
+  seriesPeopleDeleteQuery,
+  seriesPeopleInsertQuery,
+  seriesUpsertQuery
+} from "@/modules/series/series.repository.js";
 import { dropKeys, getMany, joinBy } from "@/shared/utils/object/object.js";
 import { Prisma } from "@/generated/prisma/client.js";
 import type {
@@ -27,82 +41,94 @@ export async function syncTmdb(tmdbId: number) {
 
   return prisma.$transaction(
     async (tx) => {
-      const series = await seriesRepository.upsert(
-        { tmdbId: tmdbSeries.tmdbId },
-        dropKeys(tmdbSeries, ["createdBy", "genres", "networks", "seasons"] as const),
-        tx
-      );
+      const seriesData = dropKeys(tmdbSeries, [
+        "createdBy",
+        "genres",
+        "networks",
+        "seasons"
+      ] as const);
+      const series = await seriesUpsertQuery(tx)
+        .where({ tmdbId: tmdbSeries.tmdbId })
+        .create(seriesData)
+        .update(seriesData)
+        .first();
 
-      const genres = await genreRepository.upsertMany(tmdbSeries.genres, tx);
-      await seriesRepository.replaceGenres(
-        series.id,
-        genres.map((genre) => genre.id),
-        tx
-      );
+      const genres = await genreUpsertQuery(tx).values(tmdbSeries.genres).all();
+      await seriesGenreDeleteQuery(tx).where({ seriesId: series.id }).execute();
+      await seriesGenreInsertQuery(tx)
+        .values(genres.map((genre) => ({ seriesId: series.id, genreId: genre.id })))
+        .skipDuplicates()
+        .execute();
 
-      const networks = await networkRepository.upsertMany(tmdbSeries.networks, tx);
-      await seriesRepository.replaceNetworks(
-        series.id,
-        networks.map((network) => network.id),
-        tx
-      );
+      const networks = await networkUpsertQuery(tx).values(tmdbSeries.networks).all();
+      await seriesNetworkDeleteQuery(tx).where({ seriesId: series.id }).execute();
+      await seriesNetworkInsertQuery(tx)
+        .values(networks.map((network) => ({ seriesId: series.id, networkId: network.id })))
+        .skipDuplicates()
+        .execute();
 
-      const people = await peopleRepository.upsertMany(
-        getMany<Prisma.PeopleCreateManyInput>(
-          { data: tmdbSeries, fields: ["createdBy"] },
-          { data: tmdbEpisodes, fields: ["crew", "guestStars"] }
-        ),
-        tx
-      );
+      const people = await peopleUpsertQuery(tx)
+        .values(
+          getMany<Prisma.PeopleCreateManyInput>(
+            { data: tmdbSeries, fields: ["createdBy"] },
+            { data: tmdbEpisodes, fields: ["crew", "guestStars"] }
+          )
+        )
+        .all();
       const creatorIds = joinBy(
         { data: tmdbSeries.createdBy, key: "tmdbId" },
         { data: people, key: "tmdbId", value: "id" }
       );
 
-      await seriesRepository.replacePeople(series.id, creatorIds, tx);
+      await seriesPeopleDeleteQuery(tx).where({ seriesId: series.id }).execute();
+      await seriesPeopleInsertQuery(tx)
+        .values(creatorIds.map((peopleId) => ({ seriesId: series.id, peopleId })))
+        .skipDuplicates()
+        .execute();
 
-      const characters = await characterRepository.createMany(
-        joinBy(
-          {
-            data: getMany<TmdbEpisodeDetailsGuestStar>({
-              data: tmdbEpisodes,
-              fields: ["guestStars"]
-            }),
-            key: "tmdbId",
-            value: "character",
-            as: "name"
-          },
-          {
-            data: people,
-            key: "tmdbId",
-            value: "id",
-            as: "peopleId"
-          }
-        ),
-        tx
-      );
+      const characters = await characterInsertQuery(tx)
+        .values(
+          joinBy(
+            {
+              data: getMany<TmdbEpisodeDetailsGuestStar>({
+                data: tmdbEpisodes,
+                fields: ["guestStars"]
+              }),
+              key: "tmdbId",
+              value: "character",
+              as: "name"
+            },
+            { data: people, key: "tmdbId", value: "id", as: "peopleId" }
+          )
+        )
+        .skipDuplicates()
+        .all();
 
-      const seasons = await seasonRepository.upsertMany(
-        series.id,
-        tmdbSeasons.map((season) => dropKeys(season, ["episodes"] as const)),
-        tx
-      );
+      const seasons = await seasonUpsertQuery(tx)
+        .values(
+          tmdbSeasons.map((season) => ({
+            ...dropKeys(season, ["episodes"] as const),
+            seriesId: series.id
+          }))
+        )
+        .all();
 
-      const episodes = await episodeRepository.upsertMany(
-        joinBy(
-          { data: tmdbEpisodes, key: "seasonNumber" },
-          {
-            data: seasons,
-            key: "seasonNumber",
-            select: (season, episode) => ({
-              ...dropKeys(episode, ["crew", "guestStars"] as const),
-              seriesId: series.id,
-              seasonId: season.id
-            })
-          }
-        ),
-        tx
-      );
+      const episodes = await episodeUpsertQuery(tx)
+        .values(
+          joinBy(
+            { data: tmdbEpisodes, key: "seasonNumber" },
+            {
+              data: seasons,
+              key: "seasonNumber",
+              select: (season, episode) => ({
+                ...dropKeys(episode, ["crew", "guestStars"] as const),
+                seriesId: series.id,
+                seasonId: season.id
+              })
+            }
+          )
+        )
+        .all();
 
       const episodeCrew = joinBy(
         { data: tmdbEpisodes, key: "tmdbId" },
@@ -114,32 +140,26 @@ export async function syncTmdb(tmdbId: number) {
         }
       );
 
-      await episodeRepository.replacePeople(
-        episodes.map((episode) => episode.id),
-        joinBy(
-          { data: episodeCrew, key: ({ person }) => person.tmdbId },
-          {
-            data: people,
-            key: "tmdbId",
-            select: (person, { episodeId }) => ({ episodeId, peopleId: person.id })
-          }
-        ),
-        tx
-      );
+      await episodePeopleDeleteQuery(tx)
+        .where({ episodeId: { in: episodes.map((episode) => episode.id) } })
+        .execute();
+      await episodePeopleInsertQuery(tx)
+        .values(
+          joinBy(
+            { data: episodeCrew, key: ({ person }) => person.tmdbId },
+            {
+              data: people,
+              key: "tmdbId",
+              select: (person, { episodeId }) => ({ episodeId, peopleId: person.id })
+            }
+          )
+        )
+        .skipDuplicates()
+        .execute();
 
       const episodeGuestStars = joinBy(
-        {
-          data: tmdbEpisodes,
-          key: "tmdbId",
-          value: "guestStars",
-          as: "guestStar"
-        },
-        {
-          data: episodes,
-          key: "tmdbId",
-          value: "id",
-          as: "episodeId"
-        }
+        { data: tmdbEpisodes, key: "tmdbId", value: "guestStars", as: "guestStar" },
+        { data: episodes, key: "tmdbId", value: "id", as: "episodeId" }
       );
 
       const episodeGuestStarsWithPeople = joinBy(
@@ -151,24 +171,25 @@ export async function syncTmdb(tmdbId: number) {
         }
       );
 
-      await episodeRepository.replaceCharacters(
-        episodes.map((episode) => episode.id),
-        joinBy(
-          {
-            data: episodeGuestStarsWithPeople,
-            key: ({ peopleId, guestStar }) => `${peopleId}:${guestStar.character}`
-          },
-          {
-            data: characters,
-            key: (character) => `${character.peopleId}:${character.name}`,
-            select: (character, { episodeId }) => ({
-              episodeId,
-              characterId: character.id
-            })
-          }
-        ),
-        tx
-      );
+      await episodeCharacterDeleteQuery(tx)
+        .where({ episodeId: { in: episodes.map((episode) => episode.id) } })
+        .execute();
+      await episodeCharacterInsertQuery(tx)
+        .values(
+          joinBy(
+            {
+              data: episodeGuestStarsWithPeople,
+              key: ({ peopleId, guestStar }) => `${peopleId}:${guestStar.character}`
+            },
+            {
+              data: characters,
+              key: (character) => `${character.peopleId}:${character.name}`,
+              select: (character, { episodeId }) => ({ episodeId, characterId: character.id })
+            }
+          )
+        )
+        .skipDuplicates()
+        .execute();
 
       return series;
     },
