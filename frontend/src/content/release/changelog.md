@@ -6,6 +6,14 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ---
 
+## [1.1.0] · _23 septembre 2026_
+
+### Ajouts
+
+- Ajout des données de visionnage des plateformes dans la page des séries.
+
+---
+
 ## [1.0.2] · _5 septembre 2026_
 
 ### Correction
