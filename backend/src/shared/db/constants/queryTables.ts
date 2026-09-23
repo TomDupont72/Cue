@@ -1,5 +1,6 @@
 import {
   Prisma,
+  Provider,
   SeriesProvider,
   type Episode,
   type EpisodeCharacter,
@@ -23,6 +24,12 @@ export const seriesTable = defineTable<Series>(
   "Series",
   "s",
   Object.values(Prisma.SeriesScalarFieldEnum)
+);
+
+export const providerTable = defineTable<Provider>(
+  "Provider",
+  "p",
+  Object.values(Prisma.ProviderScalarFieldEnum)
 );
 
 export const userEpisodeTable = defineTable<UserEpisode>(
@@ -91,5 +98,11 @@ export const queryRelations = [
     to: userSeriesTable.$name,
     left: seriesTable.id,
     right: userSeriesTable.seriesId
+  },
+  {
+    from: providerTable.$name,
+    to: seriesProviderTable.$name,
+    left: providerTable.id,
+    right: seriesProviderTable.providerId
   }
 ];

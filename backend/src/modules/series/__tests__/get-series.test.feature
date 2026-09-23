@@ -20,6 +20,18 @@ Feature: GET /api/series/:id
             | requestedSecond | 2  | @series.requested | @seasons.requestedSeason |
             | otherEpisode    | 3  | @series.other     | @seasons.otherSeason     |
 
+        And the database with these providers:
+            | key             | id |
+            | requestedFirst  | 1  |
+            | requestedSecond | 2  |
+            | otherProvider   | 3  |
+
+        And the database with these series providers:
+            | seriesId          | providerId                 |
+            | @series.requested | @providers.requestedFirst  |
+            | @series.requested | @providers.requestedSecond |
+            | @series.other     | @providers.otherProvider   |
+
         And the database with these user series:
             | key               | userId | seriesId          |
             | requestedProgress | user-1 | @series.requested |
@@ -35,12 +47,13 @@ Feature: GET /api/series/:id
 
         Then the response status should be 200
         And the response body should have exactly these fields:
-            | field        |
-            | series       |
-            | seasons      |
-            | episodes     |
-            | userSeries   |
-            | userEpisodes |
+            | field           |
+            | series          |
+            | seasons         |
+            | episodes        |
+            | userSeries      |
+            | userEpisodes    |
+            | seriesProviders |
 
         And the response object at "series" should exactly match the fixture "@series.requested"
 
@@ -59,17 +72,23 @@ Feature: GET /api/series/:id
             | fixture                           |
             | @userEpisodes.requestedSeenByUser |
 
+        And the response array at "seriesProviders" should contain exactly these fixtures:
+            | fixture                    |
+            | @providers.requestedFirst  |
+            | @providers.requestedSecond |
+
     Scenario: Get series - Not added
         When I send a GET request to "/api/series/2"
 
         Then the response status should be 200
         And the response body should have exactly these fields:
-            | field        |
-            | series       |
-            | seasons      |
-            | episodes     |
-            | userSeries   |
-            | userEpisodes |
+            | field           |
+            | series          |
+            | seasons         |
+            | episodes        |
+            | userSeries      |
+            | userEpisodes    |
+            | seriesProviders |
 
         And the response object at "series" should exactly match the fixture "@series.other"
 
@@ -84,23 +103,29 @@ Feature: GET /api/series/:id
         And the response field at "userSeries" should be null
         And the response array at "userEpisodes" should be empty
 
+        And the response array at "seriesProviders" should contain exactly these fixtures:
+            | fixture                  |
+            | @providers.otherProvider |
+
     Scenario: Get series - Empty
         When I send a GET request to "/api/series/3"
 
         Then the response status should be 200
         And the response body should have exactly these fields:
-            | field        |
-            | series       |
-            | seasons      |
-            | episodes     |
-            | userSeries   |
-            | userEpisodes |
+            | field           |
+            | series          |
+            | seasons         |
+            | episodes        |
+            | userSeries      |
+            | userEpisodes    |
+            | seriesProviders |
 
         And the response object at "series" should exactly match the fixture "@series.empty"
         And the response array at "seasons" should be empty
         And the response array at "episodes" should be empty
         And the response field at "userSeries" should be null
         And the response array at "userEpisodes" should be empty
+        And the response array at "seriesProviders" should be empty
 
     Scenario: Get series - Another user
         Given authentication as "user-2"
@@ -109,12 +134,13 @@ Feature: GET /api/series/:id
 
         Then the response status should be 200
         And the response body should have exactly these fields:
-            | field        |
-            | series       |
-            | seasons      |
-            | episodes     |
-            | userSeries   |
-            | userEpisodes |
+            | field           |
+            | series          |
+            | seasons         |
+            | episodes        |
+            | userSeries      |
+            | userEpisodes    |
+            | seriesProviders |
 
         And the response object at "series" should exactly match the fixture "@series.requested"
 
@@ -132,6 +158,11 @@ Feature: GET /api/series/:id
         And the response array at "userEpisodes" should exactly match these fixtures:
             | fixture                                |
             | @userEpisodes.requestedSeenByOtherUser |
+
+        And the response array at "seriesProviders" should contain exactly these fixtures:
+            | fixture                    |
+            | @providers.requestedFirst  |
+            | @providers.requestedSecond |
 
     Scenario: Get series - Invalid parameters
         When I send a GET request to "/api/series/invalid"
