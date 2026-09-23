@@ -175,7 +175,6 @@ export const tmdbTvWatchProvidersSchema = z.object({
   results: z.object({
     FR: z
       .object({
-        buy: z.array(tmdbTvWatchProvidersItemSchema).optional(),
         flatrate: z.array(tmdbTvWatchProvidersItemSchema).optional()
       })
       .optional()

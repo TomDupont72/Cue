@@ -82,7 +82,7 @@ function SeriesContent({ seriesId }: SeriesContentProps) {
     return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
   }
 
-  const { episodes, userEpisodes, seasons, series, userSeries } = seriesQuery.data;
+  const { episodes, userEpisodes, seasons, series, userSeries, seriesProviders } = seriesQuery.data;
 
   const watchProgress = userSeries
     ? getWatchProgress(userSeries?.watchCount, series.numberOfEpisodes)
@@ -112,7 +112,12 @@ function SeriesContent({ seriesId }: SeriesContentProps) {
 
         <div className="flex flex-1 flex-col gap-8">
           {view === "overview" ? (
-            <SeriesOverview series={series} userSeries={userSeries} watchProgress={watchProgress} />
+            <SeriesOverview
+              series={series}
+              userSeries={userSeries}
+              seriesProviders={seriesProviders}
+              watchProgress={watchProgress}
+            />
           ) : (
             <SeriesDetails
               id={series.id}

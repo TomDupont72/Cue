@@ -11,15 +11,24 @@ import { useTranslation } from "react-i18next";
 import { Heading } from "@/components/layout/heading";
 import { Text } from "@/components/layout/text";
 import Picture from "@/components/layout/picture";
+import type { ProviderRow } from "@/features/provider/types/provider.types";
+import { ProviderCard } from "@/features/provider/components/providerCard";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type SeriesOverviewProps = {
   series: SeriesRow;
   userSeries: UserSeriesRow | null;
+  seriesProviders: ProviderRow[];
   isProgress?: boolean;
   watchProgress?: number;
 };
 
-export function SeriesOverview({ series, userSeries, watchProgress }: SeriesOverviewProps) {
+export function SeriesOverview({
+  series,
+  userSeries,
+  watchProgress,
+  seriesProviders
+}: SeriesOverviewProps) {
   const { t } = useTranslation();
 
   const userSeriesPostMutation = useUserSeriesMutation();
@@ -53,6 +62,13 @@ export function SeriesOverview({ series, userSeries, watchProgress }: SeriesOver
             {t("series:episode", { count: series.numberOfEpisodes })}
           </Text>
         </div>
+        <ScrollArea className="w-full min-w-0">
+          <div className="flex w-max min-w-full flex-row justify-start gap-6">
+            {seriesProviders.map((seriesProvider) => (
+              <ProviderCard seriesProvider={seriesProvider} />
+            ))}
+          </div>
+        </ScrollArea>
         <p>{series.overview}</p>
       </CardContent>
 

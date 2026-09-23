@@ -52,7 +52,7 @@ export default function EpisodeCard({
     <Dialog>
       <div className="group relative rounded-xl transition-transform hover:-translate-y-1 hover:shadow-md">
         <Card className="flex h-24 flex-row overflow-hidden p-0">
-          <div className="w-24 shrink-0 overflow-hidden bg-muted">
+          <div className="w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
             <Picture path={path} hover />
           </div>
 

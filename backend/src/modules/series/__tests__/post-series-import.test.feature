@@ -4,135 +4,155 @@ Feature: POST /api/series/import
         Given TMDB responds to "/tv/100" with:
             """
             {
-              "adult": false,
-              "backdrop_path": null,
-              "created_by": [{
                 "adult": false,
-                "gender": 1,
-                "id": 30,
-                "known_for_department": "Directing",
-                "name": "Creator",
+                "backdrop_path": null,
+                "created_by": [
+                    {
+                        "adult": false,
+                        "gender": 1,
+                        "id": 30,
+                        "known_for_department": "Directing",
+                        "name": "Creator",
+                        "popularity": 1,
+                        "profile_path": null
+                    }
+                ],
+                "first_air_date": "2020-01-01",
+                "genres": [
+                    {
+                        "id": 10,
+                        "name": "Drama"
+                    }
+                ],
+                "id": 100,
+                "in_production": false,
+                "last_air_date": "2020-01-01",
+                "name": "Refreshed series",
+                "seasons": [
+                    {
+                        "id": 1001,
+                        "season_number": 1
+                    }
+                ],
+                "networks": [
+                    {
+                        "id": 20,
+                        "logo_path": null,
+                        "name": "Network"
+                    }
+                ],
+                "number_of_episodes": 1,
+                "number_of_seasons": 1,
+                "original_language": "en",
+                "original_name": "Refreshed series",
+                "overview": "Refreshed overview",
                 "popularity": 1,
-                "profile_path": null
-              }],
-              "first_air_date": "2020-01-01",
-              "genres": [{ "id": 10, "name": "Drama" }],
-              "id": 100,
-              "in_production": false,
-              "last_air_date": "2020-01-01",
-              "name": "Refreshed series",
-              "seasons": [{ "id": 1001, "season_number": 1 }],
-              "networks": [{ "id": 20, "logo_path": null, "name": "Network" }],
-              "number_of_episodes": 1,
-              "number_of_seasons": 1,
-              "original_language": "en",
-              "original_name": "Refreshed series",
-              "overview": "Refreshed overview",
-              "popularity": 1,
-              "poster_path": null
+                "poster_path": null
             }
             """
 
         And TMDB responds to "/tv/100/season/1" with:
             """
             {
-              "air_date": "2020-01-01",
-              "episodes": [{
                 "air_date": "2020-01-01",
-                "crew": [{
-                  "adult": false,
-                  "gender": 2,
-                  "id": 31,
-                  "known_for_department": "Acting",
-                  "name": "Crew member",
-                  "popularity": 2,
-                  "profile_path": null
-                }],
-                "episode_number": 1,
-                "guest_stars": [{
-                  "adult": false,
-                  "character": "Hero",
-                  "gender": 2,
-                  "id": 32,
-                  "known_for_department": "Acting",
-                  "name": "Guest star",
-                  "popularity": 3,
-                  "profile_path": null
-                }],
-                "name": "Imported episode",
-                "overview": "Imported episode overview",
-                "id": 10001,
-                "still_path": null,
-                "runtime": 42,
+                "episodes": [
+                    {
+                        "air_date": "2020-01-01",
+                        "crew": [
+                            {
+                                "adult": false,
+                                "gender": 2,
+                                "id": 31,
+                                "known_for_department": "Acting",
+                                "name": "Crew member",
+                                "popularity": 2,
+                                "profile_path": null
+                            }
+                        ],
+                        "episode_number": 1,
+                        "guest_stars": [
+                            {
+                                "adult": false,
+                                "character": "Hero",
+                                "gender": 2,
+                                "id": 32,
+                                "known_for_department": "Acting",
+                                "name": "Guest star",
+                                "popularity": 3,
+                                "profile_path": null
+                            }
+                        ],
+                        "name": "Imported episode",
+                        "overview": "Imported episode overview",
+                        "id": 10001,
+                        "still_path": null,
+                        "runtime": 42,
+                        "season_number": 1,
+                        "vote_average": 1
+                    }
+                ],
+                "name": "Imported season",
+                "overview": "Imported season overview",
+                "id": 1001,
+                "poster_path": null,
                 "season_number": 1,
                 "vote_average": 1
-              }],
-              "name": "Imported season",
-              "overview": "Imported season overview",
-              "id": 1001,
-              "poster_path": null,
-              "season_number": 1,
-              "vote_average": 1
             }
             """
 
         And TMDB responds to "/tv/100/watch/providers" with:
             """
             {
-              "id": 100,
-              "results": {
-                "FR": {
-                  "buy": [{
-                    "logo_path": "/buy-provider.png",
-                    "provider_id": 40,
-                    "provider_name": "Buy provider",
-                    "display_priority": 2
-                  }],
-                  "flatrate": [{
-                    "logo_path": null,
-                    "provider_id": 41,
-                    "provider_name": "Subscription provider",
-                    "display_priority": 3
-                  }]
+                "id": 100,
+                "results": {
+                    "FR": {
+                        "flatrate": [
+                            {
+                                "logo_path": null,
+                                "provider_id": 41,
+                                "provider_name": "Subscription provider",
+                                "display_priority": 3
+                            }
+                        ]
+                    }
                 }
-              }
             }
             """
 
         And TMDB responds to "/tv/200" with:
             """
             {
-              "adult": false,
-              "backdrop_path": null,
-              "created_by": [],
-              "first_air_date": "2021-01-01",
-              "genres": [],
-              "id": 200,
-              "in_production": true,
-              "last_air_date": null,
-              "name": "Imported series",
-              "seasons": [],
-              "networks": [],
-              "number_of_episodes": 0,
-              "number_of_seasons": 0,
-              "original_language": "fr",
-              "original_name": "Imported series",
-              "overview": "Imported overview",
-              "popularity": 2,
-              "poster_path": null
+                "adult": false,
+                "backdrop_path": null,
+                "created_by": [],
+                "first_air_date": "2021-01-01",
+                "genres": [],
+                "id": 200,
+                "in_production": true,
+                "last_air_date": null,
+                "name": "Imported series",
+                "seasons": [],
+                "networks": [],
+                "number_of_episodes": 0,
+                "number_of_seasons": 0,
+                "original_language": "fr",
+                "original_name": "Imported series",
+                "overview": "Imported overview",
+                "popularity": 2,
+                "poster_path": null
             }
             """
 
         And TMDB responds to "/tv/200/watch/providers" with:
             """
             {
-              "id": 200,
-              "results": {}
+                "id": 200,
+                "results": {}
             }
             """
 
         And the database with these series:
-            | key          | id | tmdbId | firstAirDate            | lastAirDate             | name          | numberOfEpisodes | numberOfSeasons | originalLanguage | originalName      | overview           | popularity |
+            | key          | id | tmdbId | firstAirDate             | lastAirDate              | name          | numberOfEpisodes | numberOfSeasons | originalLanguage | originalName     | overview           | popularity |
             | cachedSeries | 1  | 100    | 2020-01-01T00:00:00.000Z | 2020-01-01T00:00:00.000Z | Cached series | 1                | 1               | en               | Refreshed series | Refreshed overview | 1          |
 
         And the database with these user series:
@@ -179,9 +199,8 @@ Feature: POST /api/series/import
             | network | 1  | 20     | Network |
 
         And the database should have these providers added:
-            | key                  | id | tmdbId | name                  | logoPath          | displayPriority |
-            | buyProvider          | 1  | 40     | Buy provider          | /buy-provider.png | 2               |
-            | subscriptionProvider | 2  | 41     | Subscription provider |                   | 3               |
+            | key                  | id | tmdbId | name                  | logoPath | displayPriority |
+            | subscriptionProvider | 1  | 41     | Subscription provider |          | 3               |
 
         And the database should have these people added:
             | key       | id | tmdbId | name        |
@@ -194,7 +213,7 @@ Feature: POST /api/series/import
             | hero | 1  | @people.guestStar | Hero |
 
         And the database should have these series genres added:
-            | seriesId             | genreId      |
+            | seriesId             | genreId       |
             | @series.cachedSeries | @genres.drama |
 
         And the database should have these series networks added:
@@ -203,7 +222,6 @@ Feature: POST /api/series/import
 
         And the database should have these series providers added:
             | seriesId             | providerId                      |
-            | @series.cachedSeries | @providers.buyProvider          |
             | @series.cachedSeries | @providers.subscriptionProvider |
 
         And the database should have these series people added:
