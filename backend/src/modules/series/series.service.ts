@@ -31,6 +31,7 @@ export const seriesService = {
       .selectAll()
       .join(seriesProviderTable)
       .where(eq(seriesProviderTable.seriesId, series.id))
+      .orderBy({ displayPriority: "asc" })
       .all();
 
     return { series, seasons, episodes, userSeries, userEpisodes, seriesProviders };

@@ -43,10 +43,7 @@ export async function syncTmdb(tmdbId: number) {
     fields: ["episodes"]
   });
   const providersResult = await tvWatchProviders(tmdbId);
-  const providersFR = [
-    ...(providersResult.results.FR?.buy ?? []),
-    ...(providersResult.results.FR?.flatrate ?? [])
-  ];
+  const providersFR = providersResult.results.FR?.flatrate ?? [];
 
   return prisma.$transaction(
     async (tx) => {
