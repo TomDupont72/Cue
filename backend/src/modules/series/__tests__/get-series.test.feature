@@ -27,7 +27,7 @@ Feature: GET /api/series/:id
             | otherProvider   | 3  |
 
         And the database with these series providers:
-            | seriesId          | providerId                |
+            | seriesId          | providerId                 |
             | @series.requested | @providers.requestedFirst  |
             | @series.requested | @providers.requestedSecond |
             | @series.other     | @providers.otherProvider   |
@@ -73,7 +73,7 @@ Feature: GET /api/series/:id
             | @userEpisodes.requestedSeenByUser |
 
         And the response array at "seriesProviders" should contain exactly these fixtures:
-            | fixture                   |
+            | fixture                    |
             | @providers.requestedFirst  |
             | @providers.requestedSecond |
 
@@ -160,7 +160,7 @@ Feature: GET /api/series/:id
             | @userEpisodes.requestedSeenByOtherUser |
 
         And the response array at "seriesProviders" should contain exactly these fixtures:
-            | fixture                   |
+            | fixture                    |
             | @providers.requestedFirst  |
             | @providers.requestedSecond |
 
