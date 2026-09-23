@@ -14,8 +14,9 @@ import { syncTmdb } from "@/modules/series/series.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { count } from "@/shared/db/aggregateExpressions.js";
-import { episodeTable } from "@/shared/db/constants/queryTables.js";
-import { lt, ne } from "@/shared/db/queryExpressions.js";
+import { episodeTable, seriesProviderTable } from "@/shared/db/constants/queryTables.js";
+import { eq, lt, ne } from "@/shared/db/queryExpressions.js";
+import { providerRelationalSelectQuery } from "@/modules/provider/provider.repository.js";
 
 export const seriesService = {
   async get(userId: string, params: SeriesGetParams) {
@@ -26,8 +27,13 @@ export const seriesService = {
     const userEpisodes = await userEpisodeSelectQuery()
       .where({ userId, episode: { seriesId: series.id } })
       .all();
+    const seriesProviders = await providerRelationalSelectQuery()
+      .selectAll()
+      .join(seriesProviderTable)
+      .where(eq(seriesProviderTable.seriesId, series.id))
+      .all();
 
-    return { series, seasons, episodes, userSeries, userEpisodes };
+    return { series, seasons, episodes, userSeries, userEpisodes, seriesProviders };
   },
 
   async importPost(userId: string | null, body: SeriesImportPostBody, forceSync = false) {

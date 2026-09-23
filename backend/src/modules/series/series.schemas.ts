@@ -3,6 +3,7 @@ import { seriesRowSchema } from "./series.db.schemas.js";
 import { userEpisodeRowSchema, userSeriesRowSchema } from "../user/user.db.schemas.js";
 import { seasonRowSchema } from "../season/season.db.schemas.js";
 import { episodeRowSchema } from "../episode/episode.db.schemas.js";
+import { providerRowSchema } from "../provider/provider.db.schemas.js";
 
 // =============================================================================
 // API RESPONSE SCHEMAS
@@ -18,7 +19,8 @@ export const seriesGetResponseSchema = z.object({
   seasons: z.array(seasonRowSchema),
   episodes: z.array(episodeRowSchema),
   userSeries: userSeriesRowSchema.nullable(),
-  userEpisodes: z.array(userEpisodeRowSchema)
+  userEpisodes: z.array(userEpisodeRowSchema),
+  seriesProviders: z.array(providerRowSchema)
 });
 
 export const seriesImportPostBodySchema = z.object({
