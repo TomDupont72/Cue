@@ -14,11 +14,13 @@ import Picture from "@/components/layout/picture";
 import type { ProviderRow } from "@/features/provider/types/provider.types";
 import { ProviderCard } from "@/features/provider/components/providerCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { GenreRow } from "@/features/genre/types/genre.types";
 
 type SeriesOverviewProps = {
   series: SeriesRow;
   userSeries: UserSeriesRow | null;
   seriesProviders: ProviderRow[];
+  seriesGenres: GenreRow[];
   isProgress?: boolean;
   watchProgress?: number;
 };
@@ -27,7 +29,8 @@ export function SeriesOverview({
   series,
   userSeries,
   watchProgress,
-  seriesProviders
+  seriesProviders,
+  seriesGenres
 }: SeriesOverviewProps) {
   const { t } = useTranslation();
 
@@ -60,6 +63,9 @@ export function SeriesOverview({
             {startYear} - {series.inProduction ? t("series:dates.present") : endYear} •{" "}
             {t("series:season", { count: series.numberOfSeasons })} •{" "}
             {t("series:episode", { count: series.numberOfEpisodes })}
+            {seriesGenres.length > 0
+              ? ` - ${seriesGenres.map((seriesGenre) => seriesGenre.name).join(", ")}`
+              : null}
           </Text>
         </div>
         <ScrollArea className="w-full min-w-0">
