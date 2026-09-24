@@ -14,9 +14,14 @@ import { syncTmdb } from "@/modules/series/series.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { count } from "@/shared/db/aggregateExpressions.js";
-import { episodeTable, seriesProviderTable } from "@/shared/db/constants/queryTables.js";
+import {
+  episodeTable,
+  seriesGenreTable,
+  seriesProviderTable
+} from "@/shared/db/constants/queryTables.js";
 import { eq, lt, ne } from "@/shared/db/queryExpressions.js";
 import { providerRelationalSelectQuery } from "@/modules/provider/provider.repository.js";
+import { genreRelationalSelectQuery } from "../genre/genre.repository.js";
 
 export const seriesService = {
   async get(userId: string, params: SeriesGetParams) {
@@ -33,8 +38,14 @@ export const seriesService = {
       .where(eq(seriesProviderTable.seriesId, series.id))
       .orderBy({ displayPriority: "asc" })
       .all();
+    const seriesGenres = await genreRelationalSelectQuery()
+      .selectAll()
+      .join(seriesGenreTable)
+      .where(eq(seriesGenreTable.seriesId, series.id))
+      .orderBy({ name: "asc" })
+      .all();
 
-    return { series, seasons, episodes, userSeries, userEpisodes, seriesProviders };
+    return { series, seasons, episodes, userSeries, userEpisodes, seriesProviders, seriesGenres };
   },
 
   async importPost(userId: string | null, body: SeriesImportPostBody, forceSync = false) {

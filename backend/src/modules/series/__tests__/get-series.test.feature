@@ -20,6 +20,18 @@ Feature: GET /api/series/:id
             | requestedSecond | 2  | @series.requested | @seasons.requestedSeason |
             | otherEpisode    | 3  | @series.other     | @seasons.otherSeason     |
 
+        And the database with these genres:
+            | key             | id |
+            | requestedFirst  | 1  |
+            | requestedSecond | 2  |
+            | otherProvider   | 3  |
+
+        And the database with these series genres:
+            | seriesId          | genreId                 |
+            | @series.requested | @genres.requestedFirst  |
+            | @series.requested | @genres.requestedSecond |
+            | @series.other     | @genres.otherProvider   |
+
         And the database with these providers:
             | key             | id |
             | requestedFirst  | 1  |
@@ -54,6 +66,7 @@ Feature: GET /api/series/:id
             | userSeries      |
             | userEpisodes    |
             | seriesProviders |
+            | seriesGenres    |
 
         And the response object at "series" should exactly match the fixture "@series.requested"
 
@@ -89,6 +102,7 @@ Feature: GET /api/series/:id
             | userSeries      |
             | userEpisodes    |
             | seriesProviders |
+            | seriesGenres    |
 
         And the response object at "series" should exactly match the fixture "@series.other"
 
@@ -119,6 +133,7 @@ Feature: GET /api/series/:id
             | userSeries      |
             | userEpisodes    |
             | seriesProviders |
+            | seriesGenres    |
 
         And the response object at "series" should exactly match the fixture "@series.empty"
         And the response array at "seasons" should be empty
@@ -141,6 +156,7 @@ Feature: GET /api/series/:id
             | userSeries      |
             | userEpisodes    |
             | seriesProviders |
+            | seriesGenres    |
 
         And the response object at "series" should exactly match the fixture "@series.requested"
 

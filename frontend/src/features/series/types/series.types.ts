@@ -1,4 +1,5 @@
 import type { EpisodeRow } from "@/features/episode/types/episode.types";
+import type { GenreRow } from "@/features/genre/types/genre.types";
 import type { ProviderRow } from "@/features/provider/types/provider.types";
 import type { SeasonRow } from "@/features/season/types/season.types";
 import type { UserEpisodeRow, UserSeriesRow } from "@/features/user/types/user.types";
@@ -39,6 +40,7 @@ export type SeriesGetResponse = {
   userSeries: UserSeriesRow | null;
   userEpisodes: UserEpisodeRow[];
   seriesProviders: ProviderRow[];
+  seriesGenres: GenreRow[];
 };
 
 export type SeriesImportPostResponse = {
