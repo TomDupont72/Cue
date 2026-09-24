@@ -15,7 +15,6 @@ import type { ProviderRow } from "@/features/provider/types/provider.types";
 import { ProviderCard } from "@/features/provider/components/providerCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { GenreRow } from "@/features/genre/types/genre.types";
-import { twJoin } from "tailwind-merge";
 
 type SeriesOverviewProps = {
   series: SeriesRow;
