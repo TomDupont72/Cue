@@ -82,7 +82,8 @@ function SeriesContent({ seriesId }: SeriesContentProps) {
     return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
   }
 
-  const { episodes, userEpisodes, seasons, series, userSeries, seriesProviders } = seriesQuery.data;
+  const { episodes, userEpisodes, seasons, series, userSeries, seriesProviders, seriesGenres } =
+    seriesQuery.data;
 
   const watchProgress = userSeries
     ? getWatchProgress(userSeries?.watchCount, series.numberOfEpisodes)
@@ -116,6 +117,7 @@ function SeriesContent({ seriesId }: SeriesContentProps) {
               series={series}
               userSeries={userSeries}
               seriesProviders={seriesProviders}
+              seriesGenres={seriesGenres}
               watchProgress={watchProgress}
             />
           ) : (
