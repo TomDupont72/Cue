@@ -12,6 +12,34 @@ Feature: GET /api/user/series
             | droppedSeries   | 5  |
             | otherUserSeries | 6  |
 
+        And the database with these providers:
+            | key       | id |
+            | common    | 1  |
+            | secondary | 2  |
+
+        And the database with these series providers:
+            | seriesId                | providerId           |
+            | @series.watchingSeries  | @providers.common    |
+            | @series.watchingSeries  | @providers.secondary |
+            | @series.pausedSeries    | @providers.common    |
+            | @series.completedSeries | @providers.common    |
+            | @series.droppedSeries   | @providers.common    |
+            | @series.otherUserSeries | @providers.common    |
+
+        And the database with these genres:
+            | key       | id |
+            | common    | 1  |
+            | secondary | 2  |
+
+        And the database with these series genres:
+            | seriesId                | genreId           |
+            | @series.watchingSeries  | @genres.common    |
+            | @series.watchingSeries  | @genres.secondary |
+            | @series.pausedSeries    | @genres.common    |
+            | @series.completedSeries | @genres.common    |
+            | @series.droppedSeries   | @genres.common    |
+            | @series.otherUserSeries | @genres.common    |
+
         And the database with these user series:
             | key               | userId | seriesId                | status    |
             | plannedProgress   | user-1 | @series.plannedSeries   | PLANNED   |
@@ -30,20 +58,28 @@ Feature: GET /api/user/series
             | series |
 
         And the response array at "series" should contain exactly these fixtures:
-            | fixture                       | seriesDetails           |
-            | @userSeries.plannedProgress   | @series.plannedSeries   |
-            | @userSeries.watchingProgress  | @series.watchingSeries  |
-            | @userSeries.pausedProgress    | @series.pausedSeries    |
-            | @userSeries.completedProgress | @series.completedSeries |
-            | @userSeries.droppedProgress   | @series.droppedSeries   |
+            | fixture                       | seriesDetails           | seriesProviders                                  | seriesGenres                                  |
+            | @userSeries.plannedProgress   | @series.plannedSeries   | fixtures:                                        | fixtures:                                     |
+            | @userSeries.watchingProgress  | @series.watchingSeries  | fixtures:@providers.common,@providers.secondary | fixtures:@genres.common,@genres.secondary     |
+            | @userSeries.pausedProgress    | @series.pausedSeries    | fixtures:@providers.common                      | fixtures:@genres.common                       |
+            | @userSeries.completedProgress | @series.completedSeries | fixtures:@providers.common                      | fixtures:@genres.common                       |
+            | @userSeries.droppedProgress   | @series.droppedSeries   | fixtures:@providers.common                      | fixtures:@genres.common                       |
 
     Scenario: Get user series - Filter by series
         When I send a GET request to "/api/user/series?seriesId=2"
 
         Then the response status should be 200
         And the response array at "series" should exactly match these fixtures:
-            | fixture                      | seriesDetails          |
-            | @userSeries.watchingProgress | @series.watchingSeries |
+            | fixture                      | seriesDetails          | seriesProviders                                  | seriesGenres                              |
+            | @userSeries.watchingProgress | @series.watchingSeries | fixtures:@providers.common,@providers.secondary | fixtures:@genres.common,@genres.secondary |
+
+    Scenario: Get user series - Without provider or genre
+        When I send a GET request to "/api/user/series?seriesId=1"
+
+        Then the response status should be 200
+        And the response array at "series" should exactly match these fixtures:
+            | fixture                     | seriesDetails         | seriesProviders | seriesGenres |
+            | @userSeries.plannedProgress | @series.plannedSeries | fixtures:       | fixtures:    |
 
     Scenario: Get user series - Another user
         Given authentication as "user-2"
@@ -52,8 +88,8 @@ Feature: GET /api/user/series
 
         Then the response status should be 200
         And the response array at "series" should exactly match these fixtures:
-            | fixture                       | seriesDetails           |
-            | @userSeries.otherUserProgress | @series.otherUserSeries |
+            | fixture                       | seriesDetails           | seriesProviders             | seriesGenres           |
+            | @userSeries.otherUserProgress | @series.otherUserSeries | fixtures:@providers.common | fixtures:@genres.common |
 
     Scenario: Get user series - Series owned by another user
         When I send a GET request to "/api/user/series?seriesId=6"

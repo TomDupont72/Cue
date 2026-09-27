@@ -1,5 +1,11 @@
 import { Prisma } from "@/generated/prisma/client.js";
-import type { Column, Table } from "@/shared/db/types/relationalQuery.types.js";
+import type {
+  Column,
+  ManyProjection,
+  ResultOrder,
+  Table,
+  TableReference
+} from "@/shared/db/types/relationalQuery.types.js";
 
 export function identifier(name: string): Prisma.Sql {
   return Prisma.raw(`"${name.replaceAll('"', '""')}"`);
@@ -31,4 +37,15 @@ export function defineTable<TRow extends object>(
 
 export function getColumn(table: { $name: string; $from: Prisma.Sql }, field: string) {
   return (table as unknown as Record<string, Column<unknown>>)[field];
+}
+
+export function many<TRow extends object>(
+  table: TableReference<TRow>,
+  orderBy: ResultOrder<TRow> = {}
+): ManyProjection<TRow> {
+  return {
+    $kind: "many",
+    orderBy,
+    table
+  };
 }

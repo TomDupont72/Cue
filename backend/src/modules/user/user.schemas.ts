@@ -2,6 +2,8 @@ import z from "zod";
 import { seriesRowSchema } from "../series/series.db.schemas.js";
 import { userEpisodeRowSchema, userSeriesRowSchema } from "./user.db.schemas.js";
 import { episodeRowSchema } from "../episode/episode.db.schemas.js";
+import { providerRowSchema } from "../provider/provider.db.schemas.js";
+import { genreRowSchema } from "../genre/genre.db.schemas.js";
 
 // =============================================================================
 // API RESPONSE SCHEMAS
@@ -18,7 +20,9 @@ export const userSeasonDeleteResponseSchema = z.array(userEpisodeRowSchema);
 export const userSeriesGetResponseSchema = z.object({
   series: z.array(
     userSeriesRowSchema.extend({
-      seriesDetails: seriesRowSchema
+      seriesDetails: seriesRowSchema,
+      seriesProviders: z.array(providerRowSchema),
+      seriesGenres: z.array(genreRowSchema)
     })
   )
 });

@@ -30,12 +30,15 @@ import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import {
   episodeTable,
+  genreTable,
+  providerTable,
   seriesTable,
   userEpisodeTable,
   userSeriesTable
 } from "@/shared/db/constants/queryTables.js";
 import { coalesce, count, countWhere, max, sum } from "@/shared/db/aggregateExpressions.js";
 import { asc, dateOnly, eq, gt, ne } from "@/shared/db/queryExpressions.js";
+import { many } from "@/shared/db/queryTables.js";
 
 export const userService = {
   async seriesGet(userId: string, params: UserSeriesGetParams) {
@@ -43,8 +46,14 @@ export const userService = {
 
     const series = await userSeriesRelationalSelectQuery()
       .join(seriesTable)
+      .join(providerTable)
+      .join(genreTable)
       .selectAll()
-      .select({ seriesDetails: seriesTable })
+      .select({
+        seriesDetails: seriesTable,
+        seriesProviders: many(providerTable, { displayPriority: "asc", id: "asc" }),
+        seriesGenres: many(genreTable, { name: "asc", id: "asc" })
+      })
       .where({ userId, seriesId })
       .orderBy({ lastWatchedAt: "desc" })
       .all();
