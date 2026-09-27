@@ -6,10 +6,11 @@ import user from "./locales/fr/user.json";
 import series from "./locales/fr/series.json";
 import episode from "./locales/fr/episode.json";
 import errors from "./locales/fr/errors.json";
+import genre from "./locales/fr/genre.json";
 
 await i18n.use(initReactI18next).init({
   resources: {
-    fr: { common, user, series, episode, errors }
+    fr: { common, user, series, episode, errors, genre }
   },
   lng: "fr",
   fallbackLng: "fr",

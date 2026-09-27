@@ -15,6 +15,7 @@ import type { ProviderRow } from "@/features/provider/types/provider.types";
 import { ProviderCard } from "@/features/provider/components/providerCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { GenreRow } from "@/features/genre/types/genre.types";
+import { GENRE_KEY_BY_NAME } from "@/features/genre/constants/genreName";
 
 type SeriesOverviewProps = {
   series: SeriesRow;
@@ -39,6 +40,26 @@ export function SeriesOverview({
   const startYear = getYear(series.firstAirDate);
   const endYear = getYear(series.lastAirDate);
 
+  const genreNames = seriesGenres.map((seriesGenre) => {
+    if (seriesGenre.name in GENRE_KEY_BY_NAME) {
+      return t(`genre:${GENRE_KEY_BY_NAME[seriesGenre.name]}`);
+    }
+  });
+
+  const datesString = [startYear, series.inProduction ? t("series:dates.present") : endYear].join(
+    " - "
+  );
+  const genresString = genreNames.join(", ");
+  const informations = [
+    datesString,
+    t("series:season", { count: series.numberOfSeasons }),
+    t("series:episode", { count: series.numberOfEpisodes })
+  ];
+  const informationsString =
+    seriesGenres.length > 0
+      ? [...informations, genresString].join(" • ")
+      : informations.join(" • ");
+
   return (
     <Card className="group overflow-hidden p-0">
       <div className="overflow-hidden bg-muted">
@@ -59,14 +80,7 @@ export function SeriesOverview({
             <SeriesProductionBadge inProduction={series.inProduction} />
             {userSeries ? <StatusBadge status={userSeries.status} /> : null}
           </div>
-          <Text variant="muted">
-            {startYear} - {series.inProduction ? t("series:dates.present") : endYear} •{" "}
-            {t("series:season", { count: series.numberOfSeasons })} •{" "}
-            {t("series:episode", { count: series.numberOfEpisodes })}
-            {seriesGenres.length > 0
-              ? ` - ${seriesGenres.map((seriesGenre) => seriesGenre.name).join(", ")}`
-              : null}
-          </Text>
+          <Text variant="muted">{informationsString}</Text>
         </div>
         <ScrollArea className="w-full min-w-0">
           <div className="flex w-max min-w-full flex-row justify-start gap-6">
