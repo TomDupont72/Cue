@@ -1,8 +1,8 @@
+import type { GenreKeyByName } from "../constants/genreName";
+
 // =============================================================================
 // DATABASE ROW TYPES
 // =============================================================================
-
-import type { GenreKeyByName } from "../constants/genreName";
 
 export type GenreRow = {
   id: number;
