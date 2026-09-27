@@ -1,0 +1,18 @@
+{
+  "ACTION_ADVENTURE": "Action & Aventure",
+  "ANIMATION": "Animation",
+  "COMEDY": "Comédie",
+  "CRIME": "Crime",
+  "DOCUMENTARY": "Documentaire",
+  "DRAMA": "Drame",
+  "FAMILY": "Familial",
+  "KIDS": "Enfants",
+  "MYSTERY": "Mystère",
+  "NEWS": "Actualités",
+  "REALITY": "Télé-réalité",
+  "SCIFI_FANTASY": "Science-Fiction & Fantastique",
+  "SOAP": "Feuilleton",
+  "TALK": "Talk-show",
+  "WAR_POLITICS": "Guerre & Politique",
+  "WESTERN": "Western"
+}
