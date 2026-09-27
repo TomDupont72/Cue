@@ -1,6 +1,8 @@
 import type { SeriesRow } from "@/features/series/types/series.types";
 import { USER_SERIES_STATUS, type UserSeriesStatus } from "../constants/userSeriesStatus";
 import type { EpisodeRow } from "@/features/episode/types/episode.types";
+import type { GenreRow } from "@/features/genre/types/genre.types";
+import type { ProviderRow } from "@/features/provider/types/provider.types";
 
 // =============================================================================
 // DATABASE ROW TYPES
@@ -38,6 +40,8 @@ export type UserSeasonDeleteResponse = UserEpisodeRow[];
 export type UserSeriesGetResponse = {
   series: (UserSeriesRow & {
     seriesDetails: SeriesRow;
+    seriesProviders: ProviderRow[];
+    seriesGenres: GenreRow[];
   })[];
 };
 
@@ -86,4 +90,4 @@ export type WatchSectionItem = Omit<
   seriesBackdropPath: string | null;
 };
 
-export type SeriesSectionItem = UserSeriesRow & { seriesDetails: SeriesRow };
+export type SeriesSectionItem = UserSeriesGetResponse["series"][number];
