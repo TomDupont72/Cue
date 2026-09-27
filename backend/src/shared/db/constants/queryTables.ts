@@ -14,6 +14,18 @@ import {
   type UserSeries
 } from "@/generated/prisma/client.js";
 import { defineTable } from "@/shared/db/queryTables.js";
+import type { Column, TableReference } from "@/shared/db/types/relationalQuery.types.js";
+
+export type QueryRelation = {
+  from: TableReference;
+  to: TableReference;
+  left: Column<unknown>;
+  right: Column<unknown>;
+  /** Number of `from` rows related to one `to` row. */
+  fromCardinality: "one" | "many";
+  /** Number of `to` rows related to one `from` row. */
+  toCardinality: "one" | "many";
+};
 
 export const episodeTable = defineTable<Episode>(
   "Episode",
@@ -77,45 +89,71 @@ export const seriesNetworkTable = defineTable<SeriesNetwork>(
 
 export const seriesPeopleTable = defineTable<SeriesPeople>(
   "SeriesPeople",
-  "sp",
+  "spe",
   Object.values(Prisma.SeriesPeopleScalarFieldEnum)
 );
 
 export const seriesProviderTable = defineTable<SeriesProvider>(
   "SeriesProvider",
-  "sp",
+  "spr",
   Object.values(Prisma.SeriesProviderScalarFieldEnum)
 );
 
-export const queryRelations = [
+export const queryRelations: readonly QueryRelation[] = [
   {
-    from: userEpisodeTable.$name,
-    to: episodeTable.$name,
+    from: userEpisodeTable,
+    to: episodeTable,
     left: userEpisodeTable.episodeId,
-    right: episodeTable.id
+    right: episodeTable.id,
+    fromCardinality: "many",
+    toCardinality: "one"
   },
   {
-    from: episodeTable.$name,
-    to: seriesTable.$name,
+    from: episodeTable,
+    to: seriesTable,
     left: episodeTable.seriesId,
-    right: seriesTable.id
+    right: seriesTable.id,
+    fromCardinality: "many",
+    toCardinality: "one"
   },
   {
-    from: seriesTable.$name,
-    to: userSeriesTable.$name,
+    from: seriesTable,
+    to: userSeriesTable,
     left: seriesTable.id,
-    right: userSeriesTable.seriesId
+    right: userSeriesTable.seriesId,
+    fromCardinality: "one",
+    toCardinality: "many"
   },
   {
-    from: providerTable.$name,
-    to: seriesProviderTable.$name,
-    left: providerTable.id,
-    right: seriesProviderTable.providerId
+    from: seriesTable,
+    to: seriesProviderTable,
+    left: seriesTable.id,
+    right: seriesProviderTable.seriesId,
+    fromCardinality: "one",
+    toCardinality: "many"
   },
   {
-    from: genreTable.$name,
-    to: seriesGenreTable.$name,
-    left: genreTable.id,
-    right: seriesGenreTable.genreId
+    from: seriesProviderTable,
+    to: providerTable,
+    left: seriesProviderTable.providerId,
+    right: providerTable.id,
+    fromCardinality: "many",
+    toCardinality: "one"
+  },
+  {
+    from: seriesTable,
+    to: seriesGenreTable,
+    left: seriesTable.id,
+    right: seriesGenreTable.seriesId,
+    fromCardinality: "one",
+    toCardinality: "many"
+  },
+  {
+    from: seriesGenreTable,
+    to: genreTable,
+    left: seriesGenreTable.genreId,
+    right: genreTable.id,
+    fromCardinality: "many",
+    toCardinality: "one"
   }
 ];

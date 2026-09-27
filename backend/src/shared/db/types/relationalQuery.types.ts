@@ -23,16 +23,24 @@ export type Table<TRow extends object> = Omit<TableReference<TRow>, "$columns"> 
   [K in keyof TRow & string]: Column<TRow[K]>;
 };
 
-export type ProjectionValue = Expression<unknown> | TableReference;
+export type ManyProjection<TRow extends object = object> = {
+  $kind: "many";
+  orderBy: ResultOrder<TRow>;
+  table: TableReference<TRow>;
+};
+
+export type ProjectionValue = Expression<unknown> | TableReference | ManyProjection;
 
 export type Projection = Record<string, ProjectionValue>;
 
 export type Projected<TProjection extends Projection> = {
-  [K in keyof TProjection]: TProjection[K] extends TableReference<infer TRow>
-    ? TRow
-    : TProjection[K] extends Expression<infer TValue>
-      ? TValue
-      : never;
+  [K in keyof TProjection]: TProjection[K] extends ManyProjection<infer TRow>
+    ? TRow[]
+    : TProjection[K] extends TableReference<infer TRow>
+      ? TRow
+      : TProjection[K] extends Expression<infer TValue>
+        ? TValue
+        : never;
 };
 
 export type Predicate = {

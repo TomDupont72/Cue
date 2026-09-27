@@ -97,6 +97,20 @@ export function buildExpectedFixtures(
       extraFields.map((field, index) => {
         const value = row[index + 1] ?? "";
 
+        if (value.startsWith("fixtures:")) {
+          const references = value
+            .slice("fixtures:".length)
+            .split(",")
+            .map((reference) => reference.trim())
+            .filter(Boolean);
+
+          if (references.some((reference) => !reference.startsWith("@"))) {
+            throw new Error(`Invalid fixture collection: ${value}`);
+          }
+
+          return [field, references.map(resolveFixture)];
+        }
+
         return [field, value.startsWith("@") ? resolveFixture(value) : parseCell(value)];
       })
     );
