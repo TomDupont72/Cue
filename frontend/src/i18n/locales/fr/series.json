@@ -29,9 +29,9 @@
     "emptySeriesTitle": "Aucune série",
     "emptySeriesDescription": "Ajoute une série pour commencer.",
     "categories": {
-        "status": "Statut",
-        "genre": "Genre",
-        "provider": "Plateforme"
+      "status": "Statut",
+      "genre": "Genre",
+      "provider": "Plateforme"
     }
   },
   "season_one": "{{count}} saison",

@@ -4,7 +4,7 @@ import type { SeriesSectionItem } from "../types/user.types";
 
 type UserSeriesSectionProps = {
   series: SeriesSectionItem[];
-  category: string,
+  category: string;
 };
 
 export function UserSeriesSection({ series, category }: UserSeriesSectionProps) {

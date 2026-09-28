@@ -16,53 +16,58 @@ import type { TFunction } from "i18next";
 import { useMemo, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 
+const EMPTY_SERIES: UserSeriesGetResponse["series"] = [];
+
 const getSeriesIdsByCategory = (series: UserSeriesGetResponse["series"], t: TFunction) => {
-    const seriesByStatus = new Map()
-    for (const serie of series) {
-        const statusName = t(`user:series.status.${USER_SERIES_STATUS[serie.status]}.section`)
-        const currentValue = seriesByStatus.get(statusName) ?? []
-        seriesByStatus.set(statusName, [...currentValue, serie])
-    }
+  const seriesByStatus = new Map();
+  for (const serie of series) {
+    const statusName = t(`user:series.status.${USER_SERIES_STATUS[serie.status]}.section`);
+    const currentValue = seriesByStatus.get(statusName) ?? [];
+    seriesByStatus.set(statusName, [...currentValue, serie]);
+  }
 
-    const seriesIdsByStatusOrder = [
-        t(`user:series.status.${USER_SERIES_STATUS.WATCHING}.section`),
-        t(`user:series.status.${USER_SERIES_STATUS.PAUSED}.section`),
-        t(`user:series.status.${USER_SERIES_STATUS.PLANNED}.section`),
-        t(`user:series.status.${USER_SERIES_STATUS.COMPLETED}.section`),
-        t(`user:series.status.${USER_SERIES_STATUS.DROPPED}.section`),
-    ]
+  const seriesIdsByStatusOrder = [
+    t(`user:series.status.${USER_SERIES_STATUS.WATCHING}.section`),
+    t(`user:series.status.${USER_SERIES_STATUS.PAUSED}.section`),
+    t(`user:series.status.${USER_SERIES_STATUS.PLANNED}.section`),
+    t(`user:series.status.${USER_SERIES_STATUS.COMPLETED}.section`),
+    t(`user:series.status.${USER_SERIES_STATUS.DROPPED}.section`)
+  ];
 
-    const seriesByStatusSorted = new Map(Array.from(seriesByStatus.entries()).sort(
-        ([keyA], [keyB]) => seriesIdsByStatusOrder.indexOf(keyA) - seriesIdsByStatusOrder.indexOf(keyB))
+  const seriesByStatusSorted = new Map(
+    Array.from(seriesByStatus.entries()).sort(
+      ([keyA], [keyB]) =>
+        seriesIdsByStatusOrder.indexOf(keyA) - seriesIdsByStatusOrder.indexOf(keyB)
     )
+  );
 
-    const seriesByGenre = new Map()
-    for (const serie of series) {
-        for (const genre of serie.seriesGenres) {
-            const genreName = t(`genre:${GENRE_KEY_BY_NAME[genre.name] ?? "OTHER"}`)
-            const currentValue = seriesByGenre.get(genreName) ?? []
-            seriesByGenre.set(genreName, [...currentValue, serie])
-        }
+  const seriesByGenre = new Map();
+  for (const serie of series) {
+    for (const genre of serie.seriesGenres) {
+      const genreName = t(`genre:${GENRE_KEY_BY_NAME[genre.name] ?? "OTHER"}`);
+      const currentValue = seriesByGenre.get(genreName) ?? [];
+      seriesByGenre.set(genreName, [...currentValue, serie]);
     }
+  }
 
-    const seriesByGenreSorted = new Map(Array.from(seriesByGenre.entries()).sort(
-        ([keyA], [keyB]) => keyA.localeCompare(keyB))
-    )
+  const seriesByGenreSorted = new Map(
+    Array.from(seriesByGenre.entries()).sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+  );
 
-    const seriesByProvider = new Map()
-    for (const serie of series) {
-        for (const provider of serie.seriesProviders) {
-            const currentValue = seriesByProvider.get(provider.name) ?? []
-            seriesByProvider.set(provider.name, [...currentValue, serie])
-        }
+  const seriesByProvider = new Map();
+  for (const serie of series) {
+    for (const provider of serie.seriesProviders) {
+      const currentValue = seriesByProvider.get(provider.name) ?? [];
+      seriesByProvider.set(provider.name, [...currentValue, serie]);
     }
+  }
 
-    const seriesByProviderSorted = new Map(Array.from(seriesByProvider.entries()).sort(
-        ([keyA], [keyB]) => keyA.localeCompare(keyB)
-    ))
+  const seriesByProviderSorted = new Map(
+    Array.from(seriesByProvider.entries()).sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+  );
 
-    return [seriesByStatusSorted, seriesByGenreSorted, seriesByProviderSorted]
-}
+  return [seriesByStatusSorted, seriesByGenreSorted, seriesByProviderSorted];
+};
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -70,33 +75,36 @@ export default function Dashboard() {
   const dashboardSummaryQuery = useUserDashboardSummary();
 
   const userSeriesQuery = useUserSeries();
-  const series = userSeriesQuery.data?.series ?? [];
+  const series = userSeriesQuery.data?.series ?? EMPTY_SERIES;
 
   const isPending = userSeriesQuery.isPending || dashboardSummaryQuery.isPending;
 
-  const [category, setCategory] = useState<string>("Statut")
+  const [category, setCategory] = useState<string>("status");
 
   const [, startTransition] = useTransition();
 
-    const handleCategoryChange = (value: string) => {
+  const handleCategoryChange = (value: string) => {
     startTransition(() => setCategory(value));
-    };
+  };
 
-  const categories = [
-    t("series:dashboard.categories.status"),
-    t("series:dashboard.categories.genre"),
-    t("series:dashboard.categories.provider")
-  ]
-
-  const [seriesByStatus, seriesByGenre, seriesByProvider] = useMemo(() => getSeriesIdsByCategory(series, t), [series])
+  const [seriesByStatus, seriesByGenre, seriesByProvider] = useMemo(
+    () => getSeriesIdsByCategory(series, t),
+    [series, t]
+  );
 
   const seriesMapByCategory: Record<string, Map<string, UserSeriesGetResponse["series"]>> = {
-    [categories[0]]: seriesByStatus,
-    [categories[1]]: seriesByGenre,
-    [categories[2]]: seriesByProvider
-  }
+    status: seriesByStatus,
+    genre: seriesByGenre,
+    provider: seriesByProvider
+  };
+  const categoryNames = Object.fromEntries(
+    Object.keys(seriesMapByCategory).map((category) => [
+      category,
+      t(`series:dashboard.categories.${category}`)
+    ])
+  );
 
-  const seriesIdsByCategory = seriesMapByCategory[category]
+  const seriesIdsByCategory = seriesMapByCategory[category];
 
   if (isPending) {
     return <LoadingState />;
@@ -142,7 +150,11 @@ export default function Dashboard() {
           <Heading level={1} full={false} className="uppercase">
             {t("user:series.mySeries")}
           </Heading>
-          <GroupButton categories={categories} category={category} onCategoryChange={handleCategoryChange} />
+          <GroupButton
+            categories={categoryNames}
+            category={t(`series:dashboard.categories.${category}`)}
+            onCategoryChange={handleCategoryChange}
+          />
         </div>
         <div className="flex flex-col gap-4">
           {Array.from(seriesIdsByCategory.keys()).map((category) => (
