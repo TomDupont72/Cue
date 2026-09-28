@@ -14,5 +14,6 @@
   "SOAP": "Feuilleton",
   "TALK": "Talk-show",
   "WAR_POLITICS": "Guerre & Politique",
-  "WESTERN": "Western"
+  "WESTERN": "Western",
+  "OTHER": "Autre"
 }

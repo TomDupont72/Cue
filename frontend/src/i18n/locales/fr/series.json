@@ -27,7 +27,12 @@
   },
   "dashboard": {
     "emptySeriesTitle": "Aucune série",
-    "emptySeriesDescription": "Ajoute une série pour commencer."
+    "emptySeriesDescription": "Ajoute une série pour commencer.",
+    "categories": {
+        "status": "Statut",
+        "genre": "Genre",
+        "provider": "Plateforme"
+    }
   },
   "season_one": "{{count}} saison",
   "season_other": "{{count}} saisons",

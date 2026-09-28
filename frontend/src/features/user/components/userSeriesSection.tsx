@@ -1,15 +1,13 @@
 import SeriesDisplay from "@/features/series/components/seriesDisplay";
-import { useTranslation } from "react-i18next";
 import { Heading } from "@/components/layout/heading";
 import type { SeriesSectionItem } from "../types/user.types";
 
 type UserSeriesSectionProps = {
   series: SeriesSectionItem[];
+  category: string,
 };
 
-export function UserSeriesSection({ series }: UserSeriesSectionProps) {
-  const { t } = useTranslation();
-
+export function UserSeriesSection({ series, category }: UserSeriesSectionProps) {
   if (series.length === 0) {
     return null;
   }
@@ -17,7 +15,7 @@ export function UserSeriesSection({ series }: UserSeriesSectionProps) {
   return (
     <section className="flex flex-col gap-4">
       <Heading level={3} className="uppercase">
-        {t(`user:series.status.${series[0].status}.section`)}
+        {category}
       </Heading>
       <div className="h-px w-full bg-border" />
       <SeriesDisplay series={series.map((item) => item.seriesDetails)} userSeries={series} />
