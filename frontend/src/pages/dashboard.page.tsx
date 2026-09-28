@@ -13,7 +13,7 @@ import { useUserDashboardSummary } from "@/features/user/hooks/useUserDashboardS
 import { useUserSeries } from "@/features/user/hooks/useUserSeries";
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 import type { TFunction } from "i18next";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 
 const getSeriesIdsByCategory = (series: UserSeriesGetResponse["series"], t: TFunction) => {
@@ -76,7 +76,7 @@ export default function Dashboard() {
 
   const [category, setCategory] = useState<string>("Statut")
 
-  const [isChangingCategory, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
     const handleCategoryChange = (value: string) => {
     startTransition(() => setCategory(value));
