@@ -71,17 +71,16 @@ const getSeriesIdsByCategory = (series: UserSeriesGetResponse["series"], t: TFun
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const [, startTransition] = useTransition();
 
   const dashboardSummaryQuery = useUserDashboardSummary();
-
   const userSeriesQuery = useUserSeries();
+
   const series = userSeriesQuery.data?.series ?? EMPTY_SERIES;
 
   const isPending = userSeriesQuery.isPending || dashboardSummaryQuery.isPending;
-
   const [category, setCategory] = useState<string>("status");
 
-  const [, startTransition] = useTransition();
 
   const handleCategoryChange = (value: string) => {
     startTransition(() => setCategory(value));
