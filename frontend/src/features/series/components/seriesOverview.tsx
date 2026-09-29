@@ -41,9 +41,7 @@ export function SeriesOverview({
   const endYear = getYear(series.lastAirDate);
 
   const genreNames = seriesGenres.map((seriesGenre) => {
-    if (seriesGenre.name in GENRE_KEY_BY_NAME) {
-      return t(`genre:${GENRE_KEY_BY_NAME[seriesGenre.name]}`);
-    }
+    return t(`genre:${GENRE_KEY_BY_NAME[seriesGenre.name] ?? "OTHER"}`);
   });
 
   const datesString = [startYear, series.inProduction ? t("series:dates.present") : endYear].join(

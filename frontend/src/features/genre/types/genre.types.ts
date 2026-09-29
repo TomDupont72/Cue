@@ -1,5 +1,3 @@
-import type { GenreKeyByName } from "../constants/genreName";
-
 // =============================================================================
 // DATABASE ROW TYPES
 // =============================================================================
@@ -7,7 +5,7 @@ import type { GenreKeyByName } from "../constants/genreName";
 export type GenreRow = {
   id: number;
   tmdbId: number;
-  name: GenreKeyByName;
+  name: string;
   createdAt: string;
   updatedAt: string;
 };

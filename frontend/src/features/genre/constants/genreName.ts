@@ -1,4 +1,4 @@
-export const GENRE_KEY_BY_NAME = {
+export const GENRE_KEY_BY_NAME: Record<string, string> = {
   "Action & Adventure": "ACTION_ADVENTURE",
   Animation: "ANIMATION",
   Comédie: "COMEDY",
@@ -15,6 +15,4 @@ export const GENRE_KEY_BY_NAME = {
   Talk: "TALK",
   "War & Politics": "WAR_POLITICS",
   Western: "WESTERN"
-} as const;
-
-export type GenreKeyByName = keyof typeof GENRE_KEY_BY_NAME;
+};
