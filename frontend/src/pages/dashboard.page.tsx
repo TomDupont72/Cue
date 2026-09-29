@@ -81,7 +81,6 @@ export default function Dashboard() {
   const isPending = userSeriesQuery.isPending || dashboardSummaryQuery.isPending;
   const [category, setCategory] = useState<string>("status");
 
-
   const handleCategoryChange = (value: string) => {
     startTransition(() => setCategory(value));
   };
