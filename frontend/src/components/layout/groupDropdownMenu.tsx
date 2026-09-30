@@ -14,12 +14,16 @@ type GroupButtonProps = {
   onCategoryChange: (category: string) => void;
 };
 
-export default function GroupButton({ categories, category, onCategoryChange }: GroupButtonProps) {
+export default function GroupDropdownMenu({
+  categories,
+  category,
+  onCategoryChange
+}: GroupButtonProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="simple" className="flex flex-row w-[185px] justify-between">
+          <Button variant="outline" size="lg" className="flex flex-row w-[185px] justify-between">
             <div className="flex flex-row items-center gap-2">
               <ListFilterIcon />
               <Heading level={4}>Par {category.toLowerCase()}</Heading>
