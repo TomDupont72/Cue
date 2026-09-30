@@ -17,5 +17,12 @@
   },
   "app": {
     "install": "Installer l'application"
+  },
+  "labels": {
+    "filters": "Filtres"
+  },
+  "actions": {
+    "filterMySeries": "Filtrer mes séries",
+    "apply": "Appliquer"
   }
 }
