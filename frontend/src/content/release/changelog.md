@@ -6,6 +6,16 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ---
 
+## [1.2.0] · _1 octobre 2026_
+
+### Ajouts
+
+- Ajout des genre dans la page des séries.
+- Ajout d'un bouton de groupe dans le dashboard
+- Ajout d'un bouton pour filter les séries dans le dashboard.
+
+---
+
 ## [1.1.0] · _23 septembre 2026_
 
 ### Ajouts
