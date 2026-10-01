@@ -83,7 +83,7 @@ export function SeriesOverview({
         <ScrollArea className="w-full min-w-0">
           <div className="flex w-max min-w-full flex-row justify-start gap-6">
             {seriesProviders.map((seriesProvider) => (
-              <ProviderCard seriesProvider={seriesProvider} />
+              <ProviderCard key={seriesProvider.name} seriesProvider={seriesProvider} />
             ))}
           </div>
         </ScrollArea>
