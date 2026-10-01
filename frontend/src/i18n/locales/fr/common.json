@@ -19,7 +19,8 @@
     "install": "Installer l'application"
   },
   "labels": {
-    "filters": "Filtres"
+    "filters": "Filtres",
+    "groupedSelection": "Sélection groupée"
   },
   "actions": {
     "filterMySeries": "Filtrer mes séries",

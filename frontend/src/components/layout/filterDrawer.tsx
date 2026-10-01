@@ -79,20 +79,23 @@ export default function FilterDrawer<T>({
                       onFiltersChange((lastFilters) => {
                         const nextFilters = structuredClone(lastFilters);
                         const filters = nextFilters.get(globalCategory);
+                        const allChecked = Object.values(categories).every(
+                          ({ checked }) => checked
+                        );
 
                         if (!filters) {
                           return nextFilters;
                         }
 
                         for (const category of Object.keys(filters)) {
-                          filters[category].checked = !filters[category].checked;
+                          filters[category].checked = !allChecked;
                         }
 
                         return nextFilters;
                       })
                     }
                   >
-                    <Text>Sélection groupée</Text>
+                    <Text>{t("common:labels.groupedSelection")}</Text>
                   </Button>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -126,14 +129,13 @@ export default function FilterDrawer<T>({
         <DrawerFooter className="p-4">
           <DrawerClose
             render={
-              <Button size="lg">
-                <Heading
-                  level={3}
-                  className="uppercase"
-                  onClick={() =>
-                    onListToFilterChange(filterFunction(filters, filterNames, listToFilter, t))
-                  }
-                >
+              <Button
+                size="lg"
+                onClick={() =>
+                  onListToFilterChange(filterFunction(filters, filterNames, listToFilter, t))
+                }
+              >
+                <Heading level={3} className="uppercase">
                   {t("common:actions.apply")}
                 </Heading>
               </Button>
