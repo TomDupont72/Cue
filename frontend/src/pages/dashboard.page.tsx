@@ -24,7 +24,8 @@ const getSeriesIdsByCategory = (series: UserSeriesGetResponse["series"], t: TFun
   for (const serie of series) {
     const statusName = t(`user:series.status.${USER_SERIES_STATUS[serie.status]}.section`);
     const currentValue = seriesByStatus.get(statusName) ?? [];
-    seriesByStatus.set(statusName, [...currentValue, serie]);
+    currentValue.push(serie);
+    seriesByStatus.set(statusName, currentValue);
   }
 
   const seriesIdsByStatusOrder = [
@@ -47,7 +48,8 @@ const getSeriesIdsByCategory = (series: UserSeriesGetResponse["series"], t: TFun
     for (const genre of serie.seriesGenres) {
       const genreName = t(`genre:${GENRE_KEY_BY_NAME[genre.name] ?? "OTHER"}`);
       const currentValue = seriesByGenre.get(genreName) ?? [];
-      seriesByGenre.set(genreName, [...currentValue, serie]);
+      currentValue.push(serie);
+      seriesByGenre.set(genreName, currentValue);
     }
   }
 
@@ -59,7 +61,8 @@ const getSeriesIdsByCategory = (series: UserSeriesGetResponse["series"], t: TFun
   for (const serie of series) {
     for (const provider of serie.seriesProviders) {
       const currentValue = seriesByProvider.get(provider.name) ?? [];
-      seriesByProvider.set(provider.name, [...currentValue, serie]);
+      currentValue.push(serie);
+      seriesByProvider.set(provider.name, currentValue);
     }
   }
 
@@ -275,31 +278,40 @@ export default function Dashboard() {
       </PageSection>
 
       <PageSection>
-        <div className="flex w-full flex-row items-center gap-4">
+        <div className="flex w-full sm:flex-row flex-col items-start items-center gap-4">
           <Heading level={1} full={false} className="uppercase">
             {t("user:series.mySeries")}
           </Heading>
-          <GroupDropdownMenu
-            categories={categoryNames}
-            category={t(`series:dashboard.categories.${category}`)}
-            onCategoryChange={handleCategoryChange}
-          />
-          <FilterDrawer
-            filters={categoryFilters}
-            filterNames={categoryNames}
-            onFiltersChange={setCategoryFilters}
-            listToFilter={series}
-            onListToFilterChange={setSeriesFiltered}
-            filterFunction={filterSeries}
-          />
-        </div>
-        <div className="flex flex-col gap-4">
-          {Array.from(seriesIdsByCategoryFiltered.keys()).map((category) => (
-            <UserSeriesSection
-              key={category}
-              series={seriesIdsByCategoryFiltered.get(category) ?? []}
-              category={category}
+          <div className="flex flex-row gap-4">
+            <GroupDropdownMenu
+              categories={categoryNames}
+              category={t(`series:dashboard.categories.${category}`)}
+              onCategoryChange={handleCategoryChange}
             />
+            <FilterDrawer
+              filters={categoryFilters}
+              filterNames={categoryNames}
+              onFiltersChange={setCategoryFilters}
+              listToFilter={series}
+              onListToFilterChange={setSeriesFiltered}
+              filterFunction={filterSeries}
+            />
+          </div>
+        </div>
+        <div className="flex w-full flex-col gap-4">
+          {Array.from(seriesIdsByCategoryFiltered.keys()).map((category) => (
+            <div
+              key={category}
+              style={{
+                contentVisibility: "auto",
+                containIntrinsicSize: "500px"
+              }}
+            >
+              <UserSeriesSection
+                series={seriesIdsByCategoryFiltered.get(category) ?? []}
+                category={category}
+              />
+            </div>
           ))}
         </div>
       </PageSection>
