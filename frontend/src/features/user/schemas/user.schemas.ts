@@ -1,4 +1,18 @@
 import { z } from "zod";
+import { USER_SERIES_STATUS } from "@/features/user/constants/userSeriesStatus";
+import { commaSeparatedValuesSchema, positiveIntegerStringSchema } from "@/lib/utils.schemas";
+
+export const userDashboardSearchParamsSchema = z.object({
+  groupBy: z
+    .enum(["status", "genre", "provider"])
+    .nullable()
+    .transform((value) => value ?? "status"),
+  statuses: commaSeparatedValuesSchema.pipe(z.array(z.enum(USER_SERIES_STATUS))).nullable(),
+  genres: commaSeparatedValuesSchema.pipe(z.array(positiveIntegerStringSchema)).nullable(),
+  providers: commaSeparatedValuesSchema.pipe(z.array(positiveIntegerStringSchema)).nullable()
+});
+
+export type UserDashboardSearchParams = z.infer<typeof userDashboardSearchParamsSchema>;
 
 export const userSeriesGetQuerySchema = z.object({
   seriesId: z.number().int().min(1).optional()
