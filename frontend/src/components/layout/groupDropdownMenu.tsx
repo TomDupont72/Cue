@@ -34,7 +34,11 @@ export default function GroupDropdownMenu({
       />
       <DropdownMenuContent>
         {Object.entries(categories).map(([categoriesItem, categoriesName]) => (
-          <DropdownMenuItem key={categoriesItem} onClick={() => onCategoryChange(categoriesItem)}>
+          <DropdownMenuItem
+            variant="default"
+            key={categoriesItem}
+            onClick={() => onCategoryChange(categoriesItem)}
+          >
             <Heading level={4}>{categoriesName}</Heading>
           </DropdownMenuItem>
         ))}
