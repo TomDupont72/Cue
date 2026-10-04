@@ -2,30 +2,37 @@ import { useMemo } from "react";
 import { useTable } from "@tanstack/react-table";
 
 import { facetFiltersToColumnFilters } from "@/lib/facets/tanstackTableFacets";
-import { userSeriesColumns, userSeriesTableFeatures } from "@/features/user/utils/userSeriesTable";
+import {
+  userSeriesColumns,
+  userSeriesGroupsFromRowModel,
+  userSeriesTableFeatures
+} from "@/features/user/utils/userSeriesTable";
 
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 import type {
   UserSeriesFacetCounts,
-  UserSeriesFilters
+  UserSeriesFilters,
+  UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
 
 type UseUserSeriesTableParams = {
   series: UserSeriesGetResponse["series"];
   filters: UserSeriesFilters;
+  groupBy: UserSeriesGroupBy;
 };
 
-export function useUserSeriesTable({ series, filters }: UseUserSeriesTableParams) {
+export function useUserSeriesTable({ series, filters, groupBy }: UseUserSeriesTableParams) {
   const columnFilters = useMemo(() => facetFiltersToColumnFilters(filters), [filters]);
+  const grouping = useMemo(() => [groupBy], [groupBy]);
 
   const table = useTable({
     features: userSeriesTableFeatures,
     columns: userSeriesColumns,
     data: series,
-    state: { columnFilters }
+    state: { columnFilters, grouping }
   });
 
-  const filteredSeries = table.getFilteredRowModel().rows.map((row) => row.original);
+  const groups = userSeriesGroupsFromRowModel(table.getRowModel());
 
   const facetCounts: UserSeriesFacetCounts = {
     status: table.getColumn("status")!.getFacetedUniqueValues(),
@@ -34,7 +41,7 @@ export function useUserSeriesTable({ series, filters }: UseUserSeriesTableParams
   };
 
   return {
-    filteredSeries,
+    groups,
     facetCounts
   };
 }

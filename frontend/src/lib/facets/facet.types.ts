@@ -1,5 +1,10 @@
 export type FacetValue = string | number;
 
+export type FacetGroup = {
+  value: FacetValue;
+  name: string;
+};
+
 export type FacetSelection<T extends FacetValue> =
   { mode: "all" } | { mode: "include"; values: readonly T[] };
 

@@ -20,7 +20,6 @@ import type {
   UserDashboardSummaryGetResponse,
   UserSeriesGetResponse
 } from "@/features/user/types/user.types";
-import { getGroupLabel, groupUserSeries } from "@/features/user/utils/groupUserSeries";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { handleFiltersApply, handleGroupByChange } from "@/pages/dashboard/dashboard.utils";
@@ -58,12 +57,11 @@ export default function DashboardContent({
     provider: providers === null ? { mode: "all" } : { mode: "include", values: providers }
   };
 
-  const { filteredSeries, facetCounts } = useUserSeriesTable({
+  const { groups, facetCounts } = useUserSeriesTable({
     series,
-    filters
+    filters,
+    groupBy
   });
-
-  console.log(filteredSeries);
 
   const categoryNames = useMemo<Record<UserSeriesGroupBy, string>>(
     () => ({
@@ -114,21 +112,36 @@ export default function DashboardContent({
   }, [series, facetCounts, t]);
 
   const displayedGroups = useMemo(() => {
-    const groups = groupUserSeries(filteredSeries, groupBy).map((group) => ({
-      ...group,
-      label: getGroupLabel(group, groupBy, t)
-    }));
+    const translatedGroups = groups.map((group) => {
+      let label: string;
+
+      switch (groupBy) {
+        case "status":
+          label = t(`user:series.status.${String(group.value)}.section`);
+          break;
+
+        case "genre":
+          label = t(`genre:${GENRE_KEY_BY_NAME[group.name] ?? "OTHER"}`);
+          break;
+
+        case "provider":
+          label = group.name;
+          break;
+      }
+
+      return { ...group, label };
+    });
 
     if (groupBy === "status") {
-      return groups.sort(
+      return translatedGroups.sort(
         (first, second) =>
           STATUS_ORDER.indexOf(first.value as UserSeriesStatus) -
           STATUS_ORDER.indexOf(second.value as UserSeriesStatus)
       );
     }
 
-    return groups.sort((first, second) => first.label.localeCompare(second.label));
-  }, [filteredSeries, groupBy, t]);
+    return translatedGroups.sort((first, second) => first.label.localeCompare(second.label));
+  }, [groups, groupBy, t]);
 
   return (
     <PageContainer className="gap-18">
