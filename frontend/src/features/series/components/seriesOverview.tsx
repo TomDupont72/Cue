@@ -44,9 +44,9 @@ export function SeriesOverview({
     return t(`genre:${GENRE_KEY_BY_NAME[seriesGenre.name] ?? "OTHER"}`);
   });
 
-  const datesString = [startYear, series.inProduction ? t("series:dates.present") : endYear].join(
-    " - "
-  );
+  const datesString = startYear
+    ? [startYear, series.inProduction ? t("series:dates.present") : endYear].join(" - ")
+    : t("series:dates.unknownDate");
   const genresString = genreNames.join(", ");
   const informations = [
     datesString,
