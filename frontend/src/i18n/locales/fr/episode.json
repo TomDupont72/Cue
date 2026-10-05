@@ -1,4 +1,12 @@
 {
+  "upcoming": {
+    "emptyEpisodesTitle": "Aucun épisode à venir",
+    "emptyEpisodesDescription": "Cette page affiche les sorties futures."
+  },
+  "watch": {
+    "emptyEpisodesTitle": "Aucun épisode",
+    "emptyEpisodesDescription": "Regarde un épisode pour commencer."
+  },
   "seasonNumber": "Saison {{number}}",
   "episodeNumber": "Épisode {{number}}",
   "specialEpisodeNumber": "Épisode spécial {{number}}",
