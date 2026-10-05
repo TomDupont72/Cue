@@ -4,7 +4,8 @@
     "episodes": "Épisodes"
   },
   "dates": {
-    "present": "Présent"
+    "present": "Présent",
+    "unknownDate": "Date inconnue"
   },
   "actions": {
     "addSeries": "Ajouter la série"
