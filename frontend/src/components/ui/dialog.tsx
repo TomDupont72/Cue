@@ -45,7 +45,7 @@ function DialogContent({
   return (
     <DialogPortal>
       <DialogOverlay />
-      <div className="fixed inset-0 z-50 overflow-y-auto p-4">
+      <div className="fixed inset-0 z-50 overflow-y-auto p-12">
         <div className="grid min-h-full place-items-center">
           <DialogPrimitive.Popup
             data-slot="dialog-content"

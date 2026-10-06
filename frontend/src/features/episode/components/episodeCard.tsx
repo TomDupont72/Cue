@@ -126,7 +126,7 @@ export default function EpisodeCard({
         )}
       </div>
 
-      <DialogContent className="overflow-hidden p-0">
+      <DialogContent className="max-w-2xl overflow-hidden p-0">
         <EpisodeCardDetails
           episode={episode}
           series={series}

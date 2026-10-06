@@ -61,7 +61,7 @@ export function SeriesOverview({
   return (
     <Card className="group overflow-hidden p-0">
       <div className="overflow-hidden bg-muted">
-        <div className="h-56 w-full overflow-hidden sm:h-72 lg:h-96">
+        <div className="w-full overflow-hidden aspect-[16/9]">
           <Picture path={series.backdropPath} size="original" />
         </div>
         {watchProgress !== undefined ? (
