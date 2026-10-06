@@ -13,10 +13,12 @@ export default function Dashboard() {
   const [searchParams] = useSearchParams();
   const dashboardParams = userDashboardSearchParamsSchema.safeParse({
     groupBy: searchParams.get("group"),
-    statuses: searchParams.get("statuses"),
-    genres: searchParams.get("genres"),
-    providers: searchParams.get("providers")
+    statuses: searchParams.getAll("statuses"),
+    genres: searchParams.getAll("genres"),
+    providers: searchParams.getAll("providers")
   });
+
+  console.log(dashboardParams);
 
   const dashboardSummaryQuery = useUserDashboardSummary();
   const userSeriesQuery = useUserSeries();

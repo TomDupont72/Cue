@@ -21,10 +21,9 @@ export function setUrlSelectionParam<T extends FacetValue>(
   name: string,
   selection: FacetSelection<T>
 ) {
-  if (selection.mode === "all") {
-    searchParams.delete(name);
-    return;
-  }
+  searchParams.delete(name);
 
-  searchParams.set(name, selection.values.join(","));
+  if (selection.mode !== "all") {
+    selection.values.forEach((value) => searchParams.append(name, String(value)));
+  }
 }
