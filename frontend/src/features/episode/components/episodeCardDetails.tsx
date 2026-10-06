@@ -31,7 +31,7 @@ export default function EpisodeCardDetails({
 
   return (
     <>
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-muted">
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-muted">
         <Picture path={path} size="original" />
         {remainingDays !== null && remainingDays <= 0 ? (
           <RoundedCheckbox

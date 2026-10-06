@@ -92,7 +92,7 @@ function SeriesContent({ seriesId }: SeriesContentProps) {
   return (
     <>
       <ScrollToTop />
-      <PageContainer className="gap-4">
+      <PageContainer className="gap-4 max-w-4xl">
         <div className="grid w-full grid-cols-2 gap-2">
           <Button
             variant={view === "overview" ? "secondary" : "ghost"}
