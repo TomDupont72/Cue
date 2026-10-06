@@ -18,8 +18,6 @@ export default function Dashboard() {
     providers: searchParams.getAll("providers")
   });
 
-  console.log(dashboardParams);
-
   const dashboardSummaryQuery = useUserDashboardSummary();
   const userSeriesQuery = useUserSeries();
 
