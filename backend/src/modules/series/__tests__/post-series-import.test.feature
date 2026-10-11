@@ -249,7 +249,7 @@ Feature: POST /api/series/import
             | cachedProgress | user-1 | @series.cachedSeries |
 
         And the database with these user episodes:
-            | userId | episodeId                      |
+            | userId | episodeId                     |
             | user-1 | @episodes.firstCascadeEpisode |
 
     Scenario: Post series import - Existing series
@@ -340,7 +340,7 @@ Feature: POST /api/series/import
 
         Then the response status should be 200
         And the database should contain exactly these user episodes:
-            | userId | episodeId                      |
+            | userId | episodeId                     |
             | user-1 | @episodes.firstCascadeEpisode |
 
     Scenario: Post series import - New series
