@@ -52,9 +52,21 @@ export default function DashboardContent({
   const series = userSeries.series;
 
   const filters: UserSeriesFilters = {
-    status: statuses.length === 0 ? { mode: "all" } : { mode: "include", values: statuses },
-    genre: genres.length === 0 ? { mode: "all" } : { mode: "include", values: genres },
-    provider: providers.length === 0 ? { mode: "all" } : { mode: "include", values: providers }
+    status: statuses
+      ? statuses.length === 0
+        ? { mode: "all" }
+        : { mode: "include", values: statuses }
+      : { mode: "include", values: [] },
+    genre: genres
+      ? genres.length === 0
+        ? { mode: "all" }
+        : { mode: "include", values: genres }
+      : { mode: "include", values: [] },
+    provider: providers
+      ? providers.length === 0
+        ? { mode: "all" }
+        : { mode: "include", values: providers }
+      : { mode: "include", values: [] }
   };
 
   const { groups, facetCounts } = useUserSeriesTable({
