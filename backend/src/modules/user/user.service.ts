@@ -20,6 +20,7 @@ import { getUserDashboardSummary } from "./queries/getUserDashboardSummary.query
 import { getUserSeriesReconciliation } from "./queries/getUserSeriesReconciliation.query.js";
 import { listUserUpcomingEpisodes } from "./queries/listUserUpcomingEpisodes.query.js";
 import { listUserEpisodeFeed } from "./queries/listUserEpisodeFeed.query.js";
+import { listGroupedEpisodesBySeries } from "./queries/listGroupedEpisodesBySeries.query.js";
 
 export const userService = {
   async seriesGet(userId: string, params: UserSeriesGetParams) {
@@ -44,12 +45,47 @@ export const userService = {
   },
 
   async episodeFeedGet(userId: string) {
-    const episodes = await listUserEpisodeFeed(userId);
+    const episodesBySeries = await listGroupedEpisodesBySeries(userId);
+
+    const upcommingEpisodes = [];
+
+    for (const episodesBySerie of episodesBySeries) {
+      const indexByWatchedAt: Map<number, Date> = new Map();
+      const episodes = episodesBySerie.episodes;
+
+      for (let i = 0; i < episodesBySerie.episodes.length; i++) {
+        const episode = episodes[i];
+        if (episode.users.length !== 0) {
+          indexByWatchedAt.set(i, episode.users[0].watchedAt);
+        }
+      }
+      const indexByWatchedAtSorted = new Map(
+        [...indexByWatchedAt.entries()].sort(([, a], [, b]) => b.getTime() - a.getTime())
+      );
+      let maxIndex = episodesBySerie.episodes.length;
+
+      for (const index of [...indexByWatchedAtSorted.keys()]) {
+        const notSeenEpisodes = episodes
+          .slice(index, maxIndex)
+          .filter((episode) => episode.users.length === 0);
+        if (notSeenEpisodes.length !== 0) {
+          const { users, ...upcommingEpisode } = notSeenEpisodes[0];
+          upcommingEpisodes.push({
+            seriesName: episodesBySerie.name,
+            seriesBackdropPath: episodesBySerie.backdropPath,
+            status: episodesBySerie.users[0].status,
+            ...upcommingEpisode
+          });
+          break;
+        }
+        maxIndex = index;
+      }
+    }
 
     return {
-      WATCHING: episodes.filter(({ status }) => status === "WATCHING"),
-      PAUSED: episodes.filter(({ status }) => status === "PAUSED"),
-      DROPPED: episodes.filter(({ status }) => status === "DROPPED")
+      WATCHING: upcommingEpisodes.filter(({ status }) => status === "WATCHING"),
+      PAUSED: upcommingEpisodes.filter(({ status }) => status === "PAUSED"), // TODO: unused in frontend
+      DROPPED: upcommingEpisodes.filter(({ status }) => status === "DROPPED")
     };
   },
 

@@ -35,23 +35,11 @@ export const userDashboardSummaryGetResponseSchema = z.object({
   totalWatchedSeries: z.number().int().nonnegative()
 });
 
-export const userEpisodeFeedItemResponseSchema = userSeriesRowSchema
-  .omit({ isFavorite: true, watchCount: true, watchedEpisodeCount: true, addedAt: true })
-  .extend(
-    episodeRowSchema.omit({
-      seasonId: true,
-      tmdbId: true,
-      voteAverage: true,
-      createdAt: true,
-      updatedAt: true
-    }).shape
-  )
-  .extend({
-    seriesName: z.string(),
-    seriesBackdropPath: z.string().nullable(),
-    seriesTmdbId: z.number().int(),
-    remainingEpisodes: z.number()
-  });
+export const userEpisodeFeedItemResponseSchema = episodeRowSchema.extend({
+  seriesName: seriesRowSchema.shape.name,
+  seriesBackdropPath: seriesRowSchema.shape.name,
+  status: userSeriesRowSchema.shape.status
+});
 
 export const userEpisodeFeedGetResponseSchema = z.object({
   WATCHING: z.array(userEpisodeFeedItemResponseSchema),

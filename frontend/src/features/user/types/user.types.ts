@@ -60,13 +60,11 @@ export type UserEpisodesFeed<T> = {
 };
 
 export type UserEpisodesFeedGetResponse = UserEpisodesFeed<
-  Omit<UserSeriesRow, "isFavorite" | "watchCount" | "watchedEpisodeCount" | "addedAt"> &
-    Omit<EpisodeRow, "seasonId" | "tmdbId" | "voteAverage" | "createdAt" | "updatedAt"> & {
-      seriesName: string;
-      seriesBackdropPath: string | null;
-      seriesTmdbId: number;
-      remainingEpisodes: number;
-    }
+  EpisodeRow & {
+    seriesName: SeriesRow["name"];
+    seriesBackdropPath: SeriesRow["backdropPath"];
+    status: UserSeriesRow["status"];
+  }
 >;
 
 export type UserEpisodesUpcomingGetResponse = {
