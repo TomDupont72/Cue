@@ -1,59 +1,36 @@
-import {
-  episodeRelationalSelectQuery,
-  episodeSelectQuery
-} from "@/modules/episode/episode.repository.js";
-import { seasonsSelectQuery } from "@/modules/season/season.repository.js";
-import { seriesSelectQuery, seriesUpdateQuery } from "@/modules/series/series.repository.js";
+import { episodeRepository } from "@/modules/episode/episode.repository.js";
+import { seasonRepository } from "@/modules/season/season.repository.js";
+import { seriesRepository } from "@/modules/series/series.repository.js";
 import type {
   SeriesGetParams,
   SeriesImportPostBody,
   SeriesReconcilePostBody
 } from "@/modules/series/series.schemas.js";
-import { userEpisodeSelectQuery, userSeriesSelectQuery } from "@/modules/user/user.repository.js";
+import { userEpisodeRepository, userSeriesRepository } from "@/modules/user/user.repository.js";
 import { syncTmdb } from "@/modules/series/series.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { prisma } from "@/shared/db/prisma.js";
-import { count } from "@/shared/db/aggregateExpressions.js";
-import {
-  episodeTable,
-  seriesGenreTable,
-  seriesProviderTable
-} from "@/shared/db/constants/queryTables.js";
-import { eq, lt, ne } from "@/shared/db/queryExpressions.js";
-import { providerRelationalSelectQuery } from "@/modules/provider/provider.repository.js";
-import { genreRelationalSelectQuery } from "../genre/genre.repository.js";
+import { providerRepository } from "@/modules/provider/provider.repository.js";
+import { genreRepository } from "../genre/genre.repository.js";
+import { listEpisodeCounts } from "../episode/queries/listEpisodeCounts.query.js";
 
 export const seriesService = {
   async get(userId: string, params: SeriesGetParams) {
-    const series = await seriesSelectQuery().where(params).emptyThrow().first();
-    const seasons = await seasonsSelectQuery().where({ seriesId: series.id }).all();
-    const episodes = await episodeSelectQuery().where({ seriesId: series.id }).all();
-    const userSeries = await userSeriesSelectQuery().where({ userId, seriesId: series.id }).first();
-    const userEpisodes = await userEpisodeSelectQuery()
-      .where({ userId, episode: { seriesId: series.id } })
-      .all();
-    const seriesProviders = await providerRelationalSelectQuery()
-      .selectAll()
-      .join(seriesProviderTable)
-      .where(eq(seriesProviderTable.seriesId, series.id))
-      .orderBy({ displayPriority: "asc" })
-      .all();
-    const seriesGenres = await genreRelationalSelectQuery()
-      .selectAll()
-      .join(seriesGenreTable)
-      .where(eq(seriesGenreTable.seriesId, series.id))
-      .orderBy({ name: "asc" })
-      .all();
+    const series = await seriesRepository.requireById(params.id);
+    const seasons = await seasonRepository.listBySeriesId(series.id);
+    const episodes = await episodeRepository.listBySeriesId(series.id);
+    const userSeries = await userSeriesRepository.getBySeriesId(userId, series.id);
+    const userEpisodes = await userEpisodeRepository.listBySeriesId(userId, series.id);
+    const seriesProviders = await providerRepository.listBySeriesId(series.id);
+    const seriesGenres = await genreRepository.listBySeriesId(series.id);
 
     return { series, seasons, episodes, userSeries, userEpisodes, seriesProviders, seriesGenres };
   },
 
   async importPost(userId: string | null, body: SeriesImportPostBody, forceSync = false) {
-    const existingSeries = await seriesSelectQuery().where(body).first();
+    const existingSeries = await seriesRepository.getByTmdbId(body.tmdbId);
     const series = existingSeries && !forceSync ? existingSeries : await syncTmdb(body.tmdbId);
-    const userSeries = userId
-      ? await userSeriesSelectQuery().where({ userId, seriesId: series.id }).first()
-      : null;
+    const userSeries = userId ? await userSeriesRepository.getBySeriesId(userId, series.id) : null;
 
     return { series, userSeries };
   },
@@ -67,28 +44,19 @@ export const seriesService = {
     }
 
     const updatedCount = await prisma.$transaction(async (tx) => {
-      const series = await seriesSelectQuery(tx)
-        .where({ tmdbId: { in: tmdbIds } })
-        .all();
-      const episodeCounts = await episodeRelationalSelectQuery(tx)
-        .select({
-          seriesId: episodeTable.seriesId,
-          numberOfEpisodes: count()
-        })
-        .where({ seriesId: { in: series.map((item) => item.id) } })
-        .where(ne(episodeTable.seasonNumber, 0))
-        .where(lt(episodeTable.airDate, releaseCutoff))
-        .groupBy(episodeTable.seriesId)
-        .all();
-      const episodeCountBySeriesId = new Map(
-        episodeCounts.map((item) => [item.seriesId, item.numberOfEpisodes])
-      );
-      const updates = series.flatMap((item) => {
-        const numberOfEpisodes = episodeCountBySeriesId.get(item.id) ?? 0;
+      const series = await seriesRepository.listByTmdbIds(tmdbIds, tx);
+      const seriesIds = series.map((serie) => serie.id);
 
-        return item.numberOfEpisodes === numberOfEpisodes
+      const episodeCounts = await listEpisodeCounts(seriesIds, releaseCutoff, tx);
+      const episodeCountBySeriesId = new Map(
+        episodeCounts.map((item) => [item.seriesId, item._count])
+      );
+      const updates = series.flatMap((serie) => {
+        const numberOfEpisodes = episodeCountBySeriesId.get(serie.id) ?? 0;
+
+        return serie.numberOfEpisodes === numberOfEpisodes
           ? []
-          : [seriesUpdateQuery(tx).where({ id: item.id }).set({ numberOfEpisodes }).execute()];
+          : [seriesRepository.update(serie.id, { numberOfEpisodes }, tx)];
       });
 
       await Promise.all(updates);

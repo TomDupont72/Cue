@@ -1,15 +1,22 @@
 import { Prisma } from "@/generated/prisma/client.js";
-import { providerTable } from "@/shared/db/constants/queryTables.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { RelationalSelectQuery } from "@/shared/db/relationalSelectQuery.js";
-import { UpsertQuery } from "@/shared/db/upsertQuery.js";
+import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
-export const providerRelationalSelectQuery = (db: PrismaTx = prisma) =>
-  new RelationalSelectQuery(db.provider, db, providerTable);
+export const providerRepository = {
+  async upsertMany(data: readonly Prisma.ProviderCreateManyInput[], db: PrismaTx = prisma) {
+    return upsertManyAndFetch({
+      data,
+      scalarFields: Prisma.ProviderScalarFieldEnum,
+      uniqueBy: "tmdbId",
+      delegate: db.provider
+    });
+  },
 
-export const providerUpsertQuery = (db: PrismaTx = prisma) =>
-  new UpsertQuery<typeof db.provider, Prisma.ProviderCreateManyInput, "tmdbId">(db.provider, {
-    scalarFields: Prisma.ProviderScalarFieldEnum,
-    uniqueBy: "tmdbId"
-  });
+  async listBySeriesId(seriesId: number, db: PrismaTx = prisma) {
+    return db.provider.findMany({
+      where: { series: { some: { seriesId } } },
+      orderBy: { displayPriority: "asc" }
+    });
+  }
+};

@@ -1,46 +1,93 @@
+import { Prisma } from "@/generated/prisma/client.js";
+import type { SeriesUpdateInput } from "@/generated/prisma/models.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { SelectQuery } from "@/shared/db/selectQuery.js";
-import { InsertQuery } from "@/shared/db/insertQuery.js";
-import { DeleteQuery } from "@/shared/db/deleteQuery.js";
-import { UpsertQuery } from "@/shared/db/upsertQuery.js";
-import { UpdateQuery } from "@/shared/db/updateQuery.js";
-import {
-  seriesGenreTable,
-  seriesNetworkTable,
-  seriesPeopleTable,
-  seriesProviderTable
-} from "@/shared/db/constants/queryTables.js";
+import { notFound } from "@/shared/errors/errors.helpers.js";
 
-export const seriesSelectQuery = (db: PrismaTx = prisma) =>
-  new SelectQuery<typeof db.series>(db.series, "SERIES_NOT_FOUND");
+export const seriesRepository = {
+  async upsert(data: Prisma.SeriesUncheckedCreateInput, db: PrismaTx = prisma) {
+    return db.series.upsert({
+      where: { tmdbId: data.tmdbId },
+      create: data,
+      update: data
+    });
+  },
 
-export const seriesUpsertQuery = (db: PrismaTx = prisma) =>
-  new UpsertQuery<typeof db.series>(db.series);
+  async getById(id: number, db: PrismaTx = prisma) {
+    return db.series.findUnique({ where: { id } });
+  },
 
-export const seriesUpdateQuery = (db: PrismaTx = prisma) =>
-  new UpdateQuery<typeof db.series>(db.series);
+  async requireById(id: number, db: PrismaTx = prisma) {
+    const series = await db.series.findUnique({ where: { id } });
 
-export const seriesGenreInsertQuery = (db: PrismaTx = prisma) =>
-  new InsertQuery<typeof db.seriesGenre>(db.seriesGenre);
+    if (!series) {
+      throw notFound("SERIES_NOT_FOUND", "Series not found");
+    }
 
-export const seriesGenreDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery(db.seriesGenre, db, seriesGenreTable);
+    return series;
+  },
 
-export const seriesNetworkInsertQuery = (db: PrismaTx = prisma) =>
-  new InsertQuery<typeof db.seriesNetwork>(db.seriesNetwork);
+  async getByTmdbId(tmdbId: number, db: PrismaTx = prisma) {
+    return db.series.findUnique({ where: { tmdbId } });
+  },
 
-export const seriesNetworkDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery(db.seriesNetwork, db, seriesNetworkTable);
+  async listByTmdbIds(tmdbIds: number[], db: PrismaTx = prisma) {
+    return db.series.findMany({ where: { tmdbId: { in: tmdbIds } } });
+  },
 
-export const seriesPeopleInsertQuery = (db: PrismaTx = prisma) =>
-  new InsertQuery<typeof db.seriesPeople>(db.seriesPeople);
+  async update(id: number, data: SeriesUpdateInput, db: PrismaTx = prisma) {
+    return db.series.update({ where: { id }, data });
+  }
+};
 
-export const seriesPeopleDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery(db.seriesPeople, db, seriesPeopleTable);
+export const seriesGenreRepository = {
+  async replaceBySeriesId(seriesId: number, genreIds: readonly number[], db: PrismaTx = prisma) {
+    await db.seriesGenre.deleteMany({ where: { seriesId } });
 
-export const seriesProviderInsertQuery = (db: PrismaTx = prisma) =>
-  new InsertQuery<typeof db.seriesProvider>(db.seriesProvider);
+    if (genreIds.length > 0) {
+      await db.seriesGenre.createMany({
+        data: genreIds.map((genreId) => ({ seriesId, genreId })),
+        skipDuplicates: true
+      });
+    }
+  }
+};
 
-export const seriesProviderDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery(db.seriesProvider, db, seriesProviderTable);
+export const seriesNetworkRepository = {
+  async replaceBySeriesId(seriesId: number, networkIds: readonly number[], db: PrismaTx = prisma) {
+    await db.seriesNetwork.deleteMany({ where: { seriesId } });
+
+    if (networkIds.length > 0) {
+      await db.seriesNetwork.createMany({
+        data: networkIds.map((networkId) => ({ seriesId, networkId })),
+        skipDuplicates: true
+      });
+    }
+  }
+};
+
+export const seriesPeopleRepository = {
+  async replaceBySeriesId(seriesId: number, peopleIds: readonly number[], db: PrismaTx = prisma) {
+    await db.seriesPeople.deleteMany({ where: { seriesId } });
+
+    if (peopleIds.length > 0) {
+      await db.seriesPeople.createMany({
+        data: peopleIds.map((peopleId) => ({ seriesId, peopleId })),
+        skipDuplicates: true
+      });
+    }
+  }
+};
+
+export const seriesProviderRepository = {
+  async replaceBySeriesId(seriesId: number, providerIds: readonly number[], db: PrismaTx = prisma) {
+    await db.seriesProvider.deleteMany({ where: { seriesId } });
+
+    if (providerIds.length > 0) {
+      await db.seriesProvider.createMany({
+        data: providerIds.map((providerId) => ({ seriesId, providerId })),
+        skipDuplicates: true
+      });
+    }
+  }
+};

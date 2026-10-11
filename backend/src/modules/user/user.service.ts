@@ -1,15 +1,5 @@
 import { prisma } from "@/shared/db/prisma.js";
-import {
-  userEpisodeDeleteQuery,
-  userEpisodeInsertQuery,
-  userEpisodeRelationalSelectQuery,
-  userEpisodeSelectQuery,
-  userRepository,
-  userSeriesRelationalSelectQuery,
-  userSeriesSelectQuery,
-  userSeriesUpdateQuery,
-  userSeriesUpsertQuery
-} from "@/modules/user/user.repository.js";
+import { userEpisodeRepository, userSeriesRepository } from "@/modules/user/user.repository.js";
 import {
   UserEpisodePostParams,
   UserSeriesPostBody,
@@ -20,51 +10,41 @@ import {
   UserSeasonDeleteParams,
   UserSeriesReconcilePostParams
 } from "@/modules/user/user.schemas.js";
-import {
-  episodeRelationalSelectQuery,
-  episodeSelectQuery
-} from "@/modules/episode/episode.repository.js";
+import { episodeRepository } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import { seriesSelectQuery } from "@/modules/series/series.repository.js";
+import { seriesRepository } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
-import {
-  episodeTable,
-  genreTable,
-  providerTable,
-  seriesTable,
-  userEpisodeTable,
-  userSeriesTable
-} from "@/shared/db/constants/queryTables.js";
-import { coalesce, count, countWhere, max, sum } from "@/shared/db/aggregateExpressions.js";
-import { asc, dateOnly, eq, gt, ne } from "@/shared/db/queryExpressions.js";
-import { many } from "@/shared/db/queryTables.js";
+import { listUserSeriesWithDetails } from "./queries/listUserSeriesWithDetails.query.js";
+import { getUserDashboardSummary } from "./queries/getUserDashboardSummary.query.js";
+import { getUserSeriesReconciliation } from "./queries/getUserSeriesReconciliation.query.js";
+import { listUserUpcomingEpisodes } from "./queries/listUserUpcomingEpisodes.query.js";
+import { listUserEpisodeFeed } from "./queries/listUserEpisodeFeed.query.js";
 
 export const userService = {
   async seriesGet(userId: string, params: UserSeriesGetParams) {
     const { seriesId } = params;
 
-    const series = await userSeriesRelationalSelectQuery()
-      .join(seriesTable)
-      .join(providerTable)
-      .join(genreTable)
-      .selectAll()
-      .select({
-        seriesDetails: seriesTable,
-        seriesProviders: many(providerTable, { displayPriority: "asc", id: "asc" }),
-        seriesGenres: many(genreTable, { name: "asc", id: "asc" })
-      })
-      .where({ userId, seriesId })
-      .orderBy({ lastWatchedAt: "desc" })
-      .all();
+    const rows = await listUserSeriesWithDetails(userId, seriesId);
+    const userSeriesDetails = rows.map((row) => {
+      const { series, ...userSeries } = row;
+      const { providers, genres, ...seriesDetails } = series;
+
+      return {
+        ...userSeries,
+        seriesDetails,
+        seriesProviders: providers.map((provider) => provider.provider),
+        seriesGenres: genres.map((genre) => genre.genre)
+      };
+    });
 
     return {
-      series
+      series: userSeriesDetails
     };
   },
 
   async episodeFeedGet(userId: string) {
-    const episodes = await userRepository.getEpisodesFeed(userId);
+    const episodes = await listUserEpisodeFeed(userId);
 
     return {
       WATCHING: episodes.filter(({ status }) => status === "WATCHING"),
@@ -74,23 +54,7 @@ export const userService = {
   },
 
   async episodeUpcomingGet(userId: string, now = new Date()) {
-    const episodes = await episodeRelationalSelectQuery()
-      .join(seriesTable)
-      .join(userSeriesTable)
-      .selectAll()
-      .select({
-        seriesName: seriesTable.name,
-        seriesBackdropPath: seriesTable.backdropPath
-      })
-      .where(gt(episodeTable.airDate, dateOnly(now)))
-      .where(eq(userSeriesTable.userId, userId))
-      .firstPer(episodeTable.seriesId, [
-        asc(episodeTable.airDate),
-        asc(episodeTable.seasonNumber),
-        asc(episodeTable.episodeNumber)
-      ])
-      .orderBy({ airDate: "asc", seriesName: "asc" })
-      .all();
+    const episodes = await listUserUpcomingEpisodes(userId, now);
 
     return {
       episodes
@@ -103,13 +67,9 @@ export const userService = {
     body: UserSeriesPostBody,
     now = new Date()
   ) {
-    await seriesSelectQuery().where({ id: params.seriesId }).emptyThrow().first();
+    await seriesRepository.requireById(params.seriesId);
 
-    return userSeriesUpsertQuery()
-      .where({ userId_seriesId: { userId, ...params } })
-      .create({ userId, ...params, ...body, addedAt: now })
-      .update(body)
-      .first();
+    return userSeriesRepository.upsert(userId, params.seriesId, body, now);
   },
 
   async episodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
@@ -117,36 +77,28 @@ export const userService = {
     const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
-      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first();
+      const series = await seriesRepository.requireById(seriesId, tx);
 
-      const episode = await episodeSelectQuery(tx)
-        .where({ id: episodeId, seriesId, airDate: { lt: releaseCutoff } })
-        .emptyThrow()
-        .first();
+      const episode = await episodeRepository.requireReleasedById(
+        episodeId,
+        seriesId,
+        releaseCutoff,
+        tx
+      );
 
-      const createdUserEpisode = await userEpisodeInsertQuery(tx)
-        .value({ userId, episodeId, watchedAt: now })
-        .skipDuplicates()
-        .first();
+      const createdUserEpisode = await userEpisodeRepository.create(userId, episodeId, now, tx);
 
       if (createdUserEpisode) {
         const watchCountIncrement = episode.seasonNumber === 0 ? 0 : 1;
 
-        const userSeries = await userSeriesUpsertQuery(tx)
-          .where({ userId_seriesId: { userId, seriesId } })
-          .create({
-            userId,
-            seriesId,
-            watchCount: watchCountIncrement,
-            watchedEpisodeCount: 1,
-            lastWatchedAt: now
-          })
-          .update({
-            watchCount: { increment: watchCountIncrement },
-            watchedEpisodeCount: { increment: 1 },
-            lastWatchedAt: now
-          })
-          .first();
+        const userSeries = await userSeriesRepository.upsertProgress(
+          userId,
+          seriesId,
+          now,
+          watchCountIncrement,
+          1,
+          tx
+        );
 
         const status = getUserSeriesStatus(
           userSeries.watchedEpisodeCount,
@@ -156,13 +108,13 @@ export const userService = {
         );
 
         if (status !== userSeries.status) {
-          await userSeriesUpdateQuery(tx).where({ userId, seriesId }).set({ status }).first();
+          await userSeriesRepository.update(userId, seriesId, { status }, tx);
         }
 
         return createdUserEpisode;
       }
 
-      return userEpisodeSelectQuery(tx).where({ userId, episodeId }).emptyThrow().first();
+      return userEpisodeRepository.requireByEpisodeId(userId, episodeId, tx);
     });
   },
 
@@ -170,29 +122,31 @@ export const userService = {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
-      const episode = await episodeSelectQuery(tx)
-        .where({ id: episodeId, seriesId })
-        .emptyThrow()
-        .first();
+      const episode = await episodeRepository.requireById(episodeId, seriesId, tx);
+      const series = await seriesRepository.requireById(seriesId, tx);
 
-      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first();
+      await userSeriesRepository.requireBySeriesId(userId, seriesId, tx);
+      await userEpisodeRepository.requireByEpisodeId(userId, episodeId, tx);
 
-      await userSeriesSelectQuery(tx).where({ userId, seriesId }).emptyThrow().first();
-
-      const deletedUserEpisode = await userEpisodeDeleteQuery(tx)
-        .where({ userId, episodeId })
-        .first();
+      const deletedUserEpisode = await userEpisodeRepository.delete(userId, episodeId, tx);
 
       if (deletedUserEpisode) {
-        const watchCountDecrement = episode.seasonNumber === 0 ? 0 : 1;
+        const watchCountDecrement = episode.seasonNumber === 0 ? 0 : -1;
 
-        const updatedUserSeries = await userSeriesUpdateQuery(tx)
-          .where({ userId, seriesId })
-          .set({
-            watchCount: { decrement: watchCountDecrement },
-            watchedEpisodeCount: { decrement: 1 }
-          })
-          .first();
+        const lastWatchedAt = await userEpisodeRepository.getLastWatchedAtBySeriesId(
+          userId,
+          seriesId,
+          tx
+        );
+
+        const updatedUserSeries = await userSeriesRepository.updateProgress(
+          userId,
+          seriesId,
+          lastWatchedAt,
+          watchCountDecrement,
+          -1,
+          tx
+        );
 
         const status = getUserSeriesStatus(
           updatedUserSeries.watchedEpisodeCount,
@@ -201,15 +155,7 @@ export const userService = {
           series.inProduction
         );
 
-        const latestWatchedEpisode = await userEpisodeSelectQuery(tx)
-          .where({ userId, episode: { seriesId } })
-          .orderBy({ watchedAt: "desc" })
-          .first();
-
-        await userSeriesUpdateQuery(tx)
-          .where({ userId, seriesId })
-          .set({ status, lastWatchedAt: latestWatchedEpisode?.watchedAt ?? null })
-          .first();
+        await userSeriesRepository.update(userId, seriesId, { status, lastWatchedAt }, tx);
 
         return deletedUserEpisode;
       }
@@ -223,22 +169,22 @@ export const userService = {
     const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
-      const episodes = await episodeSelectQuery(tx)
-        .where({ seriesId, seasonId, airDate: { lt: releaseCutoff } })
-        .emptyThrow()
-        .all();
+      const series = await seriesRepository.requireById(seriesId, tx);
+      const episodes = await episodeRepository.listNotEmptyReleasedBySeasonId(
+        seasonId,
+        seriesId,
+        releaseCutoff,
+        tx
+      );
+      const episodeIds = episodes.map((episode) => episode.id);
 
-      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first();
-
-      const createdUserEpisodes = await userEpisodeInsertQuery(tx)
-        .values(episodes.map((episode) => ({ userId, episodeId: episode.id, watchedAt: now })))
-        .skipDuplicates()
-        .all();
+      const createdUserEpisodes = await userEpisodeRepository.createMany(
+        episodes.map((episode) => ({ userId, episodeId: episode.id, watchedAt: now })),
+        tx
+      );
 
       if (createdUserEpisodes.length === 0) {
-        return userEpisodeSelectQuery(tx)
-          .where({ userId, episodeId: { in: episodes.map((episode) => episode.id) } })
-          .all();
+        return userEpisodeRepository.listByEpisodeIds(userId, episodeIds, tx);
       }
 
       const regularEpisodeIds = new Set(
@@ -248,21 +194,14 @@ export const userService = {
         regularEpisodeIds.has(episode.episodeId)
       ).length;
 
-      const userSeries = await userSeriesUpsertQuery(tx)
-        .where({ userId_seriesId: { userId, seriesId } })
-        .create({
-          userId,
-          seriesId,
-          watchCount: watchCountIncrement,
-          watchedEpisodeCount: createdUserEpisodes.length,
-          lastWatchedAt: now
-        })
-        .update({
-          watchCount: { increment: watchCountIncrement },
-          watchedEpisodeCount: { increment: createdUserEpisodes.length },
-          lastWatchedAt: now
-        })
-        .first();
+      const userSeries = await userSeriesRepository.upsertProgress(
+        userId,
+        seriesId,
+        now,
+        watchCountIncrement,
+        createdUserEpisodes.length,
+        tx
+      );
 
       const status = getUserSeriesStatus(
         userSeries.watchedEpisodeCount,
@@ -272,12 +211,10 @@ export const userService = {
       );
 
       if (status !== userSeries.status) {
-        await userSeriesUpdateQuery(tx).where({ userId, seriesId }).set({ status }).first();
+        await userSeriesRepository.update(userId, seriesId, { status }, tx);
       }
 
-      return userEpisodeSelectQuery(tx)
-        .where({ userId, episodeId: { in: episodes.map((episode) => episode.id) } })
-        .all();
+      return userEpisodeRepository.listByEpisodeIds(userId, episodeIds, tx);
     });
   },
 
@@ -285,18 +222,16 @@ export const userService = {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
-      const episodes = await episodeSelectQuery(tx)
-        .where({ seriesId, seasonId })
-        .emptyThrow()
-        .all();
+      const episodes = await episodeRepository.listNotEmptyBySeasonId(seasonId, seriesId, tx);
+      const series = await seriesRepository.requireById(seriesId, tx);
 
-      const series = await seriesSelectQuery(tx).where({ id: seriesId }).emptyThrow().first();
+      await userSeriesRepository.requireBySeriesId(userId, seriesId, tx);
 
-      await userSeriesSelectQuery(tx).where({ userId, seriesId }).emptyThrow().first();
-
-      const deletedUserEpisodes = await userEpisodeDeleteQuery(tx)
-        .where({ userId, episodeId: { in: episodes.map((episode) => episode.id) } })
-        .all();
+      const deletedUserEpisodes = await userEpisodeRepository.deleteMany(
+        userId,
+        episodes.map((episode) => episode.id),
+        tx
+      );
 
       if (deletedUserEpisodes.length === 0) {
         throw notFound("USER_EPISODE_NOT_FOUND", "Episode for this user not found");
@@ -305,17 +240,24 @@ export const userService = {
       const regularEpisodeIds = new Set(
         episodes.filter((episode) => episode.seasonNumber !== 0).map((episode) => episode.id)
       );
-      const watchCountDecrement = deletedUserEpisodes.filter((episode) =>
+      const watchCountDecrement = -deletedUserEpisodes.filter((episode) =>
         regularEpisodeIds.has(episode.episodeId)
       ).length;
 
-      const updatedUserSeries = await userSeriesUpdateQuery(tx)
-        .where({ userId, seriesId })
-        .set({
-          watchCount: { decrement: watchCountDecrement },
-          watchedEpisodeCount: { decrement: deletedUserEpisodes.length }
-        })
-        .first();
+      const lastWatchedAt = await userEpisodeRepository.getLastWatchedAtBySeriesId(
+        userId,
+        seriesId,
+        tx
+      );
+
+      const updatedUserSeries = await userSeriesRepository.updateProgress(
+        userId,
+        seriesId,
+        lastWatchedAt,
+        watchCountDecrement,
+        -deletedUserEpisodes.length,
+        tx
+      );
 
       const status = getUserSeriesStatus(
         updatedUserSeries.watchedEpisodeCount,
@@ -324,36 +266,20 @@ export const userService = {
         series.inProduction
       );
 
-      const latestWatchedEpisode = await userEpisodeSelectQuery(tx)
-        .where({ userId, episode: { seriesId } })
-        .orderBy({ watchedAt: "desc" })
-        .first();
-
-      await userSeriesUpdateQuery(tx)
-        .where({ userId, seriesId })
-        .set({ status, lastWatchedAt: latestWatchedEpisode?.watchedAt ?? null })
-        .first();
+      await userSeriesRepository.update(userId, seriesId, { status }, tx);
 
       return deletedUserEpisodes;
     });
   },
 
   async dashboardSummaryGet(userId: string) {
-    const summaryEpisodes = await userEpisodeRelationalSelectQuery()
-      .join(episodeTable)
-      .select({
-        totalWatchedMinutes: coalesce(sum(episodeTable.runtime), 0),
-        totalWatchedEpisodes: count(episodeTable.id)
-      })
-      .where({ userId })
-      .first();
+    const { episodesSummary, seriesSummary } = await getUserDashboardSummary(userId);
 
-    const summarySeries = await userSeriesRelationalSelectQuery()
-      .select({ totalWatchedSeries: count() })
-      .where({ userId, status: "COMPLETED" })
-      .first();
-
-    return { ...summaryEpisodes, ...summarySeries };
+    return {
+      totalWatchedMinutes: episodesSummary._sum.runtime ?? 0,
+      totalWatchedEpisodes: episodesSummary._count,
+      totalWatchedSeries: seriesSummary._count
+    };
   },
 
   async seriesReconcilePost(params: UserSeriesReconcilePostParams, now = new Date()) {
@@ -361,27 +287,10 @@ export const userService = {
     inactiveSince.setUTCDate(inactiveSince.getUTCDate() - 60);
 
     return prisma.$transaction(async (tx) => {
-      const seriesProgress = await userEpisodeRelationalSelectQuery(tx)
-        .join(episodeTable)
-        .select({
-          seriesId: episodeTable.seriesId,
-          watchedEpisodeCount: count(),
-          watchCount: countWhere(ne(episodeTable.seasonNumber, 0)),
-          lastWatchedAt: max(userEpisodeTable.watchedAt)
-        })
-        .where({ userId: params.userId })
-        .groupBy(episodeTable.seriesId)
-        .all();
+      const { seriesProgress, userSeries } = await getUserSeriesReconciliation(params.userId, tx);
       const progressBySeriesId = new Map(
         seriesProgress.map((progress) => [progress.seriesId, progress])
       );
-
-      const userSeries = await userSeriesRelationalSelectQuery(tx)
-        .join(seriesTable)
-        .selectAll()
-        .select({ series: seriesTable })
-        .where({ userId: params.userId })
-        .all();
 
       const updates = userSeries.flatMap((item) => {
         const progress = progressBySeriesId.get(item.seriesId);
@@ -413,10 +322,12 @@ export const userService = {
         return !hasChanged
           ? []
           : [
-              userSeriesUpdateQuery(tx)
-                .where({ userId: item.userId, seriesId: item.seriesId })
-                .set({ watchedEpisodeCount, watchCount, lastWatchedAt, status })
-                .execute()
+              userSeriesRepository.update(
+                item.userId,
+                item.seriesId,
+                { watchedEpisodeCount, watchCount, lastWatchedAt, status },
+                tx
+              )
             ];
       });
 

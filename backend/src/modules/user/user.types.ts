@@ -20,3 +20,30 @@ export type EpisodeFeedRow = {
   overview: string | null;
   remainingEpisodes: number;
 };
+
+export type UserSeriesUpdate = {
+  isFavorite?: boolean;
+  status?: UserSeriesStatus;
+  watchCount?: number;
+  watchedEpisodeCount?: number;
+  lastWatchedAt?: Date | null;
+};
+
+export type UserUpcomingEpisodeRow = {
+  id: number;
+  seriesId: number;
+  seasonId: number;
+  airDate: string | null;
+  episodeNumber: number;
+  name: string;
+  overview: string | null;
+  tmdbId: number;
+  stillPath: string | null;
+  runtime: number;
+  seasonNumber: number;
+  voteAverage: number;
+  createdAt: string;
+  updatedAt: string;
+  seriesName: string;
+  seriesBackdropPath: string;
+};
