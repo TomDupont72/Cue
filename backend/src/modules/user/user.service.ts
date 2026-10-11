@@ -83,7 +83,7 @@ export const userService = {
 
     return {
       WATCHING: upcommingEpisodes.filter(({ status }) => status === "WATCHING"),
-      PAUSED: upcommingEpisodes.filter(({ status }) => status === "PAUSED"), // TODO: unused in frontend
+      PAUSED: upcommingEpisodes.filter(({ status }) => status === "PAUSED"), // TODO #263: unused in frontend
       DROPPED: upcommingEpisodes.filter(({ status }) => status === "DROPPED")
     };
   },

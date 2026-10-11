@@ -26,6 +26,7 @@ import type {
 } from "@/external/tmdb/tmdb.types.js";
 import { tvWatchProviders } from "@/external/tmdb/tmdb.tv-watch-providers.js";
 import { providerRepository } from "@/modules/provider/provider.repository.js";
+import { prepareTmdbIdsForUpsert } from "../episode/queries/prepareTmdbIdsForUpsert.query.js";
 
 export async function syncTmdb(tmdbId: number) {
   const tmdbSeries = await tvDetails(tmdbId);
@@ -108,21 +109,20 @@ export async function syncTmdb(tmdbId: number) {
         tx
       );
 
-      const episodes = await episodeRepository.upsertMany(
-        joinBy(
-          { data: tmdbEpisodes, key: "seasonNumber" },
-          {
-            data: seasons,
-            key: "seasonNumber",
-            select: (season, episode) => ({
-              ...dropKeys(episode, ["crew", "guestStars"] as const),
-              seriesId: series.id,
-              seasonId: season.id
-            })
-          }
-        ),
-        tx
+      const episodeData = joinBy(
+        { data: tmdbEpisodes, key: "seasonNumber" },
+        {
+          data: seasons,
+          key: "seasonNumber",
+          select: (season, episode) => ({
+            ...dropKeys(episode, ["crew", "guestStars"] as const),
+            seriesId: series.id,
+            seasonId: season.id
+          })
+        }
       );
+      await prepareTmdbIdsForUpsert(episodeData, tx);
+      const episodes = await episodeRepository.upsertMany(episodeData, tx);
 
       const episodeCrew = joinBy(
         { data: tmdbEpisodes, key: "tmdbId" },
