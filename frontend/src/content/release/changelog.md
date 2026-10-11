@@ -6,7 +6,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ---
 
-## [1.2.0] · _1 octobre 2026_
+## [1.2.1] · _12 octobre 2026_
 
 ### Améliorations
 
