@@ -43,8 +43,8 @@ export const userService = {
     };
   },
 
-  async episodeFeedGet(userId: string) {
-    const episodesBySeries = await listGroupedEpisodesBySeries(userId);
+  async episodeFeedGet(userId: string, now = new Date()) {
+    const episodesBySeries = await listGroupedEpisodesBySeries(userId, now);
 
     const upcommingEpisodes = [];
 
@@ -63,9 +63,9 @@ export const userService = {
       );
       let maxIndex = episodesBySerie.episodes.length;
 
-      for (const index of [...indexByWatchedAtSorted.keys()]) {
+      for (const index of [...indexByWatchedAtSorted.keys(), -1]) {
         const notSeenEpisodes = episodes
-          .slice(index, maxIndex)
+          .slice(index + 1, maxIndex)
           .filter((episode) => episode.users.length === 0);
         if (notSeenEpisodes.length !== 0) {
           const { users, ...upcommingEpisode } = notSeenEpisodes[0];
