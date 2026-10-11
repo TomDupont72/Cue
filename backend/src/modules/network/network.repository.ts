@@ -1,10 +1,16 @@
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
-import { UpsertQuery } from "@/shared/db/upsertQuery.js";
+import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
-export const networkUpsertQuery = (db: PrismaTx = prisma) =>
-  new UpsertQuery<typeof db.network, Prisma.NetworkCreateManyInput, "tmdbId">(db.network, {
+export function upsertNetworks(
+  data: readonly Prisma.NetworkCreateManyInput[],
+  db: PrismaTx = prisma
+) {
+  return upsertManyAndFetch({
+    data,
     scalarFields: Prisma.NetworkScalarFieldEnum,
-    uniqueBy: "tmdbId"
+    uniqueBy: "tmdbId",
+    delegate: db.network
   });
+}

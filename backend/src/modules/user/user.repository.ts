@@ -1,36 +1,209 @@
-import { Prisma } from "@/generated/prisma/client.js";
+import { Prisma, UserEpisode } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
-import { EpisodeFeedRow } from "./user.types.js";
+import { EpisodeFeedRow, UserSeriesUpdate } from "./user.types.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
-import { SelectQuery } from "@/shared/db/selectQuery.js";
-import { RelationalSelectQuery } from "@/shared/db/relationalSelectQuery.js";
-import { userEpisodeTable, userSeriesTable } from "@/shared/db/constants/queryTables.js";
-import { InsertQuery } from "@/shared/db/insertQuery.js";
-import { UpdateQuery } from "@/shared/db/updateQuery.js";
-import { UpsertQuery } from "@/shared/db/upsertQuery.js";
-import { DeleteQuery } from "@/shared/db/deleteQuery.js";
+import { UserEpisodeCreateManyInput } from "@/generated/prisma/models.js";
+import { notFound } from "@/shared/errors/errors.helpers.js";
 
-export const userEpisodeSelectQuery = (db: PrismaTx = prisma) =>
-  new SelectQuery(db.userEpisode, "USER_EPISODE_NOT_FOUND");
+export async function findUserSeriesBySeriesId(
+  userId: string,
+  seriesId: number,
+  db: PrismaTx = prisma
+) {
+  return db.userSeries.findUnique({ where: { userId_seriesId: { userId, seriesId } } });
+}
 
-export const userEpisodeRelationalSelectQuery = (db: PrismaTx = prisma) =>
-  new RelationalSelectQuery(db.userEpisode, db, userEpisodeTable);
+export async function requireUserSeriesByIdSeriesId(
+  userId: string,
+  seriesId: number,
+  db: PrismaTx = prisma
+) {
+  const userSeries = await findUserSeriesBySeriesId(userId, seriesId, db);
 
-export const userEpisodeInsertQuery = (db: PrismaTx = prisma) => new InsertQuery(db.userEpisode);
+  if (!userSeries) {
+    throw notFound("USER_SERIES_NOT_FOUND", "Series for this user not found");
+  }
 
-export const userEpisodeDeleteQuery = (db: PrismaTx = prisma) =>
-  new DeleteQuery(db.userEpisode, db, userEpisodeTable);
+  return userSeries;
+}
 
-export const userSeriesSelectQuery = (db: PrismaTx = prisma) =>
-  new SelectQuery(db.userSeries, "USER_SERIES_NOT_FOUND");
+export async function updateUserSeries(
+  userId: string,
+  seriesId: number,
+  data: UserSeriesUpdate,
+  db: PrismaTx = prisma
+) {
+  return db.userSeries.update({
+    where: { userId_seriesId: { userId, seriesId } },
+    data
+  });
+}
 
-export const userSeriesRelationalSelectQuery = (db: PrismaTx = prisma) =>
-  new RelationalSelectQuery(db.userSeries, db, userSeriesTable);
+export async function upsertUserSeries(
+  userId: string,
+  seriesId: number,
+  data: UserSeriesUpdate,
+  addedAt: Date,
+  db: PrismaTx = prisma
+) {
+  return db.userSeries.upsert({
+    where: { userId_seriesId: { userId, seriesId } },
+    create: { userId, seriesId, ...data, addedAt },
+    update: data
+  });
+}
 
-export const userSeriesUpdateQuery = (db: PrismaTx = prisma) => new UpdateQuery(db.userSeries);
+export async function updateUserSeriesProgress(
+  userId: string,
+  seriesId: number,
+  watchedAt: Date | null,
+  watchCountDelta: number,
+  watchedEpisodeCountDelta: number,
+  db: PrismaTx = prisma
+) {
+  return db.userSeries.update({
+    where: { userId_seriesId: { userId, seriesId } },
+    data: {
+      lastWatchedAt: watchedAt,
+      watchCount: { increment: watchCountDelta },
+      watchedEpisodeCount: { increment: watchedEpisodeCountDelta }
+    }
+  });
+}
 
-export const userSeriesUpsertQuery = (db: PrismaTx = prisma) => new UpsertQuery(db.userSeries);
+export async function upsertUserSeriesProgress(
+  userId: string,
+  seriesId: number,
+  watchedAt: Date | null,
+  watchCountDelta: number,
+  watchedEpisodeCountDelta: number,
+  db: PrismaTx = prisma
+) {
+  return db.userSeries.upsert({
+    where: { userId_seriesId: { userId, seriesId } },
+    create: {
+      userId,
+      seriesId,
+      addedAt: watchedAt ?? new Date(),
+      lastWatchedAt: watchedAt,
+      watchCount: watchCountDelta,
+      watchedEpisodeCount: watchedEpisodeCountDelta
+    },
+    update: {
+      lastWatchedAt: watchedAt,
+      watchCount: { increment: watchCountDelta },
+      watchedEpisodeCount: { increment: watchedEpisodeCountDelta }
+    }
+  });
+}
+
+export async function findUserEpisodeByEpisodeId(
+  userId: string,
+  episodeId: number,
+  db: PrismaTx = prisma
+) {
+  return db.userEpisode.findUnique({ where: { userId_episodeId: { userId, episodeId } } });
+}
+
+export async function listUserEpisodesByEpisodeIds(
+  userId: string,
+  episodeIds: number[],
+  db: PrismaTx = prisma
+) {
+  return db.userEpisode.findMany({ where: { userId, episodeId: { in: episodeIds } } });
+}
+
+export async function findLastUserEpisodeWatchedAtBySeriesId(
+  userId: string,
+  seriesId: number,
+  db: PrismaTx = prisma
+) {
+  const userEpisodes = await db.userEpisode.aggregate({
+    where: {
+      userId,
+      episode: {
+        seriesId
+      }
+    },
+    _max: {
+      watchedAt: true
+    }
+  });
+
+  return userEpisodes._max.watchedAt;
+}
+
+export async function requireUserEpisodeByEpisodeId(
+  userId: string,
+  episodeId: number,
+  db: PrismaTx = prisma
+) {
+  const userEpisode = await db.userEpisode.findUnique({
+    where: { userId_episodeId: { userId, episodeId } }
+  });
+
+  if (!userEpisode) {
+    throw notFound("USER_EPISODE_NOT_FOUND", "Episode for this user not found");
+  }
+
+  return userEpisode;
+}
+
+export async function listUserEpisodeBySeriesId(
+  userId: string,
+  seriesId: number,
+  db: PrismaTx = prisma
+) {
+  return db.userEpisode.findMany({ where: { userId, episode: { seriesId } } });
+}
+
+export async function createUserEpisode(
+  userId: string,
+  episodeId: number,
+  watchedAt: Date,
+  db: PrismaTx = prisma
+) {
+  const [userEpisode] = await db.userEpisode.createManyAndReturn({
+    data: { userId, episodeId, watchedAt },
+    skipDuplicates: true
+  });
+
+  return userEpisode;
+}
+
+export async function createManyUserEpisodes(
+  episodes: UserEpisodeCreateManyInput[],
+  db: PrismaTx = prisma
+) {
+  const userEpisodes = await db.userEpisode.createManyAndReturn({
+    data: episodes,
+    skipDuplicates: true
+  });
+
+  return userEpisodes;
+}
+
+export async function deleteUserEpisode(userId: string, episodeId: number, db: PrismaTx = prisma) {
+  return db.userEpisode.delete({ where: { userId_episodeId: { userId, episodeId } } });
+}
+
+export async function deleteManyUserEpisodes(
+  userId: string,
+  episodeIds: number[],
+  db: PrismaTx = prisma
+) {
+  if (episodeIds.length === 0) {
+    return [];
+  }
+
+  return db.$queryRaw<UserEpisode[]>(Prisma.sql`
+    DELETE FROM "UserEpisode"
+    WHERE "userId" = ${userId}
+      AND "episodeId" IN (${Prisma.join(episodeIds)})
+    RETURNING "userId", "episodeId", "watchedAt"
+  `);
+}
 
 function getEpisodesFeedQuery(userId: string, releaseCutoff: Date, seriesId?: number) {
   const seriesFilter =
