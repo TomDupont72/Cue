@@ -151,13 +151,106 @@ Feature: POST /api/series/import
             }
             """
 
+        And TMDB responds to "/tv/300" with:
+            """
+            {
+                "adult": false,
+                "backdrop_path": null,
+                "created_by": [],
+                "first_air_date": "2022-01-01",
+                "genres": [],
+                "id": 300,
+                "in_production": false,
+                "last_air_date": "2022-01-08",
+                "name": "Cascade series",
+                "seasons": [
+                    {
+                        "id": 3001,
+                        "season_number": 1
+                    }
+                ],
+                "networks": [],
+                "number_of_episodes": 2,
+                "number_of_seasons": 1,
+                "original_language": "en",
+                "original_name": "Cascade series",
+                "overview": "Cascade overview",
+                "popularity": 1,
+                "poster_path": null
+            }
+            """
+
+        And TMDB responds to "/tv/300/season/1" with:
+            """
+            {
+                "air_date": "2022-01-01",
+                "episodes": [
+                    {
+                        "air_date": "2022-01-01",
+                        "crew": [],
+                        "episode_number": 1,
+                        "guest_stars": [],
+                        "name": "First cascade episode",
+                        "overview": "First cascade episode overview",
+                        "id": 30001,
+                        "still_path": null,
+                        "runtime": 42,
+                        "season_number": 1,
+                        "vote_average": 1
+                    },
+                    {
+                        "air_date": "2022-01-08",
+                        "crew": [],
+                        "episode_number": 2,
+                        "guest_stars": [],
+                        "name": "Second cascade episode",
+                        "overview": "Second cascade episode overview",
+                        "id": 30002,
+                        "still_path": null,
+                        "runtime": 42,
+                        "season_number": 1,
+                        "vote_average": 1
+                    }
+                ],
+                "name": "Cascade season",
+                "overview": "Cascade season overview",
+                "id": 3001,
+                "poster_path": null,
+                "season_number": 1,
+                "vote_average": 1
+            }
+            """
+
+        And TMDB responds to "/tv/300/watch/providers" with:
+            """
+            {
+                "id": 300,
+                "results": {}
+            }
+            """
+
         And the database with these series:
-            | key          | id | tmdbId | firstAirDate             | lastAirDate              | name          | numberOfEpisodes | numberOfSeasons | originalLanguage | originalName     | overview           | popularity |
-            | cachedSeries | 1  | 100    | 2020-01-01T00:00:00.000Z | 2020-01-01T00:00:00.000Z | Cached series | 1                | 1               | en               | Refreshed series | Refreshed overview | 1          |
+            | key           | id | tmdbId | firstAirDate             | lastAirDate              | name           | numberOfEpisodes | numberOfSeasons | originalLanguage | originalName     | overview           | popularity |
+            | cachedSeries  | 1  | 100    | 2020-01-01T00:00:00.000Z | 2020-01-01T00:00:00.000Z | Cached series  | 1                | 1               | en               | Refreshed series | Refreshed overview | 1          |
+            | cascadeSeries | 2  | 300    | 2022-01-01T00:00:00.000Z | 2022-01-08T00:00:00.000Z | Cascade series | 2                | 1               | en               | Cascade series   | Cascade overview   | 1          |
+
+        And the database with these seasons:
+            | key           | id | seriesId              | tmdbId | seasonNumber |
+            | cascadeSeason | 1  | @series.cascadeSeries | 3001   | 1            |
+
+        And the database with these episodes:
+            | key                    | id | seriesId              | seasonId               | tmdbId | seasonNumber | episodeNumber |
+            | firstCascadeEpisode    | 1  | @series.cascadeSeries | @seasons.cascadeSeason | 29001  | 1            | 1             |
+            | secondCascadeEpisode   | 2  | @series.cascadeSeries | @seasons.cascadeSeason | 30001  | 1            | 2             |
+            | obsoleteCascadeEpisode | 3  | @series.cascadeSeries | @seasons.cascadeSeason | 30002  | 1            | 3             |
 
         And the database with these user series:
             | key            | userId | seriesId             |
             | cachedProgress | user-1 | @series.cachedSeries |
+
+        And the database with these user episodes:
+            | userId | episodeId                      |
+            | user-1 | @episodes.firstCascadeEpisode |
 
     Scenario: Post series import - Existing series
         Given authentication as "user-1"
@@ -184,11 +277,11 @@ Feature: POST /api/series/import
 
         And the database should have these seasons added:
             | id | seriesId | tmdbId | name            | seasonNumber |
-            | 1  | 1        | 1001   | Imported season | 1            |
+            | 2  | 1        | 1001   | Imported season | 1            |
 
         And the database should have these episodes added:
             | id | seriesId | seasonId | tmdbId | name             | runtime | seasonNumber | episodeNumber |
-            | 1  | 1        | 1        | 10001  | Imported episode | 42      | 1            | 1             |
+            | 4  | 1        | 2        | 10001  | Imported episode | 42      | 1            | 1             |
 
         And the database should have these genres added:
             | key   | id | tmdbId | name  |
@@ -230,13 +323,25 @@ Feature: POST /api/series/import
 
         And the database should have these episode people added:
             | episodeId | peopleId     |
-            | 1         | @people.crew |
+            | 4         | @people.crew |
 
         And the database should have these episode characters added:
             | episodeId | characterId      |
-            | 1         | @characters.hero |
+            | 4         | @characters.hero |
 
         And the response field at "userSeries" should be null
+
+    Scenario: Post series import - Worker reconciles a cascade of episode TMDB IDs by position
+        Given called by worker
+
+        When I send a POST request to "/api/series/import" with body:
+            | tmdbId |
+            | 300    |
+
+        Then the response status should be 200
+        And the database should contain exactly these user episodes:
+            | userId | episodeId                      |
+            | user-1 | @episodes.firstCascadeEpisode |
 
     Scenario: Post series import - New series
         Given called by worker
@@ -248,7 +353,7 @@ Feature: POST /api/series/import
         Then the response status should be 200
         And the database should have these series added:
             | id | tmdbId | name            | numberOfEpisodes | numberOfSeasons | inProduction |
-            | 2  | 200    | Imported series | 0                | 0               | true         |
+            | 3  | 200    | Imported series | 0                | 0               | true         |
 
         And the response field at "userSeries" should be null
 

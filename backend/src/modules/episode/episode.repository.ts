@@ -9,7 +9,7 @@ export const episodeRepository = {
     return upsertManyAndFetch({
       data,
       scalarFields: Prisma.EpisodeScalarFieldEnum,
-      uniqueBy: "tmdbId",
+      uniqueBy: ["seriesId", "seasonNumber", "episodeNumber"] as const,
       delegate: db.episode
     });
   },
