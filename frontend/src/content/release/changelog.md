@@ -6,6 +6,22 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ---
 
+## [1.2.1] · _12 octobre 2026_
+
+### Améliorations
+
+- Amélioration de l'affichage des images.
+
+### Correction
+
+- Correction de la synchronisation quotidienne des séries.
+- Correction de l'ordre dans la section des séries non commencées du dashboard.
+- Correction de l'épisode suivant dans **À voir**.
+- Correction des écrans sans données.
+- Correction de l'affichage des séries sans date.
+
+---
+
 ## [1.2.0] · _1 octobre 2026_
 
 ### Ajouts
