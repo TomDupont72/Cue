@@ -25,5 +25,8 @@ export function setUrlSelectionParam<T extends FacetValue>(
 
   if (selection.mode !== "all") {
     selection.values.forEach((value) => searchParams.append(name, String(value)));
+    if (selection.values.length === 0) {
+      searchParams.append(name, "null");
+    }
   }
 }

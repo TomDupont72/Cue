@@ -6,9 +6,18 @@ export const userDashboardSearchParamsSchema = z.object({
     .enum(["status", "genre", "provider"])
     .nullable()
     .transform((value) => value ?? "status"),
-  statuses: z.array(z.enum(USER_SERIES_STATUS)),
-  genres: z.array(z.string().transform(Number).pipe(z.number().int().min(1))),
-  providers: z.array(z.string().transform(Number).pipe(z.number().int().min(1)))
+  statuses: z.union([
+    z.array(z.enum(USER_SERIES_STATUS)),
+    z.tuple([z.literal("null")]).transform(() => null)
+  ]),
+  genres: z.union([
+    z.array(z.string().transform(Number).pipe(z.number().int().min(1))),
+    z.tuple([z.literal("null")]).transform(() => null)
+  ]),
+  providers: z.union([
+    z.array(z.string().transform(Number).pipe(z.number().int().min(1))),
+    z.tuple([z.literal("null")]).transform(() => null)
+  ])
 });
 
 export type UserDashboardSearchParams = z.infer<typeof userDashboardSearchParamsSchema>;
