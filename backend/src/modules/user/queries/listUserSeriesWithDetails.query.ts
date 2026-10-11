@@ -6,7 +6,7 @@ export async function listUserSeriesWithDetails(
   seriesId?: number,
   db: PrismaTx = prisma
 ) {
-  return db.userSeries.findMany({
+  const rows = await db.userSeries.findMany({
     include: {
       series: {
         include: {
@@ -18,7 +18,10 @@ export async function listUserSeriesWithDetails(
         }
       }
     },
-    where: { userId, seriesId },
-    orderBy: { lastWatchedAt: "desc" }
+    where: { userId, seriesId }
   });
+
+  return rows.sort(
+    (a, b) => (b.lastWatchedAt ?? b.addedAt).getTime() - (a.lastWatchedAt ?? a.addedAt).getTime()
+  );
 }
