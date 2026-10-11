@@ -3,18 +3,17 @@ import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
-export function upsertSeasons(
-  data: readonly Prisma.SeasonUncheckedCreateInput[],
-  db: PrismaTx = prisma
-) {
-  return upsertManyAndFetch({
-    data,
-    scalarFields: Prisma.SeasonScalarFieldEnum,
-    uniqueBy: "tmdbId",
-    delegate: db.season
-  });
-}
+export const seasonRepository = {
+  async upsertMany(data: readonly Prisma.SeasonUncheckedCreateInput[], db: PrismaTx = prisma) {
+    return upsertManyAndFetch({
+      data,
+      scalarFields: Prisma.SeasonScalarFieldEnum,
+      uniqueBy: "tmdbId",
+      delegate: db.season
+    });
+  },
 
-export function listSeasonBySeriesId(seriesId: number, db: PrismaTx = prisma) {
-  return db.season.findMany({ where: { seriesId } });
-}
+  async listBySeriesId(seriesId: number, db: PrismaTx = prisma) {
+    return db.season.findMany({ where: { seriesId } });
+  }
+};

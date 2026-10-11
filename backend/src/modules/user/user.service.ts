@@ -1,19 +1,5 @@
 import { prisma } from "@/shared/db/prisma.js";
-import {
-  createManyUserEpisodes,
-  createUserEpisode,
-  deleteManyUserEpisodes,
-  deleteUserEpisode,
-  findLastUserEpisodeWatchedAtBySeriesId,
-  listUserEpisodesByEpisodeIds,
-  requireUserEpisodeByEpisodeId,
-  requireUserSeriesByIdSeriesId,
-  updateUserSeries,
-  updateUserSeriesProgress,
-  upsertUserSeries,
-  upsertUserSeriesProgress,
-  userRepository
-} from "@/modules/user/user.repository.js";
+import { userEpisodeRepository, userSeriesRepository } from "@/modules/user/user.repository.js";
 import {
   UserEpisodePostParams,
   UserSeriesPostBody,
@@ -24,20 +10,16 @@ import {
   UserSeasonDeleteParams,
   UserSeriesReconcilePostParams
 } from "@/modules/user/user.schemas.js";
-import {
-  listNotEmptyEpisodesBySeasonId,
-  listNotEmptyReleasedEpisodesBySeasonId,
-  requireEpisodeById,
-  requireReleasedEpisodeById
-} from "@/modules/episode/episode.repository.js";
+import { episodeRepository } from "@/modules/episode/episode.repository.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import { requireSeriesById } from "@/modules/series/series.repository.js";
+import { seriesRepository } from "@/modules/series/series.repository.js";
 import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { listUserSeriesWithDetails } from "./queries/listUserSeriesWithDetails.query.js";
 import { getUserDashboardSummary } from "./queries/getUserDashboardSummary.query.js";
 import { getUserSeriesReconciliation } from "./queries/getUserSeriesReconciliation.query.js";
 import { listUserUpcomingEpisodes } from "./queries/listUserUpcomingEpisodes.query.js";
+import { listUserEpisodeFeed } from "./queries/listUserEpisodeFeed.query.js";
 
 export const userService = {
   async seriesGet(userId: string, params: UserSeriesGetParams) {
@@ -62,7 +44,7 @@ export const userService = {
   },
 
   async episodeFeedGet(userId: string) {
-    const episodes = await userRepository.getEpisodesFeed(userId);
+    const episodes = await listUserEpisodeFeed(userId);
 
     return {
       WATCHING: episodes.filter(({ status }) => status === "WATCHING"),
@@ -85,9 +67,9 @@ export const userService = {
     body: UserSeriesPostBody,
     now = new Date()
   ) {
-    await requireSeriesById(params.seriesId);
+    await seriesRepository.requireById(params.seriesId);
 
-    return upsertUserSeries(userId, params.seriesId, body, now);
+    return userSeriesRepository.upsert(userId, params.seriesId, body, now);
   },
 
   async episodePost(userId: string, params: UserEpisodePostParams, now = new Date()) {
@@ -95,16 +77,21 @@ export const userService = {
     const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
-      const series = await requireSeriesById(seriesId, tx);
+      const series = await seriesRepository.requireById(seriesId, tx);
 
-      const episode = await requireReleasedEpisodeById(episodeId, seriesId, releaseCutoff, tx);
+      const episode = await episodeRepository.requireReleasedById(
+        episodeId,
+        seriesId,
+        releaseCutoff,
+        tx
+      );
 
-      const createdUserEpisode = await createUserEpisode(userId, episodeId, now, tx);
+      const createdUserEpisode = await userEpisodeRepository.create(userId, episodeId, now, tx);
 
       if (createdUserEpisode) {
         const watchCountIncrement = episode.seasonNumber === 0 ? 0 : 1;
 
-        const userSeries = await upsertUserSeriesProgress(
+        const userSeries = await userSeriesRepository.upsertProgress(
           userId,
           seriesId,
           now,
@@ -121,13 +108,13 @@ export const userService = {
         );
 
         if (status !== userSeries.status) {
-          await updateUserSeries(userId, seriesId, { status }, tx);
+          await userSeriesRepository.update(userId, seriesId, { status }, tx);
         }
 
         return createdUserEpisode;
       }
 
-      return requireUserEpisodeByEpisodeId(userId, episodeId, tx);
+      return userEpisodeRepository.requireByEpisodeId(userId, episodeId, tx);
     });
   },
 
@@ -135,20 +122,24 @@ export const userService = {
     const { seriesId, episodeId } = params;
 
     return prisma.$transaction(async (tx) => {
-      const episode = await requireEpisodeById(episodeId, seriesId, tx);
-      const series = await requireSeriesById(seriesId, tx);
+      const episode = await episodeRepository.requireById(episodeId, seriesId, tx);
+      const series = await seriesRepository.requireById(seriesId, tx);
 
-      await requireUserSeriesByIdSeriesId(userId, seriesId, tx);
-      await requireUserEpisodeByEpisodeId(userId, episodeId, tx);
+      await userSeriesRepository.requireBySeriesId(userId, seriesId, tx);
+      await userEpisodeRepository.requireByEpisodeId(userId, episodeId, tx);
 
-      const deletedUserEpisode = await deleteUserEpisode(userId, episodeId, tx);
+      const deletedUserEpisode = await userEpisodeRepository.delete(userId, episodeId, tx);
 
       if (deletedUserEpisode) {
         const watchCountDecrement = episode.seasonNumber === 0 ? 0 : -1;
 
-        const lastWatchedAt = await findLastUserEpisodeWatchedAtBySeriesId(userId, seriesId, tx);
+        const lastWatchedAt = await userEpisodeRepository.getLastWatchedAtBySeriesId(
+          userId,
+          seriesId,
+          tx
+        );
 
-        const updatedUserSeries = await updateUserSeriesProgress(
+        const updatedUserSeries = await userSeriesRepository.updateProgress(
           userId,
           seriesId,
           lastWatchedAt,
@@ -164,7 +155,7 @@ export const userService = {
           series.inProduction
         );
 
-        await updateUserSeries(userId, seriesId, { status, lastWatchedAt }, tx);
+        await userSeriesRepository.update(userId, seriesId, { status, lastWatchedAt }, tx);
 
         return deletedUserEpisode;
       }
@@ -178,8 +169,8 @@ export const userService = {
     const releaseCutoff = getEpisodeReleaseCutoff(now);
 
     return prisma.$transaction(async (tx) => {
-      const series = await requireSeriesById(seriesId, tx);
-      const episodes = await listNotEmptyReleasedEpisodesBySeasonId(
+      const series = await seriesRepository.requireById(seriesId, tx);
+      const episodes = await episodeRepository.listNotEmptyReleasedBySeasonId(
         seasonId,
         seriesId,
         releaseCutoff,
@@ -187,13 +178,13 @@ export const userService = {
       );
       const episodeIds = episodes.map((episode) => episode.id);
 
-      const createdUserEpisodes = await createManyUserEpisodes(
+      const createdUserEpisodes = await userEpisodeRepository.createMany(
         episodes.map((episode) => ({ userId, episodeId: episode.id, watchedAt: now })),
         tx
       );
 
       if (createdUserEpisodes.length === 0) {
-        return listUserEpisodesByEpisodeIds(userId, episodeIds, tx);
+        return userEpisodeRepository.listByEpisodeIds(userId, episodeIds, tx);
       }
 
       const regularEpisodeIds = new Set(
@@ -203,7 +194,7 @@ export const userService = {
         regularEpisodeIds.has(episode.episodeId)
       ).length;
 
-      const userSeries = await upsertUserSeriesProgress(
+      const userSeries = await userSeriesRepository.upsertProgress(
         userId,
         seriesId,
         now,
@@ -220,10 +211,10 @@ export const userService = {
       );
 
       if (status !== userSeries.status) {
-        await updateUserSeries(userId, seriesId, { status }, tx);
+        await userSeriesRepository.update(userId, seriesId, { status }, tx);
       }
 
-      return listUserEpisodesByEpisodeIds(userId, episodeIds, tx);
+      return userEpisodeRepository.listByEpisodeIds(userId, episodeIds, tx);
     });
   },
 
@@ -231,12 +222,12 @@ export const userService = {
     const { seriesId, seasonId } = params;
 
     return prisma.$transaction(async (tx) => {
-      const episodes = await listNotEmptyEpisodesBySeasonId(seasonId, seriesId, tx);
-      const series = await requireSeriesById(seriesId, tx);
+      const episodes = await episodeRepository.listNotEmptyBySeasonId(seasonId, seriesId, tx);
+      const series = await seriesRepository.requireById(seriesId, tx);
 
-      await requireUserSeriesByIdSeriesId(userId, seriesId, tx);
+      await userSeriesRepository.requireBySeriesId(userId, seriesId, tx);
 
-      const deletedUserEpisodes = await deleteManyUserEpisodes(
+      const deletedUserEpisodes = await userEpisodeRepository.deleteMany(
         userId,
         episodes.map((episode) => episode.id),
         tx
@@ -253,9 +244,13 @@ export const userService = {
         regularEpisodeIds.has(episode.episodeId)
       ).length;
 
-      const lastWatchedAt = await findLastUserEpisodeWatchedAtBySeriesId(userId, seriesId, tx);
+      const lastWatchedAt = await userEpisodeRepository.getLastWatchedAtBySeriesId(
+        userId,
+        seriesId,
+        tx
+      );
 
-      const updatedUserSeries = await updateUserSeriesProgress(
+      const updatedUserSeries = await userSeriesRepository.updateProgress(
         userId,
         seriesId,
         lastWatchedAt,
@@ -271,7 +266,7 @@ export const userService = {
         series.inProduction
       );
 
-      await updateUserSeries(userId, seriesId, { status }, tx);
+      await userSeriesRepository.update(userId, seriesId, { status }, tx);
 
       return deletedUserEpisodes;
     });
@@ -327,7 +322,7 @@ export const userService = {
         return !hasChanged
           ? []
           : [
-              updateUserSeries(
+              userSeriesRepository.update(
                 item.userId,
                 item.seriesId,
                 { watchedEpisodeCount, watchCount, lastWatchedAt, status },

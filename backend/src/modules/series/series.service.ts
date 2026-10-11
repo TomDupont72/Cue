@@ -1,44 +1,36 @@
-import { listEpisodeBySeriesId } from "@/modules/episode/episode.repository.js";
-import { listSeasonBySeriesId } from "@/modules/season/season.repository.js";
-import {
-  findSeriesByTmdbId,
-  listSeriesByTmdbIds,
-  requireSeriesById,
-  updateSeries
-} from "@/modules/series/series.repository.js";
+import { episodeRepository } from "@/modules/episode/episode.repository.js";
+import { seasonRepository } from "@/modules/season/season.repository.js";
+import { seriesRepository } from "@/modules/series/series.repository.js";
 import type {
   SeriesGetParams,
   SeriesImportPostBody,
   SeriesReconcilePostBody
 } from "@/modules/series/series.schemas.js";
-import {
-  listUserEpisodeBySeriesId,
-  findUserSeriesBySeriesId
-} from "@/modules/user/user.repository.js";
+import { userEpisodeRepository, userSeriesRepository } from "@/modules/user/user.repository.js";
 import { syncTmdb } from "@/modules/series/series.rules.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
 import { prisma } from "@/shared/db/prisma.js";
-import { listProviderBySeriesId } from "@/modules/provider/provider.repository.js";
-import { listGenreBySeriesId } from "../genre/genre.repository.js";
+import { providerRepository } from "@/modules/provider/provider.repository.js";
+import { genreRepository } from "../genre/genre.repository.js";
 import { listEpisodeCounts } from "../episode/queries/listEpisodeCounts.query.js";
 
 export const seriesService = {
   async get(userId: string, params: SeriesGetParams) {
-    const series = await requireSeriesById(params.id);
-    const seasons = await listSeasonBySeriesId(series.id);
-    const episodes = await listEpisodeBySeriesId(series.id);
-    const userSeries = await findUserSeriesBySeriesId(userId, series.id);
-    const userEpisodes = await listUserEpisodeBySeriesId(userId, series.id);
-    const seriesProviders = await listProviderBySeriesId(series.id);
-    const seriesGenres = await listGenreBySeriesId(series.id);
+    const series = await seriesRepository.requireById(params.id);
+    const seasons = await seasonRepository.listBySeriesId(series.id);
+    const episodes = await episodeRepository.listBySeriesId(series.id);
+    const userSeries = await userSeriesRepository.getBySeriesId(userId, series.id);
+    const userEpisodes = await userEpisodeRepository.listBySeriesId(userId, series.id);
+    const seriesProviders = await providerRepository.listBySeriesId(series.id);
+    const seriesGenres = await genreRepository.listBySeriesId(series.id);
 
     return { series, seasons, episodes, userSeries, userEpisodes, seriesProviders, seriesGenres };
   },
 
   async importPost(userId: string | null, body: SeriesImportPostBody, forceSync = false) {
-    const existingSeries = await findSeriesByTmdbId(body.tmdbId);
+    const existingSeries = await seriesRepository.getByTmdbId(body.tmdbId);
     const series = existingSeries && !forceSync ? existingSeries : await syncTmdb(body.tmdbId);
-    const userSeries = userId ? await findUserSeriesBySeriesId(userId, series.id) : null;
+    const userSeries = userId ? await userSeriesRepository.getBySeriesId(userId, series.id) : null;
 
     return { series, userSeries };
   },
@@ -52,7 +44,7 @@ export const seriesService = {
     }
 
     const updatedCount = await prisma.$transaction(async (tx) => {
-      const series = await listSeriesByTmdbIds(tmdbIds, tx);
+      const series = await seriesRepository.listByTmdbIds(tmdbIds, tx);
       const seriesIds = series.map((serie) => serie.id);
 
       const episodeCounts = await listEpisodeCounts(seriesIds, releaseCutoff, tx);
@@ -64,7 +56,7 @@ export const seriesService = {
 
         return serie.numberOfEpisodes === numberOfEpisodes
           ? []
-          : [updateSeries(serie.id, { numberOfEpisodes }, tx)];
+          : [seriesRepository.update(serie.id, { numberOfEpisodes }, tx)];
       });
 
       await Promise.all(updates);

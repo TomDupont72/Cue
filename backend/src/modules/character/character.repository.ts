@@ -3,14 +3,13 @@ import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { createManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 
-export function ensureCharacters(
-  data: readonly Prisma.CharacterCreateManyInput[],
-  db: PrismaTx = prisma
-) {
-  return createManyAndFetch({
-    data,
-    scalarFields: Prisma.CharacterScalarFieldEnum,
-    uniqueBy: ["peopleId", "name"] as const,
-    delegate: db.character
-  });
-}
+export const characterRepository = {
+  async ensureMany(data: readonly Prisma.CharacterCreateManyInput[], db: PrismaTx = prisma) {
+    return createManyAndFetch({
+      data,
+      scalarFields: Prisma.CharacterScalarFieldEnum,
+      uniqueBy: ["peopleId", "name"] as const,
+      delegate: db.character
+    });
+  }
+};

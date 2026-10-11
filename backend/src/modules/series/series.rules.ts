@@ -1,22 +1,22 @@
 import { seasonDetails } from "@/external/tmdb/tmdb.season-details.js";
 import { tvDetails } from "@/external/tmdb/tmdb.tv-details.js";
 import { prisma } from "@/shared/db/prisma.js";
-import { ensureCharacters } from "@/modules/character/character.repository.js";
+import { characterRepository } from "@/modules/character/character.repository.js";
 import {
-  replaceEpisodeCharacters,
-  replaceEpisodePeople,
-  upsertEpisodes
+  episodeCharacterRepository,
+  episodePeopleRepository,
+  episodeRepository
 } from "@/modules/episode/episode.repository.js";
-import { upsertGenres } from "@/modules/genre/genre.repository.js";
-import { upsertNetworks } from "@/modules/network/network.repository.js";
-import { upsertPeople } from "@/modules/people/people.repository.js";
-import { upsertSeasons } from "@/modules/season/season.repository.js";
+import { genreRepository } from "@/modules/genre/genre.repository.js";
+import { networkRepository } from "@/modules/network/network.repository.js";
+import { peopleRepository } from "@/modules/people/people.repository.js";
+import { seasonRepository } from "@/modules/season/season.repository.js";
 import {
-  replaceSeriesGenres,
-  replaceSeriesNetworks,
-  replaceSeriesPeople,
-  replaceSeriesProviders,
-  upsertSeries
+  seriesGenreRepository,
+  seriesNetworkRepository,
+  seriesPeopleRepository,
+  seriesProviderRepository,
+  seriesRepository
 } from "@/modules/series/series.repository.js";
 import { dropKeys, getMany, joinBy } from "@/shared/utils/object/object.js";
 import type { Prisma } from "@/generated/prisma/client.js";
@@ -25,7 +25,7 @@ import type {
   TmdbEpisodeDetailsResponse
 } from "@/external/tmdb/tmdb.types.js";
 import { tvWatchProviders } from "@/external/tmdb/tmdb.tv-watch-providers.js";
-import { upsertProviders } from "@/modules/provider/provider.repository.js";
+import { providerRepository } from "@/modules/provider/provider.repository.js";
 
 export async function syncTmdb(tmdbId: number) {
   const tmdbSeries = await tvDetails(tmdbId);
@@ -47,30 +47,30 @@ export async function syncTmdb(tmdbId: number) {
         "networks",
         "seasons"
       ] as const);
-      const series = await upsertSeries(seriesData, tx);
+      const series = await seriesRepository.upsert(seriesData, tx);
 
-      const genres = await upsertGenres(tmdbSeries.genres, tx);
-      await replaceSeriesGenres(
+      const genres = await genreRepository.upsertMany(tmdbSeries.genres, tx);
+      await seriesGenreRepository.replaceBySeriesId(
         series.id,
         genres.map((genre) => genre.id),
         tx
       );
 
-      const networks = await upsertNetworks(tmdbSeries.networks, tx);
-      await replaceSeriesNetworks(
+      const networks = await networkRepository.upsertMany(tmdbSeries.networks, tx);
+      await seriesNetworkRepository.replaceBySeriesId(
         series.id,
         networks.map((network) => network.id),
         tx
       );
 
-      const providers = await upsertProviders(providersFR, tx);
-      await replaceSeriesProviders(
+      const providers = await providerRepository.upsertMany(providersFR, tx);
+      await seriesProviderRepository.replaceBySeriesId(
         series.id,
         providers.map((provider) => provider.id),
         tx
       );
 
-      const people = await upsertPeople(
+      const people = await peopleRepository.upsertMany(
         getMany<Prisma.PeopleCreateManyInput>(
           { data: tmdbSeries, fields: ["createdBy"] },
           { data: tmdbEpisodes, fields: ["crew", "guestStars"] }
@@ -82,9 +82,9 @@ export async function syncTmdb(tmdbId: number) {
         { data: people, key: "tmdbId", value: "id" }
       );
 
-      await replaceSeriesPeople(series.id, creatorIds, tx);
+      await seriesPeopleRepository.replaceBySeriesId(series.id, creatorIds, tx);
 
-      const characters = await ensureCharacters(
+      const characters = await characterRepository.ensureMany(
         joinBy(
           {
             data: getMany<TmdbEpisodeDetailsGuestStar>({
@@ -100,7 +100,7 @@ export async function syncTmdb(tmdbId: number) {
         tx
       );
 
-      const seasons = await upsertSeasons(
+      const seasons = await seasonRepository.upsertMany(
         tmdbSeasons.map((season) => ({
           ...dropKeys(season, ["episodes"] as const),
           seriesId: series.id
@@ -108,7 +108,7 @@ export async function syncTmdb(tmdbId: number) {
         tx
       );
 
-      const episodes = await upsertEpisodes(
+      const episodes = await episodeRepository.upsertMany(
         joinBy(
           { data: tmdbEpisodes, key: "seasonNumber" },
           {
@@ -134,7 +134,7 @@ export async function syncTmdb(tmdbId: number) {
         }
       );
 
-      await replaceEpisodePeople(
+      await episodePeopleRepository.replaceByEpisodeIds(
         episodes.map((episode) => episode.id),
         joinBy(
           { data: episodeCrew, key: ({ person }) => person.tmdbId },
@@ -161,7 +161,7 @@ export async function syncTmdb(tmdbId: number) {
         }
       );
 
-      await replaceEpisodeCharacters(
+      await episodeCharacterRepository.replaceByEpisodeIds(
         episodes.map((episode) => episode.id),
         joinBy(
           {
