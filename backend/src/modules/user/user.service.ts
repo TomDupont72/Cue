@@ -19,7 +19,6 @@ import { listUserSeriesWithDetails } from "./queries/listUserSeriesWithDetails.q
 import { getUserDashboardSummary } from "./queries/getUserDashboardSummary.query.js";
 import { getUserSeriesReconciliation } from "./queries/getUserSeriesReconciliation.query.js";
 import { listUserUpcomingEpisodes } from "./queries/listUserUpcomingEpisodes.query.js";
-import { listUserEpisodeFeed } from "./queries/listUserEpisodeFeed.query.js";
 import { listGroupedEpisodesBySeries } from "./queries/listGroupedEpisodesBySeries.query.js";
 
 export const userService = {
