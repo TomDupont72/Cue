@@ -1,7 +1,8 @@
+import pLimit from "p-limit";
+import z from "zod";
+
 import { env } from "@/shared/config/env.js";
 import { logger } from "@/shared/logger/logger.js";
-import z from "zod";
-import pLimit from "p-limit";
 
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 

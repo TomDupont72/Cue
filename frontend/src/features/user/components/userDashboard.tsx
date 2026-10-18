@@ -1,15 +1,16 @@
 import { useTranslation } from "react-i18next";
-import { useUserDashboardSummary } from "../hooks/useUserDashboardSummary";
-import { useUserSeries } from "../hooks/useUserSeries";
-import { ErrorState } from "@/components/feedback/errorState";
+
 import { EmptyState } from "@/components/feedback/emptyState";
+import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
+import { Heading } from "@/components/layout/heading";
 import { PageContainer } from "@/components/layout/pageContainer";
 import { PageSection } from "@/components/layout/pageSection";
-import { Heading } from "@/components/layout/heading";
-import UserDashboardSummaryWidget from "./userDashboardSummaryWidget";
-import { useUserSeriesSearchParams } from "../hooks/useUserSeriesSearchParams";
-import { UserSeriesLibrary } from "./userSeriesLibrary";
+import UserDashboardSummaryWidget from "@/features/user/components/userDashboardSummaryWidget";
+import { UserSeriesLibrary } from "@/features/user/components/userSeriesLibrary";
+import { useUserDashboardSummary } from "@/features/user/hooks/useUserDashboardSummary";
+import { useUserSeries } from "@/features/user/hooks/useUserSeries";
+import { useUserSeriesSearchParams } from "@/features/user/hooks/useUserSeriesSearchParams";
 
 export default function UserDashboard() {
   const { t } = useTranslation();

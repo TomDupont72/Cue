@@ -1,6 +1,7 @@
-import { queryKeys } from "@/lib/queryKeys";
 import { useQuery } from "@tanstack/react-query";
-import { userSeriesGet } from "../api/user.api";
+
+import { userSeriesGet } from "@/features/user/api/user.api";
+import { queryKeys } from "@/lib/queryKeys";
 
 export function useUserSeries(seriesId?: number) {
   return useQuery({

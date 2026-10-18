@@ -1,6 +1,7 @@
+import type { PrismaTx } from "@/shared/db/prisma.types.js";
+
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
-import type { PrismaTx } from "@/shared/db/prisma.types.js";
 
 type UserSeriesProgress = {
   seriesId: number;

@@ -1,11 +1,12 @@
 import type { SeriesGetResponse } from "@/features/series/types/series.types";
-import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
-import type { UserSeasonPostResponse } from "@/features/user/types/user.types";
-import { userSeasonPost } from "@/features/user/api/user.api";
-import { queryKeys } from "@/lib/queryKeys";
 import type { UserSeasonPostParams } from "@/features/user/schemas/user.schemas";
+import type { UserSeasonPostResponse } from "@/features/user/types/user.types";
+
 import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
+import { userSeasonPost } from "@/features/user/api/user.api";
 import { userCachePolicy } from "@/features/user/cache/userCachePolicy";
+import { queryKeys } from "@/lib/queryKeys";
+import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
 
 export function useUserSeasonMutation() {
   return useOptimisticMutation<

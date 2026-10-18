@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+
 import type { FacetSelection, FacetValue } from "@/lib/facets/facet.types";
 
 export function cn(...inputs: ClassValue[]) {

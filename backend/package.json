@@ -16,6 +16,7 @@
     "test:bdd:dry": "cucumber-js --config cucumber.mjs --dry-run",
     "start": "node dist/server.js",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit"
   },
@@ -30,7 +31,6 @@
     "@prisma/client": "^7.8.0",
     "better-auth": "^1.6.23",
     "dotenv": "^17.4.2",
-    "eslint": "^10.7.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "fastify": "^5.10.0",
@@ -50,9 +50,13 @@
     "@prisma/dev": "0.24.3",
     "@types/node": "^24.13.3",
     "@types/pg": "^8.20.0",
+    "eslint": "^10.13.0",
+    "eslint-plugin-path": "^3.0.0",
+    "eslint-plugin-perfectionist": "^5.12.1",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "tsc-alias": "^1.9.1",
     "tsx": "^4.23.0",
     "typescript": "^6.0.2",
-    "typescript-eslint": "^8.63.0"
+    "typescript-eslint": "^8.71.2"
   }
 }

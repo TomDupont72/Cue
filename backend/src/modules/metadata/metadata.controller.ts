@@ -1,8 +1,10 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
+
 import type {
   MetadataSeriesChangesGet,
   MetadataSeriesSearchGet
 } from "@/modules/metadata/metadata.schemas.js";
+
 import { metadataService } from "@/modules/metadata/metadata.service.js";
 
 export const metadataSeriesSearchController = {

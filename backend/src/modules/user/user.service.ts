@@ -1,5 +1,13 @@
-import { prisma } from "@/shared/db/prisma.js";
+import { episodeRepository } from "@/modules/episode/episode.repository.js";
+import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
+import { seriesRepository } from "@/modules/series/series.repository.js";
+import { getUserDashboardSummary } from "@/modules/user/queries/getUserDashboardSummary.query.js";
+import { getUserSeriesReconciliation } from "@/modules/user/queries/getUserSeriesReconciliation.query.js";
+import { listGroupedEpisodesBySeries } from "@/modules/user/queries/listGroupedEpisodesBySeries.query.js";
+import { listUserSeriesWithDetails } from "@/modules/user/queries/listUserSeriesWithDetails.query.js";
+import { listUserUpcomingEpisodes } from "@/modules/user/queries/listUserUpcomingEpisodes.query.js";
 import { userEpisodeRepository, userSeriesRepository } from "@/modules/user/user.repository.js";
+import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
 import {
   UserEpisodePostParams,
   UserSeriesPostBody,
@@ -10,16 +18,8 @@ import {
   UserSeasonDeleteParams,
   UserSeriesReconcilePostParams
 } from "@/modules/user/user.schemas.js";
-import { episodeRepository } from "@/modules/episode/episode.repository.js";
+import { prisma } from "@/shared/db/prisma.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import { seriesRepository } from "@/modules/series/series.repository.js";
-import { getUserSeriesStatus } from "@/modules/user/user.rules.js";
-import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
-import { listUserSeriesWithDetails } from "./queries/listUserSeriesWithDetails.query.js";
-import { getUserDashboardSummary } from "./queries/getUserDashboardSummary.query.js";
-import { getUserSeriesReconciliation } from "./queries/getUserSeriesReconciliation.query.js";
-import { listUserUpcomingEpisodes } from "./queries/listUserUpcomingEpisodes.query.js";
-import { listGroupedEpisodesBySeries } from "./queries/listGroupedEpisodesBySeries.query.js";
 
 export const userService = {
   async seriesGet(userId: string, params: UserSeriesGetParams) {

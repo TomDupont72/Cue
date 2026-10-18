@@ -1,10 +1,11 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { seriesService } from "./series.service.js";
+
 import {
   SeriesGetParams,
   SeriesImportPostBody,
   SeriesReconcilePostBody
-} from "./series.schemas.js";
+} from "@/modules/series/series.schemas.js";
+import { seriesService } from "@/modules/series/series.service.js";
 
 export const seriesController = {
   async get(request: FastifyRequest<{ Params: SeriesGetParams }>, reply: FastifyReply) {

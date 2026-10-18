@@ -1,10 +1,11 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from "react-i18next";
-import SummaryCard from "@/features/user/components/summaryCard";
-import { STATS } from "@/features/user/constants/stats";
+
 import { Heading } from "@/components/layout/heading";
 import { Text } from "@/components/layout/text";
-import { splitWatchedDuration } from "../utils/watchDuration";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import SummaryCard from "@/features/user/components/summaryCard";
+import { STATS } from "@/features/user/constants/stats";
+import { splitWatchedDuration } from "@/features/user/utils/watchDuration";
 
 type UserDashboardSummaryWidgetProps = {
   totalWatchedMinutes: number;

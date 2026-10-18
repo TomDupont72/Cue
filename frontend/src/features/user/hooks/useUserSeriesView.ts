@@ -1,16 +1,18 @@
-import { GENRE_KEY_BY_NAME } from "@/features/genre/constants/genreName";
-import { useUserSeriesTable } from "@/features/user/hooks/useUserSeriesTable";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+
+import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 import type {
   UserSeriesFilters,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
-import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
+
+import { GENRE_KEY_BY_NAME } from "@/features/genre/constants/genreName";
+import { useUserSeriesTable } from "@/features/user/hooks/useUserSeriesTable";
 import {
   buildDisplayedUserSeriesGroups,
   buildUserSeriesFilterOptions
 } from "@/features/user/utils/userSeriesView";
-import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
 
 type UserSeries = UserSeriesGetResponse["series"][number];
 

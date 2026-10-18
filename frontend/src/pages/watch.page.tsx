@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { EmptyState } from "@/components/feedback/emptyState";
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
@@ -6,7 +8,6 @@ import { PageContainer } from "@/components/layout/pageContainer";
 import WatchSection from "@/features/user/components/watchSection";
 import { WATCH_SECTIONS } from "@/features/user/constants/watchSections";
 import { useUserEpisodesFeed } from "@/features/user/hooks/useUserEpisodesFeed";
-import { useTranslation } from "react-i18next";
 
 export default function Watch() {
   const { t } = useTranslation();

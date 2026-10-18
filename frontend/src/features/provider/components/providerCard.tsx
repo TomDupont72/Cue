@@ -1,7 +1,8 @@
-import { Card, CardContent } from "@/components/ui/card";
-import type { ProviderRow } from "../types/provider.types";
+import type { ProviderRow } from "@/features/provider/types/provider.types";
+
 import Picture from "@/components/layout/picture";
 import { Text } from "@/components/layout/text";
+import { Card, CardContent } from "@/components/ui/card";
 
 type ProviderCardProps = {
   seriesProvider: ProviderRow;

@@ -1,5 +1,6 @@
-import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
+
+import { Badge } from "@/components/ui/badge";
 
 type SeriesProductionBadgeProps = {
   inProduction: boolean;

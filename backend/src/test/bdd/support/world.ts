@@ -1,13 +1,16 @@
-import { World, setWorldConstructor } from "@cucumber/cucumber";
 import type { InjectOptions, LightMyRequestResponse } from "fastify";
-import { PatchScope } from "@/test/bdd/support/patch-scope.js";
-import { TmdbDouble } from "@/test/bdd/doubles/tmdb.double.js";
-import { createTestGuards, TestIdentity } from "@/test/bdd/support/test-guards.js";
-import { TestDatabase } from "@/test/bdd/support/test-database.js";
+
+import { World, setWorldConstructor } from "@cucumber/cucumber";
+
 import type { DatabaseFixtureCollection } from "@/test/bdd/data/database/database-fixture.schemas.js";
+
+import { buildApp, type AppInstance } from "@/app.js";
 import { seriesService } from "@/modules/series/series.service.js";
 import { userService } from "@/modules/user/user.service.js";
-import { buildApp, type AppInstance } from "@/app.js";
+import { TmdbDouble } from "@/test/bdd/doubles/tmdb.double.js";
+import { PatchScope } from "@/test/bdd/support/patch-scope.js";
+import { TestDatabase } from "@/test/bdd/support/test-database.js";
+import { createTestGuards, TestIdentity } from "@/test/bdd/support/test-guards.js";
 
 export class ApiWorld extends World {
   private authenticatedUserId?: string | null;

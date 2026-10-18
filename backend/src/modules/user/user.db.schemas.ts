@@ -1,5 +1,6 @@
-import { UserSeriesStatus } from "@/generated/prisma/enums.js";
 import { z } from "zod";
+
+import { UserSeriesStatus } from "@/generated/prisma/enums.js";
 
 export const userEpisodeRowSchema = z.object({
   userId: z.string(),

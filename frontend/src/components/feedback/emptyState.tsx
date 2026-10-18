@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
+
+import { CircleOff } from "lucide-react";
+
 import { StatePanel } from "@/components/feedback/statePanel";
 import { PageContainer } from "@/components/layout/pageContainer";
-import { CircleOff } from "lucide-react";
 
 type EmptyStateProps = {
   title: string;

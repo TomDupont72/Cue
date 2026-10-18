@@ -1,15 +1,16 @@
-import {
-  USER_SERIES_STATUS,
-  type UserSeriesStatus
-} from "@/features/user/constants/userSeriesStatus";
+import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 import type {
   UserSeriesFacetCounts,
   UserSeriesFacetSchema,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
-import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 import type { UserSeriesGroup } from "@/features/user/utils/userSeriesTable";
 import type { FacetOptions } from "@/lib/facets/facet.types";
+
+import {
+  USER_SERIES_STATUS,
+  type UserSeriesStatus
+} from "@/features/user/constants/userSeriesStatus";
 
 type UserSeries = UserSeriesGetResponse["series"][number];
 

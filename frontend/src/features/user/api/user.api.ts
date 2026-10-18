@@ -1,13 +1,3 @@
-import { ApiClient } from "@/api/client";
-import {
-  userSeriesGetQuerySchema,
-  userEpisodeDeleteParamsSchema,
-  userEpisodePostParamsSchema,
-  userSeriesPostParamsSchema,
-  userSeriesPostBodySchema,
-  userSeasonPostParamsSchema,
-  userSeasonDeleteParamsSchema
-} from "@/features/user/schemas/user.schemas";
 import type {
   UserDashboardSummaryGetResponse,
   UserEpisodeDeleteResponse,
@@ -19,6 +9,17 @@ import type {
   UserSeriesGetResponse,
   UserSeriesPostResponse
 } from "@/features/user/types/user.types";
+
+import { ApiClient } from "@/api/client";
+import {
+  userSeriesGetQuerySchema,
+  userEpisodeDeleteParamsSchema,
+  userEpisodePostParamsSchema,
+  userSeriesPostParamsSchema,
+  userSeriesPostBodySchema,
+  userSeasonPostParamsSchema,
+  userSeasonDeleteParamsSchema
+} from "@/features/user/schemas/user.schemas";
 
 export function userSeriesGet(seriesId?: number): Promise<UserSeriesGetResponse> {
   return ApiClient("/user/series", {

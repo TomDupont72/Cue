@@ -1,9 +1,11 @@
-import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
-import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/types/episode.types";
 import { useTranslation } from "react-i18next";
+
+import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/types/episode.types";
+
 import { Heading } from "@/components/layout/heading";
 import Picture from "@/components/layout/picture";
+import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
+import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SeriesLinkBadge } from "@/features/series/components/seriesLinkBadge";
 
 type EpisodeCardDetailsProps = {

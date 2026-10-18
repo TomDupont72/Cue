@@ -1,6 +1,7 @@
-import { queryKeys } from "@/lib/queryKeys";
 import { useQuery } from "@tanstack/react-query";
-import { userEpisodesUpcomingGet } from "../api/user.api";
+
+import { userEpisodesUpcomingGet } from "@/features/user/api/user.api";
+import { queryKeys } from "@/lib/queryKeys";
 
 export function useUserEpisodesUpcoming() {
   return useQuery({

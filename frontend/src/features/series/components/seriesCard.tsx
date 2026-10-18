@@ -1,12 +1,14 @@
-import { Card, CardContent } from "@/components/ui/card";
-import type { SeriesCardSeries } from "@/features/series/types/series.types";
-import { getYear } from "@/lib/utils";
-import StatusProgressBar from "@/features/user/components/statusProgressBar";
-import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Text } from "@/components/layout/text";
+import { Link } from "react-router-dom";
+
+import type { SeriesCardSeries } from "@/features/series/types/series.types";
+import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
+
 import Picture from "@/components/layout/picture";
+import { Text } from "@/components/layout/text";
+import { Card, CardContent } from "@/components/ui/card";
+import StatusProgressBar from "@/features/user/components/statusProgressBar";
+import { getYear } from "@/lib/utils";
 
 type SeriesCardProps = {
   series: SeriesCardSeries;

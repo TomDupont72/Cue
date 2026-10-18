@@ -1,13 +1,14 @@
 import { Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
+
 import { EmptyState } from "@/components/feedback/emptyState";
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
-import { useSeriesSearch } from "@/features/series/hooks/useSeriesSearch";
 import Paginator from "@/components/layout/paginator";
-import SeriesDisplay from "@/features/series/components/seriesDisplay";
-import { useTranslation } from "react-i18next";
 import { Text } from "@/components/layout/text";
+import SeriesDisplay from "@/features/series/components/seriesDisplay";
+import { useSeriesSearch } from "@/features/series/hooks/useSeriesSearch";
 
 export function SeriesSearchResults() {
   const { t } = useTranslation();

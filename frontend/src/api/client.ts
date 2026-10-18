@@ -1,9 +1,8 @@
 import { z } from "zod";
 
+import { ApiError, type ApiErrorData } from "@/api/errors";
 import i18n from "@/i18n";
 import { handleUnauthorizedResponse } from "@/lib/sessionManager";
-
-import { ApiError, type ApiErrorData } from "./errors";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 

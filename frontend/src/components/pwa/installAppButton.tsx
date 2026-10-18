@@ -1,8 +1,8 @@
 import { Download } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { useInstallPrompt } from "@/components/pwa/useInstallPrompt";
 import { useTranslation } from "react-i18next";
+
+import { useInstallPrompt } from "@/components/pwa/useInstallPrompt";
+import { Button } from "@/components/ui/button";
 
 type InstallAppButtonProps = {
   className: string;

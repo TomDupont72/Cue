@@ -1,6 +1,8 @@
-import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
-import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
+
+import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
+
+import { Badge } from "@/components/ui/badge";
 
 type StatusBadgeProps = {
   status: UserSeriesStatus;

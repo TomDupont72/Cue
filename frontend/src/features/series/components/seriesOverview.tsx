@@ -1,21 +1,23 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { getYear } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import StatusBadge from "@/features/user/components/statusBadge";
-import type { SeriesRow } from "@/features/series/types/series.types";
-import StatusProgressBar from "@/features/user/components/statusProgressBar";
-import SeriesProductionBadge from "@/features/series/components/seriesProductionBadge";
-import { useUserSeriesMutation } from "@/features/user/hooks/useUserSeriesMutation";
-import type { UserSeriesRow } from "@/features/user/types/user.types";
 import { useTranslation } from "react-i18next";
-import { Heading } from "@/components/layout/heading";
-import { Text } from "@/components/layout/text";
-import Picture from "@/components/layout/picture";
-import type { ProviderRow } from "@/features/provider/types/provider.types";
-import { ProviderCard } from "@/features/provider/components/providerCard";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import type { GenreRow } from "@/features/genre/types/genre.types";
+import type { ProviderRow } from "@/features/provider/types/provider.types";
+import type { SeriesRow } from "@/features/series/types/series.types";
+import type { UserSeriesRow } from "@/features/user/types/user.types";
+
+import { Heading } from "@/components/layout/heading";
+import Picture from "@/components/layout/picture";
+import { Text } from "@/components/layout/text";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { GENRE_KEY_BY_NAME } from "@/features/genre/constants/genreName";
+import { ProviderCard } from "@/features/provider/components/providerCard";
+import SeriesProductionBadge from "@/features/series/components/seriesProductionBadge";
+import StatusBadge from "@/features/user/components/statusBadge";
+import StatusProgressBar from "@/features/user/components/statusProgressBar";
+import { useUserSeriesMutation } from "@/features/user/hooks/useUserSeriesMutation";
+import { getYear } from "@/lib/utils";
 
 type SeriesOverviewProps = {
   series: SeriesRow;

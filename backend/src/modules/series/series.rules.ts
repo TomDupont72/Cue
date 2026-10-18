@@ -1,15 +1,23 @@
+import type {
+  TmdbEpisodeDetailsGuestStar,
+  TmdbEpisodeDetailsResponse
+} from "@/external/tmdb/tmdb.types.js";
+import type { Prisma } from "@/generated/prisma/client.js";
+
 import { seasonDetails } from "@/external/tmdb/tmdb.season-details.js";
 import { tvDetails } from "@/external/tmdb/tmdb.tv-details.js";
-import { prisma } from "@/shared/db/prisma.js";
+import { tvWatchProviders } from "@/external/tmdb/tmdb.tv-watch-providers.js";
 import { characterRepository } from "@/modules/character/character.repository.js";
 import {
   episodeCharacterRepository,
   episodePeopleRepository,
   episodeRepository
 } from "@/modules/episode/episode.repository.js";
+import { prepareTmdbIdsForUpsert } from "@/modules/episode/queries/prepareTmdbIdsForUpsert.query.js";
 import { genreRepository } from "@/modules/genre/genre.repository.js";
 import { networkRepository } from "@/modules/network/network.repository.js";
 import { peopleRepository } from "@/modules/people/people.repository.js";
+import { providerRepository } from "@/modules/provider/provider.repository.js";
 import { seasonRepository } from "@/modules/season/season.repository.js";
 import {
   seriesGenreRepository,
@@ -18,15 +26,8 @@ import {
   seriesProviderRepository,
   seriesRepository
 } from "@/modules/series/series.repository.js";
+import { prisma } from "@/shared/db/prisma.js";
 import { dropKeys, getMany, joinBy } from "@/shared/utils/object/object.js";
-import type { Prisma } from "@/generated/prisma/client.js";
-import type {
-  TmdbEpisodeDetailsGuestStar,
-  TmdbEpisodeDetailsResponse
-} from "@/external/tmdb/tmdb.types.js";
-import { tvWatchProviders } from "@/external/tmdb/tmdb.tv-watch-providers.js";
-import { providerRepository } from "@/modules/provider/provider.repository.js";
-import { prepareTmdbIdsForUpsert } from "../episode/queries/prepareTmdbIdsForUpsert.query.js";
 
 export async function syncTmdb(tmdbId: number) {
   const tmdbSeries = await tvDetails(tmdbId);

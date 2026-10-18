@@ -1,6 +1,14 @@
 import assert from "node:assert/strict";
 import { isDeepStrictEqual } from "node:util";
+
 import type { UserSeries } from "@/generated/prisma/client.js";
+import type {
+  DatabaseFixtureCollection,
+  DatabaseFixtureRecord,
+  DatabaseFixtureRecordByCollection,
+  DatabaseFixtureRow
+} from "@/test/bdd/data/database/database-fixture.schemas.js";
+
 import { prisma } from "@/shared/db/prisma.js";
 import {
   addDatabaseFixtureRows,
@@ -9,12 +17,6 @@ import {
   type DatabaseFixtureState,
   type LoadedDatabaseFixtures
 } from "@/test/bdd/data/database/database-fixture.parser.js";
-import type {
-  DatabaseFixtureCollection,
-  DatabaseFixtureRecord,
-  DatabaseFixtureRecordByCollection,
-  DatabaseFixtureRow
-} from "@/test/bdd/data/database/database-fixture.schemas.js";
 import {
   DATABASE_FIXTURE_IDENTITY_FIELDS,
   parseDatabaseFixtureFieldsUpdate,

@@ -6,7 +6,7 @@ import {
   type DatabaseFixtureReferences,
   parseDatabaseFixtureReference,
   parseDatabaseFixtureRow
-} from "./database-fixture.schemas.js";
+} from "@/test/bdd/data/database/database-fixture.schemas.js";
 
 export type DatabaseFixtureState = {
   [Collection in DatabaseFixtureCollection]: DatabaseFixtureRecordByCollection[Collection][];

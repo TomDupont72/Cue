@@ -1,4 +1,3 @@
-import { dropKeys } from "@/shared/utils/object/object.js";
 import type {
   CreateManyAndFetchOptions,
   DeleteManyAndFetchOptions,
@@ -7,7 +6,9 @@ import type {
   UpsertManyAndFetchOptions,
   UpsertUniqueWhere,
   UniqueWhere
-} from "./prisma.types.js";
+} from "@/shared/utils/prisma/prisma.types.js";
+
+import { dropKeys } from "@/shared/utils/object/object.js";
 
 const UPSERT_BATCH_SIZE = 25;
 

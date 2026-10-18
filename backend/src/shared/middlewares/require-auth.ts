@@ -1,8 +1,10 @@
-import fp from "fastify-plugin";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+
 import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "@/shared/lib/auth.js";
+import fp from "fastify-plugin";
+
 import { unauthorized } from "@/shared/errors/errors.helpers.js";
+import { auth } from "@/shared/lib/auth.js";
 
 async function authGuardPlugin(app: FastifyInstance) {
   app.decorate("requireAuth", async (request: FastifyRequest) => {

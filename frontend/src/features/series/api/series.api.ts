@@ -1,15 +1,16 @@
-import { ApiClient } from "@/api/client";
+import type { MetadataSeriesSearchGetResponse } from "@/features/metadata/types/metadata.types";
+import type { SeriesImportPostBody } from "@/features/series/schemas/series.schemas";
 import type {
   SeriesGetResponse,
   SeriesImportPostResponse
 } from "@/features/series/types/series.types";
-import type { SeriesImportPostBody } from "@/features/series/schemas/series.schemas";
+
+import { ApiClient } from "@/api/client";
 import {
   seriesGetParamsSchema,
   seriesImportPostBodySchema,
   seriesSearchGetParamsSchema
 } from "@/features/series/schemas/series.schemas";
-import type { MetadataSeriesSearchGetResponse } from "@/features/metadata/types/metadata.types";
 
 export function seriesSearchGet(
   query: string,

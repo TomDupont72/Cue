@@ -1,5 +1,6 @@
 import { z } from "zod";
-import type { FacetSelection, FacetValue } from "./facet.types";
+
+import type { FacetSelection, FacetValue } from "@/lib/facets/facet.types";
 
 function toFacetSelection<T extends FacetValue>(values: T[] | null): FacetSelection<T> {
   if (values === null) {

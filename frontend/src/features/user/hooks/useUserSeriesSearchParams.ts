@@ -4,11 +4,12 @@ import type {
   UserSeriesFilters,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
+
+import { userDashboardSearchParamsSchema } from "@/features/user/schemas/user.schemas";
 import {
   updateUserSeriesFilters,
   updateUserSeriesGroupBy
 } from "@/features/user/utils/userSeriesSearchParams";
-import { userDashboardSearchParamsSchema } from "../schemas/user.schemas";
 
 export function useUserSeriesSearchParams() {
   const [searchParams, setSearchParams] = useSearchParams();

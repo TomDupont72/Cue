@@ -1,6 +1,7 @@
-import fp from "fastify-plugin";
-import bearerAuth from "@fastify/bearer-auth";
 import type { FastifyInstance, FastifyReply } from "fastify";
+
+import bearerAuth from "@fastify/bearer-auth";
+import fp from "fastify-plugin";
 
 import { env } from "@/shared/config/env.js";
 

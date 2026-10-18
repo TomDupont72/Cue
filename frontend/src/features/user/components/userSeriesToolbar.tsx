@@ -1,12 +1,14 @@
-import FilterDrawer from "@/components/layout/filterDrawer";
-import GroupDropdownMenu from "@/components/layout/groupDropdownMenu";
-import type { FacetOptions } from "@/lib/facets/facet.types";
+import { useTranslation } from "react-i18next";
+
 import type {
   UserSeriesFacetSchema,
   UserSeriesFilters,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
-import { useTranslation } from "react-i18next";
+import type { FacetOptions } from "@/lib/facets/facet.types";
+
+import FilterDrawer from "@/components/layout/filterDrawer";
+import GroupDropdownMenu from "@/components/layout/groupDropdownMenu";
 
 type UserSeriesToolbarProps = {
   groupBy: UserSeriesGroupBy;

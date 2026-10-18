@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from "react";
 
-import { authClient } from "@/lib/authClient";
 import {
   signInSchema,
   signUpSchema,
   type SignInInput,
   type SignUpInput
 } from "@/features/auth/schemas/auth.schemas";
+import { authClient } from "@/lib/authClient";
 
 export type AuthMode = "sign-in" | "sign-up";
 

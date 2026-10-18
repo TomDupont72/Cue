@@ -1,14 +1,16 @@
+import { useTranslation } from "react-i18next";
+
+import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
+import type {
+  UserSeriesFilters,
+  UserSeriesGroupBy
+} from "@/features/user/types/userSeriesFacets.types";
+
 import { Heading } from "@/components/layout/heading";
 import { PageSection } from "@/components/layout/pageSection";
 import { UserSeriesSection } from "@/features/user/components/userSeriesSection";
 import { UserSeriesToolbar } from "@/features/user/components/userSeriesToolbar";
 import { useUserSeriesView } from "@/features/user/hooks/useUserSeriesView";
-import type {
-  UserSeriesFilters,
-  UserSeriesGroupBy
-} from "@/features/user/types/userSeriesFacets.types";
-import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
-import { useTranslation } from "react-i18next";
 
 type UserSeries = UserSeriesGetResponse["series"][number];
 

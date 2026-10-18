@@ -1,9 +1,10 @@
 import { AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { isApiError } from "@/api/errors";
 import { useTranslation } from "react-i18next";
+
+import { isApiError } from "@/api/errors";
 import { StatePanel } from "@/components/feedback/statePanel";
 import { PageContainer } from "@/components/layout/pageContainer";
+import { Button } from "@/components/ui/button";
 
 type ErrorStateProps = {
   error: unknown;

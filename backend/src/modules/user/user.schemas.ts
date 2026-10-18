@@ -1,9 +1,10 @@
 import z from "zod";
-import { seriesRowSchema } from "../series/series.db.schemas.js";
-import { userEpisodeRowSchema, userSeriesRowSchema } from "./user.db.schemas.js";
-import { episodeRowSchema } from "../episode/episode.db.schemas.js";
-import { providerRowSchema } from "../provider/provider.db.schemas.js";
-import { genreRowSchema } from "../genre/genre.db.schemas.js";
+
+import { episodeRowSchema } from "@/modules/episode/episode.db.schemas.js";
+import { genreRowSchema } from "@/modules/genre/genre.db.schemas.js";
+import { providerRowSchema } from "@/modules/provider/provider.db.schemas.js";
+import { seriesRowSchema } from "@/modules/series/series.db.schemas.js";
+import { userEpisodeRowSchema, userSeriesRowSchema } from "@/modules/user/user.db.schemas.js";
 
 // =============================================================================
 // API RESPONSE SCHEMAS

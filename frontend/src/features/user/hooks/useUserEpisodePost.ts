@@ -1,10 +1,11 @@
-import type { UserEpisodePostParams } from "../schemas/user.schemas";
-import { userEpisodePost } from "../api/user.api";
-import { queryKeys } from "@/lib/queryKeys";
 import type { SeriesGetResponse } from "@/features/series/types/series.types";
-import type { UserEpisodePostResponse } from "../types/user.types";
+import type { UserEpisodePostParams } from "@/features/user/schemas/user.schemas";
+import type { UserEpisodePostResponse } from "@/features/user/types/user.types";
+
+import { userEpisodePost } from "@/features/user/api/user.api";
+import { userCachePolicy } from "@/features/user/cache/userCachePolicy";
+import { queryKeys } from "@/lib/queryKeys";
 import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
-import { userCachePolicy } from "../cache/userCachePolicy";
 
 export function useUserEpisodePost() {
   return useOptimisticMutation<

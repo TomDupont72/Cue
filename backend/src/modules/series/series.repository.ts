@@ -1,7 +1,8 @@
-import { Prisma } from "@/generated/prisma/client.js";
 import type { SeriesUpdateInput } from "@/generated/prisma/models.js";
-import { prisma } from "@/shared/db/prisma.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
+
+import { Prisma } from "@/generated/prisma/client.js";
+import { prisma } from "@/shared/db/prisma.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
 
 export const seriesRepository = {

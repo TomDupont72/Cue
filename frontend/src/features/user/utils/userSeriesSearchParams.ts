@@ -2,6 +2,7 @@ import type {
   UserSeriesFilters,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
+
 import { setUrlSelectionParam } from "@/lib/utils";
 
 export function updateUserSeriesGroupBy(

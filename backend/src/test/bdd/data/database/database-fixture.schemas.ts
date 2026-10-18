@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import type {
   Character,
   EpisodeCharacter,
@@ -17,6 +18,7 @@ import type {
   UserEpisode,
   UserSeries
 } from "@/generated/prisma/client.js";
+
 import { UserSeriesStatus } from "@/generated/prisma/enums.js";
 
 export type DatabaseFixtureCollection =

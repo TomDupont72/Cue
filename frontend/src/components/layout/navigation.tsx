@@ -1,16 +1,21 @@
 import { Menu } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Link, NavLink } from "react-router-dom";
 
-import { cn } from "@/lib/utils";
-
-import { Button } from "../ui/button";
+import {
+  NAVIGATION_FOOTER_LINK,
+  NAVIGATION_HEADER_LINK
+} from "@/components/constants/navigationLink";
+import { PageContainer } from "@/components/layout/pageContainer";
+import { InstallAppButton } from "@/components/pwa/installAppButton";
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList
-} from "../ui/navigation-menu";
-import { navigationMenuTriggerStyle } from "../ui/navigation-menu-variants";
+} from "@/components/ui/navigation-menu";
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu-variants";
 import {
   Sheet,
   SheetClose,
@@ -18,11 +23,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger
-} from "../ui/sheet";
-import { InstallAppButton } from "../pwa/installAppButton";
-import { NAVIGATION_FOOTER_LINK, NAVIGATION_HEADER_LINK } from "../constants/navigationLink";
-import { useTranslation } from "react-i18next";
-import { PageContainer } from "./pageContainer";
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 export function NavigationHeader() {
   const { t } = useTranslation();

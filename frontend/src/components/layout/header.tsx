@@ -1,23 +1,22 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import cueLogo from "@/assets/cue-logo.png";
-
-import { Container } from "./container";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
+import { Container } from "@/components/layout/container";
+import { NavigationHeader, NavigationHeaderMobile } from "@/components/layout/navigation";
+import { InstallAppButton } from "@/components/pwa/installAppButton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger
-} from "../ui/dropdown-menu";
-import { NavigationHeader, NavigationHeaderMobile } from "./navigation";
+} from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/authClient";
 import { queryClient } from "@/lib/queryClient";
 import { invalidateSessionGeneration } from "@/lib/sessionGeneration";
-import { InstallAppButton } from "../pwa/installAppButton";
-import { useTranslation } from "react-i18next";
 
 function getInitials(name: string | undefined): string {
   if (!name) return "NA";

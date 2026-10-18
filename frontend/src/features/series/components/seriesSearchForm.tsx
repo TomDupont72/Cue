@@ -1,11 +1,11 @@
 import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
-import { useDebounce } from "@/hooks/useDebounce";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export function SeriesSearchForm() {
   const { t } = useTranslation();

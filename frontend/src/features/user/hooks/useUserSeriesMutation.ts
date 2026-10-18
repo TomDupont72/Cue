@@ -1,13 +1,14 @@
-import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
-import type { UserSeriesPostResponse } from "@/features/user/types/user.types";
 import type { SeriesGetResponse } from "@/features/series/types/series.types";
 import type {
   UserSeriesPostBody,
   UserSeriesPostParams
 } from "@/features/user/schemas/user.schemas";
+import type { UserSeriesPostResponse } from "@/features/user/types/user.types";
+
 import { userSeriesPost } from "@/features/user/api/user.api";
-import { queryKeys } from "@/lib/queryKeys";
 import { userCachePolicy } from "@/features/user/cache/userCachePolicy";
+import { queryKeys } from "@/lib/queryKeys";
+import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
 
 export function useUserSeriesMutation() {
   return useOptimisticMutation<
