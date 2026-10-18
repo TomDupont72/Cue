@@ -1,4 +1,9 @@
 import { Given, Then, When, type DataTable } from "@cucumber/cucumber";
+import { z } from "zod";
+
+import type { DatabaseFixtureCollection } from "@/test/bdd/data/database/database-fixture.schemas.js";
+import type { ApiWorld } from "@/test/bdd/support/world.js";
+
 import {
   assertResponseArrayAtPath,
   assertResponseArrayContainsFixtures,
@@ -15,9 +20,6 @@ import {
   buildExpectedUserEpisodePostResponse,
   parseObjectTable
 } from "@/test/bdd/http/http-response.assertions.js";
-import type { ApiWorld } from "@/test/bdd/support/world.js";
-import type { DatabaseFixtureCollection } from "@/test/bdd/data/database/database-fixture.schemas.js";
-import { z } from "zod";
 
 const HTTP_METHODS = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"] as const;
 type HttpMethod = (typeof HTTP_METHODS)[number];

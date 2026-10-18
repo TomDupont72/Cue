@@ -1,6 +1,7 @@
 import type { SeriesDisplaySeries } from "@/features/series/types/series.types";
-import { SeriesCard } from "@/features/series/components/seriesCard";
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
+
+import { SeriesCard } from "@/features/series/components/seriesCard";
 import { getWatchProgress } from "@/features/user/utils/watchProgress";
 
 type SeriesDisplayProps = {

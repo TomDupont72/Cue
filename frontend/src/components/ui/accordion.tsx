@@ -1,9 +1,9 @@
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion";
 import { type VariantProps } from "class-variance-authority";
-
-import { cn } from "@/lib/utils";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import { accordionTriggerVariants } from "./accordion-variants";
+
+import { accordionTriggerVariants } from "@/components/ui/accordion-variants";
+import { cn } from "@/lib/utils";
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
   return (

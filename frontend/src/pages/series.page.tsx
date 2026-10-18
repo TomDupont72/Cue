@@ -1,3 +1,7 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation, useSearchParams } from "react-router-dom";
+
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
 import { PageContainer } from "@/components/layout/pageContainer";
@@ -9,9 +13,6 @@ import { useSeries } from "@/features/series/hooks/useSeries";
 import { useSeriesImport } from "@/features/series/hooks/useSeriesImportMutation";
 import { seriesGetParamsSchema } from "@/features/series/schemas/series.schemas";
 import { getWatchProgress } from "@/features/user/utils/watchProgress";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useLocation, useSearchParams } from "react-router-dom";
 
 export default function Series() {
   const location = useLocation();

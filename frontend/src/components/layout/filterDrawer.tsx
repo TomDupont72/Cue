@@ -1,3 +1,17 @@
+import { useMediaQuery } from "@base-ui/react/unstable-use-media-query";
+import { SlidersHorizontalIcon } from "lucide-react";
+import { useId, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+
+import type {
+  FacetFilters,
+  FacetLabels,
+  FacetOption,
+  FacetOptions,
+  FacetSelection,
+  FacetValue
+} from "@/lib/facets/facet.types";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -9,18 +23,6 @@ import {
   DrawerTrigger
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type {
-  FacetFilters,
-  FacetLabels,
-  FacetOption,
-  FacetOptions,
-  FacetSelection,
-  FacetValue
-} from "@/lib/facets/facet.types";
-import { useMediaQuery } from "@base-ui/react/unstable-use-media-query";
-import { SlidersHorizontalIcon } from "lucide-react";
-import { useId, useState, type ReactNode } from "react";
-import { useTranslation } from "react-i18next";
 
 type FilterDrawerProps<TSchema extends object> = {
   labels: FacetLabels<TSchema>;

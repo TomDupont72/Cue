@@ -1,12 +1,5 @@
-import { useMemo } from "react";
 import { useTable } from "@tanstack/react-table";
-
-import { facetFiltersToColumnFilters } from "@/lib/facets/tanstackTableFacets";
-import {
-  userSeriesColumns,
-  userSeriesGroupsFromRowModel,
-  userSeriesTableFeatures
-} from "@/features/user/utils/userSeriesTable";
+import { useMemo } from "react";
 
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 import type {
@@ -14,6 +7,13 @@ import type {
   UserSeriesFilters,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
+
+import {
+  userSeriesColumns,
+  userSeriesGroupsFromRowModel,
+  userSeriesTableFeatures
+} from "@/features/user/utils/userSeriesTable";
+import { facetFiltersToColumnFilters } from "@/lib/facets/tanstackTableFacets";
 
 type UseUserSeriesTableParams = {
   series: UserSeriesGetResponse["series"];

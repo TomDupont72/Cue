@@ -1,14 +1,15 @@
 import type { AppFastifyInstance } from "@/shared/types/fastify.js";
+
+import {
+  metadataSeriesChangesController,
+  metadataSeriesSearchController
+} from "@/modules/metadata/metadata.controller.js";
 import {
   metadataSeriesChangesGetResponseSchema,
   metadataSeriesChangesGetSchema,
   metadataSeriesSearchGetResponseSchema,
   metadataSeriesSearchGetSchema
 } from "@/modules/metadata/metadata.schemas.js";
-import {
-  metadataSeriesChangesController,
-  metadataSeriesSearchController
-} from "@/modules/metadata/metadata.controller.js";
 
 export async function metadataRoutes(app: AppFastifyInstance) {
   app.get("/series/search", {

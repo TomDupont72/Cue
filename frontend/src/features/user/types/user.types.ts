@@ -1,8 +1,12 @@
-import type { SeriesRow } from "@/features/series/types/series.types";
-import { USER_SERIES_STATUS, type UserSeriesStatus } from "../constants/userSeriesStatus";
 import type { EpisodeRow } from "@/features/episode/types/episode.types";
 import type { GenreRow } from "@/features/genre/types/genre.types";
 import type { ProviderRow } from "@/features/provider/types/provider.types";
+import type { SeriesRow } from "@/features/series/types/series.types";
+
+import {
+  USER_SERIES_STATUS,
+  type UserSeriesStatus
+} from "@/features/user/constants/userSeriesStatus";
 
 // =============================================================================
 // DATABASE ROW TYPES

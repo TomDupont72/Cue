@@ -1,6 +1,7 @@
+import type { PrismaTx } from "@/shared/db/prisma.types.js";
+
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/shared/db/prisma.js";
-import type { PrismaTx } from "@/shared/db/prisma.types.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
 import { upsertManyAndFetch } from "@/shared/utils/prisma/prisma.js";
 

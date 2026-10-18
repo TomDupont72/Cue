@@ -10,14 +10,14 @@ import {
   type RowModel
 } from "@tanstack/react-table";
 
+import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
+import type { FacetGroup } from "@/lib/facets/facet.types";
+
 import {
   createMultiValueGroupedRowModel,
   filterSomeValuesInSelection,
   filterValueInSelection
 } from "@/lib/facets/tanstackTableFacets";
-
-import type { FacetGroup } from "@/lib/facets/facet.types";
-import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 
 type UserSeries = UserSeriesGetResponse["series"][number];
 

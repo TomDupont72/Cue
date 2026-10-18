@@ -1,7 +1,8 @@
-import { queryKeys } from "@/lib/queryKeys";
 import { useQuery } from "@tanstack/react-query";
-import { userEpisodesFeedGet } from "../api/user.api";
-import { preserveFeedOrder } from "../utils/episodeFeedOrder";
+
+import { userEpisodesFeedGet } from "@/features/user/api/user.api";
+import { preserveFeedOrder } from "@/features/user/utils/episodeFeedOrder";
+import { queryKeys } from "@/lib/queryKeys";
 
 export function useUserEpisodesFeed() {
   return useQuery({

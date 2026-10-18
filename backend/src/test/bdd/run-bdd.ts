@@ -1,10 +1,10 @@
 import "dotenv/config";
+import { startPrismaDevServer, type Server as PrismaDevServer } from "@prisma/dev";
 import { spawn } from "node:child_process";
-import { createServer, type Server as NetServer } from "node:net";
 import { createRequire } from "node:module";
+import { createServer, type Server as NetServer } from "node:net";
 import { dirname, join } from "node:path";
 
-import { startPrismaDevServer, type Server as PrismaDevServer } from "@prisma/dev";
 import { assertSafeTestDatabase } from "@/test/bdd/support/test-database-safety.js";
 
 const require = createRequire(import.meta.url);

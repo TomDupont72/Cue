@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import {
   FieldSelection,
   JoinKey,
@@ -8,7 +9,7 @@ import {
   RenameKeys,
   RenameMap,
   RenameOrCamelCase
-} from "./object.types.js";
+} from "@/shared/utils/object/object.types.js";
 
 export function dropKeys<T extends object, K extends keyof T>(
   object: T,

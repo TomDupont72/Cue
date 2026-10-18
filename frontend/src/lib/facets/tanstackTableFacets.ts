@@ -94,10 +94,6 @@ function groupIdSegment(columnId: string, value: FacetGroup["value"]): string {
   return `${columnId}:${typeof value}:${encodeURIComponent(String(value))}`;
 }
 
-/**
- * TanStack grouped row model where one source row can belong to several values
- * of the same grouping column.
- */
 export function createMultiValueGroupedRowModel() {
   return <TFeatures extends GroupingFeatures, TData extends RowData>(
     table: Table<TFeatures, TData>

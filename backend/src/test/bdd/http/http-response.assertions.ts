@@ -1,6 +1,7 @@
+import type { LightMyRequestResponse } from "fastify";
+
 import assert from "node:assert/strict";
 import { isDeepStrictEqual } from "node:util";
-import type { LightMyRequestResponse } from "fastify";
 
 type TableRows = readonly (readonly string[])[];
 

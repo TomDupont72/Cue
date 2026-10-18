@@ -1,25 +1,27 @@
-import Fastify from "fastify";
-import { env } from "@/shared/config/env.js";
-import { logger } from "@/shared/logger/logger.js";
+import type { FastifyError, FastifyPluginAsync } from "fastify";
+
+import fastifyAuth from "@fastify/auth";
+import fastifyCors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
-import { authRoutes } from "@/modules/auth/auth.routes.js";
+import Fastify from "fastify";
 import {
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider
 } from "fastify-type-provider-zod";
-import { authGuard } from "@/shared/middlewares/require-auth.js";
+import { z } from "zod";
+
+import { authRoutes } from "@/modules/auth/auth.routes.js";
 import { metadataRoutes } from "@/modules/metadata/metadata.routes.js";
 import { seriesRoutes } from "@/modules/series/series.routes.js";
 import { userRoutes } from "@/modules/user/user.routes.js";
-import fastifyCors from "@fastify/cors";
-import { workerGuard } from "@/shared/middlewares/require-worker.js";
-import fastifyAuth from "@fastify/auth";
-import { z } from "zod";
+import { env } from "@/shared/config/env.js";
 import { apiErrorHandler } from "@/shared/errors/errors.handler.js";
-import type { FastifyError, FastifyPluginAsync } from "fastify";
+import { logger } from "@/shared/logger/logger.js";
+import { authGuard } from "@/shared/middlewares/require-auth.js";
+import { workerGuard } from "@/shared/middlewares/require-worker.js";
 
 export type BuildAppOptions = {
   loggerEnabled?: boolean;

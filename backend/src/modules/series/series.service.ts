@@ -1,18 +1,19 @@
-import { episodeRepository } from "@/modules/episode/episode.repository.js";
-import { seasonRepository } from "@/modules/season/season.repository.js";
-import { seriesRepository } from "@/modules/series/series.repository.js";
 import type {
   SeriesGetParams,
   SeriesImportPostBody,
   SeriesReconcilePostBody
 } from "@/modules/series/series.schemas.js";
-import { userEpisodeRepository, userSeriesRepository } from "@/modules/user/user.repository.js";
-import { syncTmdb } from "@/modules/series/series.rules.js";
+
+import { episodeRepository } from "@/modules/episode/episode.repository.js";
 import { getEpisodeReleaseCutoff } from "@/modules/episode/episode.utils.js";
-import { prisma } from "@/shared/db/prisma.js";
+import { listEpisodeCounts } from "@/modules/episode/queries/listEpisodeCounts.query.js";
+import { genreRepository } from "@/modules/genre/genre.repository.js";
 import { providerRepository } from "@/modules/provider/provider.repository.js";
-import { genreRepository } from "../genre/genre.repository.js";
-import { listEpisodeCounts } from "../episode/queries/listEpisodeCounts.query.js";
+import { seasonRepository } from "@/modules/season/season.repository.js";
+import { seriesRepository } from "@/modules/series/series.repository.js";
+import { syncTmdb } from "@/modules/series/series.rules.js";
+import { userEpisodeRepository, userSeriesRepository } from "@/modules/user/user.repository.js";
+import { prisma } from "@/shared/db/prisma.js";
 
 export const seriesService = {
   async get(userId: string, params: SeriesGetParams) {

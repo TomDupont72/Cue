@@ -1,4 +1,5 @@
 import fp from "fastify-plugin";
+
 import { unauthorized } from "@/shared/errors/errors.helpers.js";
 
 export type TestIdentity = {

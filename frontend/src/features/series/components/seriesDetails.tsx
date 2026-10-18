@@ -1,12 +1,13 @@
-import SeasonCard from "@/features/season/components/seasonCard";
-import { Accordion } from "@/components/ui/accordion";
 import type { EpisodeRow } from "@/features/episode/types/episode.types";
 import type {
   SeriesDetailsEpisode,
   SeriesDetailsSeason,
   SeriesDetailsUserEpisode
 } from "@/features/series/types/series.types";
+
 import ContentColumn from "@/components/layout/contentColumn";
+import { Accordion } from "@/components/ui/accordion";
+import SeasonCard from "@/features/season/components/seasonCard";
 
 type SeriesDetailsProps = {
   id: number;

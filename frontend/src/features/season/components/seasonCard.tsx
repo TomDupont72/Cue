@@ -1,12 +1,14 @@
+import { useTranslation } from "react-i18next";
+
+import type { SeasonCardEpisode, SeasonCardSeason } from "@/features/season/types/season.types";
+
+import { Heading } from "@/components/layout/heading";
+import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import EpisodeCard from "@/features/episode/components/episodeCard";
-import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
-import { useUserSeasonMutation } from "@/features/user/hooks/useUserSeasonMutation";
-import { useUserSeasonDelete } from "@/features/user/hooks/useUserSeasonDelete";
 import { isEpisodeReleased } from "@/features/episode/utils/episodeRelease";
-import type { SeasonCardEpisode, SeasonCardSeason } from "@/features/season/types/season.types";
-import { useTranslation } from "react-i18next";
-import { Heading } from "@/components/layout/heading";
+import { useUserSeasonDelete } from "@/features/user/hooks/useUserSeasonDelete";
+import { useUserSeasonMutation } from "@/features/user/hooks/useUserSeasonMutation";
 
 type SeasonCardProps = {
   seriesId: number;

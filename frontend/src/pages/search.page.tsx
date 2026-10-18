@@ -1,8 +1,9 @@
+import { useTranslation } from "react-i18next";
+
 import { Heading } from "@/components/layout/heading";
 import { PageContainer } from "@/components/layout/pageContainer";
 import { SeriesSearchForm } from "@/features/series/components/seriesSearchForm";
 import { SeriesSearchResults } from "@/features/series/components/seriesSearchResults";
-import { useTranslation } from "react-i18next";
 
 export default function Search() {
   const { t } = useTranslation();

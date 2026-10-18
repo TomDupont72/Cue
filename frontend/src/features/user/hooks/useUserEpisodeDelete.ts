@@ -1,12 +1,11 @@
-import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
-import { queryKeys } from "@/lib/queryKeys";
-
 import type { SeriesGetResponse } from "@/features/series/types/series.types";
-import type { UserEpisodeDeleteParams } from "../schemas/user.schemas";
-import type { UserEpisodeDeleteResponse } from "../types/user.types";
+import type { UserEpisodeDeleteParams } from "@/features/user/schemas/user.schemas";
+import type { UserEpisodeDeleteResponse } from "@/features/user/types/user.types";
 
-import { userEpisodeDelete } from "../api/user.api";
-import { userCachePolicy } from "../cache/userCachePolicy";
+import { userEpisodeDelete } from "@/features/user/api/user.api";
+import { userCachePolicy } from "@/features/user/cache/userCachePolicy";
+import { queryKeys } from "@/lib/queryKeys";
+import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
 
 export function useUserEpisodeDelete() {
   return useOptimisticMutation<

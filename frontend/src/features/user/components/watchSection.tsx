@@ -1,7 +1,9 @@
-import EpisodeCard from "@/features/episode/components/episodeCard";
-import { Heading } from "@/components/layout/heading";
 import { useTranslation } from "react-i18next";
+
 import type { WatchSectionItem, WatchSectionStatus } from "@/features/user/types/user.types";
+
+import { Heading } from "@/components/layout/heading";
+import EpisodeCard from "@/features/episode/components/episodeCard";
 
 type WatchSectionProps = {
   status?: WatchSectionStatus;

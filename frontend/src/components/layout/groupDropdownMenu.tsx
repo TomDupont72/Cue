@@ -1,12 +1,13 @@
-import { Button } from "../ui/button";
+import { ChevronDownIcon, ListFilterIcon } from "lucide-react";
+
+import { Heading } from "@/components/layout/heading";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-} from "../ui/dropdown-menu";
-import { Heading } from "./heading";
-import { ChevronDownIcon, ListFilterIcon } from "lucide-react";
+} from "@/components/ui/dropdown-menu";
 
 type GroupButtonProps = {
   categories: Record<string, string>;

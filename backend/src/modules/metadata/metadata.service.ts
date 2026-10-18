@@ -2,8 +2,9 @@ import type {
   MetadataSeriesChangesGet,
   MetadataSeriesSearchGet
 } from "@/modules/metadata/metadata.schemas.js";
-import { tvSearch } from "@/external/tmdb/tmdb.tv-search.js";
+
 import { tvChanges } from "@/external/tmdb/tmdb.tv-changes.js";
+import { tvSearch } from "@/external/tmdb/tmdb.tv-search.js";
 
 export const metadataService = {
   async seriesSearchGet(input: MetadataSeriesSearchGet) {

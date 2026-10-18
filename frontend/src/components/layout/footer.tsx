@@ -1,5 +1,5 @@
-import { Container } from "./container";
-import { NavigationFooter } from "./navigation";
+import { Container } from "@/components/layout/container";
+import { NavigationFooter } from "@/components/layout/navigation";
 
 export default function Footer() {
   return (

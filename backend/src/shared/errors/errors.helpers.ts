@@ -1,4 +1,4 @@
-import { AppError } from "./AppError.js";
+import { AppError } from "@/shared/errors/AppError.js";
 
 export function unauthorized(message = "Unauthorized") {
   return new AppError("UNAUTHORIZED", 401, message);

@@ -1,7 +1,7 @@
 import { Prisma } from "@/generated/prisma/client.js";
+import { UserUpcomingEpisodeRow } from "@/modules/user/user.types.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { PrismaTx } from "@/shared/db/prisma.types.js";
-import { UserUpcomingEpisodeRow } from "../user.types.js";
 
 export async function listUserUpcomingEpisodes(userId: string, date: Date, db: PrismaTx = prisma) {
   return db.$queryRaw<UserUpcomingEpisodeRow[]>(Prisma.sql`

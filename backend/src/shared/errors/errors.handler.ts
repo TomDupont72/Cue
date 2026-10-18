@@ -1,6 +1,8 @@
 import type { FastifyError, FastifyReply, FastifyRequest } from "fastify";
-import { AppError } from "./AppError.js";
-import type { ApiErrorResponse } from "./errors.schemas.js";
+
+import type { ApiErrorResponse } from "@/shared/errors/errors.schemas.js";
+
+import { AppError } from "@/shared/errors/AppError.js";
 
 const publicClientErrors: Partial<Record<number, ApiErrorResponse>> = {
   400: { code: "BAD_REQUEST", message: "Bad request" },

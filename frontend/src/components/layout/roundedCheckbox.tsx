@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import { ABSOLUTE_STYLE, type AbsoluteStyle } from "@/components/constants/style";
+import { cn } from "@/lib/utils";
 
 type RoundedCheckboxProps = {
   checked: boolean;

@@ -1,7 +1,8 @@
-import { queryKeys } from "@/lib/queryKeys";
 import { useMutation } from "@tanstack/react-query";
-import { seriesImportPost } from "../api/series.api";
 import { useNavigate } from "react-router-dom";
+
+import { seriesImportPost } from "@/features/series/api/series.api";
+import { queryKeys } from "@/lib/queryKeys";
 
 export function useSeriesImport() {
   const navigate = useNavigate();

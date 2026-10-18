@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import {
   Pagination,
   PaginationContent,
@@ -7,7 +9,6 @@ import {
   PaginationPrevious,
   PaginationEllipsis
 } from "@/components/ui/pagination";
-import { useTranslation } from "react-i18next";
 
 type PaginatorProps = {
   currentPage: number;

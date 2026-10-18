@@ -1,6 +1,6 @@
-import { tmdbGet } from "./tmdb.client.js";
-import { tmdbEpisodeDetailsSchema } from "./tmdb.schemas.js";
-import { TmdbEpisodeDetailsResponse } from "./tmdb.types.js";
+import { tmdbGet } from "@/external/tmdb/tmdb.client.js";
+import { tmdbEpisodeDetailsSchema } from "@/external/tmdb/tmdb.schemas.js";
+import { TmdbEpisodeDetailsResponse } from "@/external/tmdb/tmdb.types.js";
 
 export async function episodeDetails(
   seriesId: number,

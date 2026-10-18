@@ -1,7 +1,9 @@
+import type { ComponentProps } from "react";
+
+import { ImageOff } from "lucide-react";
+
 import { getTmdbImageUrl, type TmdbImageSize } from "@/lib/tmdbImage";
 import { cn } from "@/lib/utils";
-import { ImageOff } from "lucide-react";
-import type { ComponentProps } from "react";
 
 type PictureProps = Omit<ComponentProps<"img">, "src"> & {
   path: string | null;

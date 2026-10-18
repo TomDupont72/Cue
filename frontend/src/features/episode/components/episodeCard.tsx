@@ -1,17 +1,19 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
+
+import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/types/episode.types";
+
+import { Heading } from "@/components/layout/heading";
+import Picture from "@/components/layout/picture";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
+import { Text } from "@/components/layout/text";
 import { Badge } from "@/components/ui/badge";
-import { useUserEpisodePost } from "@/features/user/hooks/useUserEpisodePost";
-import { useUserEpisodeDelete } from "@/features/user/hooks/useUserEpisodeDelete";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import EpisodeCardDetails from "@/features/episode/components/episodeCardDetails";
-import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/types/episode.types";
 import { getEpisodeReleaseDayDifference } from "@/features/episode/utils/episodeRelease";
-import { useTranslation } from "react-i18next";
-import { Heading } from "@/components/layout/heading";
-import { Text } from "@/components/layout/text";
-import Picture from "@/components/layout/picture";
 import { SeriesLinkBadge } from "@/features/series/components/seriesLinkBadge";
+import { useUserEpisodeDelete } from "@/features/user/hooks/useUserEpisodeDelete";
+import { useUserEpisodePost } from "@/features/user/hooks/useUserEpisodePost";
 import { cn } from "@/lib/utils";
 
 type EpisodeCardProps = {

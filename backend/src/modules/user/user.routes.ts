@@ -1,4 +1,12 @@
-import { AppFastifyInstance } from "@/shared/types/fastify.js";
+import {
+  userDashboardSummaryController,
+  userEpisodeController,
+  userEpisodeFeedController,
+  userEpisodeUpcomingController,
+  userSeasonController,
+  userSeriesController,
+  userSeriesReconcileController
+} from "@/modules/user/user.controller.js";
 import {
   userDashboardSummaryGetResponseSchema,
   userEpisodeDeleteParamsSchema,
@@ -19,16 +27,8 @@ import {
   userSeriesPostResponseSchema,
   userEpisodeUpcomingGetResponseSchema
 } from "@/modules/user/user.schemas.js";
-import {
-  userDashboardSummaryController,
-  userEpisodeController,
-  userEpisodeFeedController,
-  userEpisodeUpcomingController,
-  userSeasonController,
-  userSeriesController,
-  userSeriesReconcileController
-} from "@/modules/user/user.controller.js";
 import { Tags } from "@/shared/enums/tags.js";
+import { AppFastifyInstance } from "@/shared/types/fastify.js";
 
 export async function userRoutes(app: AppFastifyInstance) {
   app.get("/series", {

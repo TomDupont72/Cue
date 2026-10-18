@@ -1,11 +1,12 @@
+import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { PageContainer } from "./pageContainer";
-import { Heading } from "./heading";
-import { Text } from "./text";
-import { useTranslation } from "react-i18next";
 import { parse } from "yaml";
-import { ScrollToTop } from "./scrollToTop";
+
+import { Heading } from "@/components/layout/heading";
+import { PageContainer } from "@/components/layout/pageContainer";
+import { ScrollToTop } from "@/components/layout/scrollToTop";
+import { Text } from "@/components/layout/text";
 
 type MarkdownPageProps = {
   markdown: string;

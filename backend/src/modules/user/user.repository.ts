@@ -1,9 +1,10 @@
-import { Prisma, type UserEpisode } from "@/generated/prisma/client.js";
 import type { UserEpisodeCreateManyInput } from "@/generated/prisma/models.js";
-import { prisma } from "@/shared/db/prisma.js";
+import type { UserSeriesUpdate } from "@/modules/user/user.types.js";
 import type { PrismaTx } from "@/shared/db/prisma.types.js";
+
+import { Prisma, type UserEpisode } from "@/generated/prisma/client.js";
+import { prisma } from "@/shared/db/prisma.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
-import type { UserSeriesUpdate } from "./user.types.js";
 
 export const userSeriesRepository = {
   async getBySeriesId(userId: string, seriesId: number, db: PrismaTx = prisma) {

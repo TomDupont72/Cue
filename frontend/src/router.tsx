@@ -1,15 +1,16 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import Dashboard from "@/pages/dashboard/dashboard.page";
+
 import Layout from "@/components/layout/layout";
-import Search from "./pages/search.page";
-import Series from "./pages/series.page";
-import Watch from "./pages/watch.page";
-import Legal from "./pages/legal.page";
-import Privacy from "./pages/privacy.page";
-import Terms from "./pages/terms.page";
-import Credits from "./pages/credits.page";
-import Changelog from "./pages/changelog.page";
-import Upcoming from "./pages/upcoming.page";
+import Changelog from "@/pages/changelog.page";
+import Credits from "@/pages/credits.page";
+import Dashboard from "@/pages/dashboard.page";
+import Legal from "@/pages/legal.page";
+import Privacy from "@/pages/privacy.page";
+import Search from "@/pages/search.page";
+import Series from "@/pages/series.page";
+import Terms from "@/pages/terms.page";
+import Upcoming from "@/pages/upcoming.page";
+import Watch from "@/pages/watch.page";
 
 export default function Router() {
   return (

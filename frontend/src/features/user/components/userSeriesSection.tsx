@@ -1,6 +1,7 @@
-import SeriesDisplay from "@/features/series/components/seriesDisplay";
+import type { SeriesSectionItem } from "@/features/user/types/user.types";
+
 import { Heading } from "@/components/layout/heading";
-import type { SeriesSectionItem } from "../types/user.types";
+import SeriesDisplay from "@/features/series/components/seriesDisplay";
 
 type UserSeriesSectionProps = {
   series: SeriesSectionItem[];

@@ -1,4 +1,8 @@
-import { AppFastifyInstance } from "@/shared/types/fastify.js";
+import {
+  seriesController,
+  seriesImportController,
+  seriesReconcileController
+} from "@/modules/series/series.controller.js";
 import {
   seriesGetResponseSchema,
   seriesGetParamsSchema,
@@ -7,12 +11,8 @@ import {
   seriesReconcilePostBodySchema,
   seriesReconcilePostResponseSchema
 } from "@/modules/series/series.schemas.js";
-import {
-  seriesController,
-  seriesImportController,
-  seriesReconcileController
-} from "@/modules/series/series.controller.js";
 import { Tags } from "@/shared/enums/tags.js";
+import { AppFastifyInstance } from "@/shared/types/fastify.js";
 
 export async function seriesRoutes(app: AppFastifyInstance) {
   app.get("/:id", {
