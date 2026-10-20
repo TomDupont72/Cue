@@ -19,7 +19,7 @@ export function SeriesSearchForm({ query, onQueryChange }: SeriesSearchFormProps
 
   useEffect(() => {
     if (debouncedValue !== query) {
-      onQueryChange(debouncedValue);
+      onQueryChange(debouncedValue ?? "");
     }
   }, [debouncedValue, query, onQueryChange]);
 

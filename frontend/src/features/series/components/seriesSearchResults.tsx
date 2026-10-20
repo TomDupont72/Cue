@@ -6,9 +6,9 @@ import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
 import Paginator from "@/components/layout/paginator";
 import { Text } from "@/components/layout/text";
-import { MIN_QUERY_LENGTH } from "@/features/metadata/constants/query";
 import SeriesDisplay from "@/features/series/components/seriesDisplay";
 import { useSeriesSearch } from "@/features/series/hooks/useSeriesSearch";
+import { SERIES_SEARCH_QUERY_MIN_LENGTH } from "../schemas/series.schemas";
 
 type SeriesSearchResultsProps = {
   query: string;
@@ -19,7 +19,7 @@ type SeriesSearchResultsProps = {
 export function SeriesSearchResults({ query, page, onPageChange }: SeriesSearchResultsProps) {
   const { t } = useTranslation();
 
-  const seriesQuery = useSeriesSearch(query, page, query.length >= MIN_QUERY_LENGTH);
+  const seriesQuery = useSeriesSearch(query, page, query.length >= SERIES_SEARCH_QUERY_MIN_LENGTH);
 
   if (!query) {
     return (
@@ -36,7 +36,7 @@ export function SeriesSearchResults({ query, page, onPageChange }: SeriesSearchR
       <EmptyState
         icon={<Search className="size-8" />}
         title={t("series:search.queryTooShort")}
-        description={t("series:search.minQueryLength", { count: MIN_QUERY_LENGTH })}
+        description={t("series:search.minQueryLength", { count: SERIES_SEARCH_QUERY_MIN_LENGTH })}
       />
     );
   }
