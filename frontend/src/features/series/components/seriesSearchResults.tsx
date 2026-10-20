@@ -8,7 +8,7 @@ import Paginator from "@/components/layout/paginator";
 import { Text } from "@/components/layout/text";
 import SeriesDisplay from "@/features/series/components/seriesDisplay";
 import { useSeriesSearch } from "@/features/series/hooks/useSeriesSearch";
-import { SERIES_SEARCH_QUERY_MIN_LENGTH } from "../schemas/series.schemas";
+import { SERIES_SEARCH_QUERY_MIN_LENGTH } from "@/features/series/schemas/series.schemas";
 
 type SeriesSearchResultsProps = {
   query: string;
