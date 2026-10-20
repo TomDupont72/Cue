@@ -9,7 +9,7 @@ import WatchSection from "@/features/user/components/watchSection";
 import { WATCH_SECTIONS } from "@/features/user/constants/watchSections";
 import { useUserEpisodesFeed } from "@/features/user/hooks/useUserEpisodesFeed";
 
-export default function Watch() {
+export default function Watchcontent() {
   const { t } = useTranslation();
 
   const userEpisodesFeedQuery = useUserEpisodesFeed();

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { seriesImportPost } from "@/features/series/api/series.api";
 import { queryKeys } from "@/lib/queryKeys";
 
-export function useSeriesImport() {
+export function useSeriesImportMutation() {
   const navigate = useNavigate();
 
   return useMutation({

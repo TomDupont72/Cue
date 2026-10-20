@@ -9,7 +9,7 @@ import { PageContainer } from "@/components/layout/pageContainer";
 import WatchSection from "@/features/user/components/watchSection";
 import { useUserEpisodesUpcoming } from "@/features/user/hooks/useUserEpisodesUpcoming";
 
-export default function Upcoming() {
+export default function UpcomingContent() {
   const { t } = useTranslation();
 
   const userEpisodesUpcomingQuery = useUserEpisodesUpcoming();

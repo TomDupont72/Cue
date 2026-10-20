@@ -10,16 +10,16 @@ import UserDashboardSummaryWidget from "@/features/user/components/userDashboard
 import { UserSeriesLibrary } from "@/features/user/components/userSeriesLibrary";
 import { useUserDashboardSummary } from "@/features/user/hooks/useUserDashboardSummary";
 import { useUserSeries } from "@/features/user/hooks/useUserSeries";
-import { useUserSeriesSearchParams } from "@/features/user/hooks/useUserSeriesSearchParams";
+import { useDashboardState } from "@/pages/dashboard/useDashboardState";
 
-export default function UserDashboard() {
+export default function DashboardContent() {
   const { t } = useTranslation();
 
-  const searchState = useUserSeriesSearchParams();
+  const dashboardState = useDashboardState();
   const dashboardSummaryQuery = useUserDashboardSummary();
   const userSeriesQuery = useUserSeries();
 
-  if (!searchState.success) {
+  if (!dashboardState.success) {
     return <ErrorState error={t("errors:invalidRequest")} />;
   }
 
@@ -67,10 +67,10 @@ export default function UserDashboard() {
 
       <UserSeriesLibrary
         series={userSeriesQuery.data.series}
-        groupBy={searchState.data.groupBy}
-        filters={searchState.data.filters}
-        onGroupByChange={searchState.setGroupBy}
-        onFiltersChange={searchState.setFilters}
+        groupBy={dashboardState.data.groupBy}
+        filters={dashboardState.data.filters}
+        onGroupByChange={dashboardState.setGroupBy}
+        onFiltersChange={dashboardState.setFilters}
       />
     </PageContainer>
   );

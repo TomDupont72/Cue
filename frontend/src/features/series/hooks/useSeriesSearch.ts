@@ -4,7 +4,7 @@ import { seriesSearchGet } from "@/features/series/api/series.api";
 import { seriesSearchGetParamsSchema } from "@/features/series/schemas/series.schemas";
 import { queryKeys } from "@/lib/queryKeys";
 
-export function useSeriesSearch(query: string, page: number) {
+export function useSeriesSearch(query: string, page: number, enabled = true) {
   const normalizedQuery = query.trim();
   const parsedParams = seriesSearchGetParamsSchema.safeParse({
     query: normalizedQuery,
@@ -16,6 +16,7 @@ export function useSeriesSearch(query: string, page: number) {
     queryFn: parsedParams.success
       ? () => seriesSearchGet(parsedParams.data.query, parsedParams.data.page)
       : skipToken,
-    staleTime: 5 * 60 * 1000
+    staleTime: 5 * 60 * 1000,
+    enabled
   });
 }
