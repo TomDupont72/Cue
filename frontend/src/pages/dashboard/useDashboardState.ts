@@ -5,16 +5,16 @@ import type {
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
 
-import { userDashboardSearchParamsSchema } from "@/features/user/schemas/user.schemas";
 import {
   updateUserSeriesFilters,
   updateUserSeriesGroupBy
 } from "@/features/user/utils/userSeriesSearchParams";
+import { dashboardStateSchema } from "@/pages/dashboard/dashboardState.schemas";
 
-export function useUserSeriesSearchParams() {
+export function useDashboardState() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const dashboardParams = userDashboardSearchParamsSchema.safeParse({
+  const dashboardState = dashboardStateSchema.safeParse({
     groupBy: searchParams.get("group"),
     filters: {
       statuses: searchParams.getAll("statuses"),
@@ -32,7 +32,7 @@ export function useUserSeriesSearchParams() {
   };
 
   return {
-    ...dashboardParams,
+    ...dashboardState,
     setGroupBy,
     setFilters
   };

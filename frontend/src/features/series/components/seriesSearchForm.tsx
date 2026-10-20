@@ -1,53 +1,47 @@
 import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { useDebounce } from "@/hooks/useDebounce";
 
-export function SeriesSearchForm() {
+type SeriesSearchFormProps = {
+  query: string | undefined;
+  onQueryChange: (query: string) => void;
+};
+
+export function SeriesSearchForm({ query, onQueryChange }: SeriesSearchFormProps) {
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  const query = searchParams.get("query") ?? "";
-  const [value, setValue] = useState(query);
-
-  const debouncedValue = useDebounce(value.trim(), 300);
+  const [queryDebounced, setQueryDebounced] = useState(query);
+  const debouncedValue = useDebounce(queryDebounced, 300);
 
   useEffect(() => {
-    if (!debouncedValue) {
-      setSearchParams({}, { replace: true });
-      return;
+    if (debouncedValue !== query) {
+      onQueryChange(debouncedValue ?? "");
     }
-
-    if (debouncedValue === query) {
-      return;
-    }
-
-    setSearchParams({ query: debouncedValue, page: "1" }, { replace: true });
-  }, [debouncedValue, query, setSearchParams]);
-
-  function handleClear() {
-    setValue("");
-  }
+  }, [debouncedValue, query, onQueryChange]);
 
   return (
     <div className="relative w-full max-w-2xl">
       <InputGroup>
         <InputGroupInput
           placeholder={t("series:search.placeholder")}
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
+          value={queryDebounced}
+          onChange={(event) => setQueryDebounced(event.target.value)}
         />
         <InputGroupAddon>
           <Search />
         </InputGroupAddon>
       </InputGroup>
 
-      {value && (
-        <Button variant="simple" onClick={handleClear} className="absolute right-0 top-0">
+      {queryDebounced && (
+        <Button
+          variant="simple"
+          onClick={() => setQueryDebounced("")}
+          className="absolute right-0 top-0"
+        >
           <X className="size-4" />
         </Button>
       )}

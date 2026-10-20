@@ -1,6 +1,5 @@
 import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
 
 import { EmptyState } from "@/components/feedback/emptyState";
 import { ErrorState } from "@/components/feedback/errorState";
@@ -9,24 +8,18 @@ import Paginator from "@/components/layout/paginator";
 import { Text } from "@/components/layout/text";
 import SeriesDisplay from "@/features/series/components/seriesDisplay";
 import { useSeriesSearch } from "@/features/series/hooks/useSeriesSearch";
+import { SERIES_SEARCH_QUERY_MIN_LENGTH } from "@/features/series/schemas/series.schemas";
 
-export function SeriesSearchResults() {
+type SeriesSearchResultsProps = {
+  query: string;
+  page: number;
+  onPageChange: (page: number) => void;
+};
+
+export function SeriesSearchResults({ query, page, onPageChange }: SeriesSearchResultsProps) {
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  const query = searchParams.get("query")?.trim() ?? "";
-  const page = Number(searchParams.get("page")?.trim() ?? 1);
-
-  const seriesQuery = useSeriesSearch(query, page);
-
-  function handlePageChange(nextPage: number) {
-    setSearchParams({
-      query,
-      page: String(nextPage)
-    });
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+  const seriesQuery = useSeriesSearch(query, page, query.length >= SERIES_SEARCH_QUERY_MIN_LENGTH);
 
   if (!query) {
     return (
@@ -34,6 +27,16 @@ export function SeriesSearchResults() {
         icon={<Search className="size-8" />}
         title={t("series:search.emptyQueryTitle")}
         description={t("series:search.emptyQueryDescription")}
+      />
+    );
+  }
+
+  if (!seriesQuery.isEnabled) {
+    return (
+      <EmptyState
+        icon={<Search className="size-8" />}
+        title={t("series:search.queryTooShort")}
+        description={t("series:search.minQueryLength", { count: SERIES_SEARCH_QUERY_MIN_LENGTH })}
       />
     );
   }
@@ -51,7 +54,7 @@ export function SeriesSearchResults() {
       <EmptyState
         icon={<Search className="size-8" />}
         title={t("series:search.emptyResultTitle")}
-        description={t("series:search.emptyResultDescription", { query: query })}
+        description={t("series:search.emptyResultDescription", { query })}
       />
     );
   }
@@ -67,7 +70,11 @@ export function SeriesSearchResults() {
       <Paginator
         currentPage={page}
         pageNumber={seriesQuery.data.totalPages}
-        setCurrentPage={handlePageChange}
+        setCurrentPage={(nextPage: number) => {
+          onPageChange(nextPage);
+
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
       />
     </div>
   );

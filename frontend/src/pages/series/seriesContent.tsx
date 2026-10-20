@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useSearchParams } from "react-router-dom";
 
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
@@ -10,77 +9,45 @@ import { Button } from "@/components/ui/button";
 import SeriesDetails from "@/features/series/components/seriesDetails";
 import { SeriesOverview } from "@/features/series/components/seriesOverview";
 import { useSeries } from "@/features/series/hooks/useSeries";
-import { useSeriesImport } from "@/features/series/hooks/useSeriesImportMutation";
-import { seriesGetParamsSchema } from "@/features/series/schemas/series.schemas";
+import { useSeriesImportMutation } from "@/features/series/hooks/useSeriesImportMutation";
 import { getWatchProgress } from "@/features/user/utils/watchProgress";
+import { useSeriesState } from "@/pages/series/useSeriesState";
 
-export default function Series() {
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
-
-  const seriesParams = seriesGetParamsSchema.safeParse({ id: searchParams.get("id") });
-  const tmdbId = location.state?.tmdbId as number | undefined;
-
-  if (seriesParams.success) {
-    return <SeriesContent key={seriesParams.data.id} seriesId={seriesParams.data.id} />;
-  }
-
-  if (tmdbId !== undefined) {
-    return <SeriesImport key={tmdbId} tmdbId={tmdbId} />;
-  }
-
-  return <InvalidSeries />;
-}
-
-function InvalidSeries() {
+export default function SeriesContent() {
   const { t } = useTranslation();
 
-  return <ErrorState error={t("errors:invalidRequest")} />;
-}
+  const seriesState = useSeriesState();
 
-type SeriesImportProps = {
-  tmdbId: number;
-};
+  const seriesQuery = useSeries(seriesState.data?.id ?? 0, seriesState.data?.id !== undefined);
+  const seriesImportMutation = useSeriesImportMutation();
 
-function SeriesImport({ tmdbId }: SeriesImportProps) {
-  const importStartedRef = useRef(false);
-  const { mutate, isError, error } = useSeriesImport();
-
-  const importSeries = useCallback(() => {
-    mutate(tmdbId);
-  }, [mutate, tmdbId]);
-
-  useEffect(() => {
-    if (importStartedRef.current) {
-      return;
-    }
-
-    importStartedRef.current = true;
-    importSeries();
-  }, [importSeries]);
-
-  if (isError) {
-    return <ErrorState error={error} onRetry={importSeries} />;
-  }
-
-  return <LoadingState />;
-}
-
-type SeriesContentProps = {
-  seriesId: number;
-};
-
-function SeriesContent({ seriesId }: SeriesContentProps) {
-  const { t } = useTranslation();
-  const seriesQuery = useSeries(seriesId);
   const [view, setView] = useState<"overview" | "details">("overview");
 
-  if (seriesQuery.isPending) {
+  useEffect(() => {
+    if (!seriesQuery.isEnabled && seriesState.data?.tmdbId) {
+      seriesImportMutation.mutate(seriesState.data.tmdbId);
+    }
+  }, [seriesQuery.isEnabled, seriesState.data?.tmdbId, seriesImportMutation]);
+
+  if (!seriesState.success || (!seriesState.data?.tmdbId && !seriesState.data?.id)) {
+    return <ErrorState error={t("errors:invalidRequest")} />;
+  }
+
+  if (seriesQuery.isPending || seriesImportMutation.isPending) {
     return <LoadingState />;
   }
 
   if (seriesQuery.isError) {
     return <ErrorState error={seriesQuery.error} onRetry={() => seriesQuery.refetch()} />;
+  }
+
+  if (seriesImportMutation.isError && seriesState.data?.tmdbId) {
+    return (
+      <ErrorState
+        error={seriesImportMutation.error}
+        onRetry={() => seriesImportMutation.mutate(seriesState.data.tmdbId!)}
+      />
+    );
   }
 
   const { episodes, userEpisodes, seasons, series, userSeries, seriesProviders, seriesGenres } =

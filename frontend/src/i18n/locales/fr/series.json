@@ -23,6 +23,8 @@
     "emptyResultDescription": "Aucune série trouvée pour « {{query}} ».",
     "result_one": "{{count}} résultat",
     "result_other": "{{count}} résultats",
+    "queryTooShort": "Recherche trop courte",
+    "minQueryLength": "La recherche doit faire au moins {{count}} caractères.",
     "previous": "Précédent",
     "next": "Suivant"
   },

@@ -17,6 +17,23 @@ export function getYear(date: string | null | undefined): string | null {
   return Number.isNaN(year) ? null : String(year);
 }
 
+export function setUrlParams(
+  currentSearchParams: URLSearchParams,
+  params: { name: string; value: string | number; defaultValue?: string | number }[]
+) {
+  const nextSearchParams = new URLSearchParams(currentSearchParams);
+
+  for (const param of params) {
+    nextSearchParams.delete(param.name);
+
+    if (param.value !== param.defaultValue) {
+      nextSearchParams.set(param.name, String(param.value));
+    }
+  }
+
+  return nextSearchParams;
+}
+
 export function setUrlSelectionParam<T extends FacetValue>(
   searchParams: URLSearchParams,
   name: string,
