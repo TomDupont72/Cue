@@ -14,26 +14,18 @@ Feature: GET /api/user/series
             | droppedSeries   | 5  |
             | otherUserSeries | 6  |
 
-        And the database with these seasons:
-            | key       | id | seriesId                |
-            | watching  | 1  | @series.watchingSeries  |
-            | paused    | 2  | @series.pausedSeries    |
-            | completed | 3  | @series.completedSeries |
-            | dropped   | 4  | @series.droppedSeries   |
-            | otherUser | 5  | @series.otherUserSeries |
-
         And the database with these episodes:
-            | key            | id | seriesId                | seasonId           | runtime | airDate                  |
-            | watched20      | 1  | @series.watchingSeries  | @seasons.watching  | 20      | 2026-01-01T00:00:00.000Z |
-            | watched25      | 2  | @series.watchingSeries  | @seasons.watching  | 25      | 2026-01-02T00:00:00.000Z |
-            | released30     | 3  | @series.watchingSeries  | @seasons.watching  | 30      | 2026-01-03T00:00:00.000Z |
-            | releasedNow40  | 4  | @series.watchingSeries  | @seasons.watching  | 40      | 2026-02-01T00:00:00.000Z |
-            | future         | 5  | @series.watchingSeries  | @seasons.watching  | 50      | 2026-02-02T00:00:00.000Z |
-            | unknownAirDate | 6  | @series.watchingSeries  | @seasons.watching  | 60      | null                     |
-            | paused         | 7  | @series.pausedSeries    | @seasons.paused    | 35      | 2026-01-01T00:00:00.000Z |
-            | completed      | 8  | @series.completedSeries | @seasons.completed | 45      | 2026-01-01T00:00:00.000Z |
-            | dropped        | 9  | @series.droppedSeries   | @seasons.dropped   | 55      | 2026-01-01T00:00:00.000Z |
-            | otherUser      | 10 | @series.otherUserSeries | @seasons.otherUser | 65      | 2026-01-01T00:00:00.000Z |
+            | key            | id | seriesId                | runtime | airDate                  |
+            | watched20      | 1  | @series.watchingSeries  | 20      | 2026-01-01T00:00:00.000Z |
+            | watched25      | 2  | @series.watchingSeries  | 25      | 2026-01-02T00:00:00.000Z |
+            | released30     | 3  | @series.watchingSeries  | 30      | 2026-01-03T00:00:00.000Z |
+            | releasedNow40  | 4  | @series.watchingSeries  | 40      | 2026-02-01T00:00:00.000Z |
+            | future         | 5  | @series.watchingSeries  | 50      | 2026-02-02T00:00:00.000Z |
+            | unknownAirDate | 6  | @series.watchingSeries  | 60      | null                     |
+            | paused         | 7  | @series.pausedSeries    | 35      | 2026-01-01T00:00:00.000Z |
+            | completed      | 8  | @series.completedSeries | 45      | 2026-01-01T00:00:00.000Z |
+            | dropped        | 9  | @series.droppedSeries   | 55      | 2026-01-01T00:00:00.000Z |
+            | otherUser      | 10 | @series.otherUserSeries | 65      | 2026-01-01T00:00:00.000Z |
 
         And the database with these user episodes:
             | userId | episodeId            |
