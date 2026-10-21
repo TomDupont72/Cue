@@ -22,10 +22,10 @@ import { prisma } from "@/shared/db/prisma.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
 
 export const userService = {
-  async seriesGet(userId: string, params: UserSeriesGetParams) {
+  async seriesGet(userId: string, params: UserSeriesGetParams, now = new Date()) {
     const { seriesId } = params;
 
-    const rows = await listUserSeriesWithDetails(userId, seriesId);
+    const rows = await listUserSeriesWithDetails(userId, now, seriesId);
     const userSeriesDetails = rows.map((row) => {
       const { series, ...userSeries } = row;
       const { providers, genres, ...seriesDetails } = series;
