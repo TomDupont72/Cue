@@ -130,6 +130,8 @@ export class ApiWorld extends World {
         const seriesPost = userService.seriesPost.bind(userService);
         const seriesReconcilePost = userService.seriesReconcilePost.bind(userService);
         const reconcileEpisodesAtCurrentDate = seriesService.reconcilePost.bind(seriesService);
+        const seriesGet = userService.seriesGet.bind(userService);
+
         const getEpisodesAtCurrentDate: typeof userService.episodeUpcomingGet = (userId) =>
           episodeUpcomingGet(userId, currentDate);
         const postEpisodeAtCurrentDate: typeof userService.episodePost = (userId, params) =>
@@ -142,6 +144,8 @@ export class ApiWorld extends World {
           seriesReconcilePost(params, currentDate);
         const reconcileEpisodesAtFixedDate: typeof seriesService.reconcilePost = (body) =>
           reconcileEpisodesAtCurrentDate(body, currentDate);
+        const getSeriesAtCurrentDate: typeof userService.seriesGet = (userId, params) =>
+          seriesGet(userId, params, currentDate);
 
         scope.replace(userService, "episodeUpcomingGet", getEpisodesAtCurrentDate);
         scope.replace(userService, "episodePost", postEpisodeAtCurrentDate);
@@ -149,6 +153,7 @@ export class ApiWorld extends World {
         scope.replace(userService, "seriesPost", postSeriesAtCurrentDate);
         scope.replace(userService, "seriesReconcilePost", reconcileSeriesAtCurrentDate);
         scope.replace(seriesService, "reconcilePost", reconcileEpisodesAtFixedDate);
+        scope.replace(userService, "seriesGet", getSeriesAtCurrentDate);
       }
 
       if (this.authenticatedUserId !== undefined) {

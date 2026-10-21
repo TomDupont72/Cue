@@ -46,6 +46,8 @@ export type UserSeriesGetResponse = {
     seriesDetails: SeriesRow;
     seriesProviders: ProviderRow[];
     seriesGenres: GenreRow[];
+    watchedMinutes: number;
+    remainingReleasedMinutes: number;
   })[];
 };
 

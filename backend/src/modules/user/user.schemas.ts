@@ -23,7 +23,9 @@ export const userSeriesGetResponseSchema = z.object({
     userSeriesRowSchema.extend({
       seriesDetails: seriesRowSchema,
       seriesProviders: z.array(providerRowSchema),
-      seriesGenres: z.array(genreRowSchema)
+      seriesGenres: z.array(genreRowSchema),
+      watchedMinutes: z.number().int().min(0),
+      remainingReleasedMinutes: z.number().int().min(0)
     })
   )
 });
