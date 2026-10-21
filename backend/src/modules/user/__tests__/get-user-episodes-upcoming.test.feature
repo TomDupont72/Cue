@@ -56,7 +56,7 @@ Feature: GET /api/user/episodes/upcoming
 
         Then the response status should be 200
         And the response array at "episodes" should exactly match these fixtures:
-            | fixture          | seriesName     | seriesBackdropPath   |
+            | fixture           | seriesName     | seriesBackdropPath  |
             | @episodes.ignored | Ignored series | /ignored-series.jpg |
 
     Scenario: Get user episodes upcoming - No upcoming episodes
