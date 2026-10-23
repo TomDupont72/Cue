@@ -12,10 +12,8 @@ import { UserSeriesSection } from "@/features/user/components/userSeriesSection"
 import { UserSeriesToolbar } from "@/features/user/components/userSeriesToolbar";
 import { useUserSeriesView } from "@/features/user/hooks/useUserSeriesView";
 
-type UserSeries = UserSeriesGetResponse["series"][number];
-
 type UserSeriesLibraryProps = {
-  series: UserSeries[];
+  series: UserSeriesGetResponse["series"];
   groupBy: UserSeriesGroupBy;
   filters: UserSeriesFilters;
   onGroupByChange: (groupBy: UserSeriesGroupBy) => void;
@@ -30,6 +28,8 @@ export function UserSeriesLibrary({
   onFiltersChange
 }: UserSeriesLibraryProps) {
   const { t } = useTranslation();
+
+  console.log(filters)
 
   const { categoryNames, filterOptions, displayedGroups } = useUserSeriesView({
     series,

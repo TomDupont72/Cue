@@ -45,6 +45,7 @@ export function useUserSeriesView({ series, filters, groupBy }: UseUserSeriesVie
       buildUserSeriesFilterOptions({
         series,
         facetCounts,
+        filters,
         getStatusLabel: (status) => t(`user:series.status.${status}.section`),
         getGenreLabel: (name) => t(`genre:${GENRE_KEY_BY_NAME[name] ?? "OTHER"}`)
       }),

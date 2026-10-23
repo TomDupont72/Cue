@@ -6,7 +6,7 @@ export type FacetGroup = {
 };
 
 export type FacetSelection<T extends FacetValue> =
-  { mode: "all" } | { mode: "include"; values: readonly T[] };
+  ({ mode: "all" } | { mode: "include"; values: readonly T[] }) & {limit?: number};
 
 export type FacetFilters<TSchema> = {
   [K in keyof TSchema]: TSchema[K] extends FacetValue ? FacetSelection<TSchema[K]> : never;
@@ -17,7 +17,7 @@ export type FacetCounts<TSchema> = {
 };
 
 export type FacetOption<T extends FacetValue> = {
-  value: T;
+  value: T[];
   label: string;
   count: number;
   disabled?: boolean;

@@ -2,10 +2,11 @@ import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 import type {
   UserSeriesFacetCounts,
   UserSeriesFacetSchema,
+  UserSeriesFilters,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
 import type { UserSeriesGroup } from "@/features/user/utils/userSeriesTable";
-import type { FacetOptions } from "@/lib/facets/facet.types";
+import type { FacetOption, FacetOptions } from "@/lib/facets/facet.types";
 
 import {
   USER_SERIES_STATUS,
@@ -30,11 +31,13 @@ type LabelResolvers = {
 type BuildFilterOptionsParams = LabelResolvers & {
   series: UserSeries[];
   facetCounts: UserSeriesFacetCounts;
+  filters: UserSeriesFilters
 };
 
 export function buildUserSeriesFilterOptions({
   series,
   facetCounts,
+  filters,
   getStatusLabel,
   getGenreLabel
 }: BuildFilterOptionsParams): FacetOptions<UserSeriesFacetSchema> {
@@ -51,11 +54,17 @@ export function buildUserSeriesFilterOptions({
     }
   }
 
-  const status = USER_SERIES_STATUS_ORDER.map((value) => ({
+  let status: FacetOption<UserSeriesStatus | "OTHER">[] = USER_SERIES_STATUS_ORDER.map((value) => ({
     value,
     label: getStatusLabel(value),
     count: facetCounts.status.get(value) ?? 0
-  }));
+  }))
+
+  if (filters.status.limit && filters.status.limit < status.length - 1) {
+    const statusOrderedByMetricLimited = status.sort((first, second) => second.count - first.count).slice(0, filters.status.limit)
+    const statusKept = new Set(statusOrderedByMetricLimited.map((status) => status.value))
+    status = [...status.filter((data) => statusKept.has(data.value)), {value: "OTHER", label: "Other", count: status.filter((data) => !statusKept.has(data.value)).reduce((total, val) => total + val.count, 0)}]
+  }
 
   const genre = Array.from(genresById, ([value, name]) => ({
     value,

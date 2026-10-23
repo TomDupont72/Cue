@@ -11,6 +11,7 @@ import Series from "@/pages/series/series.page";
 import Terms from "@/pages/terms.page";
 import Upcoming from "@/pages/upcoming/upcoming.page";
 import Watch from "@/pages/watch/watch.page";
+import Stats from "./pages/stats/statsContent";
 
 export default function Router() {
   return (
@@ -21,6 +22,7 @@ export default function Router() {
         <Route path="/series" element={<Series />} />
         <Route path="/watch" element={<Watch />} />
         <Route path="/upcoming" element={<Upcoming />} />
+        <Route path="/stats" element={<Stats />} />
         <Route path="/legal" element={<Legal />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />

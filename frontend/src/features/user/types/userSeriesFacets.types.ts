@@ -2,7 +2,7 @@ import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatu
 import type { FacetCounts, FacetFilters } from "@/lib/facets/facet.types";
 
 export type UserSeriesFacetSchema = {
-  status: UserSeriesStatus;
+  status: UserSeriesStatus | "OTHER";
   genre: number;
   provider: number;
 };

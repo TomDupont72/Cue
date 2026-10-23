@@ -16,7 +16,7 @@ import {
   type TableFeatures
 } from "@tanstack/react-table";
 
-import type { FacetFilters, FacetGroup, FacetSelection } from "@/lib/facets/facet.types";
+import type { FacetFilters, FacetGroup, FacetOption, FacetSelection, FacetValue } from "@/lib/facets/facet.types";
 
 function toSelectionSet(value: unknown): ReadonlySet<unknown> {
   return new Set(Array.isArray(value) ? value : []);
@@ -228,4 +228,18 @@ export function createMultiValueGroupedRowModel() {
       }
     });
   };
+}
+
+export function keepFirstFilters<T extends FacetValue>(options: FacetOption<T>[], limit?: number, metric: "count") {
+    let optionsLimited = options
+
+    if (limit && limit < options.length) {
+        const optionsOrderedByMetricLimited = options.sort((first, second) => second[metric] - first[metric]).slice(0, limit)
+        const optionsKeptValues = new Set(optionsOrderedByMetricLimited.map((option) => option.value).flat())
+        const optionsKept = options.filter((options) => options.value.some((value) => optionsKeptValues.has(value)))
+        const optionsNotKept = options.filter((options) => !options.value.some((value) => optionsKeptValues.has(value)))
+        optionsLimited = [...optionsKept, {value: optionsNotKept.map((option) => option.value).flat(), label: "Other", count: optionsNotKept.reduce((total, value) => total + value[metric], 0)}]
+    }
+
+    return optionsLimited
 }
