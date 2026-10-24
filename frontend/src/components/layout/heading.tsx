@@ -20,7 +20,7 @@ export function Heading({ level = 2, absolute, className, full = true, ...props 
       className={cn(
         HEADING_STYLE[level],
         absolute && ABSOLUTE_STYLE[absolute],
-        full && "w-full",
+        full ? "w-full" : "shrink-0",
         className
       )}
       {...props}

@@ -5,10 +5,8 @@ import type {
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
 
-import {
-  updateUserSeriesFilters,
-  updateUserSeriesGroupBy
-} from "@/features/user/utils/userSeriesSearchParams";
+import { updateUserSeriesFilters } from "@/features/user/utils/userSeriesSearchParams";
+import { setUrlParams } from "@/lib/utils";
 import { dashboardStateSchema } from "@/pages/dashboard/dashboardState.schemas";
 
 export function useDashboardState() {
@@ -24,7 +22,9 @@ export function useDashboardState() {
   });
 
   const setGroupBy = (groupBy: UserSeriesGroupBy) => {
-    setSearchParams((currentSearchParams) => updateUserSeriesGroupBy(currentSearchParams, groupBy));
+    setSearchParams((currentSearchParams) =>
+      setUrlParams(currentSearchParams, [{ name: "group", value: groupBy, defaultValue: "status" }])
+    );
   };
 
   const setFilters = (filters: UserSeriesFilters) => {

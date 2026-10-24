@@ -63,10 +63,7 @@ export default function FilterDrawer<TSchema extends object>({
     setOpen(nextOpen);
   };
 
-  const handleFacetChange = (
-    facetKey: FacetKey<TSchema>,
-    selection: FacetSelection<FacetValue>
-  ) => {
+  const handleFacetChange = (facetKey: FacetKey<TSchema>, selection: FacetSelection) => {
     setDraftValue(
       (currentValue) =>
         ({
@@ -111,7 +108,7 @@ export default function FilterDrawer<TSchema extends object>({
                 idPrefix={`${componentId}-${facetKey}`}
                 label={labels[facetKey]}
                 options={options[facetKey] as readonly FacetOption<FacetValue>[]}
-                selection={draftValue[facetKey] as FacetSelection<FacetValue>}
+                selection={draftValue[facetKey] as FacetSelection}
                 selectAllLabel={selectAllLabel ?? t("common:labels.groupedSelection")}
                 onSelectionChange={(selection) => handleFacetChange(facetKey, selection)}
               />
@@ -135,9 +132,9 @@ type FacetSectionProps = {
   idPrefix: string;
   label: string;
   options: readonly FacetOption<FacetValue>[];
-  selection: FacetSelection<FacetValue>;
+  selection: FacetSelection;
   selectAllLabel: ReactNode;
-  onSelectionChange: (selection: FacetSelection<FacetValue>) => void;
+  onSelectionChange: (selection: FacetSelection) => void;
 };
 
 function FacetSection({
@@ -148,36 +145,32 @@ function FacetSection({
   selectAllLabel,
   onSelectionChange
 }: FacetSectionProps) {
-  const selectedValues =
-    selection.mode === "all" ? options.map((option) => option.value) : selection.values;
-  const selectedValueSet = new Set(selectedValues);
-  const allSelected =
-    options.length > 0 && options.every((option) => selectedValueSet.has(option.value));
-  const someSelected = !allSelected && options.some((option) => selectedValueSet.has(option.value));
+  const selectedIds = selection.mode === "all" ? options.map((option) => option.id) : selection.ids;
+  const selectedIdSet = new Set(selectedIds);
+  const allSelected = options.length > 0 && options.every((option) => selectedIdSet.has(option.id));
+  const someSelected = !allSelected && options.some((option) => selectedIdSet.has(option.id));
 
-  const handleOptionChange = (optionValue: FacetValue, checked: boolean) => {
-    const nextSelectedValues = new Set(selectedValues);
+  const handleOptionChange = (optionId: string, checked: boolean) => {
+    const nextSelectedIds = new Set(selectedIds);
 
     if (checked) {
-      nextSelectedValues.add(optionValue);
+      nextSelectedIds.add(optionId);
     } else {
-      nextSelectedValues.delete(optionValue);
+      nextSelectedIds.delete(optionId);
     }
 
-    if (options.length > 0 && options.every((option) => nextSelectedValues.has(option.value))) {
+    if (options.length > 0 && options.every((option) => nextSelectedIds.has(option.id))) {
       onSelectionChange({ mode: "all" });
       return;
     }
 
-    const knownValues = options
-      .map((option) => option.value)
-      .filter((value) => nextSelectedValues.has(value));
-    const knownValueSet = new Set(options.map((option) => option.value));
-    const unknownValues = [...nextSelectedValues].filter((value) => !knownValueSet.has(value));
+    const knownIds = options.map((option) => option.id).filter((id) => nextSelectedIds.has(id));
+    const knownIdSet = new Set(options.map((option) => option.id));
+    const unknownIds = [...nextSelectedIds].filter((id) => !knownIdSet.has(id));
 
     onSelectionChange({
       mode: "include",
-      values: [...knownValues, ...unknownValues]
+      ids: [...knownIds, ...unknownIds]
     });
   };
 
@@ -200,7 +193,7 @@ function FacetSection({
             indeterminate={someSelected}
             disabled={options.length === 0}
             onCheckedChange={(checked) =>
-              onSelectionChange(checked ? { mode: "all" } : { mode: "include", values: [] })
+              onSelectionChange(checked ? { mode: "all" } : { mode: "include", ids: [] })
             }
           />
           <span>{selectAllLabel}</span>
@@ -210,11 +203,11 @@ function FacetSection({
       <div className="flex flex-col gap-2">
         {options.map((option, index) => {
           const optionId = `${idPrefix}-${index}`;
-          const checked = selectedValueSet.has(option.value);
+          const checked = selectedIdSet.has(option.id);
 
           return (
             <label
-              key={`${typeof option.value}-${String(option.value)}`}
+              key={option.id}
               htmlFor={optionId}
               className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg bg-muted px-3 py-2 text-base font-medium transition-colors hover:bg-muted/80 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50"
             >
@@ -222,7 +215,7 @@ function FacetSection({
                 id={optionId}
                 checked={checked}
                 disabled={option.disabled}
-                onCheckedChange={(nextChecked) => handleOptionChange(option.value, nextChecked)}
+                onCheckedChange={(nextChecked) => handleOptionChange(option.id, nextChecked)}
               />
               <span className="min-w-0 flex-1">
                 {option.label} ({option.count})

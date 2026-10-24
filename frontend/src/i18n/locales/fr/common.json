@@ -8,6 +8,7 @@
     "dashboard": "Dashboard",
     "watch": "À voir",
     "upcoming": "À venir",
+    "stats": "Statistiques",
     "search": "Recherche",
     "legal": "Légal",
     "privacy": "Confidentialité",
@@ -20,7 +21,10 @@
   },
   "labels": {
     "filters": "Filtres",
-    "groupedSelection": "Sélection groupée"
+    "groupedSelection": "Sélection groupée",
+    "others": "Autres",
+    "total": "Total",
+    "top": "Top"
   },
   "actions": {
     "filterMySeries": "Filtrer mes séries",

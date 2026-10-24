@@ -16,7 +16,17 @@ import {
   type TableFeatures
 } from "@tanstack/react-table";
 
-import type { FacetFilters, FacetGroup, FacetSelection } from "@/lib/facets/facet.types";
+import type {
+  FacetFilters,
+  FacetGroup,
+  FacetMetrics,
+  FacetMetricsGetter,
+  FacetOption,
+  FacetOptionConfig,
+  FacetOptionValues,
+  FacetSelection,
+  FacetValue
+} from "@/lib/facets/facet.types";
 
 function toSelectionSet(value: unknown): ReadonlySet<unknown> {
   return new Set(Array.isArray(value) ? value : []);
@@ -39,11 +49,40 @@ export const filterSomeValuesInSelection = constructFilterFn({
 });
 
 export function facetFiltersToColumnFilters<TSchema>(
-  filters: FacetFilters<TSchema>
+  filters: Partial<FacetFilters<TSchema>>,
+  optionValues: Partial<FacetOptionValues<TSchema>>
 ): ColumnFiltersState {
-  return Object.entries(filters as Record<string, FacetSelection<string | number>>).flatMap(
-    ([id, selection]) => (selection.mode === "all" ? [] : [{ id, value: selection.values }])
-  );
+  const filtersById = filters as Record<string, FacetSelection>;
+  const optionValuesByFacet = optionValues as Record<
+    string,
+    ReadonlyMap<string, readonly FacetValue[]>
+  >;
+
+  return Object.entries(filtersById).flatMap(([id, selection]) => {
+    if (selection.mode === "all") {
+      return [];
+    }
+
+    return [
+      {
+        id,
+        value: resolveFacetOptionIds(selection.ids, optionValuesByFacet[id] ?? new Map())
+      }
+    ];
+  });
+}
+
+export function resolveFacetOptionIds<T extends FacetValue>(
+  selectedIds: readonly string[],
+  optionValues: ReadonlyMap<string, readonly T[]>
+): T[] {
+  const values = new Set<T>();
+
+  for (const id of selectedIds) {
+    optionValues.get(id)?.forEach((value) => values.add(value));
+  }
+
+  return [...values];
 }
 
 type GroupingFeatures = TableFeatures & {
@@ -228,4 +267,96 @@ export function createMultiValueGroupedRowModel() {
       }
     });
   };
+}
+
+export function createColumnFacetMetrics<T extends FacetValue, TData>(
+  column: {
+    id: string;
+    getFacetedRowModel: () => {
+      flatRows: readonly {
+        original: TData;
+        getUniqueValues: <TValue>(columnId: string) => TValue[];
+      }[];
+    };
+  },
+  getWatchedMinutes: (data: TData) => number
+): FacetMetricsGetter<T> {
+  return createFacetMetrics(
+    column.getFacetedRowModel().flatRows.map((row) => ({
+      values: row.getUniqueValues<T>(column.id),
+      watchedMinutes: getWatchedMinutes(row.original)
+    }))
+  );
+}
+
+export function createFacetMetrics<T extends FacetValue>(
+  rows: Iterable<{ values: readonly T[]; watchedMinutes: number }>
+): FacetMetricsGetter<T> {
+  const facetRows = Array.from(rows, (row) => ({
+    values: [...new Set(row.values)],
+    watchedMinutes: row.watchedMinutes
+  }));
+  const metricsByValue = new Map<T, FacetMetrics>();
+
+  for (const row of facetRows) {
+    for (const value of row.values) {
+      const metrics = metricsByValue.get(value) ?? { count: 0, watchedMinutes: 0 };
+      metricsByValue.set(value, {
+        count: metrics.count + 1,
+        watchedMinutes: metrics.watchedMinutes + row.watchedMinutes
+      });
+    }
+  }
+
+  return {
+    get(values) {
+      if (values.length === 0) return { count: 0, watchedMinutes: 0 };
+      if (values.length === 1) {
+        return metricsByValue.get(values[0]) ?? { count: 0, watchedMinutes: 0 };
+      }
+
+      const selected = new Set(values);
+      let count = 0;
+      let watchedMinutes = 0;
+
+      for (const row of facetRows) {
+        if (row.values.some((value) => selected.has(value))) {
+          count++;
+          watchedMinutes += row.watchedMinutes;
+        }
+      }
+
+      return { count, watchedMinutes };
+    }
+  };
+}
+
+export function keepFirstFilters<T extends FacetValue>(
+  options: FacetOption<T>[],
+  facetMetrics: FacetMetricsGetter<T>,
+  otherLabel: string,
+  config?: FacetOptionConfig
+) {
+  let optionsLimited = options;
+
+  if (config && config.limit >= 0 && config.limit < options.length) {
+    const optionsOrderedByMetricLimited = [...options]
+      .sort((first, second) => second[config.orderBy] - first[config.orderBy])
+      .slice(0, config.limit);
+    const optionsKeptIds = new Set(optionsOrderedByMetricLimited.map((option) => option.id));
+    const optionsKept = options.filter((option) => optionsKeptIds.has(option.id));
+    const optionsNotKept = options.filter((option) => !optionsKeptIds.has(option.id));
+    const otherValues = optionsNotKept.flatMap((option) => option.values);
+    optionsLimited = [
+      ...optionsKept,
+      {
+        id: "other",
+        values: otherValues,
+        label: otherLabel,
+        ...facetMetrics.get(otherValues)
+      }
+    ];
+  }
+
+  return optionsLimited;
 }

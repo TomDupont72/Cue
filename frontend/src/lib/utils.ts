@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import type { FacetSelection, FacetValue } from "@/lib/facets/facet.types";
+import type { FacetSelection } from "@/lib/facets/facet.types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -34,16 +34,16 @@ export function setUrlParams(
   return nextSearchParams;
 }
 
-export function setUrlSelectionParam<T extends FacetValue>(
+export function setUrlSelectionParam(
   searchParams: URLSearchParams,
   name: string,
-  selection: FacetSelection<T>
+  selection: FacetSelection
 ) {
   searchParams.delete(name);
 
   if (selection.mode !== "all") {
-    selection.values.forEach((value) => searchParams.append(name, String(value)));
-    if (selection.values.length === 0) {
+    selection.ids.forEach((id) => searchParams.append(name, id));
+    if (selection.ids.length === 0) {
       searchParams.append(name, "null");
     }
   }
