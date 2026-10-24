@@ -30,7 +30,7 @@ import {
 
 type SeriesDataGroupBy = Exclude<UserSeriesGroupBy, "status">;
 
-type SeriesDataPieChartProps = {
+type UserSeriesDataPieChartProps = {
   series: UserSeriesGetResponse["series"];
   groupBy: SeriesDataGroupBy;
   filters: UserSeriesFiltersFor<SeriesDataGroupBy>;
@@ -41,7 +41,7 @@ type SeriesDataPieChartProps = {
   onLimitChange: (limit: number) => void;
 };
 
-export default function SeriesDataPieChart({
+export default function UserSeriesDataPieChart({
   series,
   groupBy,
   filters,
@@ -50,7 +50,7 @@ export default function SeriesDataPieChart({
   onGroupByChange,
   onMetricChange,
   onLimitChange
-}: SeriesDataPieChartProps) {
+}: UserSeriesDataPieChartProps) {
   const { t } = useTranslation();
 
   const optionConfig = {
@@ -82,12 +82,12 @@ export default function SeriesDataPieChart({
   ) as ChartConfig;
 
   return (
-    <Card>
-      <CardHeader className="flex w-full flex-col gap-4 lg:flex-row ">
+    <Card className="h-full">
+      <CardHeader className="flex w-full flex-col gap-4">
         <Heading full={false} className="uppercase">
           {t("user:stats.group_distribution")}
         </Heading>
-        <div className="flex w-full min-w-0 flex-wrap lg:flex-nowrap items-center justify-start gap-2 lg:justify-end">
+        <div className="flex w-full min-w-0 flex-wrap items-center justify-start gap-2">
           <GroupDropdownMenu
             categories={categoryNames}
             category={categoryNames[groupBy]}

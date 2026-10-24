@@ -1,8 +1,10 @@
 import { useTranslation } from "react-i18next";
 
-import type { UserSeriesStatus } from "@/features/user/constants/userSeriesStatus";
-
 import { Badge } from "@/components/ui/badge";
+import {
+  USER_SERIES_STATUS_COLOR,
+  type UserSeriesStatus
+} from "@/features/user/constants/userSeriesStatus";
 
 type StatusBadgeProps = {
   status: UserSeriesStatus;
@@ -14,25 +16,23 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
   const statusValues = {
     COMPLETED: {
       text: t("user:series.status.COMPLETED.label"),
-      color: "bg-green-50 text-green-700 dark:bg-green-950 border-green-200 dark:text-green-300"
+      color: USER_SERIES_STATUS_COLOR.COMPLETED
     },
     PLANNED: {
       text: t("user:series.status.PLANNED.label"),
-      color:
-        "bg-yellow-50 text-yellow-700 dark:bg-yellow-950 border-yellow-200 dark:text-yellow-300"
+      color: USER_SERIES_STATUS_COLOR.PLANNED
     },
     WATCHING: {
       text: t("user:series.status.WATCHING.label"),
-      color: "bg-blue-50 text-blue-700 dark:bg-blue-950 border-blue-200 dark:text-blue-300"
+      color: USER_SERIES_STATUS_COLOR.WATCHING
     },
     DROPPED: {
       text: t("user:series.status.DROPPED.label"),
-      color: "bg-red-50 text-red-700 dark:bg-red-950 border-red-200 dark:text-red-300"
+      color: USER_SERIES_STATUS_COLOR.DROPPED
     },
     PAUSED: {
       text: t("user:series.status.PAUSED.label"),
-      color:
-        "bg-purple-50 text-purple-700 dark:bg-purple-950 border-purple-200 dark:text-purple-300"
+      color: USER_SERIES_STATUS_COLOR.PAUSED
     }
   };
 

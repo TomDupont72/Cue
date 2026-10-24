@@ -29,7 +29,8 @@
     "minute_other": "Minutes",
     "watchedEpisodes": "Épisodes visionnés",
     "watchedSeries": "Séries terminées",
-    "group_distribution": "Répartition par groupes"
+    "group_distribution": "Répartition par groupes",
+    "status_distribution": "Répartition par statuts"
   },
   "series": {
     "mySeries": "Mes séries",
