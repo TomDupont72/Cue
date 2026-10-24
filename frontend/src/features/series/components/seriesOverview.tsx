@@ -43,7 +43,7 @@ export function SeriesOverview({
   const endYear = getYear(series.lastAirDate);
 
   const genreNames = seriesGenres.map((seriesGenre) => {
-    return t(`genre:${GENRE_KEY_BY_NAME[seriesGenre.name] ?? "OTHER"}`);
+    return t(`genre:${GENRE_KEY_BY_NAME[seriesGenre.name] ?? "UNKNOWN"}`);
   });
 
   const datesString = startYear

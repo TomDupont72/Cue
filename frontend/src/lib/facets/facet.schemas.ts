@@ -1,21 +1,21 @@
 import { z } from "zod";
 
-import type { FacetSelection, FacetValue } from "@/lib/facets/facet.types";
+import type { FacetSelection } from "@/lib/facets/facet.types";
 
-function toFacetSelection<T extends FacetValue>(values: T[] | null): FacetSelection<T> {
-  if (values === null) {
-    return { mode: "include", values: [] };
+function toFacetSelection(ids: string[] | null): FacetSelection {
+  if (ids === null) {
+    return { mode: "include", ids: [] };
   }
 
-  if (values.length === 0) {
+  if (ids.length === 0) {
     return { mode: "all" };
   }
 
-  return { mode: "include", values };
+  return { mode: "include", ids: [...new Set(ids)] };
 }
 
-export function facetSelectionSearchParamSchema<T extends FacetValue>(valueSchema: z.ZodType<T>) {
+export function facetSelectionSearchParamSchema() {
   return z
-    .union([z.array(valueSchema), z.tuple([z.literal("null")]).transform(() => null)])
+    .union([z.tuple([z.literal("null")]).transform(() => null), z.array(z.string().min(1))])
     .transform(toFacetSelection);
 }

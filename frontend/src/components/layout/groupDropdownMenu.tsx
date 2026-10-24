@@ -24,12 +24,14 @@ export default function GroupDropdownMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="outline" size="lg" className="flex flex-row w-[185px] justify-between">
-            <div className="flex flex-row items-center gap-2">
-              <ListFilterIcon />
-              <Heading level={4}>Par {category.toLowerCase()}</Heading>
+          <Button variant="outline" size="lg" className="flex w-[185px] max-w-full justify-between">
+            <div className="flex min-w-0 flex-row items-center gap-2">
+              <ListFilterIcon className="shrink-0" />
+              <Heading level={4} className="truncate">
+                Par {category.toLowerCase()}
+              </Heading>
             </div>
-            <ChevronDownIcon className="opacity-60" />
+            <ChevronDownIcon className="shrink-0 opacity-60" />
           </Button>
         }
       />

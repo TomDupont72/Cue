@@ -8,10 +8,10 @@ import Legal from "@/pages/legal.page";
 import Privacy from "@/pages/privacy.page";
 import Search from "@/pages/search/search.page";
 import Series from "@/pages/series/series.page";
+import Stats from "@/pages/stats/statsContent";
 import Terms from "@/pages/terms.page";
 import Upcoming from "@/pages/upcoming/upcoming.page";
 import Watch from "@/pages/watch/watch.page";
-import Stats from "./pages/stats/statsContent";
 
 export default function Router() {
   return (

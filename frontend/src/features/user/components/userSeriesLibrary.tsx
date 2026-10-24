@@ -29,8 +29,6 @@ export function UserSeriesLibrary({
 }: UserSeriesLibraryProps) {
   const { t } = useTranslation();
 
-  console.log(filters)
-
   const { categoryNames, filterOptions, displayedGroups } = useUserSeriesView({
     series,
     filters,

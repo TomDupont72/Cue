@@ -21,7 +21,10 @@
   },
   "labels": {
     "filters": "Filtres",
-    "groupedSelection": "Sélection groupée"
+    "groupedSelection": "Sélection groupée",
+    "others": "Autres",
+    "total": "Total",
+    "top": "Top"
   },
   "actions": {
     "filterMySeries": "Filtrer mes séries",

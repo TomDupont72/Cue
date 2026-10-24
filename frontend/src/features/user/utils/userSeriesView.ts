@@ -1,17 +1,26 @@
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 import type {
-  UserSeriesFacetCounts,
+  UserSeriesFacetMetrics,
+  UserSeriesFacetMetricsFor,
   UserSeriesFacetSchema,
-  UserSeriesFilters,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
 import type { UserSeriesGroup } from "@/features/user/utils/userSeriesTable";
-import type { FacetOption, FacetOptions } from "@/lib/facets/facet.types";
+import type {
+  FacetMetricsGetter,
+  FacetOption,
+  FacetOptionConfig,
+  FacetOptions,
+  FacetOptionsConfig,
+  FacetOptionValues,
+  FacetValue
+} from "@/lib/facets/facet.types";
 
 import {
   USER_SERIES_STATUS,
   type UserSeriesStatus
 } from "@/features/user/constants/userSeriesStatus";
+import { createFacetMetrics, keepFirstFilters } from "@/lib/facets/tanstackTableFacets";
 
 type UserSeries = UserSeriesGetResponse["series"][number];
 
@@ -28,61 +37,206 @@ type LabelResolvers = {
   getGenreLabel: (genreName: string) => string;
 };
 
-type BuildFilterOptionsParams = LabelResolvers & {
+type UserSeriesFacetOptionsFor<TKey extends UserSeriesGroupBy> = Pick<
+  FacetOptions<UserSeriesFacetSchema>,
+  TKey
+>;
+
+type UserSeriesFacetOptionValuesFor<TKey extends UserSeriesGroupBy> = Pick<
+  FacetOptionValues<UserSeriesFacetSchema>,
+  TKey
+>;
+
+type BuildFilterOptionsParams<TKey extends UserSeriesGroupBy> = LabelResolvers & {
   series: UserSeries[];
-  facetCounts: UserSeriesFacetCounts;
-  filters: UserSeriesFilters
+  facetKeys: readonly TKey[];
+  optionConfig?: FacetOptionsConfig<UserSeriesFacetSchema>;
+  otherLabel: string;
 };
 
-export function buildUserSeriesFilterOptions({
+export function buildUserSeriesFilterOptionCatalog<TKey extends UserSeriesGroupBy>({
   series,
-  facetCounts,
-  filters,
+  facetKeys,
+  optionConfig,
+  otherLabel,
   getStatusLabel,
   getGenreLabel
-}: BuildFilterOptionsParams): FacetOptions<UserSeriesFacetSchema> {
-  const genresById = new Map<number, string>();
-  const providersById = new Map<number, string>();
+}: BuildFilterOptionsParams<TKey>): {
+  options: UserSeriesFacetOptionsFor<TKey>;
+  optionValues: UserSeriesFacetOptionValuesFor<TKey>;
+} {
+  const options: Partial<FacetOptions<UserSeriesFacetSchema>> = {};
+  const optionValues: Partial<FacetOptionValues<UserSeriesFacetSchema>> = {};
 
-  for (const item of series) {
-    for (const genre of item.seriesGenres) {
-      genresById.set(genre.id, genre.name);
-    }
+  for (const facetKey of facetKeys) {
+    switch (facetKey) {
+      case "status": {
+        const allOptions: FacetOption<UserSeriesStatus>[] = USER_SERIES_STATUS_ORDER.map(
+          (value) => ({
+            id: String(value),
+            values: [value],
+            label: getStatusLabel(value),
+            count: 0,
+            watchedMinutes: 0
+          })
+        );
+        const displayedOptions = limitFacetOptions(
+          allOptions,
+          optionConfig?.status,
+          otherLabel,
+          () =>
+            createFacetMetrics(
+              series.map((item) => ({
+                values: [item.status],
+                watchedMinutes: item.watchedMinutes
+              }))
+            )
+        );
 
-    for (const provider of item.seriesProviders) {
-      providersById.set(provider.id, provider.name);
+        options.status = displayedOptions;
+        optionValues.status = createFacetOptionValues(allOptions, displayedOptions);
+        break;
+      }
+
+      case "genre": {
+        const genresById = new Map<number, string>();
+
+        for (const item of series) {
+          for (const genre of item.seriesGenres) {
+            genresById.set(genre.id, genre.name);
+          }
+        }
+
+        const allOptions: FacetOption<number>[] = Array.from(genresById, ([value, name]) => ({
+          id: String(value),
+          values: [value],
+          label: getGenreLabel(name),
+          count: 0,
+          watchedMinutes: 0
+        })).sort((first, second) => first.label.localeCompare(second.label));
+        const displayedOptions = limitFacetOptions(
+          allOptions,
+          optionConfig?.genre,
+          otherLabel,
+          () =>
+            createFacetMetrics(
+              series.map((item) => ({
+                values: item.seriesGenres.map((genre) => genre.id),
+                watchedMinutes: item.watchedMinutes
+              }))
+            )
+        );
+
+        options.genre = displayedOptions;
+        optionValues.genre = createFacetOptionValues(allOptions, displayedOptions);
+        break;
+      }
+
+      case "provider": {
+        const providersById = new Map<number, string>();
+
+        for (const item of series) {
+          for (const provider of item.seriesProviders) {
+            providersById.set(provider.id, provider.name);
+          }
+        }
+
+        const allOptions: FacetOption<number>[] = Array.from(providersById, ([value, name]) => ({
+          id: String(value),
+          values: [value],
+          label: name,
+          count: 0,
+          watchedMinutes: 0
+        })).sort((first, second) => first.label.localeCompare(second.label));
+        const displayedOptions = limitFacetOptions(
+          allOptions,
+          optionConfig?.provider,
+          otherLabel,
+          () =>
+            createFacetMetrics(
+              series.map((item) => ({
+                values: item.seriesProviders.map((provider) => provider.id),
+                watchedMinutes: item.watchedMinutes
+              }))
+            )
+        );
+
+        options.provider = displayedOptions;
+        optionValues.provider = createFacetOptionValues(allOptions, displayedOptions);
+        break;
+      }
     }
   }
-
-  let status: FacetOption<UserSeriesStatus | "OTHER">[] = USER_SERIES_STATUS_ORDER.map((value) => ({
-    value,
-    label: getStatusLabel(value),
-    count: facetCounts.status.get(value) ?? 0
-  }))
-
-  if (filters.status.limit && filters.status.limit < status.length - 1) {
-    const statusOrderedByMetricLimited = status.sort((first, second) => second.count - first.count).slice(0, filters.status.limit)
-    const statusKept = new Set(statusOrderedByMetricLimited.map((status) => status.value))
-    status = [...status.filter((data) => statusKept.has(data.value)), {value: "OTHER", label: "Other", count: status.filter((data) => !statusKept.has(data.value)).reduce((total, val) => total + val.count, 0)}]
-  }
-
-  const genre = Array.from(genresById, ([value, name]) => ({
-    value,
-    label: getGenreLabel(name),
-    count: facetCounts.genre.get(value) ?? 0
-  })).sort((first, second) => first.label.localeCompare(second.label));
-
-  const provider = Array.from(providersById, ([value, name]) => ({
-    value,
-    label: name,
-    count: facetCounts.provider.get(value) ?? 0
-  })).sort((first, second) => first.label.localeCompare(second.label));
 
   return {
-    status,
-    genre,
-    provider
+    options: options as UserSeriesFacetOptionsFor<TKey>,
+    optionValues: optionValues as UserSeriesFacetOptionValuesFor<TKey>
   };
+}
+
+function limitFacetOptions<T extends FacetValue>(
+  options: FacetOption<T>[],
+  config: FacetOptionConfig | undefined,
+  otherLabel: string,
+  createMetrics: () => FacetMetricsGetter<T>
+): FacetOption<T>[] {
+  if (!config || config.limit < 0 || config.limit >= options.length) {
+    return options;
+  }
+
+  const metrics = createMetrics();
+  const optionsWithMetrics = options.map((option) => ({
+    ...option,
+    ...metrics.get(option.values)
+  }));
+
+  return keepFirstFilters(optionsWithMetrics, metrics, otherLabel, config);
+}
+
+function createFacetOptionValues<T extends FacetValue>(
+  allOptions: readonly FacetOption<T>[],
+  displayedOptions: readonly FacetOption<T>[]
+): ReadonlyMap<string, readonly T[]> {
+  return new Map(
+    [...allOptions, ...displayedOptions].map((option) => [option.id, option.values] as const)
+  );
+}
+
+export function updateUserSeriesFilterOptionMetrics<TKey extends UserSeriesGroupBy>(
+  options: UserSeriesFacetOptionsFor<TKey>,
+  facetMetrics: UserSeriesFacetMetricsFor<TKey>,
+  facetKeys: readonly TKey[]
+): UserSeriesFacetOptionsFor<TKey> {
+  const currentOptions = options as Partial<FacetOptions<UserSeriesFacetSchema>>;
+  const metrics = facetMetrics as Partial<UserSeriesFacetMetrics>;
+  const updatedOptions: Partial<FacetOptions<UserSeriesFacetSchema>> = {};
+
+  for (const facetKey of facetKeys) {
+    switch (facetKey) {
+      case "status":
+        updatedOptions.status = currentOptions.status!.map((option) => ({
+          ...option,
+          ...metrics.status!.get(option.values)
+        }));
+        break;
+
+      case "genre":
+        updatedOptions.genre = currentOptions.genre!.map((option) => ({
+          ...option,
+          ...metrics.genre!.get(option.values)
+        }));
+        break;
+
+      case "provider":
+        updatedOptions.provider = currentOptions.provider!.map((option) => ({
+          ...option,
+          ...metrics.provider!.get(option.values)
+        }));
+        break;
+    }
+  }
+
+  return updatedOptions as UserSeriesFacetOptionsFor<TKey>;
 }
 
 type BuildDisplayedGroupsParams = LabelResolvers & {

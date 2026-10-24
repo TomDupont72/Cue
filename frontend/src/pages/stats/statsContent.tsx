@@ -1,56 +1,44 @@
+import { useTranslation } from "react-i18next";
+
+import { ErrorState } from "@/components/feedback/errorState";
+import { LoadingState } from "@/components/feedback/loadingState";
 import { PageContainer } from "@/components/layout/pageContainer";
-import type { ChartConfig } from "@/components/ui/chart";
 import SeriesDataPieChart from "@/features/user/components/seriesDataPieChart";
 import { useUserSeries } from "@/features/user/hooks/useUserSeries";
+import { useStatsState } from "@/pages/stats/useStatsState";
 
 export default function StatsContent() {
+  const { t } = useTranslation();
 
-    const userSeriesQuery = useUserSeries()
+  const statsState = useStatsState();
+  const userSeriesQuery = useUserSeries();
 
-    if (userSeriesQuery.isPending) {
-        return 
-    }
+  if (!statsState.success) {
+    return <ErrorState error={t("errors:invalidRequest")} />;
+  }
 
-    if (userSeriesQuery.isError) {
-        return 
-    }
+  if (userSeriesQuery.isPending) {
+    return <LoadingState />;
+  }
 
-    const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 90, fill: "var(--color-other)" },
-]
-
-    const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "var(--chart-1)",
-  },
-  safari: {
-    label: "Safari",
-    color: "var(--chart-2)",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "var(--chart-3)",
-  },
-  edge: {
-    label: "Edge",
-    color: "var(--chart-4)",
-  },
-  other: {
-    label: "Other",
-    color: "var(--chart-5)",
-  },
-} satisfies ChartConfig
+  if (userSeriesQuery.isError) {
     return (
-        <PageContainer>
-            <SeriesDataPieChart series={userSeriesQuery.data.series} />
-        </PageContainer>
-    )
+      <ErrorState error={userSeriesQuery.error} onRetry={() => void userSeriesQuery.refetch()} />
+    );
+  }
+
+  return (
+    <PageContainer>
+      <SeriesDataPieChart
+        series={userSeriesQuery.data.series}
+        groupBy={statsState.data.groupBy}
+        filters={statsState.data.filters}
+        metric={statsState.data.metric}
+        limit={statsState.data.limit}
+        onGroupByChange={statsState.setGroupBy}
+        onMetricChange={statsState.setMetric}
+        onLimitChange={statsState.setLimit}
+      />
+    </PageContainer>
+  );
 }
