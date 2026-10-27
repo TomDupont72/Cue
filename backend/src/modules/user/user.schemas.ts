@@ -38,6 +38,14 @@ export const userDashboardSummaryGetResponseSchema = z.object({
   totalWatchedSeries: z.number().int().nonnegative()
 });
 
+export const userEpisodesActivitySchema = z.array(
+  z.object({
+    date: z.date(),
+    watchedEpisodes: z.number().int().min(0),
+    watchedMinutes: z.number().int().min(0)
+  })
+);
+
 export const userEpisodeFeedItemResponseSchema = episodeRowSchema.extend({
   seriesName: seriesRowSchema.shape.name,
   seriesBackdropPath: seriesRowSchema.shape.name,
@@ -66,6 +74,16 @@ export const userSeriesReconcilePostResponseSchema = z.object({
 // =============================================================================
 // API PARAMS SCHEMAS
 // =============================================================================
+
+export const userEpisodesActivityGetParamsSchema = z.object({
+  seriesIds: z
+    .union([z.array(z.coerce.number().int().min(1)), z.coerce.number().int().min(1)])
+    .transform((value) => (Array.isArray(value) ? value : [value]))
+    .optional(),
+  timezone: z.enum(["UTC", ...Intl.supportedValuesOf("timeZone")]).default("UTC")
+});
+
+export type UserEpisodesActivityGetParams = z.infer<typeof userEpisodesActivityGetParamsSchema>;
 
 export const userEpisodePostParamsSchema = z.object({
   seriesId: z.coerce.number().int().min(1),

@@ -2,6 +2,7 @@ import {
   userDashboardSummaryController,
   userEpisodeController,
   userEpisodeFeedController,
+  userEpisodesActivityController,
   userEpisodeUpcomingController,
   userSeasonController,
   userSeriesController,
@@ -25,7 +26,9 @@ import {
   userSeriesPostBodySchema,
   userSeriesPostParamsSchema,
   userSeriesPostResponseSchema,
-  userEpisodeUpcomingGetResponseSchema
+  userEpisodeUpcomingGetResponseSchema,
+  userEpisodesActivitySchema,
+  userEpisodesActivityGetParamsSchema
 } from "@/modules/user/user.schemas.js";
 import { Tags } from "@/shared/enums/tags.js";
 import { AppFastifyInstance } from "@/shared/types/fastify.js";
@@ -65,6 +68,18 @@ export async function userRoutes(app: AppFastifyInstance) {
       }
     },
     handler: userSeriesController.post
+  });
+
+  app.get("/episodes/activity", {
+    preHandler: [app.requireAuth],
+    schema: {
+      tags: [Tags.USER],
+      response: {
+        200: userEpisodesActivitySchema
+      },
+      querystring: userEpisodesActivityGetParamsSchema
+    },
+    handler: userEpisodesActivityController.get
   });
 
   app.get("/episodes/feed", {

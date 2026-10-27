@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import {
   UserEpisodeDeleteParams,
   UserEpisodePostParams,
+  UserEpisodesActivityGetParams,
   UserSeasonDeleteParams,
   UserSeasonPostParams,
   UserSeriesGetParams,
@@ -71,6 +72,17 @@ export const userSeriesReconcileController = {
     reply: FastifyReply
   ) {
     const result = await userService.seriesReconcilePost(request.params);
+
+    return reply.send(result);
+  }
+};
+
+export const userEpisodesActivityController = {
+  async get(
+    request: FastifyRequest<{ Querystring: UserEpisodesActivityGetParams }>,
+    reply: FastifyReply
+  ) {
+    const result = await userService.episodesActivityGet(request.user.id, request.query);
 
     return reply.send(result);
   }
