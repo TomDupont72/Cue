@@ -16,10 +16,13 @@ import {
   UserSeriesGetParams,
   UserSeasonPostParams,
   UserSeasonDeleteParams,
-  UserSeriesReconcilePostParams
+  UserSeriesReconcilePostParams,
+  UserEpisodesActivityGetParams
 } from "@/modules/user/user.schemas.js";
 import { prisma } from "@/shared/db/prisma.js";
 import { notFound } from "@/shared/errors/errors.helpers.js";
+
+import { listUserEpisodesActivity } from "./queries/listUserEpisodesActivity.query.js";
 
 export const userService = {
   async seriesGet(userId: string, params: UserSeriesGetParams, now = new Date()) {
@@ -41,6 +44,16 @@ export const userService = {
     return {
       series: userSeriesDetails
     };
+  },
+
+  async episodesActivityGet(userId: string, params: UserEpisodesActivityGetParams) {
+    const userEpisodesActivity = await listUserEpisodesActivity(
+      userId,
+      params.timezone,
+      params.seriesIds
+    );
+
+    return userEpisodesActivity;
   },
 
   async episodeFeedGet(userId: string, now = new Date()) {
