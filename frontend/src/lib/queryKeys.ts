@@ -27,6 +27,8 @@ export const queryKeys = {
 
     feed: () => [...queryKeys.userEpisodes.all, "feed"] as const,
 
-    upcoming: () => [...queryKeys.userEpisodes.all, "upcoming"] as const
+    upcoming: () => [...queryKeys.userEpisodes.all, "upcoming"] as const,
+
+    activity: (timezone: string, seriesIds?: number[]) => [...queryKeys.userEpisodes.all, "activity", timezone, seriesIds] as const
   }
 };

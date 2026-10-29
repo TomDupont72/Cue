@@ -47,13 +47,13 @@ export const userService = {
   },
 
   async episodesActivityGet(userId: string, params: UserEpisodesActivityGetParams) {
-    const userEpisodesActivity = await listUserEpisodesActivity(
+    const activity = await listUserEpisodesActivity(
       userId,
       params.timezone,
       params.seriesIds
     );
 
-    return userEpisodesActivity;
+    return { activity };
   },
 
   async episodeFeedGet(userId: string, now = new Date()) {

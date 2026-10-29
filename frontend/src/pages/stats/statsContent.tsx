@@ -8,26 +8,39 @@ import UserSeriesDataDonutChart from "@/features/user/components/UserSeriesDataD
 import UserSeriesDataPieChart from "@/features/user/components/userSeriesDataPieChart";
 import { useUserSeries } from "@/features/user/hooks/useUserSeries";
 import { useStatsState } from "@/pages/stats/useStatsState";
+import UserEpisodesDataAreaChart from "@/features/user/components/userEpisodesDataAreaChart";
+import { useUserEpisodesActivity } from "@/features/user/hooks/useUserEpisodesActivity";
 
 export default function StatsContent() {
   const { t } = useTranslation();
 
+  const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
+
   const statsState = useStatsState();
   const userSeriesQuery = useUserSeries();
+  const userEpisodesActivityQuery = useUserEpisodesActivity(timeZone)
 
   if (!statsState.success) {
     return <ErrorState error={t("errors:invalidRequest")} />;
   }
 
-  if (userSeriesQuery.isPending) {
+  if (userSeriesQuery.isPending || userEpisodesActivityQuery.isPending) {
     return <LoadingState />;
   }
 
   if (userSeriesQuery.isError) {
     return (
-      <ErrorState error={userSeriesQuery.error} onRetry={() => void userSeriesQuery.refetch()} />
+      <ErrorState error={userSeriesQuery.error} onRetry={() => userSeriesQuery.refetch()} />
     );
   }
+
+  if (userEpisodesActivityQuery.isError) {
+    return (
+        <ErrorState error={userEpisodesActivityQuery.error} onRetry={() => userEpisodesActivityQuery.refetch()} />
+    )
+  }
+
+  console.log(userEpisodesActivityQuery.data.activity)
 
   return (
     <PageContainer>
@@ -36,13 +49,14 @@ export default function StatsContent() {
           series={userSeriesQuery.data.series}
           groupBy={statsState.data.groupBy}
           filters={statsState.data.filters}
-          metric={statsState.data.metric}
+          metric={statsState.data.pieMetric}
           limit={statsState.data.limit}
           onGroupByChange={statsState.setGroupBy}
-          onMetricChange={statsState.setMetric}
+          onMetricChange={statsState.setPieMetric}
           onLimitChange={statsState.setLimit}
         />
         <UserSeriesDataDonutChart series={userSeriesQuery.data.series} />
+        <div className="col-span-2"><UserEpisodesDataAreaChart series={userSeriesQuery.data.series} episodesActivity={userEpisodesActivityQuery.data.activity} metric={statsState.data.areaMetric} onMetricChange={statsState.setAreaMetric}/></div>
       </PageSection>
     </PageContainer>
   );

@@ -15,7 +15,8 @@ export function useStatsState() {
       genres: searchParams.getAll("genres"),
       providers: searchParams.getAll("providers")
     },
-    metric: searchParams.get("metric"),
+    pieMetric: searchParams.get("pieMetric"),
+    areaMetric: searchParams.get("areaMetric"),
     limit: searchParams.get("limit")
   });
 
@@ -25,9 +26,15 @@ export function useStatsState() {
     );
   };
 
-  const setMetric = (metric: keyof FacetMetrics) => {
+  const setPieMetric = (metric: keyof FacetMetrics) => {
     setSearchParams((currentSearchParams) =>
-      setUrlParams(currentSearchParams, [{ name: "metric", value: metric, defaultValue: "count" }])
+      setUrlParams(currentSearchParams, [{ name: "pieMetric", value: metric, defaultValue: "count" }])
+    );
+  };
+
+  const setAreaMetric = (metric: keyof FacetMetrics) => {
+    setSearchParams((currentSearchParams) =>
+      setUrlParams(currentSearchParams, [{ name: "areaMetric", value: metric, defaultValue: "watchedEpisodes" }])
     );
   };
 
@@ -40,7 +47,8 @@ export function useStatsState() {
   return {
     ...statsState,
     setGroupBy,
-    setMetric,
+    setPieMetric,
+    setAreaMetric,
     setLimit
   };
 }

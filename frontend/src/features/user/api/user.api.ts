@@ -2,6 +2,7 @@ import type {
   UserDashboardSummaryGetResponse,
   UserEpisodeDeleteResponse,
   UserEpisodePostResponse,
+  UserEpisodesActivityGetResponse,
   UserEpisodesFeedGetResponse,
   UserEpisodesUpcomingGetResponse,
   UserSeasonDeleteResponse,
@@ -18,7 +19,8 @@ import {
   userSeriesPostParamsSchema,
   userSeriesPostBodySchema,
   userSeasonPostParamsSchema,
-  userSeasonDeleteParamsSchema
+  userSeasonDeleteParamsSchema,
+  userEpisodesActivityGetParamsSchema
 } from "@/features/user/schemas/user.schemas";
 
 export function userSeriesGet(seriesId?: number): Promise<UserSeriesGetResponse> {
@@ -111,4 +113,14 @@ export function userEpisodesFeedGet(): Promise<UserEpisodesFeedGetResponse> {
 
 export function userEpisodesUpcomingGet(): Promise<UserEpisodesUpcomingGetResponse> {
   return ApiClient("/user/episodes/upcoming");
+}
+
+export function userEpisodesActivityGet(timezone: string, seriesIds?: number[]): Promise<UserEpisodesActivityGetResponse> {
+    return ApiClient("/user/episodes/activity", {
+        query: {
+            seriesIds,
+            timezone
+        },
+        querySchema: userEpisodesActivityGetParamsSchema
+    })
 }

@@ -16,10 +16,14 @@ export const statsStateSchema = z.object({
       genre: genres,
       provider: providers
     })),
-  metric: z
+  pieMetric: z
     .enum(["count", "watchedMinutes"])
     .nullable()
     .transform((value) => value ?? "count"),
+  areaMetric: z
+    .enum(["watchedEpisodes", "watchedMinutes"])
+    .nullable()
+    .transform((value) => value ?? "watchedEpisodes"),
   limit: z.coerce
     .number()
     .int()
