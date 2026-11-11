@@ -27,7 +27,7 @@ export const statsStateSchema = z.object({
   areaPeriod: z
     .enum(["all", "month", "months3", "months6", "year", "years2", "years5"])
     .nullable()
-    .transform((value) => value ?? "months3"),
+    .transform((value) => value ?? "all"),
   limit: z.coerce
     .number()
     .int()

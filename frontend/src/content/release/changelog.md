@@ -6,6 +6,17 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ---
 
+## [1.3.0] · _11 novembre 2026_
+
+### Ajouts
+
+- Création de la page de statistiques.
+- Ajout d'un graphique par genre et plateforme dans les statistiques.
+- Ajout d'un graphique par statut dans les statistiques.
+- Ajout d'un graphique du visionnage quotidien des les statistiques.
+
+---
+
 ## [1.2.1] · _12 octobre 2026_
 
 ### Améliorations
@@ -27,7 +38,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 ### Ajouts
 
 - Ajout des genre dans la page des séries.
-- Ajout d'un bouton de groupe dans le dashboard
+- Ajout d'un bouton de groupe dans le dashboard.
 - Ajout d'un bouton pour filter les séries dans le dashboard.
 
 ---
