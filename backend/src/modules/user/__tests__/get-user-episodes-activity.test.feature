@@ -36,8 +36,9 @@ Feature: GET /api/user/episodes/activity
         When I send a GET request to "/api/user/episodes/activity"
 
         Then the response status should be 200
-        And the response array at "$" should exactly match:
+        And the response array at "activity" should exactly match:
             | date                     | watchedEpisodes | watchedMinutes |
+            | 2026-01-09T00:00:00.000Z | 0               | 0              |
             | 2026-01-10T00:00:00.000Z | 2               | 60             |
             | 2026-01-11T00:00:00.000Z | 2               | 80             |
             | 2026-01-12T00:00:00.000Z | 1               | 25             |
@@ -47,8 +48,9 @@ Feature: GET /api/user/episodes/activity
         When I send a GET request to "/api/user/episodes/activity?seriesIds=1"
 
         Then the response status should be 200
-        And the response array at "$" should exactly match:
+        And the response array at "activity" should exactly match:
             | date                     | watchedEpisodes | watchedMinutes |
+            | 2026-01-09T00:00:00.000Z | 0               | 0              |
             | 2026-01-10T00:00:00.000Z | 1               | 20             |
             | 2026-01-12T00:00:00.000Z | 1               | 25             |
             | 2026-01-14T00:00:00.000Z | 1               | 0              |
@@ -57,8 +59,9 @@ Feature: GET /api/user/episodes/activity
         When I send a GET request to "/api/user/episodes/activity?seriesIds=1&seriesIds=2"
 
         Then the response status should be 200
-        And the response array at "$" should exactly match:
+        And the response array at "activity" should exactly match:
             | date                     | watchedEpisodes | watchedMinutes |
+            | 2026-01-09T00:00:00.000Z | 0               | 0              |
             | 2026-01-10T00:00:00.000Z | 2               | 60             |
             | 2026-01-11T00:00:00.000Z | 1               | 30             |
             | 2026-01-12T00:00:00.000Z | 1               | 25             |
@@ -68,8 +71,9 @@ Feature: GET /api/user/episodes/activity
         When I send a GET request to "/api/user/episodes/activity?timezone=Europe%2FParis"
 
         Then the response status should be 200
-        And the response array at "$" should exactly match:
+        And the response array at "activity" should exactly match:
             | date                     | watchedEpisodes | watchedMinutes |
+            | 2026-01-08T23:00:00.000Z | 0               | 0              |
             | 2026-01-09T23:00:00.000Z | 1               | 20             |
             | 2026-01-10T23:00:00.000Z | 3               | 120            |
             | 2026-01-11T23:00:00.000Z | 1               | 25             |
@@ -79,8 +83,9 @@ Feature: GET /api/user/episodes/activity
         When I send a GET request to "/api/user/episodes/activity?seriesIds=1&seriesIds=2&timezone=Asia%2FTokyo"
 
         Then the response status should be 200
-        And the response array at "$" should exactly match:
+        And the response array at "activity" should exactly match:
             | date                     | watchedEpisodes | watchedMinutes |
+            | 2026-01-08T15:00:00.000Z | 0               | 0              |
             | 2026-01-09T15:00:00.000Z | 1               | 20             |
             | 2026-01-10T15:00:00.000Z | 2               | 70             |
             | 2026-01-11T15:00:00.000Z | 1               | 25             |
@@ -99,8 +104,9 @@ Feature: GET /api/user/episodes/activity
         When I send a GET request to "/api/user/episodes/activity?timezone=Europe%2FParis"
 
         Then the response status should be 200
-        And the response array at "$" should exactly match:
+        And the response array at "activity" should exactly match:
             | date                     | watchedEpisodes | watchedMinutes |
+            | 2026-03-26T23:00:00.000Z | 0               | 0              |
             | 2026-03-27T23:00:00.000Z | 1               | 20             |
             | 2026-03-28T23:00:00.000Z | 2               | 55             |
             | 2026-03-29T22:00:00.000Z | 1               | 40             |
@@ -111,8 +117,9 @@ Feature: GET /api/user/episodes/activity
         When I send a GET request to "/api/user/episodes/activity"
 
         Then the response status should be 200
-        And the response array at "$" should exactly match:
+        And the response array at "activity" should exactly match:
             | date                     | watchedEpisodes | watchedMinutes |
+            | 2026-01-08T00:00:00.000Z | 0               | 0              |
             | 2026-01-09T00:00:00.000Z | 1               | 20             |
             | 2026-01-10T00:00:00.000Z | 1               | 999            |
 
@@ -120,13 +127,13 @@ Feature: GET /api/user/episodes/activity
         When I send a GET request to "/api/user/episodes/activity?seriesIds=4"
 
         Then the response status should be 200
-        And the response array at "$" should be empty
+        And the response array at "activity" should be empty
 
     Scenario: Get user episodes activity - Missing series
         When I send a GET request to "/api/user/episodes/activity?seriesIds=999"
 
         Then the response status should be 200
-        And the response array at "$" should be empty
+        And the response array at "activity" should be empty
 
     Scenario: Get user episodes activity - No watched episodes
         Given authentication as "user-3"
@@ -134,7 +141,7 @@ Feature: GET /api/user/episodes/activity
         When I send a GET request to "/api/user/episodes/activity"
 
         Then the response status should be 200
-        And the response array at "$" should be empty
+        And the response array at "activity" should be empty
 
     Scenario: Get user episodes activity - Invalid query
         When I send a GET request to "/api/user/episodes/activity?seriesIds=invalid"
