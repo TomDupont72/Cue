@@ -16,14 +16,25 @@ export const statsStateSchema = z.object({
       genre: genres,
       provider: providers
     })),
-  metric: z
+  pieMetric: z
     .enum(["count", "watchedMinutes"])
     .nullable()
     .transform((value) => value ?? "count"),
+  areaMetric: z
+    .enum(["watchedEpisodes", "watchedMinutes"])
+    .nullable()
+    .transform((value) => value ?? "watchedEpisodes"),
+  areaPeriod: z
+    .enum(["all", "month", "months3", "months6", "year", "years2", "years5"])
+    .nullable()
+    .transform((value) => value ?? "months3"),
   limit: z.coerce
     .number()
     .int()
     .min(1)
     .nullable()
-    .transform((value) => value ?? 5)
+    .transform((value) => value ?? 5),
+  seriesIds: z
+    .array(z.coerce.number().int().min(1))
+    .transform((seriesIds) => [...new Set(seriesIds)])
 });

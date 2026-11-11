@@ -5,7 +5,7 @@ import { Text } from "@/components/layout/text";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SummaryCard from "@/features/user/components/summaryCard";
 import { STATS } from "@/features/user/constants/stats";
-import { splitWatchedDuration } from "@/features/user/utils/watchDuration";
+import { splitWatchedDuration } from "@/features/user/utils/dates";
 
 type UserDashboardSummaryWidgetProps = {
   totalWatchedMinutes: number;

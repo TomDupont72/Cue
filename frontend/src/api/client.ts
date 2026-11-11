@@ -7,7 +7,7 @@ import { handleUnauthorizedResponse } from "@/lib/sessionManager";
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
 type QueryValue = string | number | boolean | null | undefined;
-type QueryParams = Record<string, QueryValue>;
+type QueryParams = Record<string, QueryValue | QueryValue[]>;
 
 type PathValue = string | number;
 type PathParams = Record<string, PathValue>;
@@ -67,7 +67,13 @@ function buildUrl(path: string, query?: QueryParams): string {
 
   if (query) {
     Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (item !== undefined && item !== null) {
+            url.searchParams.append(key, String(item));
+          }
+        });
+      } else if (value !== undefined && value !== null) {
         url.searchParams.set(key, String(value));
       }
     });

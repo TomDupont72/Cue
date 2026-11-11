@@ -1,4 +1,5 @@
 import { ChevronDownIcon, ListFilterIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Heading } from "@/components/layout/heading";
 import { Button } from "@/components/ui/button";
@@ -13,13 +14,18 @@ type GroupButtonProps = {
   categories: Record<string, string>;
   category: string;
   onCategoryChange: (category: string) => void;
+  prefix?: string;
 };
 
 export default function GroupDropdownMenu({
   categories,
   category,
-  onCategoryChange
+  onCategoryChange,
+  prefix
 }: GroupButtonProps) {
+  const { t } = useTranslation();
+  const labelPrefix = prefix ?? t("common:labels.by");
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -28,7 +34,7 @@ export default function GroupDropdownMenu({
             <div className="flex min-w-0 flex-row items-center gap-2">
               <ListFilterIcon className="shrink-0" />
               <Heading level={4} className="truncate">
-                Par {category.toLowerCase()}
+                {labelPrefix ? `${labelPrefix} ${category.toLowerCase()}` : category}
               </Heading>
             </div>
             <ChevronDownIcon className="shrink-0 opacity-60" />
