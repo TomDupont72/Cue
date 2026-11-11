@@ -47,11 +47,7 @@ export const userService = {
   },
 
   async episodesActivityGet(userId: string, params: UserEpisodesActivityGetParams) {
-    const activity = await listUserEpisodesActivity(
-      userId,
-      params.timezone,
-      params.seriesIds
-    );
+    const activity = await listUserEpisodesActivity(userId, params.timezone, params.seriesIds);
 
     return { activity };
   },

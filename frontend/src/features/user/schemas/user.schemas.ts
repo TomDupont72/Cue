@@ -5,16 +5,16 @@ export const userSeriesGetQuerySchema = z.object({
 });
 
 export const userSeriesPostParamsSchema = z.object({
-    seriesId: z.number().int().min(1)
+  seriesId: z.number().int().min(1)
 });
 
 export const userSeriesPostBodySchema = z.object({
-    isFavorite: z.boolean().optional()
+  isFavorite: z.boolean().optional()
 });
 
 export const userSeasonPostParamsSchema = z.object({
-    seriesId: z.number().int().min(1),
-    seasonId: z.number().int().min(1)
+  seriesId: z.number().int().min(1),
+  seasonId: z.number().int().min(1)
 });
 
 export const userSeasonDeleteParamsSchema = userSeasonPostParamsSchema;
@@ -42,7 +42,7 @@ export type UserSeasonPostParams = z.infer<typeof userSeasonPostParamsSchema>;
 
 export type UserSeasonDeleteParams = z.infer<typeof userSeasonDeleteParamsSchema>;
 
-export type UserEpisodesActivityGetParams = z.infer<typeof userEpisodesActivityGetParamsSchema>
+export type UserEpisodesActivityGetParams = z.infer<typeof userEpisodesActivityGetParamsSchema>;
 
 export type UserEpisodePostParams = z.infer<typeof userEpisodePostParamsSchema>;
 

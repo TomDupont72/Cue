@@ -115,12 +115,15 @@ export function userEpisodesUpcomingGet(): Promise<UserEpisodesUpcomingGetRespon
   return ApiClient("/user/episodes/upcoming");
 }
 
-export function userEpisodesActivityGet(timezone: string, seriesIds?: number[]): Promise<UserEpisodesActivityGetResponse> {
-    return ApiClient("/user/episodes/activity", {
-        query: {
-            seriesIds,
-            timezone
-        },
-        querySchema: userEpisodesActivityGetParamsSchema
-    })
+export function userEpisodesActivityGet(
+  timezone: string,
+  seriesIds?: number[]
+): Promise<UserEpisodesActivityGetResponse> {
+  return ApiClient("/user/episodes/activity", {
+    query: {
+      seriesIds,
+      timezone
+    },
+    querySchema: userEpisodesActivityGetParamsSchema
+  });
 }

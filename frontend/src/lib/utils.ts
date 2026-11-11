@@ -34,17 +34,29 @@ export function setUrlParams(
   return nextSearchParams;
 }
 
+export function setUrlListParam(
+  searchParams: URLSearchParams,
+  name: string,
+  values: readonly (string | number)[]
+) {
+  searchParams.delete(name);
+
+  values.forEach((value) => searchParams.append(name, String(value)));
+}
+
 export function setUrlSelectionParam(
   searchParams: URLSearchParams,
   name: string,
   selection: FacetSelection
 ) {
-  searchParams.delete(name);
+  if (selection.mode === "all") {
+    setUrlListParam(searchParams, name, []);
+    return;
+  }
 
-  if (selection.mode !== "all") {
-    selection.ids.forEach((id) => searchParams.append(name, id));
-    if (selection.ids.length === 0) {
-      searchParams.append(name, "null");
-    }
+  setUrlListParam(searchParams, name, selection.ids);
+
+  if (selection.ids.length === 0) {
+    searchParams.append(name, "null");
   }
 }

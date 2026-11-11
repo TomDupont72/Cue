@@ -39,13 +39,13 @@ export const userDashboardSummaryGetResponseSchema = z.object({
 });
 
 export const userEpisodesActivitySchema = z.object({
-  activity:  z.array(
-  z.object({
-    date: z.date(),
-    watchedEpisodes: z.number().int().min(0),
-    watchedMinutes: z.number().int().min(0)
-  })
-)
+  activity: z.array(
+    z.object({
+      date: z.date(),
+      watchedEpisodes: z.number().int().min(0),
+      watchedMinutes: z.number().int().min(0)
+    })
+  )
 });
 
 export const userEpisodeFeedItemResponseSchema = episodeRowSchema.extend({

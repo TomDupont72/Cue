@@ -81,12 +81,12 @@ export type UserEpisodesUpcomingGetResponse = {
 };
 
 export type UserEpisodesActivityGetResponse = {
-    activity: {
-        date: string,
-        watchedEpisodes: number,
-        watchedMinutes: number
-    }[]
-}
+  activity: {
+    date: string;
+    watchedEpisodes: number;
+    watchedMinutes: number;
+  }[];
+};
 
 // =============================================================================
 // COMPONENT TYPES

@@ -30,7 +30,29 @@
     "watchedEpisodes": "Épisodes visionnés",
     "watchedSeries": "Séries terminées",
     "group_distribution": "Répartition par groupes",
-    "status_distribution": "Répartition par statuts"
+    "status_distribution": "Répartition par statuts",
+    "activity": {
+      "title": "Évolution des visionnages",
+      "metrics": {
+        "total": "Total",
+        "watchTime": "Temps de visionnage"
+      },
+      "period": {
+        "prefix": "Sur",
+        "all": "Toute la période",
+        "month": "1 mois",
+        "months3": "3 mois",
+        "months6": "6 mois",
+        "year": "1 an",
+        "years2": "2 ans",
+        "years5": "5 ans"
+      },
+      "series": {
+        "all": "Toutes les séries",
+        "search": "Rechercher une série…",
+        "empty": "Aucune série trouvée."
+      }
+    }
   },
   "series": {
     "mySeries": "Mes séries",
