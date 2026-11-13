@@ -28,7 +28,14 @@ export type EpisodeRow = {
 
 export type EpisodeCardEpisode = Pick<
   EpisodeRow,
-  "id" | "airDate" | "episodeNumber" | "name" | "overview" | "stillPath" | "seasonNumber"
+  | "id"
+  | "airDate"
+  | "episodeNumber"
+  | "name"
+  | "overview"
+  | "stillPath"
+  | "seasonNumber"
+  | "runtime"
 >;
 
 export type EpisodeCardSeries = Optional<

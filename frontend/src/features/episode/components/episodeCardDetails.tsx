@@ -5,8 +5,10 @@ import type { EpisodeCardEpisode, EpisodeCardSeries } from "@/features/episode/t
 import { Heading } from "@/components/layout/heading";
 import Picture from "@/components/layout/picture";
 import { RoundedCheckbox } from "@/components/layout/roundedCheckbox";
+import { Text } from "@/components/layout/text";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SeriesLinkBadge } from "@/features/series/components/seriesLinkBadge";
+import { durationToString } from "@/features/user/utils/dates";
 
 type EpisodeCardDetailsProps = {
   episode: EpisodeCardEpisode;
@@ -50,11 +52,16 @@ export default function EpisodeCardDetails({
           <SeriesLinkBadge seriesId={series.id} name={series.name} className="relative z-20 mb-1" />
         ) : null}
         <DialogTitle className="font-bold text-xl">{episode.name}</DialogTitle>
-        <Heading level={5}>
-          {episode.seasonNumber === 0
-            ? t("episode:specialEpisodeNumber", { number: episode.episodeNumber })
-            : `${t("episode:seasonNumber", { number: episode.seasonNumber })} • ${t("episode:episodeNumber", { number: episode.episodeNumber })}`}
-        </Heading>
+        <div className="flex gap-3">
+          <Heading level={5} full={false}>
+            {episode.seasonNumber === 0
+              ? t("episode:specialEpisodeNumber", { number: episode.episodeNumber })
+              : `${t("episode:seasonNumber", { number: episode.seasonNumber })} • ${t("episode:episodeNumber", { number: episode.episodeNumber })}`}
+          </Heading>
+          <Text variant="muted">
+            {episode.runtime !== 0 ? durationToString(episode.runtime) : null}
+          </Text>
+        </div>
       </DialogHeader>
 
       <DialogDescription className="flex px-4 pb-4">
