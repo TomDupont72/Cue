@@ -26,5 +26,12 @@ export type SeasonCardSeason = Pick<SeasonRow, "id" | "seasonNumber">;
 
 export type SeasonCardEpisode = Pick<
   EpisodeRow,
-  "id" | "airDate" | "name" | "episodeNumber" | "seasonNumber" | "stillPath" | "overview"
+  | "id"
+  | "airDate"
+  | "name"
+  | "episodeNumber"
+  | "seasonNumber"
+  | "stillPath"
+  | "overview"
+  | "runtime"
 >;
