@@ -47,7 +47,9 @@ export function SeriesOverview({
   });
 
   const datesString = startYear
-    ? [startYear, series.inProduction ? t("series:dates.present") : endYear].join(" - ")
+    ? startYear === endYear
+      ? startYear
+      : [startYear, series.inProduction ? t("series:dates.present") : endYear].join(" - ")
     : t("series:dates.unknownDate");
   const genresString = genreNames.join(", ");
   const informations = [
