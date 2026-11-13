@@ -27,7 +27,7 @@ import {
   type UserSeriesFiltersFor,
   type UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
-import { durationToString } from "../utils/dates";
+import { durationToString } from "@/features/user/utils/dates";
 
 type SeriesDataGroupBy = Exclude<UserSeriesGroupBy, "status">;
 
