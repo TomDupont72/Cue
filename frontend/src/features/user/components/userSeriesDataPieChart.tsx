@@ -27,6 +27,7 @@ import {
   type UserSeriesFiltersFor,
   type UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
+import { durationToString } from "@/features/user/utils/dates";
 
 type SeriesDataGroupBy = Exclude<UserSeriesGroupBy, "status">;
 
@@ -126,7 +127,19 @@ export default function UserSeriesDataPieChart({
           className="flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 min-h-100"
         >
           <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  valueFormatter={
+                    metric === "watchedMinutes"
+                      ? (value) => durationToString(Number(value))
+                      : undefined
+                  }
+                />
+              }
+            />
             <Pie data={chartData} dataKey={metric} nameKey="id" />
             <ChartLegend content={<ChartLegendContent nameKey="id" className="flex flex-wrap" />} />
           </PieChart>
