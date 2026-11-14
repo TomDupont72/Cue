@@ -52,7 +52,7 @@ export default function EpisodeCardDetails({
         ) : null}
       </div>
 
-      <DialogHeader className="flex px-4">
+      <DialogHeader className="flex min-w-0 px-4">
         {displayName && series.name ? (
           <SeriesLinkBadge seriesId={series.id} name={series.name} className="relative z-20 mb-1" />
         ) : null}
