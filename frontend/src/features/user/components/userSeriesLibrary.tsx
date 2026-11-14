@@ -54,13 +54,7 @@ export function UserSeriesLibrary({
 
       <div className="flex w-full flex-col gap-4">
         {displayedGroups.map((group) => (
-          <div
-            key={`${groupBy}-${group.value}`}
-            style={{
-              contentVisibility: "auto",
-              containIntrinsicSize: "500px"
-            }}
-          >
+          <div key={`${groupBy}-${group.value}`}>
             <UserSeriesSection series={group.series} category={group.label} />
           </div>
         ))}
