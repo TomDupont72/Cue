@@ -54,7 +54,7 @@ export default function SeasonCard({
   }
 
   return (
-    <AccordionItem className="border-none">
+    <AccordionItem value={season.seasonNumber} className="border-none">
       <div className="relative my-3">
         <AccordionTrigger
           variant="card"

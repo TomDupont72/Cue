@@ -9,7 +9,10 @@ export function useSeriesState() {
 
   const seriesState = seriesStateSchema.safeParse({
     id: searchParams.get("id") ?? undefined,
-    tmdbId: location.state?.tmdbId
+    tmdbId: location.state?.tmdbId,
+    view: searchParams.get("view"),
+    episodeNumber: searchParams.get("episodeNumber"),
+    seasonNumber: searchParams.get("seasonNumber")
   });
 
   const setId = (id: number) => {
@@ -18,8 +21,15 @@ export function useSeriesState() {
     );
   };
 
+  const setView = (view: string) => {
+    setSearchParams((currentViewParams) =>
+      setUrlParams(currentViewParams, [{ name: "view", value: view, defaultValue: "overview" }])
+    );
+  };
+
   return {
     ...seriesState,
-    setId
+    setId,
+    setView
   };
 }
