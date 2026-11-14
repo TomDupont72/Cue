@@ -10,6 +10,7 @@ import UserSeriesDataPieChart from "@/features/user/components/userSeriesDataPie
 import { useUserEpisodesActivity } from "@/features/user/hooks/useUserEpisodesActivity";
 import { useUserSeries } from "@/features/user/hooks/useUserSeries";
 import { useStatsState } from "@/pages/stats/useStatsState";
+import { Heading } from "@/components/layout/heading";
 
 export default function StatsContent() {
   const { t } = useTranslation();
@@ -43,33 +44,38 @@ export default function StatsContent() {
 
   return (
     <PageContainer>
-      <PageSection className="grid grid-cols-1 gap-6 md:grid-cols-2 items-stretch">
-        <div className="min-w-0">
-          <UserSeriesDataPieChart
-            series={userSeriesQuery.data.series}
-            groupBy={statsState.data.groupBy}
-            filters={statsState.data.filters}
-            metric={statsState.data.pieMetric}
-            limit={statsState.data.limit}
-            onGroupByChange={statsState.setGroupBy}
-            onMetricChange={statsState.setPieMetric}
-            onLimitChange={statsState.setLimit}
-          />
-        </div>
-        <div className="min-w-0">
-          <UserSeriesDataDonutChart series={userSeriesQuery.data.series} />
-        </div>
-        <div className="col-span-1 min-w-0 md:col-span-2">
-          <UserEpisodesDataAreaChart
-            series={userSeriesQuery.data.series}
-            episodesActivity={userEpisodesActivityQuery.data.activity}
-            metric={statsState.data.areaMetric}
-            period={statsState.data.areaPeriod}
-            seriesIds={statsState.data.seriesIds}
-            onMetricChange={statsState.setAreaMetric}
-            onPeriodChange={statsState.setAreaPeriod}
-            onSeriesIdsChange={statsState.setSeriesIds}
-          />
+      <PageSection>
+        <Heading level={1} className="uppercase">
+          {t("user:stats.title")}
+        </Heading>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 items-stretch">
+          <div className="min-w-0">
+            <UserSeriesDataPieChart
+              series={userSeriesQuery.data.series}
+              groupBy={statsState.data.groupBy}
+              filters={statsState.data.filters}
+              metric={statsState.data.pieMetric}
+              limit={statsState.data.limit}
+              onGroupByChange={statsState.setGroupBy}
+              onMetricChange={statsState.setPieMetric}
+              onLimitChange={statsState.setLimit}
+            />
+          </div>
+          <div className="min-w-0">
+            <UserSeriesDataDonutChart series={userSeriesQuery.data.series} />
+          </div>
+          <div className="col-span-1 min-w-0 md:col-span-2">
+            <UserEpisodesDataAreaChart
+              series={userSeriesQuery.data.series}
+              episodesActivity={userEpisodesActivityQuery.data.activity}
+              metric={statsState.data.areaMetric}
+              period={statsState.data.areaPeriod}
+              seriesIds={statsState.data.seriesIds}
+              onMetricChange={statsState.setAreaMetric}
+              onPeriodChange={statsState.setAreaPeriod}
+              onSeriesIdsChange={statsState.setSeriesIds}
+            />
+          </div>
         </div>
       </PageSection>
     </PageContainer>
