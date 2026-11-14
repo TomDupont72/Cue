@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { ErrorState } from "@/components/feedback/errorState";
 import { LoadingState } from "@/components/feedback/loadingState";
+import { Heading } from "@/components/layout/heading";
 import { PageContainer } from "@/components/layout/pageContainer";
 import { PageSection } from "@/components/layout/pageSection";
 import UserEpisodesDataAreaChart from "@/features/user/components/userEpisodesDataAreaChart";
@@ -10,7 +11,6 @@ import UserSeriesDataPieChart from "@/features/user/components/userSeriesDataPie
 import { useUserEpisodesActivity } from "@/features/user/hooks/useUserEpisodesActivity";
 import { useUserSeries } from "@/features/user/hooks/useUserSeries";
 import { useStatsState } from "@/pages/stats/useStatsState";
-import { Heading } from "@/components/layout/heading";
 
 export default function StatsContent() {
   const { t } = useTranslation();
