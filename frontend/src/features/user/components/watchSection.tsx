@@ -33,6 +33,7 @@ export default function WatchSection({ status, items }: WatchSectionProps) {
               episode={item}
               isWatched={false}
               displayName
+              displayEpisodeRedirection
             />
           ))}
         </>

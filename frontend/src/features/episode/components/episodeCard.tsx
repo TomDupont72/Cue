@@ -21,13 +21,15 @@ type EpisodeCardProps = {
   episode: EpisodeCardEpisode;
   isWatched: boolean;
   displayName?: boolean;
+  displayEpisodeRedirection?: boolean;
 };
 
 export default function EpisodeCard({
   series,
   episode,
   isWatched,
-  displayName = false
+  displayName = false,
+  displayEpisodeRedirection = false
 }: EpisodeCardProps) {
   const { t } = useTranslation();
 
@@ -140,6 +142,7 @@ export default function EpisodeCard({
           isPending={userEpisodePostMutation.isPending || userEpisodeDeleteMutation.isPending}
           remainingDays={remainingDays}
           displayName={displayName}
+          displayEpisodeRedirection={displayEpisodeRedirection}
         />
       </DialogContent>
     </Dialog>
