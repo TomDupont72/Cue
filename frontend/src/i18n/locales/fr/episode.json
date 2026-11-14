@@ -15,5 +15,6 @@
   "day_other": "{{count}} Jours",
   "incoming": "À venir",
   "openDetails": "Voir les détails de {{name}}",
-  "noDescription": "Pas de description disponible"
+  "noDescription": "Pas de description disponible",
+  "goToEpisode": "Aller à l'épisode"
 }
