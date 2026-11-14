@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import type { EpisodeRow } from "@/features/episode/types/episode.types";
 import type {
   SeriesDetailsEpisode,
@@ -15,6 +17,8 @@ type SeriesDetailsProps = {
   userEpisodes: SeriesDetailsUserEpisode[];
   seasons: SeriesDetailsSeason[];
   backdropPath: string | null;
+  defaultEpisodeNumber: number | null;
+  defaultSeasonNumber: number | null;
 };
 
 export default function SeriesDetails({
@@ -22,7 +26,9 @@ export default function SeriesDetails({
   episodes,
   userEpisodes,
   seasons,
-  backdropPath
+  backdropPath,
+  defaultEpisodeNumber,
+  defaultSeasonNumber
 }: SeriesDetailsProps) {
   const sortedEpisodes = [...episodes].sort((a, b) => a.episodeNumber - b.episodeNumber);
 
@@ -42,9 +48,19 @@ export default function SeriesDetails({
     return a.seasonNumber - b.seasonNumber;
   });
 
+  useEffect(() => {
+    if (defaultSeasonNumber === null || defaultEpisodeNumber === null) return;
+
+    requestAnimationFrame(() => {
+      document
+        .getElementById(`${defaultSeasonNumber}-${defaultEpisodeNumber}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [defaultSeasonNumber, defaultEpisodeNumber]);
+
   return (
     <ContentColumn>
-      <Accordion multiple>
+      <Accordion multiple defaultValue={defaultSeasonNumber ? [defaultSeasonNumber] : undefined}>
         {sortedSeasons.map((season) => (
           <SeasonCard
             key={season.id}

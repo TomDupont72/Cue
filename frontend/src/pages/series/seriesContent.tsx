@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ErrorState } from "@/components/feedback/errorState";
@@ -20,8 +20,6 @@ export default function SeriesContent() {
 
   const seriesQuery = useSeries(seriesState.data?.id ?? 0, seriesState.data?.id !== undefined);
   const seriesImportMutation = useSeriesImportMutation();
-
-  const [view, setView] = useState<"overview" | "details">("overview");
 
   useEffect(() => {
     if (!seriesQuery.isEnabled && seriesState.data?.tmdbId) {
@@ -63,16 +61,16 @@ export default function SeriesContent() {
       <PageContainer className="gap-4 max-w-4xl">
         <div className="grid w-full grid-cols-2 gap-2">
           <Button
-            variant={view === "overview" ? "secondary" : "ghost"}
-            onClick={() => setView("overview")}
+            variant={seriesState.data.view === "overview" ? "secondary" : "ghost"}
+            onClick={() => seriesState.setView("overview")}
             className="text-lg font-bold"
           >
             {t("series:tabs.about").toUpperCase()}
           </Button>
 
           <Button
-            variant={view === "details" ? "secondary" : "ghost"}
-            onClick={() => setView("details")}
+            variant={seriesState.data.view === "details" ? "secondary" : "ghost"}
+            onClick={() => seriesState.setView("details")}
             className="text-lg font-bold"
           >
             {t("series:tabs.episodes").toUpperCase()}
@@ -80,7 +78,7 @@ export default function SeriesContent() {
         </div>
 
         <div className="flex flex-1 flex-col gap-8">
-          {view === "overview" ? (
+          {seriesState.data.view === "overview" ? (
             <SeriesOverview
               series={series}
               userSeries={userSeries}
@@ -95,6 +93,8 @@ export default function SeriesContent() {
               userEpisodes={userEpisodes}
               seasons={seasons}
               backdropPath={series.backdropPath}
+              defaultSeasonNumber={seriesState.data.seasonNumber}
+              defaultEpisodeNumber={seriesState.data.episodeNumber}
             />
           )}
         </div>

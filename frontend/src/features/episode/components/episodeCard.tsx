@@ -52,7 +52,10 @@ export default function EpisodeCard({
 
   return (
     <Dialog>
-      <div className="group relative rounded-xl transition-transform hover:-translate-y-1 hover:shadow-md">
+      <div
+        id={`${episode.seasonNumber}-${episode.episodeNumber}`}
+        className="group relative rounded-xl transition-transform hover:-translate-y-1 hover:shadow-md scroll-mt-10"
+      >
         <Card className="flex h-24 flex-row overflow-hidden p-0">
           <div className="w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
             <Picture path={path} hover />
