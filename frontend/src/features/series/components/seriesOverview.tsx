@@ -73,7 +73,7 @@ export function SeriesOverview({
         ) : null}
       </div>
 
-      <CardContent className="flex flex-col gap-4 pb-4">
+      <CardContent className="flex flex-col gap-4">
         <div className="flex flex-col gap-4">
           <Heading level={1}>
             {series.name} ({series.originalName})
@@ -91,7 +91,7 @@ export function SeriesOverview({
             ))}
           </div>
         </ScrollArea>
-        <p>{series.overview}</p>
+        {series.overview !== "" ? <Text>{series.overview}</Text> : null}
       </CardContent>
 
       <div>
