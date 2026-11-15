@@ -7,7 +7,6 @@ type UserSeriesProgress = {
   seriesId: number;
   watchedEpisodeCount: number;
   watchCount: number;
-  lastWatchedAt: Date | null;
 };
 
 export async function getUserSeriesReconciliation(userId: string, db: PrismaTx = prisma) {
@@ -15,8 +14,7 @@ export async function getUserSeriesReconciliation(userId: string, db: PrismaTx =
     SELECT
       e."seriesId" AS "seriesId",
       COUNT(*)::integer AS "watchedEpisodeCount",
-      (COUNT(*) FILTER (WHERE e."seasonNumber" <> 0))::integer AS "watchCount",
-      MAX(ue."watchedAt") AS "lastWatchedAt"
+      (COUNT(*) FILTER (WHERE e."seasonNumber" <> 0))::integer AS "watchCount"
     FROM "UserEpisode" ue
     INNER JOIN "Episode" e ON e.id = ue."episodeId"
     WHERE ue."userId" = ${userId}

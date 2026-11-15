@@ -340,7 +340,6 @@ export const userService = {
         const progress = progressBySeriesId.get(item.seriesId);
         const watchedEpisodeCount = progress?.watchedEpisodeCount ?? 0;
         const watchCount = progress?.watchCount ?? 0;
-        const lastWatchedAt = progress?.lastWatchedAt ?? null;
         const calculatedStatus = getUserSeriesStatus(
           watchedEpisodeCount,
           watchCount,
@@ -352,10 +351,14 @@ export const userService = {
             ? "DROPPED"
             : item.status === "WATCHING" &&
                 calculatedStatus === "WATCHING" &&
-                lastWatchedAt !== null &&
-                lastWatchedAt <= inactiveSince
+                item.lastWatchedAt !== null &&
+                item.lastWatchedAt <= inactiveSince
               ? "DROPPED"
               : calculatedStatus;
+        const lastWatchedAt =
+          item.status === "PAUSED" && calculatedStatus === "WATCHING"
+            ? new Date(now)
+            : item.lastWatchedAt;
 
         const hasChanged =
           item.watchedEpisodeCount !== watchedEpisodeCount ||

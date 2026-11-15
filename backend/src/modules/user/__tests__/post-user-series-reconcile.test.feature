@@ -55,12 +55,12 @@ Feature: POST /api/user/:userId/series/reconcile
         And the database should contain exactly these user series:
             | userId | seriesId                 | status   | watchCount | watchedEpisodeCount | lastWatchedAt            |
             | user-1 | @series.watchingSeries   | WATCHING | 1          | 1                   | 2026-01-01T00:00:00.000Z |
-            | user-1 | @series.pausedSeries     | WATCHING | 1          | 1                   | 2026-01-01T00:00:00.000Z |
+            | user-1 | @series.pausedSeries     | WATCHING | 1          | 1                   | 2026-02-01T00:00:00.000Z |
             | user-1 | @series.droppedSeries    | DROPPED  | 1          | 1                   | 2026-01-01T00:00:00.000Z |
             | user-1 | @series.unwatchingSeries | DROPPED  | 1          | 1                   | 2025-06-01T00:00:00.000Z |
             | user-1 | @series.plannedSeries    | PLANNED  | 0          | 0                   |                          |
             | user-1 | @series.completedSeries  | COMPLETED | 1          | 1                   | 2026-01-01T00:00:00.000Z |
-            | user-1 | @series.outdatedSeries   | WATCHING | 1          | 2                   | 2026-01-20T00:00:00.000Z |
+            | user-1 | @series.outdatedSeries   | WATCHING | 1          | 2                   | 2025-01-01T00:00:00.000Z |
 
         And the response body should exactly match:
             | updatedCount |
