@@ -7,6 +7,7 @@ import type {
   UserSeriesFacetLabelsFor,
   UserSeriesFacetSchema,
   UserSeriesFiltersFor,
+  UserSeriesFilterKey,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
 import type { FacetMetrics, FacetOptionsConfig } from "@/lib/facets/facet.types";
@@ -23,7 +24,7 @@ type UserSeries = UserSeriesGetResponse["series"][number];
 type FacetMetric = keyof FacetMetrics;
 type FacetMetricNamesFor<TMetric extends FacetMetric> = Pick<Record<FacetMetric, string>, TMetric>;
 
-type UseUserSeriesViewParams<TKey extends UserSeriesGroupBy, TMetric extends FacetMetric> = {
+type UseUserSeriesViewParams<TKey extends UserSeriesFilterKey, TMetric extends FacetMetric> = {
   series: UserSeries[];
   filters: UserSeriesFiltersFor<TKey>;
   optionConfig?: FacetOptionsConfig<Pick<UserSeriesFacetSchema, NoInfer<TKey>>>;
@@ -32,7 +33,7 @@ type UseUserSeriesViewParams<TKey extends UserSeriesGroupBy, TMetric extends Fac
 };
 
 export function useUserSeriesView<
-  TKey extends UserSeriesGroupBy,
+  TKey extends UserSeriesFilterKey,
   TMetric extends FacetMetric = never
 >({ series, filters, optionConfig, metricKeys, groupBy }: UseUserSeriesViewParams<TKey, TMetric>) {
   const { t } = useTranslation();
@@ -57,7 +58,11 @@ export function useUserSeriesView<
         optionConfig,
         otherLabel: t("common:labels.others"),
         getStatusLabel: (status) => t(`user:series.status.${status}.section`),
-        getGenreLabel: (name) => t(`genre:${GENRE_KEY_BY_NAME[name] ?? "UNKNOWN"}`)
+        getGenreLabel: (name) => t(`genre:${GENRE_KEY_BY_NAME[name] ?? "UNKNOWN"}`),
+        getRecentlyWatchedLabel: (recentlyWatched) =>
+          t(`series:dashboard.period.${recentlyWatched}`),
+        getTimeRemainingLabel: (timeRemaining) =>
+          t(`series:dashboard.timeRemaining.${timeRemaining}`)
       }),
     [series, facetKeys, optionConfig, t]
   );
@@ -91,6 +96,15 @@ export function useUserSeriesView<
     return names as UserSeriesFacetLabelsFor<TKey>;
   }, [facetKeys, t]);
 
+  const groupCategoryNames = useMemo(
+    () => ({
+      status: t("series:dashboard.categories.status"),
+      recentlyWatched: t("series:dashboard.categories.recentlyWatched"),
+      timeRemaining: t("series:dashboard.categories.timeRemaining")
+    }),
+    [t]
+  );
+
   const metricNames = useMemo(() => {
     const names: Partial<Record<FacetMetric, string>> = {};
 
@@ -121,7 +135,11 @@ export function useUserSeriesView<
             groups,
             groupBy,
             getStatusLabel: (status) => t(`user:series.status.${status}.section`),
-            getGenreLabel: (name) => t(`genre:${GENRE_KEY_BY_NAME[name] ?? "UNKNOWN"}`)
+            getGenreLabel: (name) => t(`genre:${GENRE_KEY_BY_NAME[name] ?? "UNKNOWN"}`),
+            getRecentlyWatchedLabel: (recentlyWatched) =>
+              t(`series:dashboard.period.${recentlyWatched}`),
+            getTimeRemainingLabel: (timeRemaining) =>
+              t(`series:dashboard.timeRemaining.${timeRemaining}`)
           })
         : [],
     [groups, groupBy, t]
@@ -129,6 +147,7 @@ export function useUserSeriesView<
 
   return {
     categoryNames,
+    groupCategoryNames,
     metricNames,
     filterOptions,
     displayedGroups

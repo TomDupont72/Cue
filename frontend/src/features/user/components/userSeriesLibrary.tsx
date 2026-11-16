@@ -29,7 +29,7 @@ export function UserSeriesLibrary({
 }: UserSeriesLibraryProps) {
   const { t } = useTranslation();
 
-  const { categoryNames, filterOptions, displayedGroups } = useUserSeriesView({
+  const { categoryNames, groupCategoryNames, filterOptions, displayedGroups } = useUserSeriesView({
     series,
     filters,
     groupBy
@@ -45,7 +45,8 @@ export function UserSeriesLibrary({
         <UserSeriesToolbar
           groupBy={groupBy}
           filters={filters}
-          categoryNames={categoryNames}
+          groupCategoryNames={groupCategoryNames}
+          filterCategoryNames={categoryNames}
           filterOptions={filterOptions}
           onGroupByChange={onGroupByChange}
           onFiltersChange={onFiltersChange}

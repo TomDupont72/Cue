@@ -25,11 +25,11 @@ import {
   SERIES_DATA_METRICS,
   type SeriesDataMetric,
   type UserSeriesFiltersFor,
-  type UserSeriesGroupBy
+  type UserSeriesStatsGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
 import { durationToString } from "@/features/user/utils/dates";
 
-type SeriesDataGroupBy = Exclude<UserSeriesGroupBy, "status">;
+type SeriesDataGroupBy = UserSeriesStatsGroupBy;
 
 type UserSeriesDataPieChartProps = {
   series: UserSeriesGetResponse["series"];

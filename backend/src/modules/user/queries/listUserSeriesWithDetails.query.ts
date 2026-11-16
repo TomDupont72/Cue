@@ -29,7 +29,7 @@ export async function listUserSeriesWithDetails(
         SELECT
             us."seriesId",
             COALESCE(SUM(e.runtime) FILTER (WHERE ue."episodeId" IS NOT NULL), 0) AS "watchedMinutes",
-            COALESCE(SUM(e.runtime) FILTER (WHERE ue."episodeId" IS NULL AND e."airDate" <= ${date}), 0) AS "remainingReleasedMinutes"
+            COALESCE(SUM(e.runtime) FILTER (WHERE ue."episodeId" IS NULL AND e."airDate" <= ${date} AND e."seasonNumber" <> 0), 0) AS "remainingReleasedMinutes"
         FROM "UserSeries" us
         LEFT JOIN "Episode" e
             ON e."seriesId" = us."seriesId"

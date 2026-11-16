@@ -7,6 +7,7 @@ import type {
   UserSeriesFacetMetricsFor,
   UserSeriesFacetSchema,
   UserSeriesFiltersFor,
+  UserSeriesFilterKey,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
 import type { FacetOptionValues } from "@/lib/facets/facet.types";
@@ -21,14 +22,14 @@ import {
   facetFiltersToColumnFilters
 } from "@/lib/facets/tanstackTableFacets";
 
-type UseUserSeriesTableParams<TKey extends UserSeriesGroupBy> = {
+type UseUserSeriesTableParams<TKey extends UserSeriesFilterKey> = {
   series: UserSeriesGetResponse["series"];
   filters: UserSeriesFiltersFor<TKey>;
   optionValues: Pick<FacetOptionValues<UserSeriesFacetSchema>, TKey>;
   groupBy?: UserSeriesGroupBy;
 };
 
-export function useUserSeriesTable<TKey extends UserSeriesGroupBy>({
+export function useUserSeriesTable<TKey extends UserSeriesFilterKey>({
   series,
   filters,
   optionValues,
