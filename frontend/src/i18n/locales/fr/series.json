@@ -34,7 +34,25 @@
     "categories": {
       "status": "Statut",
       "genre": "Genre",
-      "provider": "Plateforme"
+      "provider": "Plateforme",
+      "recentlyWatched": "Dernier visionnage",
+      "timeRemaining": "Temps restant"
+    },
+    "period": {
+      "day": "Moins d'un jour",
+      "week": "Moins d'une semaine",
+      "month": "Moins d'un mois",
+      "months3": "Moins de 3 mois",
+      "months6": "Moins de 6 mois",
+      "year": "Moins d'un an",
+      "other": "Plus d'un an"
+    },
+    "timeRemaining": {
+      "under2Hours": "Moins de 2 h",
+      "under6Hours": "De 2 à 6 h",
+      "under12Hours": "De 6 à 12 h",
+      "underDay": "De 12 à 24 h",
+      "overDay": "Plus d'un jour"
     }
   },
   "season_one": "{{count}} saison",

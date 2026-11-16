@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
 
 import type {
-  UserSeriesFacetSchema,
+  UserSeriesFacetLabels,
+  UserSeriesFilterKey,
+  UserSeriesFilterSchema,
   UserSeriesFilters,
   UserSeriesGroupBy
 } from "@/features/user/types/userSeriesFacets.types";
@@ -13,8 +15,9 @@ import GroupDropdownMenu from "@/components/layout/groupDropdownMenu";
 type UserSeriesToolbarProps = {
   groupBy: UserSeriesGroupBy;
   filters: UserSeriesFilters;
-  categoryNames: Record<UserSeriesGroupBy, string>;
-  filterOptions: FacetOptions<UserSeriesFacetSchema>;
+  groupCategoryNames: Record<UserSeriesGroupBy, string>;
+  filterCategoryNames: Pick<UserSeriesFacetLabels, UserSeriesFilterKey>;
+  filterOptions: FacetOptions<UserSeriesFilterSchema>;
   onGroupByChange: (groupBy: UserSeriesGroupBy) => void;
   onFiltersChange: (filters: UserSeriesFilters) => void;
 };
@@ -22,7 +25,8 @@ type UserSeriesToolbarProps = {
 export function UserSeriesToolbar({
   groupBy,
   filters,
-  categoryNames,
+  groupCategoryNames,
+  filterCategoryNames,
   filterOptions,
   onGroupByChange,
   onFiltersChange
@@ -32,13 +36,13 @@ export function UserSeriesToolbar({
   return (
     <div className="flex flex-row gap-4">
       <GroupDropdownMenu
-        categories={categoryNames}
-        category={categoryNames[groupBy]}
+        categories={groupCategoryNames}
+        category={groupCategoryNames[groupBy]}
         onCategoryChange={(value) => onGroupByChange(value as UserSeriesGroupBy)}
       />
 
-      <FilterDrawer
-        labels={categoryNames}
+      <FilterDrawer<UserSeriesFilterSchema>
+        labels={filterCategoryNames}
         options={filterOptions}
         value={filters}
         onApply={onFiltersChange}

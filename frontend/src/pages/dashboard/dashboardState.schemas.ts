@@ -4,7 +4,7 @@ import { facetSelectionSearchParamSchema } from "@/lib/facets/facet.schemas";
 
 export const dashboardStateSchema = z.object({
   groupBy: z
-    .enum(["status", "genre", "provider"])
+    .enum(["status", "recentlyWatched", "timeRemaining"])
     .nullable()
     .transform((value) => value ?? "status"),
   filters: z

@@ -11,8 +11,18 @@ import {
 } from "@tanstack/react-table";
 
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
+import type {
+  UserRecentlyWatched,
+  UserTimeRemaining
+} from "@/features/user/types/userSeriesFacets.types";
 import type { FacetGroup } from "@/lib/facets/facet.types";
 
+import {
+  RECENTLY_WATCHED_PERIODS,
+  RECENTLY_WATCHED_VALUES,
+  TIME_REMAINING_LIMITS,
+  TIME_REMAINING_VALUES
+} from "@/features/user/types/userSeriesFacets.types";
 import {
   createMultiValueGroupedRowModel,
   filterSomeValuesInSelection,
@@ -37,6 +47,33 @@ export const userSeriesTableFeatures = tableFeatures({
 
 const columnHelper = createColumnHelper<typeof userSeriesTableFeatures, UserSeries>();
 
+export function getSeriesRecentlyWatched(serie: UserSeries): UserRecentlyWatched {
+  const lastWatchedAtTimestamp = new Date(serie.lastWatchedAt ?? serie.addedAt).getTime();
+  const elapsed = Date.now() - lastWatchedAtTimestamp;
+
+  for (const value of RECENTLY_WATCHED_VALUES) {
+    if (value !== "other" && elapsed <= RECENTLY_WATCHED_PERIODS[value]) {
+      return value;
+    }
+  }
+
+  return "other";
+}
+
+export function getSeriesTimeRemaining(serie: UserSeries): UserTimeRemaining | null {
+  if (serie.remainingReleasedMinutes <= 0) {
+    return null;
+  }
+
+  for (const value of TIME_REMAINING_VALUES) {
+    if (value !== "overDay" && serie.remainingReleasedMinutes < TIME_REMAINING_LIMITS[value]) {
+      return value;
+    }
+  }
+
+  return "overDay";
+}
+
 export const userSeriesColumns = columnHelper.columns([
   columnHelper.accessor("status", {
     id: "status",
@@ -59,6 +96,28 @@ export const userSeriesColumns = columnHelper.columns([
     getUniqueValues: (serie) => [...new Set(serie.seriesProviders.map((provider) => provider.id))],
     getGroupingValue: (serie) =>
       serie.seriesProviders.map(({ id, name }) => ({ value: id, name })) satisfies FacetGroup[]
+  }),
+
+  columnHelper.accessor(getSeriesRecentlyWatched, {
+    id: "recentlyWatched",
+    filterFn: filterValueInSelection,
+    getGroupingValue: (serie) => {
+      const value = getSeriesRecentlyWatched(serie);
+      return [{ value, name: value }] satisfies FacetGroup[];
+    }
+  }),
+
+  columnHelper.accessor(getSeriesTimeRemaining, {
+    id: "timeRemaining",
+    filterFn: filterValueInSelection,
+    getUniqueValues: (serie) => {
+      const value = getSeriesTimeRemaining(serie);
+      return value ? [value] : [];
+    },
+    getGroupingValue: (serie) => {
+      const value = getSeriesTimeRemaining(serie);
+      return value ? ([{ value, name: value }] satisfies FacetGroup[]) : [];
+    }
   })
 ]);
 

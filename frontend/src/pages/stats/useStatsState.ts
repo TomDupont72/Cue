@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 
 import type { UserEpisodesActivityPeriod } from "@/features/user/constants/userEpisodesActivity";
-import type { UserSeriesGroupBy } from "@/features/user/types/userSeriesFacets.types";
+import type { UserSeriesStatsGroupBy } from "@/features/user/types/userSeriesFacets.types";
 import type { FacetMetrics } from "@/lib/facets/facet.types";
 
 import { setUrlListParam, setUrlParams } from "@/lib/utils";
@@ -25,7 +25,7 @@ export function useStatsState() {
     seriesIds: searchParams.getAll("seriesId")
   });
 
-  const setGroupBy = (groupBy: UserSeriesGroupBy) => {
+  const setGroupBy = (groupBy: UserSeriesStatsGroupBy) => {
     setSearchParams((currentSearchParams) =>
       setUrlParams(currentSearchParams, [{ name: "group", value: groupBy, defaultValue: "genre" }])
     );
@@ -50,7 +50,7 @@ export function useStatsState() {
   const setAreaPeriod = (period: UserEpisodesActivityPeriod) => {
     setSearchParams((currentSearchParams) =>
       setUrlParams(currentSearchParams, [
-        { name: "areaPeriod", value: period, defaultValue: "months3" }
+        { name: "areaPeriod", value: period, defaultValue: "all" }
       ])
     );
   };

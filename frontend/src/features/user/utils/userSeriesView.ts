@@ -1,12 +1,5 @@
 import type { UserSeriesGetResponse } from "@/features/user/types/user.types";
 import type {
-  UserSeriesFacetMetrics,
-  UserSeriesFacetMetricsFor,
-  UserSeriesFacetSchema,
-  UserSeriesGroupBy
-} from "@/features/user/types/userSeriesFacets.types";
-import type { UserSeriesGroup } from "@/features/user/utils/userSeriesTable";
-import type {
   FacetMetricsGetter,
   FacetOption,
   FacetOptionConfig,
@@ -20,6 +13,20 @@ import {
   USER_SERIES_STATUS,
   type UserSeriesStatus
 } from "@/features/user/constants/userSeriesStatus";
+import {
+  type UserRecentlyWatched,
+  type UserSeriesFacetMetrics,
+  type UserSeriesFacetMetricsFor,
+  type UserSeriesFacetSchema,
+  type UserSeriesFilterKey,
+  type UserSeriesGroupBy,
+  type UserTimeRemaining
+} from "@/features/user/types/userSeriesFacets.types";
+import {
+  RECENTLY_WATCHED_VALUES,
+  TIME_REMAINING_VALUES
+} from "@/features/user/types/userSeriesFacets.types";
+import { type UserSeriesGroup } from "@/features/user/utils/userSeriesTable";
 import { createFacetMetrics, keepFirstFilters } from "@/lib/facets/tanstackTableFacets";
 
 type UserSeries = UserSeriesGetResponse["series"][number];
@@ -35,26 +42,28 @@ export const USER_SERIES_STATUS_ORDER: readonly UserSeriesStatus[] = [
 type LabelResolvers = {
   getStatusLabel: (status: UserSeriesStatus) => string;
   getGenreLabel: (genreName: string) => string;
+  getRecentlyWatchedLabel: (recentlyWatched: UserRecentlyWatched) => string;
+  getTimeRemainingLabel: (timeRemaining: UserTimeRemaining) => string;
 };
 
-type UserSeriesFacetOptionsFor<TKey extends UserSeriesGroupBy> = Pick<
+type UserSeriesFacetOptionsFor<TKey extends UserSeriesFilterKey> = Pick<
   FacetOptions<UserSeriesFacetSchema>,
   TKey
 >;
 
-type UserSeriesFacetOptionValuesFor<TKey extends UserSeriesGroupBy> = Pick<
+type UserSeriesFacetOptionValuesFor<TKey extends UserSeriesFilterKey> = Pick<
   FacetOptionValues<UserSeriesFacetSchema>,
   TKey
 >;
 
-type BuildFilterOptionsParams<TKey extends UserSeriesGroupBy> = LabelResolvers & {
+type BuildFilterOptionsParams<TKey extends UserSeriesFilterKey> = LabelResolvers & {
   series: UserSeries[];
   facetKeys: readonly TKey[];
   optionConfig?: FacetOptionsConfig<UserSeriesFacetSchema>;
   otherLabel: string;
 };
 
-export function buildUserSeriesFilterOptionCatalog<TKey extends UserSeriesGroupBy>({
+export function buildUserSeriesFilterOptionCatalog<TKey extends UserSeriesFilterKey>({
   series,
   facetKeys,
   optionConfig,
@@ -202,7 +211,7 @@ function createFacetOptionValues<T extends FacetValue>(
   );
 }
 
-export function updateUserSeriesFilterOptionMetrics<TKey extends UserSeriesGroupBy>(
+export function updateUserSeriesFilterOptionMetrics<TKey extends UserSeriesFilterKey>(
   options: UserSeriesFacetOptionsFor<TKey>,
   facetMetrics: UserSeriesFacetMetricsFor<TKey>,
   facetKeys: readonly TKey[]
@@ -248,7 +257,8 @@ export function buildDisplayedUserSeriesGroups({
   groups,
   groupBy,
   getStatusLabel,
-  getGenreLabel
+  getRecentlyWatchedLabel,
+  getTimeRemainingLabel
 }: BuildDisplayedGroupsParams) {
   const displayedGroups = groups.map((group) => {
     let label: string;
@@ -258,12 +268,12 @@ export function buildDisplayedUserSeriesGroups({
         label = getStatusLabel(group.value as UserSeriesStatus);
         break;
 
-      case "genre":
-        label = getGenreLabel(group.name);
+      case "recentlyWatched":
+        label = getRecentlyWatchedLabel(group.value as UserRecentlyWatched);
         break;
 
-      case "provider":
-        label = group.name;
+      case "timeRemaining":
+        label = getTimeRemainingLabel(group.value as UserTimeRemaining);
         break;
     }
 
@@ -278,6 +288,22 @@ export function buildDisplayedUserSeriesGroups({
       (first, second) =>
         USER_SERIES_STATUS_ORDER.indexOf(first.value as UserSeriesStatus) -
         USER_SERIES_STATUS_ORDER.indexOf(second.value as UserSeriesStatus)
+    );
+  }
+
+  if (groupBy === "recentlyWatched") {
+    return displayedGroups.sort(
+      (first, second) =>
+        RECENTLY_WATCHED_VALUES.indexOf(first.value as UserRecentlyWatched) -
+        RECENTLY_WATCHED_VALUES.indexOf(second.value as UserRecentlyWatched)
+    );
+  }
+
+  if (groupBy === "timeRemaining") {
+    return displayedGroups.sort(
+      (first, second) =>
+        TIME_REMAINING_VALUES.indexOf(first.value as UserTimeRemaining) -
+        TIME_REMAINING_VALUES.indexOf(second.value as UserTimeRemaining)
     );
   }
 

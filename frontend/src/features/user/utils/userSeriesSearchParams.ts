@@ -29,6 +29,8 @@ export function updateUserSeriesFilters(
   setUrlSelectionParam(nextSearchParams, "statuses", filters.status);
   setUrlSelectionParam(nextSearchParams, "genres", filters.genre);
   setUrlSelectionParam(nextSearchParams, "providers", filters.provider);
+  nextSearchParams.delete("recentlyWatched");
+  nextSearchParams.delete("timeRemaining");
 
   return nextSearchParams;
 }
