@@ -6,6 +6,28 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ---
 
+## [1.4.0] · _16 novembre 2026_
+
+### Ajouts
+
+- Affichage du temps d'un épisode.
+- Ajout du groupement par dernier visionnage et temps de visionnage restant dans le dashboard.
+- Redirection vers un épisode dans la page d'une série.
+
+### Corrections
+
+- Correction de l'affichage des durées dans le graphique par genre et plateforme des statistiques.
+- Correction de l'affichage des années des séries.
+- Correction de l'affichage d'une série sans description.
+- Correction du scroll par défaut lors d'un retour en arrière dans le dashboard.
+- Correction du statut d'une série à jour avec de nouveaux épisodes.
+
+### Suppressions
+
+- Suppression du groupement par genres et plateformes dans le dashboard.
+
+---
+
 ## [1.3.0] · _11 novembre 2026_
 
 ### Ajouts
@@ -23,7 +45,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 - Amélioration de l'affichage des images.
 
-### Correction
+### Corrections
 
 - Correction de la synchronisation quotidienne des séries.
 - Correction de l'ordre dans la section des séries non commencées du dashboard.
@@ -53,7 +75,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ## [1.0.2] · _5 septembre 2026_
 
-### Correction
+### Corrections
 
 - Correction des timeout dans le job journalier.
 
@@ -61,7 +83,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 
 ## [1.0.1] · _22 août 2026_
 
-### Correction
+### Corrections
 
 - Correction de l’affichage des images des épisodes à venir.
 - Correction de l’accès à la série depuis les épisodes spéciaux.
@@ -77,7 +99,7 @@ _Les dernières fonctionnalités, améliorations et corrections apportées à Cu
 - Ajout d’une page pour consulter les nouveautées.
 - Ajout des pages légales.
 
-### Correction
+### Corrections
 
 - Correction de la sélection du prochain épisode dans **À voir**.
 
